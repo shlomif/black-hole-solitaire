@@ -127,7 +127,7 @@ sub _trace_solution
     my @moves;
     while (($prev_state, $col_idx) = @{$positions{$state}})
     {
-        push @moves, 
+        push @moves,
             $board_cards[$col_idx][vec($prev_state, 4+$col_idx, 2)-1]
             ;
     }
