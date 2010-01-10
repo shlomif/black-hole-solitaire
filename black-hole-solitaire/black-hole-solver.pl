@@ -44,17 +44,22 @@ foreach my $col_idx (0 .. $#board_values)
     vec($init_state, 4+$col_idx, 2) = scalar(@{$board_values[$col_idx]});
 }
 
-my %positions = ($init_state => { prev => undef(), });
+# The values of %positions is an array reference with the 0th key being the
+# previous state, and the 1th key being the column of the move.
+my %positions = ($init_state => []);
 
 my @queue = ($init_state);
 
 my %is_good_diff = (map { $_ => 1 } (1, $#ranks));
 
+my $verdict = 0;
+
+QUEUE_LOOP:
 while (my $state = pop(@queue))
 {
     # The foundation
     my $fnd = vec($state, 0, 8);
-    my $num_empty = 0;
+    my $no_cards = 1;
 
     # my @debug_pos;
     foreach my $col_idx (0 .. $#board_values)
@@ -63,6 +68,8 @@ while (my $state = pop(@queue))
         # push @debug_pos, $pos;
         if ($pos)
         {
+            $no_cards = 0;
+
             my $card = $board_values[$col_idx][$pos-1];
             if (exists($is_good_diff{
                 ($card - $fnd) % scalar(@ranks)
@@ -73,20 +80,45 @@ while (my $state = pop(@queue))
                 vec($next_s, 4+$col_idx, 2)--;
                 if (! exists($positions{$next_s}))
                 {
-                    $positions{$next_s} = { prev => $state, move => $col_idx };
+                    $positions{$next_s} = [$state, $col_idx];
                     push(@queue, $next_s);
                 }
             }
         }
-        else
-        {
-            $num_empty++;
-        }
     }
     # print "Checking ", join(",", @debug_pos), "\n";
-    if ($num_empty == @board_values)
+    if ($no_cards)
     {
-        print "Reached a final solution!\n";
-        exit(0);
+        print "Solved!\n";
+        _trace_solution($state);
+        $verdict = 1;
+        last QUEUE_LOOP;
     }
+}
+
+if (! $verdict)
+{
+    print "Unsolved!\n";
+}
+exit(! $verdict);
+
+sub _trace_solution
+{
+    my $final_state = shift;
+
+    my $state = $final_state;
+    my ($prev_state, $col_idx);
+
+    my @moves;
+    while (($prev_state, $col_idx) = @{$positions{$state}})
+    {
+        push @moves, 
+            $board_cards[$col_idx][vec($prev_state, 4+$col_idx, 2)-1]
+            ;
+    }
+    continue
+    {
+        $state = $prev_state;
+    }
+    print map { "$_\n" } reverse(@moves);
 }
