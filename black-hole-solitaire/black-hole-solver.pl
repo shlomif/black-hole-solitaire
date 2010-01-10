@@ -3,8 +3,6 @@
 use strict;
 use warnings;
 
-use IO::All;
-
 my ($filename) = @ARGV;
 
 my @ranks = ("A", 2 .. 9, qw(T J Q K));
@@ -18,7 +16,24 @@ sub get_rank
     return $ranks_to_n{substr(shift(), 0, 1)};
 }
 
-my @lines = io->file($filename)->chomp->getlines();
+sub _calc_lines
+{
+    if ($filename eq "-")
+    {
+        return [<STDIN>];
+    }
+    else
+    {
+        open my $in, "<", $filename
+            or die "Could not open $filename for inputting the board lines - $!";
+        my @lines = <$in>;
+        close($in);
+        return \@lines;
+    }
+}
+
+my @lines = @{_calc_lines()};
+chomp(@lines);
 
 my $found_line = shift(@lines);
 
