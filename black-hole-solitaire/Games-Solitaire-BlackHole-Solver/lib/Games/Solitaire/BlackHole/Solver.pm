@@ -5,52 +5,35 @@ use strict;
 
 =head1 NAME
 
-Games::Solitaire::BlackHole::Solver - The great new Games::Solitaire::BlackHole::Solver!
+Games::Solitaire::BlackHole::Solver - A solver for Black Hole Solitaire
 
 =head1 VERSION
 
-Version 0.01
+Version 0.0.1
 
 =cut
 
-our $VERSION = '0.01';
-
+our $VERSION = '0.0.1';
 
 =head1 SYNOPSIS
 
-Quick summary of what the module does.
+See L<Games::Solitaire::BlackHole::Solver::App> .
 
-Perhaps a little code snippet.
+=head1 DESCRIPTION
 
-    use Games::Solitaire::BlackHole::Solver;
+More information about Black Hole Solitaire can be found at:
 
-    my $foo = Games::Solitaire::BlackHole::Solver->new();
-    ...
+=over 4
 
-=head1 EXPORT
+=item * L<http://en.wikipedia.org/wiki/Black_Hole_%28solitaire%29>
 
-A list of functions that can be exported.  You can delete this section
-if you don't export anything, such as for a purely object-oriented module.
+=item * L<http://pysolfc.sourceforge.net/doc/rules/blackhole.html>
 
-=head1 FUNCTIONS
-
-=head2 function1
-
-=cut
-
-sub function1 {
-}
-
-=head2 function2
-
-=cut
-
-sub function2 {
-}
+=back
 
 =head1 AUTHOR
 
-Shlomi Fish, C<< <shlomif at iglu.org.il> >>
+Shlomi Fish, L<http://www.shlomifish.org/> .
 
 =head1 BUGS
 
@@ -90,7 +73,6 @@ L<http://search.cpan.org/dist/Games-Solitaire-BlackHole-Solver/>
 
 =back
 
-
 =head1 ACKNOWLEDGEMENTS
 
 
@@ -121,7 +103,6 @@ HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
-
 
 =cut
 
