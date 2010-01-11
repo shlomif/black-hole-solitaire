@@ -1,105 +1,157 @@
 package Games::Solitaire::BlackHole::Solver::App;
 
-use warnings;
 use strict;
+use warnings;
 
-=head1 NAME
-
-Games::Solitaire::BlackHole::Solver::App - The great new Games::Solitaire::BlackHole::Solver::App!
-
-=head1 VERSION
-
-Version 0.01
-
-=cut
-
-our $VERSION = '0.01';
-
-
-=head1 SYNOPSIS
-
-Quick summary of what the module does.
-
-Perhaps a little code snippet.
-
-    use Games::Solitaire::BlackHole::Solver::App;
-
-    my $foo = Games::Solitaire::BlackHole::Solver::App->new();
-    ...
-
-=head1 EXPORT
-
-A list of functions that can be exported.  You can delete this section
-if you don't export anything, such as for a purely object-oriented module.
-
-=head1 FUNCTIONS
-
-=head2 function1
-
-=cut
-
-sub function1 {
+sub new
+{
+    my $class = shift;
+    return bless {}, $class;
 }
 
-=head2 function2
+my @ranks = ("A", 2 .. 9, qw(T J Q K));
+my %ranks_to_n = (map { $ranks[$_] => $_ } 0 .. $#ranks);
 
-=cut
+my $card_re_str = '[' . join("", @ranks) . '][HSCD]';
+my $card_re = qr{$card_re_str};
 
-sub function2 {
+sub _get_rank
+{
+    return $ranks_to_n{substr(shift(), 0, 1)};
 }
 
-=head1 AUTHOR
+sub _calc_lines
+{
+    my $filename = shift;
 
-Shlomi Fish, C<< <shlomif at iglu.org.il> >>
+    if ($filename eq "-")
+    {
+        return [<STDIN>];
+    }
+    else
+    {
+        open my $in, "<", $filename
+            or die "Could not open $filename for inputting the board lines - $!";
+        my @lines = <$in>;
+        close($in);
+        return \@lines;
+    }
+}
 
-=head1 BUGS
+sub run
+{
+    my ($filename) = @ARGV;
 
-Please report any bugs or feature requests to C<bug-games-solitaire-blackhole-solver at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Games-Solitaire-BlackHole-Solver>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
+    my @lines = @{_calc_lines($filename)};
+    chomp(@lines);
 
+    my $found_line = shift(@lines);
 
+    my $init_foundation;
+    if (my ($card) = $found_line =~ m{\AFoundations: ($card_re)\z})
+    {
+        $init_foundation = _get_rank($card);
+    }
+    else
+    {
+        die "Could not match first foundation line!";
+    }
 
+    my @board_cards = map { [split/\s+/, $_]} @lines;
+    my @board_values = map { [map { _get_rank($_) } @$_ ] } @board_cards;
 
-=head1 SUPPORT
+    my $init_state = "";
 
-You can find documentation for this module with the perldoc command.
+    vec($init_state, 0, 8) = $init_foundation;
 
-    perldoc Games::Solitaire::BlackHole::Solver::App
+    foreach my $col_idx (0 .. $#board_values)
+    {
+        vec($init_state, 4+$col_idx, 2) = scalar(@{$board_values[$col_idx]});
+    }
 
+    # The values of %positions is an array reference with the 0th key being the
+    # previous state, and the 1th key being the column of the move.
+    my %positions = ($init_state => []);
 
-You can also look for information at:
+    my @queue = ($init_state);
 
-=over 4
+    my %is_good_diff = (map { $_ => 1 } (1, $#ranks));
 
-=item * RT: CPAN's request tracker
+    my $verdict = 0;
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Games-Solitaire-BlackHole-Solver>
+    my $trace_solution = sub {
+        my $final_state = shift;
 
-=item * AnnoCPAN: Annotated CPAN documentation
+        my $state = $final_state;
+        my ($prev_state, $col_idx);
 
-L<http://annocpan.org/dist/Games-Solitaire-BlackHole-Solver>
+        my @moves;
+        while (($prev_state, $col_idx) = @{$positions{$state}})
+        {
+            push @moves,
+                $board_cards[$col_idx][vec($prev_state, 4+$col_idx, 2)-1]
+                ;
+        }
+        continue
+        {
+            $state = $prev_state;
+        }
+        print map { "$_\n" } reverse(@moves);
+    };
 
-=item * CPAN Ratings
+    QUEUE_LOOP:
+    while (my $state = pop(@queue))
+    {
+        # The foundation
+        my $fnd = vec($state, 0, 8);
+        my $no_cards = 1;
 
-L<http://cpanratings.perl.org/d/Games-Solitaire-BlackHole-Solver>
+        # my @debug_pos;
+        foreach my $col_idx (0 .. $#board_values)
+        {
+            my $pos = vec($state, 4+$col_idx, 2);
+            # push @debug_pos, $pos;
+            if ($pos)
+            {
+                $no_cards = 0;
 
-=item * Search CPAN
+                my $card = $board_values[$col_idx][$pos-1];
+                if (exists($is_good_diff{
+                    ($card - $fnd) % scalar(@ranks)
+                }))
+                {
+                    my $next_s = $state;
+                    vec($next_s, 0, 8) = $card;
+                    vec($next_s, 4+$col_idx, 2)--;
+                    if (! exists($positions{$next_s}))
+                    {
+                        $positions{$next_s} = [$state, $col_idx];
+                        push(@queue, $next_s);
+                    }
+                }
+            }
+        }
+        # print "Checking ", join(",", @debug_pos), "\n";
+        if ($no_cards)
+        {
+            print "Solved!\n";
+            $trace_solution->($state);
+            $verdict = 1;
+            last QUEUE_LOOP;
+        }
+    }
 
-L<http://search.cpan.org/dist/Games-Solitaire-BlackHole-Solver/>
+    if (! $verdict)
+    {
+        print "Unsolved!\n";
+    }
+    exit(! $verdict);
 
-=back
+}
 
+=head1 COPYRIGHT AND LICENSE
 
-=head1 ACKNOWLEDGEMENTS
-
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright 2010 Shlomi Fish.
-
-This program is distributed under the MIT (X11) License:
-L<http://www.opensource.org/licenses/mit-license.php>
+Copyright (c) 2010 Shlomi Fish
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation
@@ -122,7 +174,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 
-
 =cut
 
-1; # End of Games::Solitaire::BlackHole::Solver::App
+1;
+
