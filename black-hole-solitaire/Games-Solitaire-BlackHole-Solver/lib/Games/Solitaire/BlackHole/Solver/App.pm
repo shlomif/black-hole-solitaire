@@ -3,6 +3,92 @@ package Games::Solitaire::BlackHole::Solver::App;
 use strict;
 use warnings;
 
+=head1 NAME
+
+Games::Solitaire::BlackHole::Solver::App - a command line application
+implemented as a class to solve the Black Hole solitaire.
+
+=head1 VERSION
+
+Version 0.0.1
+
+=cut
+
+our $VERSION = '0.0.1';
+
+=head1 SYNOPSIS
+
+    use Games::Solitaire::BlackHole::Solver::App;
+
+    my $app = Games::Solitaire::BlackHole::Solver::App->new;
+
+    $app->run();
+
+And then from the command-line:
+
+    $ black-hole-solve myboard.txt
+
+=head1 DESCRIPTION
+
+A script that encapsulates this application accepts a filename pointing
+at the file containing the board or C<"-"> for specifying the standard input.
+
+A board looks like this and can be generated for PySol using the 
+make_pysol_board.py in the contrib/ .
+
+    Foundations: AS
+    KD JH JS
+    8H 4C 7D
+    7H TD 4H
+    JD 9S 5S
+    AH 3S 6H
+    9C 9D 8S
+    7S 2H 6S
+    AC JC QH
+    QD 4S TS
+    6C QS QC
+    8D 3D KH
+    5H 5C 8C
+    4D KC TC
+    6D 3C 3H
+    2C KS TH
+    AD 5D 7C
+    9H 2S 2D
+
+Other flags:
+
+=over 4
+
+=item * --version
+
+=item * --help
+
+=item * --man
+
+=back
+
+More information about Black Hole Solitaire can be found at:
+
+=over 4
+
+=item * L<http://en.wikipedia.org/wiki/Black_Hole_%28solitaire%29>
+
+=item * L<http://pysolfc.sourceforge.net/doc/rules/blackhole.html>
+
+=back
+
+=head1 METHODS
+
+=head2 $self->new()
+
+Instantiates an object.
+
+=head2 $self->run()
+
+Runs the application.
+
+=cut
+
 sub new
 {
     my $class = shift;
@@ -148,6 +234,18 @@ sub run
     exit(! $verdict);
 
 }
+
+
+=head1 AUTHOR
+
+Shlomi Fish, L<http://www.shlomifish.org/>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to
+C<games-solitaire-blackhole-solver rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Games-Solitaire-BlackHole-Solver>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
 
 =head1 COPYRIGHT AND LICENSE
 
