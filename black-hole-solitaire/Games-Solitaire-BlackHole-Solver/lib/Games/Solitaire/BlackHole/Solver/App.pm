@@ -3,6 +3,8 @@ package Games::Solitaire::BlackHole::Solver::App;
 use strict;
 use warnings;
 
+use Getopt::Long;
+
 =head1 NAME
 
 Games::Solitaire::BlackHole::Solver::App - a command line application
@@ -65,6 +67,10 @@ Other flags:
 
 =item * --man
 
+=item * -o/--output solution_file.txt
+
+Output to a solution file.
+
 =back
 
 More information about Black Hole Solitaire can be found at:
@@ -126,7 +132,27 @@ sub _calc_lines
 
 sub run
 {
-    my ($filename) = @ARGV;
+    my $output_fn;
+
+    if (!GetOptions(
+        "o|output=s" => \$output_fn,
+    ))
+    {
+        die "Invalid command line options given";
+    }
+    my $filename = shift(@ARGV);
+
+    my $output_handle;
+
+    if (defined($output_fn))
+    {
+        open ($output_handle, ">", $output_fn)
+            or die "Could not open '$output_fn' for writing";
+    }
+    else
+    {
+        open ($output_handle, ">&STDOUT");
+    }
 
     my @lines = @{_calc_lines($filename)};
     chomp(@lines);
@@ -182,7 +208,7 @@ sub run
         {
             $state = $prev_state;
         }
-        print map { "$_\n" } reverse(@moves);
+        print {$output_handle} map { "$_\n" } reverse(@moves);
     };
 
     QUEUE_LOOP:
@@ -220,7 +246,7 @@ sub run
         # print "Checking ", join(",", @debug_pos), "\n";
         if ($no_cards)
         {
-            print "Solved!\n";
+            print {$output_handle} "Solved!\n";
             $trace_solution->($state);
             $verdict = 1;
             last QUEUE_LOOP;
@@ -229,10 +255,15 @@ sub run
 
     if (! $verdict)
     {
-        print "Unsolved!\n";
+        print {$output_handle} "Unsolved!\n";
     }
-    exit(! $verdict);
 
+    if (defined($output_fn))
+    {
+        close($output_handle);
+    }
+
+    exit(! $verdict);
 }
 
 
