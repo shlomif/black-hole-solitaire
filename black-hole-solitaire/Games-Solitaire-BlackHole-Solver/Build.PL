@@ -14,6 +14,7 @@ my $builder = Test::Run::Builder->new(
         'Test::More' => 0,
     },
     add_to_cleanup      => [ 'Games-Solitaire-BlackHole-Solver-*' ],
+    script_files => ["scripts/black-hole-solve",],
     create_makefile_pl => 'traditional',
 );
 

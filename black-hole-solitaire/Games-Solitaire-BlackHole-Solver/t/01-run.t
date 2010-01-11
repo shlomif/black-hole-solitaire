@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 2;
+use Test::More tests => 4;
 
 use File::Spec;
 
@@ -10,30 +10,7 @@ sub _filename
     return File::Spec->catfile(File::Spec->curdir(), "t", "data", shift());
 }
 
-{
-    my $sol_fn = _filename("26464608654870335080.bh.sol.txt");
-    # TEST
-    ok (!system($^X, "-Mblib", "-MGames::Solitaire::BlackHole::Solver::App",
-            "-e", "Games::Solitaire::BlackHole::Solver::App->new()->run()",
-            "--",
-            "-o", $sol_fn,
-            _filename("26464608654870335080.bh.board.txt")
-        )
-    );
-
-    my $contents;
-    {
-        local $/;
-        open my $in, "<", $sol_fn,
-            or die "Could not open '$sol_fn' for reading.";
-        $contents = <$in>;
-        close($in);
-    }
-
-    # TEST
-    is (
-        $contents,
-        <<'EOF',
+my $solution1 = <<'EOF';
 Solved!
 2D
 3H
@@ -87,6 +64,59 @@ TD
 5H
 4D
 EOF
+
+{
+    my $sol_fn = _filename("26464608654870335080.bh.sol.txt");
+    # TEST
+    ok (!system($^X, "-Mblib", "-MGames::Solitaire::BlackHole::Solver::App",
+            "-e", "Games::Solitaire::BlackHole::Solver::App->new()->run()",
+            "--",
+            "-o", $sol_fn,
+            _filename("26464608654870335080.bh.board.txt")
+        )
+    );
+
+    my $contents;
+    {
+        local $/;
+        open my $in, "<", $sol_fn,
+            or die "Could not open '$sol_fn' for reading.";
+        $contents = <$in>;
+        close($in);
+    }
+
+    # TEST
+    is (
+        $contents,
+        $solution1,
+        "Testing for correct solution.",
+    );
+
+    unlink($sol_fn);
+}
+
+{
+    my $sol_fn = _filename("26464608654870335080.bh.sol.txt");
+    # TEST
+    ok (!system($^X, "-Mblib", File::Spec->catfile(File::Spec->curdir(), "scripts", "black-hole-solve"),
+            "-o", $sol_fn,
+            _filename("26464608654870335080.bh.board.txt")
+        )
+    );
+
+    my $contents;
+    {
+        local $/;
+        open my $in, "<", $sol_fn,
+            or die "Could not open '$sol_fn' for reading.";
+        $contents = <$in>;
+        close($in);
+    }
+
+    # TEST
+    is (
+        $contents,
+        $solution1,
         "Testing for correct solution.",
     );
 
