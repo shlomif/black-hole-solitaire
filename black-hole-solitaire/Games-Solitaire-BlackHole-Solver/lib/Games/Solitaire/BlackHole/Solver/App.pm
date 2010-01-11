@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use Getopt::Long;
+use Pod::Usage;
 
 =head1 NAME
 
@@ -134,12 +135,24 @@ sub run
 {
     my $output_fn;
 
-    if (!GetOptions(
+    my ($help, $man, $version);
+
+    GetOptions(
         "o|output=s" => \$output_fn,
-    ))
+        'help|h|?' => \$help,
+        'man' => \$man,
+        'version' => \$version,
+    ) or pod2usage(2);
+
+    pod2usage(1) if $help;
+    pod2usage(-exitstatus => 0, -verbose => 2) if $man;
+
+    if ($version)
     {
-        die "Invalid command line options given";
+        print "black-hole-solve version $VERSION\n";
+        exit(0);
     }
+
     my $filename = shift(@ARGV);
 
     my $output_handle;
