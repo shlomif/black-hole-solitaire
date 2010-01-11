@@ -1,0 +1,9 @@
+Build.PL
+Changes
+MANIFEST
+README
+lib/Games/Solitaire/BlackHole/Solver.pm
+lib/Games/Solitaire/BlackHole/Solver/App.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
