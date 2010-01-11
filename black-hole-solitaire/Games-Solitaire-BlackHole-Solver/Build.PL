@@ -1,8 +1,11 @@
 use strict;
 use warnings;
-use Module::Build;
 
-my $builder = Module::Build->new(
+use lib "./inc";
+
+use Test::Run::Builder;
+
+my $builder = Test::Run::Builder->new(
     module_name         => 'Games::Solitaire::BlackHole::Solver',
     license             => 'mit',
     dist_author         => q{Shlomi Fish <shlomif@iglu.org.il>},
