@@ -22,6 +22,7 @@ typedef struct
 typedef struct
 {
     char data[NUM_DATA_CHARS];
+    bhs_rank_t foundations;
 } bhs_state_key_t;
 
 typedef char bhs_col_idx_t;
