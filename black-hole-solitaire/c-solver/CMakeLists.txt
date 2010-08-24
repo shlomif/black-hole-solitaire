@@ -1,5 +1,65 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
+INCLUDE( "${CMAKE_CURRENT_SOURCE_DIR}/Common.cmake" )
+
+LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
+# This is the equivalent to perform a "make dist"/"make distdir" etc.
+SET(CPACK_PACKAGE_NAME "black_hole_solver")
+SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Black Hole Solver")
+SET(CPACK_PACKAGE_VENDOR "Shlomi Fish")
+SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/README.txt")
+SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/COPYING.txt")
+
+# Process and extract the version number.
+FILE( READ "ver.txt" VERSION)
+
+CHOMP (VERSION)
+
+STRING (REGEX MATCHALL "([0-9]+)" VERSION_DIGITS "${VERSION}")
+
+LIST(GET VERSION_DIGITS 0 CPACK_PACKAGE_VERSION_MAJOR)
+LIST(GET VERSION_DIGITS 1 CPACK_PACKAGE_VERSION_MINOR)
+LIST(GET VERSION_DIGITS 2 CPACK_PACKAGE_VERSION_PATCH)
+
+SET(CPACK_PACKAGE_INSTALL_DIRECTORY "${CPACK_PACKAGE_DESCRIPTION_SUMMARY} ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
+
+SET(CPACK_SOURCE_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
+
+SET (base_with_ver "black_hole_solver-[0-9]+\\\\.[0-9]+\\\\.[0-9]+")
+SET(CPACK_SOURCE_IGNORE_FILES
+    "/_CPack_Packages/"
+    "/CMakeFiles/"
+    "/.deps/"
+    "${base_with_ver}(-Source|-Linux)/"
+    "${base_with_ver}.tar\\\\.(gz|bz2|Z|lzma|xz)$"
+    "\\\\.o$"
+    "~$"
+    "/board_gen/(pi-make-microsoft-freecell-board|make-microsoft-freecell-board|make-gnome-freecell-board|make-aisleriot-freecell-board)$"
+    "/(fc-solve|freecell-solver-range-parallel-solve|freecell-solver-fc-pro-range-solve|freecell-solver-multi-thread-solve|freecell-solver-fork-solve|measure-depth-dep-tests-order-perf)$"
+    "/lib(fcs|freecell-solver)\\\\.(a|la)$"
+    "\\\\.so(\\\\.[0-9]+)*$"
+    "/\\\\.svn/"
+    "\\\\.(pdf|fo)$"
+    "/t/t/.*\\\\.exe$"
+    "/t/Presets"
+    "/CMakeCache\\\\.txt$"
+    "/Makefile$"
+    "/CTestTestfile\\\\.cmake$"
+    "/cmake_install\\\\.cmake$"
+    "/CPackConfig\\\\.cmake$"
+    "/CPackSourceConfig\\\\.cmake$"
+    "/tags$"
+    "/freecell-solver-config$"
+    "/libfreecell-solver\\\\.pc$"
+    "/([0-9]+)\\\\.board$"
+    "/config\\\\.h$"
+    "/install_manifest\\\\.txt$"
+    "/t/card-test-(parse|render)\\\\.c$"
+    "/Testing/"
+    "ids-whitelist\\\\.txt"
+)
+
 SET (LIB_BASE "black_hole_solver")
 
 SET (BLACK_HOLE_SOLVER_MODULES "${LIB_BASE}.c")
