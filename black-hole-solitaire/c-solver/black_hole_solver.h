@@ -33,6 +33,21 @@
 extern "C" {
 #endif
 
+#ifdef _MSC_VER
+  #ifdef BUILDING_DLL
+    #define DLLEXPORT __declspec(dllexport)
+  #else
+    #define DLLEXPORT __declspec(dllimport)
+  #endif
+  #define DLLLOCAL
+#elif defined(__GNUC__)
+    #define DLLEXPORT __attribute__ ((visibility("default")))
+    #define DLLLOCAL __attribute__ ((visibility("hidden")))
+#else
+    #define DLLEXPORT
+    #define DLLLOCAL
+#endif
+
 enum
 {
     BLACK_HOLE_SOLVER__SUCCESS = 0,
@@ -51,21 +66,21 @@ typedef struct
     char nothing;
 } black_hole_solver_instance_t;
 
-extern int black_hole_solver_create(
+DLLEXPORT extern int black_hole_solver_create(
     black_hole_solver_instance_t * * ret_instance
 );
 
-extern int black_hole_solver_read_board(
+DLLEXPORT extern int black_hole_solver_read_board(
     black_hole_solver_instance_t * ret_instance,
     const char * board_string,
     int * error_line_number
 );
 
-extern int black_hole_solver_run(
+DLLEXPORT extern int black_hole_solver_run(
     black_hole_solver_instance_t * ret_instance
 );
 
-extern int black_hole_solver_free(
+DLLEXPORT extern int black_hole_solver_free(
     black_hole_solver_instance_t * instance_proto
 );
 

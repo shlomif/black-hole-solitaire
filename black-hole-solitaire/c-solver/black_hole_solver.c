@@ -56,7 +56,7 @@ typedef struct
 
 } bhs_solver_t;
 
-int black_hole_solver_create(
+int DLLEXPORT black_hole_solver_create(
     black_hole_solver_instance_t * * ret_instance
 )
 {
@@ -165,7 +165,7 @@ static int parse_card(
 }
 
 
-extern int black_hole_solver_read_board(
+extern int DLLEXPORT black_hole_solver_read_board(
     black_hole_solver_instance_t * instance_proto,
     const char * board_string,
     int * error_line_number
@@ -281,7 +281,7 @@ static GCC_INLINE ub4 perl_hash_function(
     return hash_value_int;
 }
 
-extern int black_hole_solver_run(
+extern int DLLEXPORT black_hole_solver_run(
     black_hole_solver_instance_t * ret_instance
 )
 {
@@ -401,7 +401,7 @@ extern int black_hole_solver_run(
     return BLACK_HOLE_SOLVER__NOT_SOLVABLE;
 }
 
-extern int black_hole_solver_free(
+extern int DLLEXPORT black_hole_solver_free(
     black_hole_solver_instance_t * instance_proto
 )
 {
