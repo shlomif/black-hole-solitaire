@@ -28,6 +28,11 @@
 #ifndef BLACK_HOLE_SOLVER__H
 #define BLACK_HOLE_SOLVER__H
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 enum
 {
     BLACK_HOLE_SOLVER__SUCCESS = 0,
@@ -63,5 +68,9 @@ extern int black_hole_solver_run(
 extern int black_hole_solver_free(
     black_hole_solver_instance_t * instance_proto
 );
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* BLACK_HOLE_SOLVER__H */
