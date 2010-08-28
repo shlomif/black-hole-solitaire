@@ -367,9 +367,9 @@ extern int DLLEXPORT black_hole_solver_run(
                 *next_state = *state;
                 next_state->key.foundations = card;
                 next_state->key.data[(col_idx>>2)] &= 
-                    (~(0x3 << (col_idx&0x3)));
+                    (~(0x3 << ((col_idx&0x3)<<1)));
                 next_state->key.data[(col_idx>>2)] |=
-                    ((pos-1) << (col_idx&0x3));
+                    ((pos-1) << ((col_idx&0x3)<<1));
                 next_state->value.parent_state = state->key;
                 next_state->value.col_idx = col_idx;
 
