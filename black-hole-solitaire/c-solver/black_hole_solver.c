@@ -44,11 +44,15 @@ typedef struct
 
     bhs_rank_t initial_foundation;
 
-    fc_solve_hash_t hash;
+    fcs_compact_allocator_t allocator;
+    fc_solve_hash_t positions;
 
     bhs_card_string_t initial_foundation_string;
     bhs_card_string_t initial_board_card_strings[MAX_NUM_COLUMNS][MAX_NUM_CARDS_IN_COL];
     int initial_lens[MAX_NUM_COLUMNS];
+
+    bhs_state_key_value_pair_t * init_state;
+    bhs_state_key_value_pair_t * final_state;
 
 } bhs_solver_t;
 
@@ -67,11 +71,14 @@ int black_hole_solver_create(
     }
     else
     {
-        fc_solve_hash_init(&(ret->hash), 256);
+        fc_solve_compact_allocator_init(&(ret->allocator));
+        fc_solve_hash_init(&(ret->positions), 256);
         *ret_instance = (black_hole_solver_instance_t *)ret;
         return BLACK_HOLE_SOLVER__SUCCESS;
     }
 }
+
+#define MAX_RANK 12
 
 static int parse_card(
     const char * * s,
@@ -253,22 +260,53 @@ extern int black_hole_solver_read_board(
     return BLACK_HOLE_SOLVER__SUCCESS;
 }
 
+
+typedef  unsigned long  int  ub4;   /* unsigned 4-byte quantities */
+typedef  unsigned       char ub1;
+
+static GCC_INLINE ub4 perl_hash_function(
+    register ub1 *s_ptr,        /* the key */
+    register ub4  length        /* the length of the key */
+    )
+{
+    register ub4  hash_value_int = 0;
+    register ub1 * s_end = s_ptr+length;
+
+    while (s_ptr < s_end)
+    {
+        hash_value_int += (hash_value_int << 5) + *(s_ptr++);
+    }
+    hash_value_int += (hash_value_int>>5);
+
+    return hash_value_int;
+}
+
 extern int black_hole_solver_run(
     black_hole_solver_instance_t * ret_instance
 )
 {
     bhs_solver_t * solver;
-    bhs_state_key_t init_state;
+    bhs_state_key_value_pair_t * init_state;
+    void * init_state_existing;
+    bhs_state_key_value_pair_t * state, * next_state;
     int four_cols_idx, four_cols_offset;
+    bhs_state_key_value_pair_t * * queue;
+    int queue_len, queue_max_len;
+    int foundations;
+    fcs_bool_t no_cards;
+    int col_idx, pos;
+    bhs_rank_t card;
 
     solver = (bhs_solver_t *)ret_instance;
 
-    memset(&init_state, '\0', sizeof(init_state));
-    init_state.foundations = solver->initial_foundation;
+    solver->init_state = init_state = 
+        fcs_compact_alloc_ptr(&(solver->allocator), sizeof(*init_state));
+    memset(init_state, '\0', sizeof(*init_state));
+    init_state->key.foundations = solver->initial_foundation;
 
     for (four_cols_idx = 0, four_cols_offset = 0; four_cols_idx < 4; four_cols_idx++, four_cols_offset += 4)
     {
-        init_state.data[four_cols_idx] =
+        init_state->key.data[four_cols_idx] =
             (unsigned char)
             (
               (solver->initial_lens[four_cols_offset]) 
@@ -279,8 +317,86 @@ extern int black_hole_solver_run(
             ;
     }
     /* Only one left. */
-    init_state.data[four_cols_idx] = (unsigned char)(solver->initial_lens[four_cols_offset]);
+    init_state->key.data[four_cols_idx] = (unsigned char)(solver->initial_lens[four_cols_offset]);
 
+    fc_solve_hash_insert(
+        &(solver->positions),
+        init_state,
+        &init_state_existing,
+        perl_hash_function(((ub1 *)&(init_state->key)), sizeof(init_state->key))
+    );
+
+    queue_max_len = 64;
+
+    queue = malloc(sizeof(queue[0]) * queue_max_len);
+
+    queue_len = 0;
+    queue[queue_len++] = init_state;
+
+    while (queue_len > 0)
+    {
+        state = queue[--queue_len];
+
+        foundations = state->key.foundations;
+
+        no_cards = TRUE;
+
+        for (col_idx = 0 ; col_idx < MAX_NUM_COLUMNS ; col_idx++)
+        {
+            if ((pos = (state->key.data[(col_idx >> 2)] >> (col_idx&(4-1)))))
+            {
+                no_cards = FALSE;
+            }
+
+            card = solver->board_values[col_idx][pos-1];
+            
+            if ((card == ((foundations+1)%MAX_RANK))
+                    ||
+                (card == ((foundations-1)%MAX_RANK))
+               )
+            {
+                next_state = fcs_compact_alloc_ptr(
+                        &(solver->allocator), 
+                        sizeof(*next_state)
+                        );
+                *next_state = *state;
+                next_state->key.foundations = card;
+                next_state->key.data[(col_idx>>2)] &= 
+                    (~(0x3 << (col_idx&0x3)));
+                next_state->key.data[(col_idx>>2)] |=
+                    ((pos-1) << (col_idx&0x3));
+                next_state->value.parent_state = state->key;
+                next_state->value.col_idx = col_idx;
+
+                if (! fc_solve_hash_insert(
+                    &(solver->positions),
+                    next_state,
+                    &init_state_existing,
+                    perl_hash_function(((ub1 *)&(next_state->key)), 
+                        sizeof(next_state->key))
+                    )
+                )
+                {
+                    /* It's a new state - put it in the queue. */
+                    queue[queue_len++] = next_state;
+                    if (queue_len == queue_max_len)
+                    {
+                        queue = realloc(queue, sizeof(queue[0]) * (queue_max_len += 64));
+                    }
+                }
+                else
+                {
+                    fcs_compact_alloc_release(&(solver->allocator));
+                }
+            }
+        }
+        if (no_cards)
+        {
+            solver->final_state = state;
+
+            return BLACK_HOLE_SOLVER__SUCCESS;
+        }
+    }
 
     return BLACK_HOLE_SOLVER__NOT_SOLVABLE;
 }

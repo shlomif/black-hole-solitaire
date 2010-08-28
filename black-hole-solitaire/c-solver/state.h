@@ -28,4 +28,10 @@ typedef struct
     bhs_col_idx_t col_idx;
 } bhs_state_value_t;
 
+typedef struct
+{
+    bhs_state_key_t key;
+    bhs_state_value_t value;
+} bhs_state_key_value_pair_t;
+
 #endif /*  BHS_STATE_H */
