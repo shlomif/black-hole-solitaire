@@ -355,10 +355,7 @@ extern int DLLEXPORT black_hole_solver_run(
 
             card = solver->board_values[col_idx][pos-1];
             
-            if ((card == ((foundations+1)%MAX_RANK))
-                    ||
-                (card == ((foundations-1)%MAX_RANK))
-               )
+            if (abs(card-foundations)%(MAX_RANK-1) == 1)
             {
                 next_state = fcs_compact_alloc_ptr(
                         &(solver->allocator), 
