@@ -343,7 +343,12 @@ extern int DLLEXPORT black_hole_solver_run(
 
         for (col_idx = 0 ; col_idx < MAX_NUM_COLUMNS ; col_idx++)
         {
-            if ((pos = (state->key.data[(col_idx >> 2)] >> (col_idx&(4-1)))))
+            if ((pos = (
+                (state->key.data[(col_idx >> 2)] >> ((col_idx&(4-1))<<1))
+                    &
+                    (4-1)
+                )
+            ))
             {
                 no_cards = FALSE;
             }

@@ -27,6 +27,7 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 
 #include "black_hole_solver.h"
@@ -39,6 +40,8 @@ int main(int argc, char * argv[])
     char board[MAX_LEN_BOARD_STRING];
     int error_line_num;
     int ret;
+    char * filename = NULL;
+    FILE * fh;
 
     if (black_hole_solver_create(&solver))
     {
@@ -46,7 +49,29 @@ int main(int argc, char * argv[])
         exit(-1);
     }
 
-    fread(board, sizeof(board[0]), MAX_LEN_BOARD_STRING, stdin);
+    if (argc > 1)
+    {
+        if (strcmp(argv[1], "-"))
+        {
+            filename = argv[1];
+        }
+    }
+
+    if (filename)
+    {
+        fh = fopen(filename, "rt");
+    }
+    else
+    {
+        fh = stdin;
+    }
+
+    fread(board, sizeof(board[0]), MAX_LEN_BOARD_STRING, fh);
+
+    if (filename)
+    {
+        fclose(fh);
+    }
 
     board[MAX_LEN_BOARD_STRING-1] = '\0';
 
