@@ -400,3 +400,19 @@ extern int black_hole_solver_run(
 
     return BLACK_HOLE_SOLVER__NOT_SOLVABLE;
 }
+
+extern int black_hole_solver_free(
+    black_hole_solver_instance_t * instance_proto
+)
+{
+    bhs_solver_t * solver;
+
+    solver = (bhs_solver_t *)instance_proto;
+
+    fc_solve_compact_allocator_finish(&(solver->allocator));
+    fc_solve_hash_free(&(solver->positions));
+
+    free(solver);
+
+    return BLACK_HOLE_SOLVER__SUCCESS;
+}

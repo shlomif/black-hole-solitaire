@@ -60,4 +60,8 @@ extern int black_hole_solver_run(
     black_hole_solver_instance_t * ret_instance
 );
 
+extern int black_hole_solver_free(
+    black_hole_solver_instance_t * instance_proto
+);
+
 #endif /* BLACK_HOLE_SOLVER__H */
