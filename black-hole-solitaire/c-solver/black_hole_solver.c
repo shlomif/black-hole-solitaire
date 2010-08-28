@@ -27,6 +27,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "black_hole_solver.h"
 #include "state.h"
@@ -351,44 +352,48 @@ extern int DLLEXPORT black_hole_solver_run(
             ))
             {
                 no_cards = FALSE;
-            }
 
-            card = solver->board_values[col_idx][pos-1];
-            
-            if (abs(card-foundations)%(MAX_RANK-1) == 1)
-            {
-                next_state = fcs_compact_alloc_ptr(
-                        &(solver->allocator), 
-                        sizeof(*next_state)
-                        );
-                *next_state = *state;
-                next_state->key.foundations = card;
-                next_state->key.data[(col_idx>>2)] &= 
-                    (~(0x3 << ((col_idx&0x3)<<1)));
-                next_state->key.data[(col_idx>>2)] |=
-                    ((pos-1) << ((col_idx&0x3)<<1));
-                next_state->value.parent_state = state->key;
-                next_state->value.col_idx = col_idx;
+                card = solver->board_values[col_idx][pos-1];
+                
+                if (abs(card-foundations)%(MAX_RANK-1) == 1)
+                {
+                    next_state = fcs_compact_alloc_ptr(
+                            &(solver->allocator), 
+                            sizeof(*next_state)
+                            );
+                    *next_state = *state;
+                    next_state->key.foundations = card;
+                    next_state->key.data[(col_idx>>2)] &= 
+                        (~(0x3 << ((col_idx&0x3)<<1)));
+                    next_state->key.data[(col_idx>>2)] |=
+                        ((pos-1) << ((col_idx&0x3)<<1));
+                    next_state->value.parent_state = state->key;
+                    next_state->value.col_idx = col_idx;
 
-                if (! fc_solve_hash_insert(
-                    &(solver->positions),
-                    next_state,
-                    &init_state_existing,
-                    perl_hash_function(((ub1 *)&(next_state->key)), 
-                        sizeof(next_state->key))
+                    if (! fc_solve_hash_insert(
+                        &(solver->positions),
+                        next_state,
+                        &init_state_existing,
+                        perl_hash_function(((ub1 *)&(next_state->key)), 
+                            sizeof(next_state->key))
+                        )
                     )
-                )
-                {
-                    /* It's a new state - put it in the queue. */
-                    queue[queue_len++] = next_state;
-                    if (queue_len == queue_max_len)
                     {
-                        queue = realloc(queue, sizeof(queue[0]) * (queue_max_len += 64));
+                        /* It's a new state - put it in the queue. */
+                        queue[queue_len++] = next_state;
+
+                        if (queue_len == queue_max_len)
+                        {
+                            queue = realloc(
+                                queue,
+                                sizeof(queue[0]) * (queue_max_len += 64)
+                            );
+                        }
                     }
-                }
-                else
-                {
-                    fcs_compact_alloc_release(&(solver->allocator));
+                    else
+                    {
+                        fcs_compact_alloc_release(&(solver->allocator));
+                    }
                 }
             }
         }
