@@ -84,18 +84,6 @@ typedef struct
     fc_solve_hash_symlink_item_t * list_of_vacant_items;
     /* A comparison function that can be used for comparing two keys
        in the collection */
-#ifdef FCS_INLINED_HASH_COMPARISON
-    enum FCS_INLINED_HASH_DATA_TYPE hash_type;
-#else
-#ifdef FCS_WITH_CONTEXT_VARIABLE
-    int (*compare_function)(const void * key1, const void * key2, void * context);
-    /* A context to pass to the comparison function */
-    void * context;
-#else
-    int (*compare_function)(const void * key1, const void * key2);
-#endif
-#endif
-
     /* The size of the hash table */
     int size;
 
@@ -114,17 +102,7 @@ typedef struct
 extern void
 fc_solve_hash_init(
     fc_solve_hash_t * hash,
-    fc_solve_hash_value_t wanted_size,
-#ifdef FCS_INLINED_HASH_COMPARISON
-    enum FCS_INLINED_HASH_DATA_TYPE hash_type
-#else
-#ifdef FCS_WITH_CONTEXT_VARIABLE
-    int (*compare_function)(const void * key1, const void * key2, void * context),
-    void * context
-#else
-    int (*compare_function)(const void * key1, const void * key2)
-#endif
-#endif
+    fc_solve_hash_value_t wanted_size
     );
 
 /*

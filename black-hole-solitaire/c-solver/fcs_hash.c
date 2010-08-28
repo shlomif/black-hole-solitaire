@@ -43,23 +43,15 @@
 
 #include "inline.h"
 
+#include "state.h"
+
 static void GCC_INLINE fc_solve_hash_rehash(fc_solve_hash_t * hash);
 
 
 
 void fc_solve_hash_init(
     fc_solve_hash_t * hash,
-    fc_solve_hash_value_t wanted_size,
-#ifdef FCS_INLINED_HASH_COMPARISON
-    enum FCS_INLINED_HASH_DATA_TYPE hash_type
-#else
-#ifdef FCS_WITH_CONTEXT_VARIABLE
-    int (*compare_function)(const void * key1, const void * key2, void * context),
-    void * context
-#else
-    int (*compare_function)(const void * key1, const void * key2)
-#endif
-#endif
+    fc_solve_hash_value_t wanted_size
     )
 {
     int size;
@@ -83,15 +75,6 @@ void fc_solve_hash_init(
         );
 
     hash->list_of_vacant_items = NULL;
-
-#ifdef FCS_INLINED_HASH_COMPARISON
-    hash->hash_type = hash_type;
-#else
-    hash->compare_function = compare_function;
-#ifdef FCS_WITH_CONTEXT_VARIABLE
-    hash->context = context;
-#endif
-#endif
 
     /* Initialize all the cells of the hash table to NULL, which indicate
        that the cork of the linked list is right at the start */
@@ -163,11 +146,7 @@ fcs_bool_t fc_solve_hash_insert(
                 comparing the entire data structure.
             */
             if (
-                (item->hash_value == hash_value)
-#ifdef FCS_ENABLE_SECONDARY_HASH_VALUE
-                && (item->secondary_hash_value == secondary_hash_value)
-#endif
-                && MY_HASH_COMPARE()
+                (!memcmp(item->key, key, sizeof(bhs_state_key_t)))
                )
             {
                 *existing_key = item->key;

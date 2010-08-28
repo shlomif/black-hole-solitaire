@@ -29,12 +29,8 @@
 #include <string.h>
 
 #include "black_hole_solver.h"
-
-typedef char bhs_card_string_t[3];
-typedef char bhs_rank_t;
-
-#define MAX_NUM_COLUMNS 17
-#define MAX_NUM_CARDS_IN_COL 3
+#include "state.h"
+#include "fcs_hash.h"
 
 typedef struct 
 {
@@ -48,29 +44,13 @@ typedef struct
 
     bhs_rank_t initial_foundation;
 
+    fc_solve_hash_t hash;
+
     bhs_card_string_t initial_foundation_string;
     bhs_card_string_t initial_board_card_strings[MAX_NUM_COLUMNS][MAX_NUM_CARDS_IN_COL];
     int initial_lens[MAX_NUM_COLUMNS];
 
 } bhs_solver_t;
-
-/* We allocate 2-bits for the length of every column */
-#define NUM_DATA_CHARS (MAX_NUM_COLUMNS * 2 / 8 + 1)
-typedef struct
-{
-    unsigned char data[NUM_DATA_CHARS];
-    bhs_rank_t foundations;
-} bhs_state_key_t;
-
-typedef char bhs_col_idx_t;
-
-typedef struct
-{
-    /* The state from which this state was derived. */
-    bhs_state_key_t parent_state;
-    /* The index of the column that was changed. */
-    bhs_col_idx_t col_idx;
-} bhs_state_value_t;
 
 int black_hole_solver_create(
     black_hole_solver_instance_t * * ret_instance
@@ -87,6 +67,7 @@ int black_hole_solver_create(
     }
     else
     {
+        fc_solve_hash_init(&(ret->hash), 256);
         *ret_instance = (black_hole_solver_instance_t *)ret;
         return BLACK_HOLE_SOLVER__SUCCESS;
     }
