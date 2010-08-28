@@ -301,4 +301,5 @@ extern int black_hole_solver_run(
     init_state.data[four_cols_idx] = (unsigned char)(solver->initial_lens[four_cols_offset]);
 
 
+    return BLACK_HOLE_SOLVER__NOT_SOLVABLE;
 }
