@@ -28,4 +28,8 @@ extern int black_hole_solver_read_board(
     int * error_line_number
 );
 
+extern int black_hole_solver_run(
+    black_hole_solver_instance_t * ret_instance
+);
+
 #endif /* BLACK_HOLE_SOLVER__H */

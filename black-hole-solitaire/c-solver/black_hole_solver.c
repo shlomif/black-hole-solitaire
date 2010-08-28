@@ -31,7 +31,7 @@ typedef struct
 #define NUM_DATA_CHARS (MAX_NUM_COLUMNS * 2 / 8 + 1)
 typedef struct
 {
-    char data[NUM_DATA_CHARS];
+    unsigned char data[NUM_DATA_CHARS];
     bhs_rank_t foundations;
 } bhs_state_key_t;
 
@@ -245,6 +245,33 @@ extern int black_hole_solver_read_board(
     return BLACK_HOLE_SOLVER__SUCCESS;
 }
 
-static int run(const char * board_s)
+extern int black_hole_solver_run(
+    black_hole_solver_instance_t * ret_instance
+)
 {
+    bhs_solver_t * solver;
+    bhs_state_key_t init_state;
+    int four_cols_idx, four_cols_offset;
+
+    solver = (bhs_solver_t *)ret_instance;
+
+    memset(&init_state, '\0', sizeof(init_state));
+    init_state.foundations = solver->initial_foundation;
+
+    for (four_cols_idx = 0, four_cols_offset = 0; four_cols_idx < 4; four_cols_idx++, four_cols_offset += 4)
+    {
+        init_state.data[four_cols_idx] =
+            (unsigned char)
+            (
+              (solver->initial_lens[four_cols_offset]) 
+            | (solver->initial_lens[four_cols_offset+1] << 2)    
+            | (solver->initial_lens[four_cols_offset+2] << 4)    
+            | (solver->initial_lens[four_cols_offset+3] << 6)    
+            )
+            ;
+    }
+    /* Only one left. */
+    init_state.data[four_cols_idx] = (unsigned char)(solver->initial_lens[four_cols_offset]);
+
+
 }
