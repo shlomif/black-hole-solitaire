@@ -55,6 +55,8 @@ typedef struct
     bhs_state_key_value_pair_t * init_state;
     bhs_state_key_value_pair_t * final_state;
 
+    bhs_state_key_value_pair_t * states_in_solution;
+    int num_states_in_solution, current_state_in_solution_idx;
 } bhs_solver_t;
 
 int DLLEXPORT black_hole_solver_create(
@@ -64,6 +66,8 @@ int DLLEXPORT black_hole_solver_create(
     bhs_solver_t * ret;
 
     ret = (bhs_solver_t *)malloc(sizeof(*ret));
+
+    ret->states_in_solution = NULL;
 
     if (! ret)
     {
@@ -423,3 +427,123 @@ extern int DLLEXPORT black_hole_solver_free(
 
     return BLACK_HOLE_SOLVER__SUCCESS;
 }
+
+static int suit_char_to_index(char suit)
+{
+    switch (suit)
+    {
+        case 'H':
+            return 0;
+        case 'C':
+            return 1;
+        case 'D':
+            return 2;
+        case 'S':
+            return 3;
+        default:
+            return -1;
+    }
+}
+DLLEXPORT extern int black_hole_solver_get_next_move(
+    black_hole_solver_instance_t * instance_proto,
+    int * col_idx_ptr,
+    int * card_rank_ptr,
+    int * card_suit_ptr /*  H=0, C=1, D=2, S=3 */
+)
+{
+    bhs_solver_t * solver;
+
+    solver = (bhs_solver_t *)instance_proto;
+
+    if (! solver->states_in_solution)
+    {
+        bhs_state_key_value_pair_t * states;
+        bhs_state_key_value_pair_t temp_state;
+
+        int i, num_states, max_num_states;
+        void * next_state;
+
+        num_states = 0;
+        max_num_states = 53;
+
+        states = malloc(sizeof(states[0]) * max_num_states);
+        
+        states[num_states++] = (*(solver->final_state));
+
+        while (memcmp(
+            &(states[num_states].key),
+            &(solver->init_state->key),
+            sizeof(states[num_states].key)
+        ))
+        {
+            if (num_states == max_num_states)
+            {
+                states =
+                    realloc(
+                        states,
+                        sizeof(states[0]) * (max_num_states += 16)
+                    );
+            }
+         
+            /* Look up the next state in the positions associative array. */
+            fc_solve_hash_insert(
+                &(solver->positions),
+                &(states[num_states].value),
+                &next_state,
+                perl_hash_function(((ub1 *)&(states[num_states].key)), 
+                    sizeof(states[num_states].key))
+            );
+
+            memcpy(
+                states+(++num_states),
+                next_state, 
+                sizeof(states[0])
+            );
+        }
+
+        num_states++;
+
+        /* Reverse the list in place. */
+        for (i = 0 ; i < (num_states >> 1) ; i++)
+        {
+            temp_state = states[i];
+            states[i] = states[num_states-i];
+            states[num_states-i] = temp_state;
+        }
+
+        solver->states_in_solution = states;
+        solver->num_states_in_solution = num_states;
+        solver->current_state_in_solution_idx = 0;
+    }
+
+    if (solver->current_state_in_solution_idx == solver->num_states_in_solution)
+    {
+        *col_idx_ptr = *card_rank_ptr = *card_suit_ptr = -1;
+        return BLACK_HOLE_SOLVER__END;
+    }
+
+    {
+        bhs_state_key_value_pair_t next_state;
+        int height;
+
+        next_state = solver->states_in_solution[
+            ++solver->current_state_in_solution_idx
+            ];
+
+        *col_idx_ptr = next_state.value.col_idx;
+        height =
+        (
+        (
+            (next_state.key.data[(*col_idx_ptr)>>2]
+                >>
+            (((*col_idx_ptr)&0x3) << 1)) & 0x3
+        )
+        );
+
+        (*card_rank_ptr) = solver->board_values[*col_idx_ptr][height];
+        (*card_suit_ptr) = suit_char_to_index(solver->initial_board_card_strings[*col_idx_ptr][height][1]);
+
+        return BLACK_HOLE_SOLVER__SUCCESS;
+    }
+}
+

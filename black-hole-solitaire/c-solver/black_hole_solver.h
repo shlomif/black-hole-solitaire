@@ -58,7 +58,8 @@ enum
     BLACK_HOLE_SOLVER__TRAILING_CHARS,
     BLACK_HOLE_SOLVER__NOT_ENOUGH_COLUMNS,
     BLACK_HOLE_SOLVER__TOO_MANY_CARDS,
-    BLACK_HOLE_SOLVER__NOT_SOLVABLE
+    BLACK_HOLE_SOLVER__NOT_SOLVABLE,
+    BLACK_HOLE_SOLVER__END
 };
 
 typedef struct
@@ -82,6 +83,13 @@ DLLEXPORT extern int black_hole_solver_run(
 
 DLLEXPORT extern int black_hole_solver_free(
     black_hole_solver_instance_t * instance_proto
+);
+
+DLLEXPORT extern int black_hole_solver_get_next_move(
+    black_hole_solver_instance_t * instance_proto,
+    int * col_idx_ptr,
+    int * card_rank_ptr,
+    int * card_suit_ptr /* Will return H=0, C=1, D=2, S=3 */
 );
 
 #ifdef __cplusplus
