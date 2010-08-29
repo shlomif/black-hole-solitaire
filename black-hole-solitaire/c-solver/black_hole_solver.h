@@ -92,6 +92,14 @@ DLLEXPORT extern int black_hole_solver_get_next_move(
     int * card_suit_ptr /* Will return H=0, C=1, D=2, S=3 */
 );
 
+DLLEXPORT extern long black_hole_solver_get_num_states_in_collection(
+    black_hole_solver_instance_t * instance_proto
+);
+
+DLLEXPORT extern long black_hole_solver_get_iterations_num(
+    black_hole_solver_instance_t * instance_proto
+);
+
 #ifdef __cplusplus
 }
 #endif

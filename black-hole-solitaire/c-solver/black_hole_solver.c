@@ -69,7 +69,6 @@ int DLLEXPORT black_hole_solver_create(
 
     ret = (bhs_solver_t *)malloc(sizeof(*ret));
 
-    ret->states_in_solution = NULL;
 
     if (! ret)
     {
@@ -78,6 +77,9 @@ int DLLEXPORT black_hole_solver_create(
     }
     else
     {
+        ret->states_in_solution = NULL;
+        ret->iterations_num = 0;
+        ret->num_states_in_collection = 0;
         fc_solve_compact_allocator_init(&(ret->allocator));
         fc_solve_hash_init(&(ret->positions), 256);
         *ret_instance = (black_hole_solver_instance_t *)ret;
@@ -411,6 +413,7 @@ extern int DLLEXPORT black_hole_solver_run(
                 }
             }
         }
+
         if (no_cards)
         {
             solver->final_state = state;
@@ -563,5 +566,19 @@ DLLEXPORT extern int black_hole_solver_get_next_move(
 
         return BLACK_HOLE_SOLVER__SUCCESS;
     }
+}
+
+DLLEXPORT extern long black_hole_solver_get_num_states_in_collection(
+    black_hole_solver_instance_t * instance_proto
+)
+{
+    return ((bhs_solver_t *)instance_proto)->num_states_in_collection;
+}
+
+DLLEXPORT extern long black_hole_solver_get_iterations_num(
+    black_hole_solver_instance_t * instance_proto
+)
+{
+    return ((bhs_solver_t *)instance_proto)->iterations_num;
 }
 

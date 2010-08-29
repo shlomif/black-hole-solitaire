@@ -124,6 +124,13 @@ int main(int argc, char * argv[])
         ret = -1;
     }
 
+    printf("\n\n--------------------\n" 
+        "Total number of states checked is %ld.\n"
+        "This scan generated %ld states.\n",
+        black_hole_solver_get_iterations_num(solver),
+        black_hole_solver_get_num_states_in_collection(solver)
+    );
+
     black_hole_solver_free(solver);
 
     return ret;

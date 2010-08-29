@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 2;
+use Test::More tests => 3;
 use Test::Differences;
 
 use File::Spec;
@@ -388,6 +388,32 @@ Info: Card moved is 4D
 
 ====================
 
+
+
+--------------------
+Total number of states checked is 8636.
+This scan generated 8672 states.
+EOF
+
+# TEST
+eq_or_diff ($trap->stdout(), $expected_output, "Right output.");
+
+trap
+{
+    system("./black-hole-solve", 
+        File::Spec->catfile(
+            $bin_dir, "data", "1.bh.board.txt"
+        )
+    );
+};
+
+$expected_output = <<'EOF';
+Unsolved!
+
+
+--------------------
+Total number of states checked is 8.
+This scan generated 8 states.
 EOF
 
 # TEST
