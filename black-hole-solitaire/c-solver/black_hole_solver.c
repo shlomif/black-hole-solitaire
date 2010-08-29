@@ -57,6 +57,8 @@ typedef struct
 
     bhs_state_key_value_pair_t * states_in_solution;
     int num_states_in_solution, current_state_in_solution_idx;
+    
+    long iterations_num, num_states_in_collection;
 } bhs_solver_t;
 
 int DLLEXPORT black_hole_solver_create(
@@ -301,6 +303,7 @@ extern int DLLEXPORT black_hole_solver_run(
     fcs_bool_t no_cards;
     int col_idx, pos;
     bhs_rank_t card;
+    long iterations_num, num_states_in_collection;
 
     solver = (bhs_solver_t *)ret_instance;
 
@@ -324,12 +327,17 @@ extern int DLLEXPORT black_hole_solver_run(
     /* Only one left. */
     init_state->key.data[four_cols_idx] = (unsigned char)(solver->initial_lens[four_cols_offset]);
 
+    num_states_in_collection = 0;
+    iterations_num = 0;
+
     fc_solve_hash_insert(
         &(solver->positions),
         init_state,
         &init_state_existing,
         perl_hash_function(((ub1 *)&(init_state->key)), sizeof(init_state->key))
     );
+
+    num_states_in_collection++;
 
     queue_max_len = 64;
 
@@ -341,6 +349,7 @@ extern int DLLEXPORT black_hole_solver_run(
     while (queue_len > 0)
     {
         state = queue[--queue_len];
+        iterations_num++;
 
         foundations = state->key.foundations;
 
@@ -383,6 +392,7 @@ extern int DLLEXPORT black_hole_solver_run(
                         )
                     )
                     {
+                        num_states_in_collection++;
                         /* It's a new state - put it in the queue. */
                         queue[queue_len++] = next_state;
 
@@ -405,9 +415,15 @@ extern int DLLEXPORT black_hole_solver_run(
         {
             solver->final_state = state;
 
+            solver->iterations_num = iterations_num;
+            solver->num_states_in_collection = num_states_in_collection;
+
             return BLACK_HOLE_SOLVER__SUCCESS;
         }
     }
+
+    solver->iterations_num = iterations_num;
+    solver->num_states_in_collection = num_states_in_collection;
 
     return BLACK_HOLE_SOLVER__NOT_SOLVABLE;
 }
