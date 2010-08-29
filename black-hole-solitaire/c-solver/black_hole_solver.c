@@ -444,6 +444,7 @@ static int suit_char_to_index(char suit)
             return -1;
     }
 }
+
 DLLEXPORT extern int black_hole_solver_get_next_move(
     black_hole_solver_instance_t * instance_proto,
     int * col_idx_ptr,
@@ -458,6 +459,7 @@ DLLEXPORT extern int black_hole_solver_get_next_move(
     if (! solver->states_in_solution)
     {
         bhs_state_key_value_pair_t * states;
+        bhs_state_key_t * key_ptr;
         bhs_state_key_value_pair_t temp_state;
 
         int i, num_states, max_num_states;
@@ -468,7 +470,7 @@ DLLEXPORT extern int black_hole_solver_get_next_move(
 
         states = malloc(sizeof(states[0]) * max_num_states);
         
-        states[num_states++] = (*(solver->final_state));
+        states[num_states] = (*(solver->final_state));
 
         while (memcmp(
             &(states[num_states].key),
@@ -485,13 +487,13 @@ DLLEXPORT extern int black_hole_solver_get_next_move(
                     );
             }
          
+            key_ptr = &(states[num_states].value.parent_state);
             /* Look up the next state in the positions associative array. */
             fc_solve_hash_insert(
                 &(solver->positions),
-                &(states[num_states].value),
+                key_ptr,
                 &next_state,
-                perl_hash_function(((ub1 *)&(states[num_states].key)), 
-                    sizeof(states[num_states].key))
+                perl_hash_function((ub1 *)key_ptr, sizeof(*key_ptr))
             );
 
             memcpy(

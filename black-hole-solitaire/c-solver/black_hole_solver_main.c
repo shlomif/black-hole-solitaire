@@ -88,7 +88,35 @@ int main(int argc, char * argv[])
     ret = 0;
     if (!black_hole_solver_run(solver))
     {
+        int col_idx, card_rank, card_suit;
+        int next_move_ret_code;
+
         printf("Solved!\n");
+
+        while ((next_move_ret_code = black_hole_solver_get_next_move(
+            solver,
+            &col_idx,
+            &card_rank,
+            &card_suit
+            )) == BLACK_HOLE_SOLVER__SUCCESS)
+        {
+            printf ("Move a card from stack %d to the foundations\n\n" 
+                "Info: Card moved is %c%c\n\n\n====================\n\n",
+                col_idx,
+                (("0A23456789JQK")[card_rank]), ("HCDS")[card_suit]
+            );
+        }
+
+        if (next_move_ret_code != BLACK_HOLE_SOLVER__END)
+        {
+            fprintf(
+                stderr, 
+                "%s - %d\n",
+                "Get next move routine returned the wrong error code.",
+                next_move_ret_code
+            );
+            ret = -1;
+        }
     }
     else
     {
