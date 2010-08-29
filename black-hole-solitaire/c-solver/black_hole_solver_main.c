@@ -103,7 +103,7 @@ int main(int argc, char * argv[])
             printf ("Move a card from stack %d to the foundations\n\n" 
                 "Info: Card moved is %c%c\n\n\n====================\n\n",
                 col_idx,
-                (("0A23456789JQK")[card_rank]), ("HCDS")[card_suit]
+                (("0A23456789TJQK")[card_rank]), ("HCDS")[card_suit]
             );
         }
 

@@ -165,3 +165,13 @@ ADD_CUSTOM_COMMAND(
     ARGS "config.h.in"
 )
 
+ADD_CUSTOM_TARGET(
+    "test"
+    "perl" "${CMAKE_CURRENT_SOURCE_DIR}/run-tests.pl"
+)
+
+ADD_DEPENDENCIES(
+    "test"
+    "all"
+)
+

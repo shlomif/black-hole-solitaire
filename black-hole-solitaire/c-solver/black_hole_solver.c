@@ -509,8 +509,8 @@ DLLEXPORT extern int black_hole_solver_get_next_move(
         for (i = 0 ; i < (num_states >> 1) ; i++)
         {
             temp_state = states[i];
-            states[i] = states[num_states-i];
-            states[num_states-i] = temp_state;
+            states[i] = states[num_states-1-i];
+            states[num_states-1-i] = temp_state;
         }
 
         solver->states_in_solution = states;
@@ -518,7 +518,7 @@ DLLEXPORT extern int black_hole_solver_get_next_move(
         solver->current_state_in_solution_idx = 0;
     }
 
-    if (solver->current_state_in_solution_idx == solver->num_states_in_solution)
+    if (solver->current_state_in_solution_idx == solver->num_states_in_solution-1)
     {
         *col_idx_ptr = *card_rank_ptr = *card_suit_ptr = -1;
         return BLACK_HOLE_SOLVER__END;
@@ -542,7 +542,7 @@ DLLEXPORT extern int black_hole_solver_get_next_move(
         )
         );
 
-        (*card_rank_ptr) = solver->board_values[*col_idx_ptr][height];
+        (*card_rank_ptr) = solver->board_values[*col_idx_ptr][height]+1;
         (*card_suit_ptr) = suit_char_to_index(solver->initial_board_card_strings[*col_idx_ptr][height][1]);
 
         return BLACK_HOLE_SOLVER__SUCCESS;
