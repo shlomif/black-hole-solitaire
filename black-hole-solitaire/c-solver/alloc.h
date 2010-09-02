@@ -43,16 +43,16 @@ typedef struct
     char * max_ptr;
     char * ptr;
     char * rollback_ptr;
-} fcs_compact_allocator_t;
+} bhs_compact_allocator_t;
 
 extern void
-    fc_solve_compact_allocator_init(fcs_compact_allocator_t * allocator);
+    bh_solve_compact_allocator_init(bhs_compact_allocator_t * allocator);
 
-extern void fc_solve_compact_allocator_extend(
-    fcs_compact_allocator_t * allocator
+extern void bh_solve_compact_allocator_extend(
+    bhs_compact_allocator_t * allocator
         );
 
-static GCC_INLINE void * fcs_compact_alloc_ptr(fcs_compact_allocator_t * allocator, int how_much)
+static GCC_INLINE void * fcs_compact_alloc_ptr(bhs_compact_allocator_t * allocator, int how_much)
 {
     /* Round ptr to the next pointer boundary */
     how_much +=
@@ -62,7 +62,7 @@ static GCC_INLINE void * fcs_compact_alloc_ptr(fcs_compact_allocator_t * allocat
 
     if (allocator->max_ptr - allocator->ptr < how_much)
     {
-        fc_solve_compact_allocator_extend(allocator);
+        bh_solve_compact_allocator_extend(allocator);
     }
     else
     {
@@ -78,7 +78,7 @@ static GCC_INLINE void * fcs_compact_alloc_ptr(fcs_compact_allocator_t * allocat
     (allocator)->ptr = (allocator)->rollback_ptr; \
 }
 
-extern void fc_solve_compact_allocator_finish(fcs_compact_allocator_t * allocator);
+extern void bh_solve_compact_allocator_finish(bhs_compact_allocator_t * allocator);
 
 #ifdef __cplusplus
 };

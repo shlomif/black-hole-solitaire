@@ -38,8 +38,8 @@
 
 #define ALLOCED_SIZE (FCS_IA_PACK_SIZE*1024-(256+128))
 
-void fc_solve_compact_allocator_init(
-    fcs_compact_allocator_t * allocator
+void bh_solve_compact_allocator_init(
+    bhs_compact_allocator_t * allocator
     )
 {
     allocator->packs = (char * *)malloc(sizeof(allocator->packs[0]) * IA_STATE_PACKS_GROW_BY);
@@ -53,8 +53,8 @@ void fc_solve_compact_allocator_init(
     return;
 }
 
-void fc_solve_compact_allocator_extend(
-    fcs_compact_allocator_t * allocator
+void bh_solve_compact_allocator_extend(
+    bhs_compact_allocator_t * allocator
         )
 {
     /* Allocate a new pack */
@@ -76,7 +76,7 @@ void fc_solve_compact_allocator_extend(
 }
 
 
-void fc_solve_compact_allocator_finish(fcs_compact_allocator_t * allocator)
+void bh_solve_compact_allocator_finish(bhs_compact_allocator_t * allocator)
 {
     char * * curr_pack, * * packs_end;
 

@@ -94,7 +94,7 @@ typedef struct
 
     int max_num_elems_before_resize;
 
-    fcs_compact_allocator_t allocator;
+    bhs_compact_allocator_t allocator;
 
 } fc_solve_hash_t;
 
@@ -128,7 +128,7 @@ static GCC_INLINE void fc_solve_hash_free(
     fc_solve_hash_t * hash
     )
 {
-    fc_solve_compact_allocator_finish(&(hash->allocator));
+    bh_solve_compact_allocator_finish(&(hash->allocator));
 
     free(hash->entries);
 }

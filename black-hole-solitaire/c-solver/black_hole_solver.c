@@ -45,7 +45,7 @@ typedef struct
 
     bhs_rank_t initial_foundation;
 
-    fcs_compact_allocator_t allocator;
+    bhs_compact_allocator_t allocator;
     fc_solve_hash_t positions;
 
     bhs_card_string_t initial_foundation_string;
@@ -80,7 +80,7 @@ int DLLEXPORT black_hole_solver_create(
         ret->states_in_solution = NULL;
         ret->iterations_num = 0;
         ret->num_states_in_collection = 0;
-        fc_solve_compact_allocator_init(&(ret->allocator));
+        bh_solve_compact_allocator_init(&(ret->allocator));
         fc_solve_hash_init(&(ret->positions), 256);
         *ret_instance = (black_hole_solver_instance_t *)ret;
         return BLACK_HOLE_SOLVER__SUCCESS;
@@ -439,7 +439,7 @@ extern int DLLEXPORT black_hole_solver_free(
 
     solver = (bhs_solver_t *)instance_proto;
 
-    fc_solve_compact_allocator_finish(&(solver->allocator));
+    bh_solve_compact_allocator_finish(&(solver->allocator));
     fc_solve_hash_free(&(solver->positions));
 
     free(solver);

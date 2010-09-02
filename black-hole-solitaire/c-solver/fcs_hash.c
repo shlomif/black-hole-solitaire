@@ -80,7 +80,7 @@ void fc_solve_hash_init(
        that the cork of the linked list is right at the start */
     memset(hash->entries, 0, sizeof(fc_solve_hash_symlink_t)*size);
 
-    fc_solve_compact_allocator_init(&(hash->allocator));
+    bh_solve_compact_allocator_init(&(hash->allocator));
 
     return;
 }
