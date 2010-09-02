@@ -48,40 +48,40 @@ enum FCS_INLINED_HASH_DATA_TYPE
 };
 #endif
 
-typedef int fc_solve_hash_value_t;
+typedef int bh_solve_hash_value_t;
 
-struct fc_solve_hash_symlink_item_struct
+struct bh_solve_hash_symlink_item_struct
 {
     /* A pointer to the data structure that is to be collected */
     void * key;
     /* We also store the hash value corresponding to this key for faster
        comparisons */
-    fc_solve_hash_value_t hash_value;
+    bh_solve_hash_value_t hash_value;
 #ifdef FCS_ENABLE_SECONDARY_HASH_VALUE
     /*
      * We also store a secondary hash value, which is not used for indexing,
      * but is used to speed up comparison.
      * */
-    fc_solve_hash_value_t secondary_hash_value;
+    bh_solve_hash_value_t secondary_hash_value;
 #endif
     /* The next item in the list */
-    struct fc_solve_hash_symlink_item_struct * next;
+    struct bh_solve_hash_symlink_item_struct * next;
 };
 
-typedef struct fc_solve_hash_symlink_item_struct fc_solve_hash_symlink_item_t;
+typedef struct bh_solve_hash_symlink_item_struct bh_solve_hash_symlink_item_t;
 
 typedef struct 
 {
-    fc_solve_hash_symlink_item_t * first_item;
-} fc_solve_hash_symlink_t;
+    bh_solve_hash_symlink_item_t * first_item;
+} bh_solve_hash_symlink_t;
 
 typedef struct
 {
     /* The vector of the hash table itself */
-    fc_solve_hash_symlink_t * entries;
+    bh_solve_hash_symlink_t * entries;
     /* The list of vacant items as freed by the garbage collector. Use
      * if before allocating more. */
-    fc_solve_hash_symlink_item_t * list_of_vacant_items;
+    bh_solve_hash_symlink_item_t * list_of_vacant_items;
     /* A comparison function that can be used for comparing two keys
        in the collection */
     /* The size of the hash table */
@@ -96,13 +96,13 @@ typedef struct
 
     bhs_compact_allocator_t allocator;
 
-} fc_solve_hash_t;
+} bh_solve_hash_t;
 
 
 extern void
-fc_solve_hash_init(
-    fc_solve_hash_t * hash,
-    fc_solve_hash_value_t wanted_size
+bh_solve_hash_init(
+    bh_solve_hash_t * hash,
+    bh_solve_hash_value_t wanted_size
     );
 
 /*
@@ -112,20 +112,20 @@ fc_solve_hash_init(
  * Returns TRUE if the key is not new and *existing_key / *existing_val
  * was set to it.
  */
-extern fcs_bool_t fc_solve_hash_insert(
-    fc_solve_hash_t * hash,
+extern fcs_bool_t bh_solve_hash_insert(
+    bh_solve_hash_t * hash,
     void * key,
     void * * existing_key,
-    fc_solve_hash_value_t hash_value
+    bh_solve_hash_value_t hash_value
 #ifdef FCS_ENABLE_SECONDARY_HASH_VALUE
-    , fc_solve_hash_value_t secondary_hash_value
+    , bh_solve_hash_value_t secondary_hash_value
 #endif
     );
 
 
 
-static GCC_INLINE void fc_solve_hash_free(
-    fc_solve_hash_t * hash
+static GCC_INLINE void bh_solve_hash_free(
+    bh_solve_hash_t * hash
     )
 {
     bh_solve_compact_allocator_finish(&(hash->allocator));

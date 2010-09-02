@@ -45,13 +45,13 @@
 
 #include "state.h"
 
-static void GCC_INLINE fc_solve_hash_rehash(fc_solve_hash_t * hash);
+static void GCC_INLINE bh_solve_hash_rehash(bh_solve_hash_t * hash);
 
 
 
-void fc_solve_hash_init(
-    fc_solve_hash_t * hash,
-    fc_solve_hash_value_t wanted_size
+void bh_solve_hash_init(
+    bh_solve_hash_t * hash,
+    bh_solve_hash_value_t wanted_size
     )
 {
     int size;
@@ -70,34 +70,34 @@ void fc_solve_hash_init(
     hash->num_elems = 0;
 
     /* Allocate a table of size entries */
-    hash->entries = (fc_solve_hash_symlink_t *)malloc(
-        sizeof(fc_solve_hash_symlink_t) * size
+    hash->entries = (bh_solve_hash_symlink_t *)malloc(
+        sizeof(bh_solve_hash_symlink_t) * size
         );
 
     hash->list_of_vacant_items = NULL;
 
     /* Initialize all the cells of the hash table to NULL, which indicate
        that the cork of the linked list is right at the start */
-    memset(hash->entries, 0, sizeof(fc_solve_hash_symlink_t)*size);
+    memset(hash->entries, 0, sizeof(bh_solve_hash_symlink_t)*size);
 
     bh_solve_compact_allocator_init(&(hash->allocator));
 
     return;
 }
 
-fcs_bool_t fc_solve_hash_insert(
-    fc_solve_hash_t * hash,
+fcs_bool_t bh_solve_hash_insert(
+    bh_solve_hash_t * hash,
     void * key,
     void * * existing_key,
-    fc_solve_hash_value_t hash_value
+    bh_solve_hash_value_t hash_value
 #ifdef FCS_ENABLE_SECONDARY_HASH_VALUE
-    , fc_solve_hash_value_t secondary_hash_value
+    , bh_solve_hash_value_t secondary_hash_value
 #endif
     )
 {
-    fc_solve_hash_symlink_t * list;
-    fc_solve_hash_symlink_item_t * item, * last_item;
-    fc_solve_hash_symlink_item_t * * item_placeholder;
+    bh_solve_hash_symlink_t * list;
+    bh_solve_hash_symlink_item_t * item, * last_item;
+    bh_solve_hash_symlink_item_t * * item_placeholder;
 #ifdef FCS_INLINED_HASH_COMPARISON
     enum FCS_INLINED_HASH_DATA_TYPE hash_type;
 #endif
@@ -132,8 +132,8 @@ fcs_bool_t fc_solve_hash_insert(
 
 #ifdef FCS_INLINED_HASH_COMPARISON
 #define MY_HASH_COMPARE() (!(hash_type == FCS_INLINED_HASH__COLUMNS \
-                ? fc_solve_stack_compare_for_comparison(item->key, key) \
-                : fc_solve_state_compare(item->key, key) \
+                ? bh_solve_stack_compare_for_comparison(item->key, key) \
+                : bh_solve_state_compare(item->key, key) \
                 ))
 #else
 #define MY_HASH_COMPARE() (!(hash->compare_function(item->key, key MY_HASH_CONTEXT_VAR)))
@@ -184,7 +184,7 @@ fcs_bool_t fc_solve_hash_insert(
 
     if ((++hash->num_elems) > hash->max_num_elems_before_resize)
     {
-        fc_solve_hash_rehash(hash);
+        bh_solve_hash_rehash(hash);
     }
 
     *existing_key = NULL;
@@ -197,22 +197,22 @@ fcs_bool_t fc_solve_hash_insert(
     hash table, allowing for smaller chains, and faster lookup.
 
   */
-static void GCC_INLINE fc_solve_hash_rehash(
-    fc_solve_hash_t * hash
+static void GCC_INLINE bh_solve_hash_rehash(
+    bh_solve_hash_t * hash
     )
 {
     int old_size, new_size, new_size_bitmask;
     int i;
-    fc_solve_hash_symlink_item_t * item, * next_item;
+    bh_solve_hash_symlink_item_t * item, * next_item;
     int place;
-    fc_solve_hash_symlink_t * new_entries;
+    bh_solve_hash_symlink_t * new_entries;
 
     old_size = hash->size;
 
     new_size = old_size << 1;
     new_size_bitmask = new_size - 1;
 
-    new_entries = calloc(new_size, sizeof(fc_solve_hash_symlink_t));
+    new_entries = calloc(new_size, sizeof(bh_solve_hash_symlink_t));
 
     /* Copy the items to the new hash while not allocating them again */
     for(i=0;i<old_size;i++)
@@ -252,6 +252,6 @@ static void GCC_INLINE fc_solve_hash_rehash(
 #else
 
 /* ANSI C doesn't allow empty compilation */
-static void fc_solve_hash_c_dummy();
+static void bh_solve_hash_c_dummy();
 
 #endif /* (FCS_STATE_STORAGE == FCS_STATE_STORAGE_INTERNAL_HASH) || defined(INDIRECT_STACK_STATES) */

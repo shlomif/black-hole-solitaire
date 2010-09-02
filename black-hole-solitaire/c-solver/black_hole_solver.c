@@ -46,7 +46,7 @@ typedef struct
     bhs_rank_t initial_foundation;
 
     bhs_compact_allocator_t allocator;
-    fc_solve_hash_t positions;
+    bh_solve_hash_t positions;
 
     bhs_card_string_t initial_foundation_string;
     bhs_card_string_t initial_board_card_strings[MAX_NUM_COLUMNS][MAX_NUM_CARDS_IN_COL];
@@ -81,7 +81,7 @@ int DLLEXPORT black_hole_solver_create(
         ret->iterations_num = 0;
         ret->num_states_in_collection = 0;
         bh_solve_compact_allocator_init(&(ret->allocator));
-        fc_solve_hash_init(&(ret->positions), 256);
+        bh_solve_hash_init(&(ret->positions), 256);
         *ret_instance = (black_hole_solver_instance_t *)ret;
         return BLACK_HOLE_SOLVER__SUCCESS;
     }
@@ -332,7 +332,7 @@ extern int DLLEXPORT black_hole_solver_run(
     num_states_in_collection = 0;
     iterations_num = 0;
 
-    fc_solve_hash_insert(
+    bh_solve_hash_insert(
         &(solver->positions),
         init_state,
         &init_state_existing,
@@ -385,7 +385,7 @@ extern int DLLEXPORT black_hole_solver_run(
                     next_state->value.parent_state = state->key;
                     next_state->value.col_idx = col_idx;
 
-                    if (! fc_solve_hash_insert(
+                    if (! bh_solve_hash_insert(
                         &(solver->positions),
                         next_state,
                         &init_state_existing,
@@ -440,7 +440,7 @@ extern int DLLEXPORT black_hole_solver_free(
     solver = (bhs_solver_t *)instance_proto;
 
     bh_solve_compact_allocator_finish(&(solver->allocator));
-    fc_solve_hash_free(&(solver->positions));
+    bh_solve_hash_free(&(solver->positions));
 
     free(solver);
 
@@ -508,7 +508,7 @@ DLLEXPORT extern int black_hole_solver_get_next_move(
          
             key_ptr = &(states[num_states].value.parent_state);
             /* Look up the next state in the positions associative array. */
-            fc_solve_hash_insert(
+            bh_solve_hash_insert(
                 &(solver->positions),
                 key_ptr,
                 &next_state,
