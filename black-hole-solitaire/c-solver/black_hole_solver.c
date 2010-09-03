@@ -53,7 +53,9 @@ typedef struct
 
     bhs_rank_t initial_foundation;
 
+#if (! (BHS_STATE_STORAGE == BHS_STATE_STORAGE_TOKYO_CAB_HASH))
     bhs_compact_allocator_t allocator;
+#endif
     bh_solve_hash_t positions;
 
     bhs_card_string_t initial_foundation_string;
@@ -61,7 +63,11 @@ typedef struct
     int initial_lens[MAX_NUM_COLUMNS];
 
     bhs_state_key_value_pair_t * init_state;
-    bhs_state_key_value_pair_t * final_state;
+#if (BHS_STATE_STORAGE == BHS_STATE_STORAGE_TOKYO_CAB_HASH)
+    bhs_state_key_value_pair_t init_state_raw;
+#endif
+
+    bhs_state_key_value_pair_t final_state;
 
     bhs_state_key_value_pair_t * states_in_solution;
     int num_states_in_solution, current_state_in_solution_idx;
@@ -88,7 +94,9 @@ int DLLEXPORT black_hole_solver_create(
         ret->states_in_solution = NULL;
         ret->iterations_num = 0;
         ret->num_states_in_collection = 0;
+#if (! (BHS_STATE_STORAGE == BHS_STATE_STORAGE_TOKYO_CAB_HASH))
         bh_solve_compact_allocator_init(&(ret->allocator));
+#endif
         bh_solve_hash_init(&(ret->positions));
         *ret_instance = (black_hole_solver_instance_t *)ret;
         return BLACK_HOLE_SOLVER__SUCCESS;
@@ -304,12 +312,21 @@ extern int DLLEXPORT black_hole_solver_run(
 {
     bhs_solver_t * solver;
     bhs_state_key_value_pair_t * init_state;
-#if (! (BHS_STATE_STORAGE == BHS_STATE_STORAGE_TOKYO_CAB_HASH))
+#if (BHS_STATE_STORAGE == BHS_STATE_STORAGE_TOKYO_CAB_HASH)
+    bhs_state_key_value_pair_t next_state_raw;
+#define next_state (&(next_state_raw))
+#else
     void * init_state_existing;
+    bhs_state_key_value_pair_t * next_state;
 #endif
-    bhs_state_key_value_pair_t * state, * next_state;
+    bhs_state_key_value_pair_t * state;
+
     int four_cols_idx, four_cols_offset;
+#if (BHS_STATE_STORAGE == BHS_STATE_STORAGE_TOKYO_CAB_HASH)
+    bhs_state_key_value_pair_t * queue;
+#else
     bhs_state_key_value_pair_t * * queue;
+#endif
     int queue_len, queue_max_len;
     int foundations;
     fcs_bool_t no_cards;
@@ -319,8 +336,12 @@ extern int DLLEXPORT black_hole_solver_run(
 
     solver = (bhs_solver_t *)ret_instance;
 
+#if (BHS_STATE_STORAGE == BHS_STATE_STORAGE_TOKYO_CAB_HASH)
+    solver->init_state = init_state = &(solver->init_state_raw);
+#else
     solver->init_state = init_state = 
         fcs_compact_alloc_ptr(&(solver->allocator), sizeof(*init_state));
+#endif
     memset(init_state, '\0', sizeof(*init_state));
     init_state->key.foundations = solver->initial_foundation;
 
@@ -358,11 +379,19 @@ extern int DLLEXPORT black_hole_solver_run(
     queue = malloc(sizeof(queue[0]) * queue_max_len);
 
     queue_len = 0;
+#if (BHS_STATE_STORAGE == BHS_STATE_STORAGE_TOKYO_CAB_HASH)
+    queue[queue_len++] = (*init_state);
+#else
     queue[queue_len++] = init_state;
+#endif
 
     while (queue_len > 0)
     {
+#if (BHS_STATE_STORAGE == BHS_STATE_STORAGE_TOKYO_CAB_HASH)
+        state = &(queue[--queue_len]);
+#else
         state = queue[--queue_len];
+#endif
         iterations_num++;
 
         foundations = state->key.foundations;
@@ -384,10 +413,12 @@ extern int DLLEXPORT black_hole_solver_run(
                 
                 if (abs(card-foundations)%(MAX_RANK-1) == 1)
                 {
+#if (! (BHS_STATE_STORAGE == BHS_STATE_STORAGE_TOKYO_CAB_HASH))
                     next_state = fcs_compact_alloc_ptr(
                             &(solver->allocator), 
                             sizeof(*next_state)
                             );
+#endif
                     *next_state = *state;
                     next_state->key.foundations = card;
                     next_state->key.data[(col_idx>>2)] &= 
@@ -410,7 +441,11 @@ extern int DLLEXPORT black_hole_solver_run(
                     {
                         num_states_in_collection++;
                         /* It's a new state - put it in the queue. */
+#if (BHS_STATE_STORAGE == BHS_STATE_STORAGE_TOKYO_CAB_HASH)
+                        queue[queue_len++] = (*next_state);
+#else
                         queue[queue_len++] = next_state;
+#endif
 
                         if (queue_len == queue_max_len)
                         {
@@ -420,20 +455,24 @@ extern int DLLEXPORT black_hole_solver_run(
                             );
                         }
                     }
+#if (! (BHS_STATE_STORAGE == BHS_STATE_STORAGE_TOKYO_CAB_HASH))
                     else
                     {
                         fcs_compact_alloc_release(&(solver->allocator));
                     }
+#endif
                 }
             }
         }
 
         if (no_cards)
         {
-            solver->final_state = state;
+            solver->final_state = (*state);
 
             solver->iterations_num = iterations_num;
             solver->num_states_in_collection = num_states_in_collection;
+
+            free(queue);
 
             return BLACK_HOLE_SOLVER__SUCCESS;
         }
@@ -442,8 +481,13 @@ extern int DLLEXPORT black_hole_solver_run(
     solver->iterations_num = iterations_num;
     solver->num_states_in_collection = num_states_in_collection;
 
+    free(queue);
+
     return BLACK_HOLE_SOLVER__NOT_SOLVABLE;
 }
+#if (BHS_STATE_STORAGE == BHS_STATE_STORAGE_TOKYO_CAB_HASH)
+#undef next_state
+#endif
 
 extern int DLLEXPORT black_hole_solver_free(
     black_hole_solver_instance_t * instance_proto
@@ -453,7 +497,9 @@ extern int DLLEXPORT black_hole_solver_free(
 
     solver = (bhs_solver_t *)instance_proto;
 
+#if (! (BHS_STATE_STORAGE == BHS_STATE_STORAGE_TOKYO_CAB_HASH))
     bh_solve_compact_allocator_finish(&(solver->allocator));
+#endif
     bh_solve_hash_free(&(solver->positions));
 
     free(solver);
@@ -505,7 +551,7 @@ DLLEXPORT extern int black_hole_solver_get_next_move(
 
         states = malloc(sizeof(states[0]) * max_num_states);
         
-        states[num_states] = (*(solver->final_state));
+        states[num_states] = (solver->final_state);
 
         while (memcmp(
             &(states[num_states].key),
