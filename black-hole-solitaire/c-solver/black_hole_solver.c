@@ -38,6 +38,9 @@
 #else
 #include "fcs_hash.h"
 #endif
+
+#include "alloc.h"
+
 typedef struct 
 {
     /*
@@ -86,7 +89,7 @@ int DLLEXPORT black_hole_solver_create(
         ret->iterations_num = 0;
         ret->num_states_in_collection = 0;
         bh_solve_compact_allocator_init(&(ret->allocator));
-        bh_solve_hash_init(&(ret->positions), 256);
+        bh_solve_hash_init(&(ret->positions));
         *ret_instance = (black_hole_solver_instance_t *)ret;
         return BLACK_HOLE_SOLVER__SUCCESS;
     }
@@ -301,7 +304,9 @@ extern int DLLEXPORT black_hole_solver_run(
 {
     bhs_solver_t * solver;
     bhs_state_key_value_pair_t * init_state;
+#if (! (BHS_STATE_STORAGE == BHS_STATE_STORAGE_TOKYO_CAB_HASH))
     void * init_state_existing;
+#endif
     bhs_state_key_value_pair_t * state, * next_state;
     int four_cols_idx, four_cols_offset;
     bhs_state_key_value_pair_t * * queue;
@@ -399,8 +404,8 @@ extern int DLLEXPORT black_hole_solver_run(
                         , &init_state_existing
                         , perl_hash_function(((ub1 *)&(next_state->key)), 
                             sizeof(next_state->key))
-                        )
 #endif
+                        )
                     )
                     {
                         num_states_in_collection++;
@@ -491,7 +496,9 @@ DLLEXPORT extern int black_hole_solver_get_next_move(
         bhs_state_key_value_pair_t temp_state;
 
         int i, num_states, max_num_states;
+#if (! (BHS_STATE_STORAGE == BHS_STATE_STORAGE_TOKYO_CAB_HASH))
         void * next_state;
+#endif
 
         num_states = 0;
         max_num_states = 53;

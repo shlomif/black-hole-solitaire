@@ -38,13 +38,12 @@
 #include "state.h"
 
 void bh_solve_hash_init(
-    bh_solve_hash_t * hash,
-    bh_solve_hash_value_t wanted_size
+    bh_solve_hash_t * hash
     )
 {
     hash->hash = tchdbnew();
     tchdbsetcache(hash->hash, 128*1024);
-    tchdbopen(hash->hash, "bh_solve.hdb", HDBOWRITER|GDBOTRUNC|HDBOREADER);
+    tchdbopen(hash->hash, "bh_solve.hdb", HDBOWRITER|HDBOTRUNC|HDBOREADER);
     return;
 }
 

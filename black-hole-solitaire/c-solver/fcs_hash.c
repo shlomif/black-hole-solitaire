@@ -50,18 +50,10 @@ static void GCC_INLINE bh_solve_hash_rehash(bh_solve_hash_t * hash);
 
 
 void bh_solve_hash_init(
-    bh_solve_hash_t * hash,
-    bh_solve_hash_value_t wanted_size
+    bh_solve_hash_t * hash
     )
 {
-    int size;
-    /* Find a size that's a power of 2 that's just greater than 
-     * the wanted_size. */
-    size = 256;
-    while (size < wanted_size)
-    {
-        size <<= 1;
-    }
+    int size = 256;
 
     hash->size = size;
     hash->size_bitmask = size-1;

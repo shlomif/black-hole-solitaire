@@ -101,8 +101,7 @@ typedef struct
 
 extern void
 bh_solve_hash_init(
-    bh_solve_hash_t * hash,
-    bh_solve_hash_value_t wanted_size
+    bh_solve_hash_t * hash
     );
 
 /*

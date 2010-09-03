@@ -44,6 +44,8 @@ extern "C" {
 #include "inline.h"
 #include "bool.h"
 
+#include "state.h"
+
 typedef struct
 {
     TCHDB * hash;
@@ -51,8 +53,7 @@ typedef struct
 
 extern void
 bh_solve_hash_init(
-    bh_solve_hash_t * hash,
-    bh_solve_hash_value_t wanted_size
+    bh_solve_hash_t * hash
     );
 
 /*
@@ -81,7 +82,7 @@ static GCC_INLINE void bh_solve_hash_get(
     bhs_state_key_value_pair_t * result
     )
 {
-    result->key = key_ptr;
+    result->key = (*key_ptr);
     tchdbget3(hash->hash, key_ptr, sizeof(*key_ptr), &(result->value), sizeof(result->value));
 
     return;
