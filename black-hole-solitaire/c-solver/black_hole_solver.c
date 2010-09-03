@@ -29,10 +29,15 @@
 #include <string.h>
 #include <stdio.h>
 
+#include "config.h"
 #include "black_hole_solver.h"
 #include "state.h"
-#include "fcs_hash.h"
 
+#if (BHS_STATE_STORAGE == BHS_STATE_STORAGE_TOKYO_CAB_HASH)
+#include "tokyo_cab_hash.h"
+#else
+#include "fcs_hash.h"
+#endif
 typedef struct 
 {
     /*
@@ -334,9 +339,11 @@ extern int DLLEXPORT black_hole_solver_run(
 
     bh_solve_hash_insert(
         &(solver->positions),
-        init_state,
-        &init_state_existing,
-        perl_hash_function(((ub1 *)&(init_state->key)), sizeof(init_state->key))
+        init_state
+#if (! (BHS_STATE_STORAGE == BHS_STATE_STORAGE_TOKYO_CAB_HASH))
+        , &init_state_existing
+        , perl_hash_function(((ub1 *)&(init_state->key)), sizeof(init_state->key))
+#endif
     );
 
     num_states_in_collection++;
@@ -387,11 +394,13 @@ extern int DLLEXPORT black_hole_solver_run(
 
                     if (! bh_solve_hash_insert(
                         &(solver->positions),
-                        next_state,
-                        &init_state_existing,
-                        perl_hash_function(((ub1 *)&(next_state->key)), 
+                        next_state
+#if (! (BHS_STATE_STORAGE == BHS_STATE_STORAGE_TOKYO_CAB_HASH))
+                        , &init_state_existing
+                        , perl_hash_function(((ub1 *)&(next_state->key)), 
                             sizeof(next_state->key))
                         )
+#endif
                     )
                     {
                         num_states_in_collection++;
@@ -508,6 +517,13 @@ DLLEXPORT extern int black_hole_solver_get_next_move(
          
             key_ptr = &(states[num_states].value.parent_state);
             /* Look up the next state in the positions associative array. */
+#if (BHS_STATE_STORAGE == BHS_STATE_STORAGE_TOKYO_CAB_HASH)
+            bh_solve_hash_get(
+                &(solver->positions),
+                key_ptr,
+                states+(++num_states)
+            );
+#else
             bh_solve_hash_insert(
                 &(solver->positions),
                 key_ptr,
@@ -519,7 +535,9 @@ DLLEXPORT extern int black_hole_solver_get_next_move(
                 states+(++num_states),
                 next_state, 
                 sizeof(states[0])
-            );
+            );            
+#endif
+
         }
 
         num_states++;

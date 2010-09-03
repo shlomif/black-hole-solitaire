@@ -59,6 +59,11 @@ extern "C" {
 /* The size of a single pack in alloc.c/alloc.h measured in 1024 chars. */
 #cmakedefine FCS_IA_PACK_SIZE ${FCS_IA_PACK_SIZE}
 
+#define BHS_STATE_STORAGE_INTERNAL_HASH 0
+#define BHS_STATE_STORAGE_TOKYO_CAB_HASH 1
+
+#define BHS_STATE_STORAGE ${BHS_STATE_STORAGE}
+
 #ifdef __cplusplus
 }
 #endif
