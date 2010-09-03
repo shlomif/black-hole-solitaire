@@ -314,12 +314,14 @@ extern int DLLEXPORT black_hole_solver_run(
     bhs_state_key_value_pair_t * init_state;
 #if (BHS_STATE_STORAGE == BHS_STATE_STORAGE_TOKYO_CAB_HASH)
     bhs_state_key_value_pair_t next_state_raw;
+    bhs_state_key_value_pair_t state_raw;
 #define next_state (&(next_state_raw))
+#define state (&(state_raw))
 #else
     void * init_state_existing;
     bhs_state_key_value_pair_t * next_state;
-#endif
     bhs_state_key_value_pair_t * state;
+#endif
 
     int four_cols_idx, four_cols_offset;
 #if (BHS_STATE_STORAGE == BHS_STATE_STORAGE_TOKYO_CAB_HASH)
@@ -388,7 +390,7 @@ extern int DLLEXPORT black_hole_solver_run(
     while (queue_len > 0)
     {
 #if (BHS_STATE_STORAGE == BHS_STATE_STORAGE_TOKYO_CAB_HASH)
-        state = &(queue[--queue_len]);
+        state_raw = queue[--queue_len];
 #else
         state = queue[--queue_len];
 #endif
@@ -487,6 +489,7 @@ extern int DLLEXPORT black_hole_solver_run(
 }
 #if (BHS_STATE_STORAGE == BHS_STATE_STORAGE_TOKYO_CAB_HASH)
 #undef next_state
+#undef state
 #endif
 
 extern int DLLEXPORT black_hole_solver_free(
