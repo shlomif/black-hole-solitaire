@@ -32,6 +32,9 @@
 #define BUILDING_DLL 1
 #include "config.h"
 
+#include <assert.h>
+#include <stdlib.h>
+
 #if (BHS_STATE_STORAGE == BHS_STATE_STORAGE_TOKYO_CAB_HASH)
 
 #include "tokyo_cab_hash.h"
@@ -41,9 +44,16 @@ void bh_solve_hash_init(
     bh_solve_hash_t * hash
     )
 {
+    int ecode;
+
     hash->hash = tchdbnew();
     tchdbsetcache(hash->hash, 128*1024);
-    tchdbopen(hash->hash, "bh_solve.hdb", HDBOWRITER|HDBOTRUNC|HDBOREADER);
+    if (!tchdbopen(hash->hash, "bh_solve.hdb", HDBOWRITER|HDBOTRUNC|HDBOCREAT))
+    {
+        ecode = tchdbecode(hash->hash);
+        fprintf(stderr, "Tokyo Cabinet open error: %s\n", tchdberrmsg(ecode));
+        exit(-1);
+    }
     return;
 }
 
@@ -52,14 +62,30 @@ fcs_bool_t bh_solve_hash_insert(
     bhs_state_key_value_pair_t * key
 )
 {
-    return
-        !tchdbputkeep(
+    int ecode;
+
+    if (tchdbvsiz(hash->hash, &(key->key), sizeof(key->key)) < 0)
+    {
+        /* Record does not exist. */
+        if (!tchdbputkeep(
             hash->hash,
             &(key->key),
             sizeof(key->key),
             &(key->value),
             sizeof(key->value)
-            );
+            ))
+        {
+            ecode = tchdbecode(hash->hash);
+            fprintf(stderr, "Tokyo Cabinet putkeep error: %s\n", tchdberrmsg(ecode));
+            exit(-1);
+    
+        }
+        return FALSE;
+    }
+    else
+    {
+        return TRUE;
+    }
 }
 
 #else
