@@ -1,0 +1,47 @@
+INSTALL file for Black Hole Solitaire Solver
+============================================
+Shlomi Fish <shlomif@cpan.org>
+:Date: 2009-08-29
+:Revision: $Id: INSTALL.txt 2303 2009-11-22 08:37:36Z shlomif $
+
+Quick and Dirty Compilation
+---------------------------
+
+Black Hole Solitaire Solver is using CMake ( http://www.cmake.org/ ) 
+for its build system. You'll need to install CMake version 2.6.3
+or later from your distribution's repository or from its source
+distribution. *NOTE*: CMake 2.6.2 (that ships with some releases of Ubuntu)
+won't work due to a regression bug so please don't report any errors with
+it.
+
+Next, run:
+
+    cmake-gui .         # For the GUI configuration applet
+
+Or:
+
+    ccmake .            # For the Curses-based configuration applet
+
+With a fallback to:
+
+    cmake .             # Non-interactive application.
+
+This will build and install the "black_hole_solver" shared library,
+and "black-hole-solve" which is the executable for you.
+
+Installing under Win32
+----------------------
+
+Consult the CMake documentation for generating a Visual C++ , MinGW32
+etc. compatible makefile or project.
+
+Testing
+-------
+
+To test the Black Hole Solitaire Solver, you need to:
+
+1. Configure it.
+
+2. Run "make test".
+
+Please report any errors to me ( http://www.shlomifish.org/me/contact-me/ ).
