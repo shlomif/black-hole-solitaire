@@ -62,11 +62,7 @@ typedef struct
     bhs_card_string_t initial_board_card_strings[MAX_NUM_COLUMNS][MAX_NUM_CARDS_IN_COL];
     int initial_lens[MAX_NUM_COLUMNS];
 
-    bhs_state_key_value_pair_t * init_state;
-#if (BHS_STATE_STORAGE == BHS_STATE_STORAGE_TOKYO_CAB_HASH)
-    bhs_state_key_value_pair_t init_state_raw;
-#endif
-
+    bhs_state_key_value_pair_t init_state;
     bhs_state_key_value_pair_t final_state;
 
     bhs_state_key_value_pair_t * states_in_solution;
@@ -333,12 +329,7 @@ extern int DLLEXPORT black_hole_solver_run(
 
     solver = (bhs_solver_t *)ret_instance;
 
-#if (BHS_STATE_STORAGE == BHS_STATE_STORAGE_TOKYO_CAB_HASH)
-    solver->init_state = init_state = &(solver->init_state_raw);
-#else
-    solver->init_state = init_state = 
-        fcs_compact_alloc_ptr(&(solver->allocator), sizeof(*init_state));
-#endif
+    init_state = &(solver->init_state);
     memset(init_state, '\0', sizeof(*init_state));
     init_state->key.foundations = solver->initial_foundation;
 
@@ -541,7 +532,7 @@ DLLEXPORT extern int black_hole_solver_get_next_move(
 
         while (memcmp(
             &(states[num_states].key),
-            &(solver->init_state->key),
+            &(solver->init_state.key),
             sizeof(states[num_states].key)
         ))
         {
