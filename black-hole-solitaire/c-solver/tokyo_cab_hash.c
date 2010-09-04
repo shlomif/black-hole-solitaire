@@ -40,37 +40,6 @@
 #include "tokyo_cab_hash.h"
 #include "state.h"
 
-void bh_solve_hash_init(
-    bh_solve_hash_t * hash
-    )
-{
-    int ecode;
-
-    hash->hash = tchdbnew();
-    tchdbsetcache(hash->hash, 1024*1024);
-    if (!tchdbopen(hash->hash, "bh_solve.hdb", HDBOWRITER|HDBOTRUNC|HDBOCREAT))
-    {
-        ecode = tchdbecode(hash->hash);
-        fprintf(stderr, "Tokyo Cabinet open error: %s\n", tchdberrmsg(ecode));
-        exit(-1);
-    }
-    return;
-}
-
-fcs_bool_t bh_solve_hash_insert(
-    bh_solve_hash_t * hash,
-    bhs_state_key_value_pair_t * key
-)
-{
-    return (!tchdbputkeep(
-        hash->hash,
-        &(key->key),
-        sizeof(key->key),
-        &(key->value),
-        sizeof(key->value)
-    ));
-}
-
 #else
 
 /* ANSI C doesn't allow empty compilation */
