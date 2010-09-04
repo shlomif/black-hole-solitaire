@@ -59,7 +59,8 @@ enum
     BLACK_HOLE_SOLVER__NOT_ENOUGH_COLUMNS,
     BLACK_HOLE_SOLVER__TOO_MANY_CARDS,
     BLACK_HOLE_SOLVER__NOT_SOLVABLE,
-    BLACK_HOLE_SOLVER__END
+    BLACK_HOLE_SOLVER__END,
+    BLACK_HOLE_SOLVER__OUT_OF_ITERS
 };
 
 typedef struct
@@ -75,6 +76,11 @@ DLLEXPORT extern int black_hole_solver_read_board(
     black_hole_solver_instance_t * ret_instance,
     const char * board_string,
     int * error_line_number
+);
+
+DLLEXPORT extern int black_hole_solver_set_max_iters_limit(
+    black_hole_solver_instance_t * instance_proto,
+    long limit
 );
 
 DLLEXPORT extern int black_hole_solver_run(

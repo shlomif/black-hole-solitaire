@@ -39,9 +39,11 @@ int main(int argc, char * argv[])
     black_hole_solver_instance_t * solver;
     char board[MAX_LEN_BOARD_STRING];
     int error_line_num;
-    int ret;
+    int ret, solver_ret_code;
     char * filename = NULL;
     FILE * fh;
+    int arg_idx;
+    long max_iters_limit = -1;
 
     if (black_hole_solver_create(&solver))
     {
@@ -49,12 +51,30 @@ int main(int argc, char * argv[])
         exit(-1);
     }
 
-    if (argc > 1)
+    arg_idx = 1;
+    if (argc > arg_idx)
     {
-        if (strcmp(argv[1], "-"))
+        if (!strcmp(argv[arg_idx], "--max-iters"))
         {
-            filename = argv[1];
+            arg_idx++;
+            if (argc == arg_idx)
+            {
+                fprintf(stderr, "Error! --max-iters requires an arguments.\n");
+                exit(-1);
+            }
+            max_iters_limit = atol(argv[arg_idx++]);
         }
+    }
+
+    black_hole_solver_set_max_iters_limit(solver, max_iters_limit);
+    
+    if (argc > arg_idx)
+    {
+        if (strcmp(argv[arg_idx], "-"))
+        {
+            filename = argv[arg_idx];
+        }
+        arg_idx++;
     }
 
     if (filename)
@@ -86,7 +106,9 @@ int main(int argc, char * argv[])
     }
 
     ret = 0;
-    if (!black_hole_solver_run(solver))
+
+    solver_ret_code = black_hole_solver_run(solver);
+    if (!solver_ret_code)
     {
         int col_idx, card_rank, card_suit;
         int next_move_ret_code;
@@ -117,6 +139,11 @@ int main(int argc, char * argv[])
             );
             ret = -1;
         }
+    }
+    else if (solver_ret_code == BLACK_HOLE_SOLVER__OUT_OF_ITERS)
+    {
+        printf("Intractable!\n");
+        ret = -2;
     }
     else
     {

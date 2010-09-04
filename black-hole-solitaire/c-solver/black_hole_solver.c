@@ -28,6 +28,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <limits.h>
 
 #include "config.h"
 #include "black_hole_solver.h"
@@ -65,7 +66,7 @@ typedef struct
     bhs_state_key_value_pair_t * states_in_solution;
     int num_states_in_solution, current_state_in_solution_idx;
     
-    long iterations_num, num_states_in_collection;
+    long iterations_num, num_states_in_collection, max_iters_limit;
 } bhs_solver_t;
 
 int DLLEXPORT black_hole_solver_create(
@@ -278,6 +279,20 @@ extern int DLLEXPORT black_hole_solver_read_board(
     return BLACK_HOLE_SOLVER__SUCCESS;
 }
 
+DLLEXPORT extern int black_hole_solver_set_max_iters_limit(
+    black_hole_solver_instance_t * instance_proto,
+    long limit
+)
+{
+    bhs_solver_t * solver;
+
+    solver = (bhs_solver_t *)instance_proto;
+    solver->max_iters_limit = limit;
+
+    return BLACK_HOLE_SOLVER__SUCCESS;
+}
+
+
 extern int DLLEXPORT black_hole_solver_run(
     black_hole_solver_instance_t * ret_instance
 )
@@ -295,12 +310,20 @@ extern int DLLEXPORT black_hole_solver_run(
     int col_idx, pos;
     bhs_rank_t card;
     long iterations_num, num_states_in_collection;
+    long max_iters_limit;
 
     solver = (bhs_solver_t *)ret_instance;
 
     init_state = &(solver->init_state);
     memset(init_state, '\0', sizeof(*init_state));
     init_state->key.foundations = solver->initial_foundation;
+
+    max_iters_limit = solver->max_iters_limit;
+
+    if (max_iters_limit < 0)
+    {
+        max_iters_limit = LONG_MAX;
+    }
 
     for (four_cols_idx = 0, four_cols_offset = 0; four_cols_idx < 4; four_cols_idx++, four_cols_offset += 4)
     {
@@ -399,6 +422,14 @@ extern int DLLEXPORT black_hole_solver_run(
             free(queue);
 
             return BLACK_HOLE_SOLVER__SUCCESS;
+        }
+        else
+        {
+            if (iterations_num == max_iters_limit)
+            {
+                free(queue);
+                return BLACK_HOLE_SOLVER__OUT_OF_ITERS;
+            }
         }
     }
 
