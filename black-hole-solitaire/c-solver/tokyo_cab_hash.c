@@ -62,30 +62,13 @@ fcs_bool_t bh_solve_hash_insert(
     bhs_state_key_value_pair_t * key
 )
 {
-    int ecode;
-
-    if (tchdbvsiz(hash->hash, &(key->key), sizeof(key->key)) < 0)
-    {
-        /* Record does not exist. */
-        if (!tchdbputkeep(
-            hash->hash,
-            &(key->key),
-            sizeof(key->key),
-            &(key->value),
-            sizeof(key->value)
-            ))
-        {
-            ecode = tchdbecode(hash->hash);
-            fprintf(stderr, "Tokyo Cabinet putkeep error: %s\n", tchdberrmsg(ecode));
-            exit(-1);
-    
-        }
-        return FALSE;
-    }
-    else
-    {
-        return TRUE;
-    }
+    return (!tchdbputkeep(
+        hash->hash,
+        &(key->key),
+        sizeof(key->key),
+        &(key->value),
+        sizeof(key->value)
+    ));
 }
 
 #else
