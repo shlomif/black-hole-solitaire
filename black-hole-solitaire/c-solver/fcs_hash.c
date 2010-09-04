@@ -50,13 +50,11 @@
 typedef  unsigned long  int  ub4;   /* unsigned 4-byte quantities */
 typedef  unsigned       char ub1;
 
-static GCC_INLINE ub4 perl_hash_function(
-    register ub1 *s_ptr,        /* the key */
-    register ub4  length        /* the length of the key */
-    )
+static GCC_INLINE ub4 perl_hash_function(bhs_state_key_t key)
 {
     register ub4  hash_value_int = 0;
-    register ub1 * s_end = s_ptr+length;
+    register ub1 * s_ptr = (ub1 *)(&(key));
+    register ub1 * s_end = s_ptr+sizeof(key);
 
     while (s_ptr < s_end)
     {
@@ -110,7 +108,7 @@ void bh_solve_hash_get(
 
     bh_solve_hash_value_t hash_value;
 
-    hash_value = perl_hash_function((ub1*)&(key_ptr->key), sizeof(key_ptr->key));
+    hash_value = perl_hash_function(key_ptr->key);
 
 #define PLACE() (hash_value & (hash->size_bitmask))
     list = (hash->entries + PLACE());
@@ -150,7 +148,7 @@ fcs_bool_t bh_solve_hash_insert(
     enum FCS_INLINED_HASH_DATA_TYPE hash_type;
 #endif
 
-    hash_value = perl_hash_function((ub1*)&(key->key), sizeof(key->key));
+    hash_value = perl_hash_function(key->key);
 
 #ifdef FCS_INLINED_HASH_COMPARISON
     hash_type = hash->hash_type;
