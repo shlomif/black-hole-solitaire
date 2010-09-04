@@ -53,9 +53,6 @@ typedef struct
 
     bhs_rank_t initial_foundation;
 
-#if (! (BHS_STATE_STORAGE == BHS_STATE_STORAGE_TOKYO_CAB_HASH))
-    bhs_compact_allocator_t allocator;
-#endif
     bh_solve_hash_t positions;
 
     bhs_card_string_t initial_foundation_string;
@@ -90,11 +87,11 @@ int DLLEXPORT black_hole_solver_create(
         ret->states_in_solution = NULL;
         ret->iterations_num = 0;
         ret->num_states_in_collection = 0;
-#if (! (BHS_STATE_STORAGE == BHS_STATE_STORAGE_TOKYO_CAB_HASH))
-        bh_solve_compact_allocator_init(&(ret->allocator));
-#endif
+
         bh_solve_hash_init(&(ret->positions));
+
         *ret_instance = (black_hole_solver_instance_t *)ret;
+
         return BLACK_HOLE_SOLVER__SUCCESS;
     }
 }
@@ -309,13 +306,8 @@ extern int DLLEXPORT black_hole_solver_run(
     bhs_solver_t * solver;
     bhs_state_key_value_pair_t * init_state;
     bhs_state_key_value_pair_t state_raw;
-#if (BHS_STATE_STORAGE == BHS_STATE_STORAGE_TOKYO_CAB_HASH)
-    bhs_state_key_value_pair_t next_state_raw;
-#define next_state (&(next_state_raw))
-#else
+    bhs_state_key_value_pair_t next_state;
     bhs_state_key_value_pair_t * init_state_existing;
-    bhs_state_key_value_pair_t * next_state;
-#endif
 #define state (&(state_raw))
 
     int four_cols_idx, four_cols_offset;
@@ -393,35 +385,29 @@ extern int DLLEXPORT black_hole_solver_run(
                 
                 if (abs(card-foundations)%(MAX_RANK-1) == 1)
                 {
-#if (! (BHS_STATE_STORAGE == BHS_STATE_STORAGE_TOKYO_CAB_HASH))
-                    next_state = fcs_compact_alloc_ptr(
-                            &(solver->allocator), 
-                            sizeof(*next_state)
-                            );
-#endif
-                    *next_state = *state;
-                    next_state->key.foundations = card;
-                    next_state->key.data[(col_idx>>2)] &= 
+                    next_state = *state;
+                    next_state.key.foundations = card;
+                    next_state.key.data[(col_idx>>2)] &= 
                         (~(0x3 << ((col_idx&0x3)<<1)));
-                    next_state->key.data[(col_idx>>2)] |=
+                    next_state.key.data[(col_idx>>2)] |=
                         ((pos-1) << ((col_idx&0x3)<<1));
-                    next_state->value.parent_state = state->key;
-                    next_state->value.col_idx = col_idx;
+                    next_state.value.parent_state = state->key;
+                    next_state.value.col_idx = col_idx;
 
                     if (! bh_solve_hash_insert(
                         &(solver->positions),
-                        next_state
+                        &next_state
 #if (! (BHS_STATE_STORAGE == BHS_STATE_STORAGE_TOKYO_CAB_HASH))
                         , &init_state_existing
-                        , perl_hash_function(((ub1 *)&(next_state->key)), 
-                            sizeof(next_state->key))
+                        , perl_hash_function(((ub1 *)&(next_state.key)), 
+                            sizeof(next_state.key))
 #endif
                         )
                     )
                     {
                         num_states_in_collection++;
                         /* It's a new state - put it in the queue. */
-                        queue[queue_len++] = (*next_state);
+                        queue[queue_len++] = next_state;
 
                         if (queue_len == queue_max_len)
                         {
@@ -431,12 +417,6 @@ extern int DLLEXPORT black_hole_solver_run(
                             );
                         }
                     }
-#if (! (BHS_STATE_STORAGE == BHS_STATE_STORAGE_TOKYO_CAB_HASH))
-                    else
-                    {
-                        fcs_compact_alloc_release(&(solver->allocator));
-                    }
-#endif
                 }
             }
         }
@@ -474,9 +454,6 @@ extern int DLLEXPORT black_hole_solver_free(
 
     solver = (bhs_solver_t *)instance_proto;
 
-#if (! (BHS_STATE_STORAGE == BHS_STATE_STORAGE_TOKYO_CAB_HASH))
-    bh_solve_compact_allocator_finish(&(solver->allocator));
-#endif
     bh_solve_hash_free(&(solver->positions));
 
     free(solver);
