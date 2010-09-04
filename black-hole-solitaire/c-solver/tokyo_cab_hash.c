@@ -47,7 +47,7 @@ void bh_solve_hash_init(
     int ecode;
 
     hash->hash = tchdbnew();
-    tchdbsetcache(hash->hash, 128*1024);
+    tchdbsetcache(hash->hash, 1024*1024);
     if (!tchdbopen(hash->hash, "bh_solve.hdb", HDBOWRITER|HDBOTRUNC|HDBOCREAT))
     {
         ecode = tchdbecode(hash->hash);
