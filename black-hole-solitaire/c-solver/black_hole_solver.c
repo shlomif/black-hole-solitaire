@@ -307,7 +307,9 @@ extern int DLLEXPORT black_hole_solver_run(
     bhs_state_key_value_pair_t * init_state;
     bhs_state_key_value_pair_t state;
     bhs_state_key_value_pair_t next_state;
+#if (! (BHS_STATE_STORAGE == BHS_STATE_STORAGE_TOKYO_CAB_HASH))
     bhs_state_key_value_pair_t * init_state_existing;
+#endif
 
     int four_cols_idx, four_cols_offset;
     bhs_state_key_value_pair_t * queue;
@@ -491,9 +493,6 @@ DLLEXPORT extern int black_hole_solver_get_next_move(
         bhs_state_key_value_pair_t temp_state;
 
         int i, num_states, max_num_states;
-#if (! (BHS_STATE_STORAGE == BHS_STATE_STORAGE_TOKYO_CAB_HASH))
-        bhs_state_key_value_pair_t * next_state;
-#endif
 
         num_states = 0;
         max_num_states = 53;
@@ -519,27 +518,14 @@ DLLEXPORT extern int black_hole_solver_get_next_move(
          
             key_ptr = (bhs_state_key_value_pair_t *)&(states[num_states].value.parent_state);
             /* Look up the next state in the positions associative array. */
-#if (BHS_STATE_STORAGE == BHS_STATE_STORAGE_TOKYO_CAB_HASH)
             bh_solve_hash_get(
                 &(solver->positions),
                 key_ptr,
                 states+(++num_states)
-            );
-#else
-            bh_solve_hash_insert(
-                &(solver->positions),
-                key_ptr,
-                &next_state,
-                perl_hash_function((ub1 *)key_ptr, sizeof(key_ptr->key))
-            );
-
-            memcpy(
-                states+(++num_states),
-                next_state, 
-                sizeof(states[0])
-            );            
+#if (! (BHS_STATE_STORAGE == BHS_STATE_STORAGE_TOKYO_CAB_HASH))
+                ,perl_hash_function((ub1 *)&(key_ptr->key), sizeof(key_ptr->key))
 #endif
-
+            );
         }
 
         num_states++;

@@ -78,16 +78,16 @@ static GCC_INLINE void bh_solve_hash_free(
 
 static GCC_INLINE void bh_solve_hash_get(
     bh_solve_hash_t * hash,
-    bhs_state_key_t * key_ptr,
+    bhs_state_key_value_pair_t * key_ptr,
     bhs_state_key_value_pair_t * result
     )
 {
-    result->key = (*key_ptr);
-    tchdbget3(hash->hash, key_ptr, sizeof(*key_ptr), &(result->value), sizeof(result->value));
+    result->key = key_ptr->key;
+    tchdbget3(hash->hash, &(key_ptr->key), sizeof(key_ptr->key), &(result->value), sizeof(result->value));
 
     return;
 }
-    
+
 #ifdef __cplusplus
 }
 #endif

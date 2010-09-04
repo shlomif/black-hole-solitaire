@@ -36,6 +36,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 
 #include "fcs_hash.h"
 
@@ -73,6 +74,40 @@ void bh_solve_hash_init(
     memset(hash->entries, 0, sizeof(bh_solve_hash_symlink_t)*size);
 
     bh_solve_compact_allocator_init(&(hash->allocator));
+
+    return;
+}
+
+void bh_solve_hash_get(
+    bh_solve_hash_t * hash,
+    bhs_state_key_value_pair_t * key_ptr,
+    bhs_state_key_value_pair_t * result,
+    bh_solve_hash_value_t hash_value
+    )
+{
+    bh_solve_hash_symlink_t * list;
+    bh_solve_hash_symlink_item_t * item;
+#define PLACE() (hash_value & (hash->size_bitmask))
+    list = (hash->entries + PLACE());
+
+    assert(item = list->first_item);
+
+    result->key = key_ptr->key;
+
+    while (item != NULL)
+    {
+        if (
+            (!memcmp(&(item->key.key), &(key_ptr->key), sizeof(bhs_state_key_t)))
+        )
+        {
+            result->value = item->key.value;
+            return;
+        }
+
+        item = item->next;
+    }
+
+    assert(0);
 
     return;
 }
@@ -133,10 +168,6 @@ fcs_bool_t bh_solve_hash_insert(
 
         while (item != NULL)
         {
-            /*
-                We first compare the hash values, because it is faster than
-                comparing the entire data structure.
-            */
             if (
                 (!memcmp(&(item->key.key), &(key->key), sizeof(bhs_state_key_t)))
                )
