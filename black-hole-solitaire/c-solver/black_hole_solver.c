@@ -307,9 +307,6 @@ extern int DLLEXPORT black_hole_solver_run(
     bhs_state_key_value_pair_t * init_state;
     bhs_state_key_value_pair_t state;
     bhs_state_key_value_pair_t next_state;
-#if (! (BHS_STATE_STORAGE == BHS_STATE_STORAGE_TOKYO_CAB_HASH))
-    bhs_state_key_value_pair_t * init_state_existing;
-#endif
 
     int four_cols_idx, four_cols_offset;
     bhs_state_key_value_pair_t * queue;
@@ -348,7 +345,6 @@ extern int DLLEXPORT black_hole_solver_run(
         &(solver->positions),
         init_state
 #if (! (BHS_STATE_STORAGE == BHS_STATE_STORAGE_TOKYO_CAB_HASH))
-        , &init_state_existing
         , perl_hash_function(((ub1 *)&(init_state->key)), sizeof(init_state->key))
 #endif
     );
@@ -399,7 +395,6 @@ extern int DLLEXPORT black_hole_solver_run(
                         &(solver->positions),
                         &next_state
 #if (! (BHS_STATE_STORAGE == BHS_STATE_STORAGE_TOKYO_CAB_HASH))
-                        , &init_state_existing
                         , perl_hash_function(((ub1 *)&(next_state.key)), 
                             sizeof(next_state.key))
 #endif

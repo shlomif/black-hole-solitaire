@@ -115,7 +115,6 @@ void bh_solve_hash_get(
 fcs_bool_t bh_solve_hash_insert(
     bh_solve_hash_t * hash,
     bhs_state_key_value_pair_t * key,
-    bhs_state_key_value_pair_t * * existing_key,
     bh_solve_hash_value_t hash_value
 #ifdef FCS_ENABLE_SECONDARY_HASH_VALUE
     , bh_solve_hash_value_t secondary_hash_value
@@ -172,8 +171,6 @@ fcs_bool_t bh_solve_hash_insert(
                 (!memcmp(&(item->key.key), &(key->key), sizeof(bhs_state_key_t)))
                )
             {
-                *existing_key = &(item->key);
-
                 return TRUE;
             }
             /* Cache the item before the current in last_item */
@@ -209,8 +206,6 @@ fcs_bool_t bh_solve_hash_insert(
     {
         bh_solve_hash_rehash(hash);
     }
-
-    *existing_key = NULL;
 
     return FALSE;
 }

@@ -107,15 +107,12 @@ bh_solve_hash_init(
 
 /*
  * Returns FALSE if the key is new and the key/val pair was inserted.
- *      - in that case *existing_key / *existing_val will be set to key
- *      and val respectively.
  * Returns TRUE if the key is not new and *existing_key / *existing_val
  * was set to it.
  */
 extern fcs_bool_t bh_solve_hash_insert(
     bh_solve_hash_t * hash,
     bhs_state_key_value_pair_t * key,
-    bhs_state_key_value_pair_t * * existing_key,
     bh_solve_hash_value_t hash_value
 #ifdef FCS_ENABLE_SECONDARY_HASH_VALUE
     , bh_solve_hash_value_t secondary_hash_value
