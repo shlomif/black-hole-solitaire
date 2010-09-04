@@ -39,6 +39,7 @@ extern "C" {
 
 #include "inline.h"
 #include "bool.h"
+#include "state.h"
 
 #ifdef FCS_INLINED_HASH_COMPARISON
 enum FCS_INLINED_HASH_DATA_TYPE
@@ -53,7 +54,7 @@ typedef int bh_solve_hash_value_t;
 struct bh_solve_hash_symlink_item_struct
 {
     /* A pointer to the data structure that is to be collected */
-    void * key;
+    bhs_state_key_value_pair_t key;
     /* We also store the hash value corresponding to this key for faster
        comparisons */
     bh_solve_hash_value_t hash_value;
@@ -113,8 +114,8 @@ bh_solve_hash_init(
  */
 extern fcs_bool_t bh_solve_hash_insert(
     bh_solve_hash_t * hash,
-    void * key,
-    void * * existing_key,
+    bhs_state_key_value_pair_t * key,
+    bhs_state_key_value_pair_t * * existing_key,
     bh_solve_hash_value_t hash_value
 #ifdef FCS_ENABLE_SECONDARY_HASH_VALUE
     , bh_solve_hash_value_t secondary_hash_value

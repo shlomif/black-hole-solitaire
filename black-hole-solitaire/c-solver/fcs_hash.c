@@ -79,8 +79,8 @@ void bh_solve_hash_init(
 
 fcs_bool_t bh_solve_hash_insert(
     bh_solve_hash_t * hash,
-    void * key,
-    void * * existing_key,
+    bhs_state_key_value_pair_t * key,
+    bhs_state_key_value_pair_t * * existing_key,
     bh_solve_hash_value_t hash_value
 #ifdef FCS_ENABLE_SECONDARY_HASH_VALUE
     , bh_solve_hash_value_t secondary_hash_value
@@ -138,10 +138,10 @@ fcs_bool_t bh_solve_hash_insert(
                 comparing the entire data structure.
             */
             if (
-                (!memcmp(item->key, key, sizeof(bhs_state_key_t)))
+                (!memcmp(&(item->key.key), &(key->key), sizeof(bhs_state_key_t)))
                )
             {
-                *existing_key = item->key;
+                *existing_key = &(item->key);
 
                 return TRUE;
             }
@@ -167,7 +167,7 @@ fcs_bool_t bh_solve_hash_insert(
 
     /* Put the new element at the end of the list */
     /* Do an in-order insertion. */
-    item->key = key;
+    item->key = (*key);
     item->hash_value = hash_value;
 #ifdef FCS_ENABLE_SECONDARY_HASH_VALUE
     item->secondary_hash_value = secondary_hash_value;
