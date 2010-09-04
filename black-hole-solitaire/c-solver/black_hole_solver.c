@@ -312,23 +312,18 @@ extern int DLLEXPORT black_hole_solver_run(
 {
     bhs_solver_t * solver;
     bhs_state_key_value_pair_t * init_state;
+    bhs_state_key_value_pair_t state_raw;
 #if (BHS_STATE_STORAGE == BHS_STATE_STORAGE_TOKYO_CAB_HASH)
     bhs_state_key_value_pair_t next_state_raw;
-    bhs_state_key_value_pair_t state_raw;
 #define next_state (&(next_state_raw))
-#define state (&(state_raw))
 #else
     void * init_state_existing;
     bhs_state_key_value_pair_t * next_state;
-    bhs_state_key_value_pair_t * state;
 #endif
+#define state (&(state_raw))
 
     int four_cols_idx, four_cols_offset;
-#if (BHS_STATE_STORAGE == BHS_STATE_STORAGE_TOKYO_CAB_HASH)
     bhs_state_key_value_pair_t * queue;
-#else
-    bhs_state_key_value_pair_t * * queue;
-#endif
     int queue_len, queue_max_len;
     int foundations;
     fcs_bool_t no_cards;
@@ -381,19 +376,11 @@ extern int DLLEXPORT black_hole_solver_run(
     queue = malloc(sizeof(queue[0]) * queue_max_len);
 
     queue_len = 0;
-#if (BHS_STATE_STORAGE == BHS_STATE_STORAGE_TOKYO_CAB_HASH)
     queue[queue_len++] = (*init_state);
-#else
-    queue[queue_len++] = init_state;
-#endif
 
     while (queue_len > 0)
     {
-#if (BHS_STATE_STORAGE == BHS_STATE_STORAGE_TOKYO_CAB_HASH)
         state_raw = queue[--queue_len];
-#else
-        state = queue[--queue_len];
-#endif
         iterations_num++;
 
         foundations = state->key.foundations;
@@ -443,11 +430,7 @@ extern int DLLEXPORT black_hole_solver_run(
                     {
                         num_states_in_collection++;
                         /* It's a new state - put it in the queue. */
-#if (BHS_STATE_STORAGE == BHS_STATE_STORAGE_TOKYO_CAB_HASH)
                         queue[queue_len++] = (*next_state);
-#else
-                        queue[queue_len++] = next_state;
-#endif
 
                         if (queue_len == queue_max_len)
                         {
