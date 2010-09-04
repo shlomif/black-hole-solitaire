@@ -305,10 +305,9 @@ extern int DLLEXPORT black_hole_solver_run(
 {
     bhs_solver_t * solver;
     bhs_state_key_value_pair_t * init_state;
-    bhs_state_key_value_pair_t state_raw;
+    bhs_state_key_value_pair_t state;
     bhs_state_key_value_pair_t next_state;
     bhs_state_key_value_pair_t * init_state_existing;
-#define state (&(state_raw))
 
     int four_cols_idx, four_cols_offset;
     bhs_state_key_value_pair_t * queue;
@@ -363,17 +362,17 @@ extern int DLLEXPORT black_hole_solver_run(
 
     while (queue_len > 0)
     {
-        state_raw = queue[--queue_len];
+        state = queue[--queue_len];
         iterations_num++;
 
-        foundations = state->key.foundations;
+        foundations = state.key.foundations;
 
         no_cards = TRUE;
 
         for (col_idx = 0 ; col_idx < MAX_NUM_COLUMNS ; col_idx++)
         {
             if ((pos = (
-                (state->key.data[(col_idx >> 2)] >> ((col_idx&(4-1))<<1))
+                (state.key.data[(col_idx >> 2)] >> ((col_idx&(4-1))<<1))
                     &
                     (4-1)
                 )
@@ -385,13 +384,13 @@ extern int DLLEXPORT black_hole_solver_run(
                 
                 if (abs(card-foundations)%(MAX_RANK-1) == 1)
                 {
-                    next_state = *state;
+                    next_state = state;
                     next_state.key.foundations = card;
                     next_state.key.data[(col_idx>>2)] &= 
                         (~(0x3 << ((col_idx&0x3)<<1)));
                     next_state.key.data[(col_idx>>2)] |=
                         ((pos-1) << ((col_idx&0x3)<<1));
-                    next_state.value.parent_state = state->key;
+                    next_state.value.parent_state = state.key;
                     next_state.value.col_idx = col_idx;
 
                     if (! bh_solve_hash_insert(
@@ -423,7 +422,7 @@ extern int DLLEXPORT black_hole_solver_run(
 
         if (no_cards)
         {
-            solver->final_state = (*state);
+            solver->final_state = state;
 
             solver->iterations_num = iterations_num;
             solver->num_states_in_collection = num_states_in_collection;
@@ -441,10 +440,6 @@ extern int DLLEXPORT black_hole_solver_run(
 
     return BLACK_HOLE_SOLVER__NOT_SOLVABLE;
 }
-#if (BHS_STATE_STORAGE == BHS_STATE_STORAGE_TOKYO_CAB_HASH)
-#undef next_state
-#undef state
-#endif
 
 extern int DLLEXPORT black_hole_solver_free(
     black_hole_solver_instance_t * instance_proto
