@@ -88,6 +88,7 @@ int DLLEXPORT black_hole_solver_create(
         ret->states_in_solution = NULL;
         ret->iterations_num = 0;
         ret->num_states_in_collection = 0;
+        ret->max_iters_limit = -1;
 
         bh_solve_hash_init(&(ret->positions));
 
