@@ -108,6 +108,7 @@ int main(int argc, char * argv[])
     ret = 0;
 
     solver_ret_code = black_hole_solver_run(solver);
+
     if (!solver_ret_code)
     {
         int col_idx, card_rank, card_suit;

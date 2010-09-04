@@ -428,7 +428,11 @@ extern int DLLEXPORT black_hole_solver_run(
         {
             if (iterations_num == max_iters_limit)
             {
+                solver->iterations_num = iterations_num;
+                solver->num_states_in_collection = num_states_in_collection;
+
                 free(queue);
+
                 return BLACK_HOLE_SOLVER__OUT_OF_ITERS;
             }
         }
