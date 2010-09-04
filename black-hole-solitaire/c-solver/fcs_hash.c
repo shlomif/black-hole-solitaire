@@ -46,6 +46,27 @@
 
 #include "state.h"
 
+
+typedef  unsigned long  int  ub4;   /* unsigned 4-byte quantities */
+typedef  unsigned       char ub1;
+
+static GCC_INLINE ub4 perl_hash_function(
+    register ub1 *s_ptr,        /* the key */
+    register ub4  length        /* the length of the key */
+    )
+{
+    register ub4  hash_value_int = 0;
+    register ub1 * s_end = s_ptr+length;
+
+    while (s_ptr < s_end)
+    {
+        hash_value_int += (hash_value_int << 5) + *(s_ptr++);
+    }
+    hash_value_int += (hash_value_int>>5);
+
+    return hash_value_int;
+}
+
 static void GCC_INLINE bh_solve_hash_rehash(bh_solve_hash_t * hash);
 
 
@@ -81,12 +102,16 @@ void bh_solve_hash_init(
 void bh_solve_hash_get(
     bh_solve_hash_t * hash,
     bhs_state_key_value_pair_t * key_ptr,
-    bhs_state_key_value_pair_t * result,
-    bh_solve_hash_value_t hash_value
+    bhs_state_key_value_pair_t * result
     )
 {
     bh_solve_hash_symlink_t * list;
     bh_solve_hash_symlink_item_t * item;
+
+    bh_solve_hash_value_t hash_value;
+
+    hash_value = perl_hash_function((ub1*)&(key_ptr->key), sizeof(key_ptr->key));
+
 #define PLACE() (hash_value & (hash->size_bitmask))
     list = (hash->entries + PLACE());
 
@@ -114,19 +139,18 @@ void bh_solve_hash_get(
 
 fcs_bool_t bh_solve_hash_insert(
     bh_solve_hash_t * hash,
-    bhs_state_key_value_pair_t * key,
-    bh_solve_hash_value_t hash_value
-#ifdef FCS_ENABLE_SECONDARY_HASH_VALUE
-    , bh_solve_hash_value_t secondary_hash_value
-#endif
+    bhs_state_key_value_pair_t * key
     )
 {
     bh_solve_hash_symlink_t * list;
     bh_solve_hash_symlink_item_t * item, * last_item;
     bh_solve_hash_symlink_item_t * * item_placeholder;
+    bh_solve_hash_value_t hash_value;
 #ifdef FCS_INLINED_HASH_COMPARISON
     enum FCS_INLINED_HASH_DATA_TYPE hash_type;
 #endif
+
+    hash_value = perl_hash_function((ub1*)&(key->key), sizeof(key->key));
 
 #ifdef FCS_INLINED_HASH_COMPARISON
     hash_type = hash->hash_type;

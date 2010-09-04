@@ -112,11 +112,7 @@ bh_solve_hash_init(
  */
 extern fcs_bool_t bh_solve_hash_insert(
     bh_solve_hash_t * hash,
-    bhs_state_key_value_pair_t * key,
-    bh_solve_hash_value_t hash_value
-#ifdef FCS_ENABLE_SECONDARY_HASH_VALUE
-    , bh_solve_hash_value_t secondary_hash_value
-#endif
+    bhs_state_key_value_pair_t * key
     );
 
 
@@ -133,8 +129,7 @@ static GCC_INLINE void bh_solve_hash_free(
 extern void bh_solve_hash_get(
     bh_solve_hash_t * hash,
     bhs_state_key_value_pair_t * key_ptr,
-    bhs_state_key_value_pair_t * result,
-    bh_solve_hash_value_t hash_value
+    bhs_state_key_value_pair_t * result
     );
 
 

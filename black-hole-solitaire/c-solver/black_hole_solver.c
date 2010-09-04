@@ -278,27 +278,6 @@ extern int DLLEXPORT black_hole_solver_read_board(
     return BLACK_HOLE_SOLVER__SUCCESS;
 }
 
-
-typedef  unsigned long  int  ub4;   /* unsigned 4-byte quantities */
-typedef  unsigned       char ub1;
-
-static GCC_INLINE ub4 perl_hash_function(
-    register ub1 *s_ptr,        /* the key */
-    register ub4  length        /* the length of the key */
-    )
-{
-    register ub4  hash_value_int = 0;
-    register ub1 * s_end = s_ptr+length;
-
-    while (s_ptr < s_end)
-    {
-        hash_value_int += (hash_value_int << 5) + *(s_ptr++);
-    }
-    hash_value_int += (hash_value_int>>5);
-
-    return hash_value_int;
-}
-
 extern int DLLEXPORT black_hole_solver_run(
     black_hole_solver_instance_t * ret_instance
 )
@@ -344,9 +323,6 @@ extern int DLLEXPORT black_hole_solver_run(
     bh_solve_hash_insert(
         &(solver->positions),
         init_state
-#if (! (BHS_STATE_STORAGE == BHS_STATE_STORAGE_TOKYO_CAB_HASH))
-        , perl_hash_function(((ub1 *)&(init_state->key)), sizeof(init_state->key))
-#endif
     );
 
     num_states_in_collection++;
@@ -394,10 +370,6 @@ extern int DLLEXPORT black_hole_solver_run(
                     if (! bh_solve_hash_insert(
                         &(solver->positions),
                         &next_state
-#if (! (BHS_STATE_STORAGE == BHS_STATE_STORAGE_TOKYO_CAB_HASH))
-                        , perl_hash_function(((ub1 *)&(next_state.key)), 
-                            sizeof(next_state.key))
-#endif
                         )
                     )
                     {
@@ -517,9 +489,6 @@ DLLEXPORT extern int black_hole_solver_get_next_move(
                 &(solver->positions),
                 key_ptr,
                 states+(++num_states)
-#if (! (BHS_STATE_STORAGE == BHS_STATE_STORAGE_TOKYO_CAB_HASH))
-                ,perl_hash_function((ub1 *)&(key_ptr->key), sizeof(key_ptr->key))
-#endif
             );
         }
 
