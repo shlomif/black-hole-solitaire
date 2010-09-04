@@ -113,7 +113,9 @@ void bh_solve_hash_get(
 #define PLACE() (hash_value & (hash->size_bitmask))
     list = (hash->entries + PLACE());
 
-    assert(item = list->first_item);
+    item = list->first_item;
+
+    assert(item != NULL);
 
     result->key = key_ptr->key;
 
