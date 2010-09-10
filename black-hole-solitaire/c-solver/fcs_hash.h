@@ -41,14 +41,6 @@ extern "C" {
 #include "bool.h"
 #include "state.h"
 
-#ifdef FCS_INLINED_HASH_COMPARISON
-enum FCS_INLINED_HASH_DATA_TYPE
-{
-    FCS_INLINED_HASH__COLUMNS,
-    FCS_INLINED_HASH__STATES,
-};
-#endif
-
 typedef int bh_solve_hash_value_t;
 
 struct bh_solve_hash_symlink_item_struct

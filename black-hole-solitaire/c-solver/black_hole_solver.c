@@ -36,8 +36,12 @@
 
 #if (BHS_STATE_STORAGE == BHS_STATE_STORAGE_TOKYO_CAB_HASH)
 #include "tokyo_cab_hash.h"
-#else
+#elif (BHS_STATE_STORAGE == BHS_STATE_STORAGE_INTERNAL_HASH)
 #include "fcs_hash.h"
+#elif (BHS_STATE_STORAGE == BHS_STATE_STORAGE_GOOGLE_SPARSE_HASH)
+#include "google_hash.h"
+#else
+#error Unknown state storage.
 #endif
 
 #include "alloc.h"
