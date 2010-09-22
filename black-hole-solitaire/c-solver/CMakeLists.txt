@@ -2,7 +2,6 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 INCLUDE( "${CMAKE_CURRENT_SOURCE_DIR}/Common.cmake" )
 
-INCLUDE(CPack)
 INCLUDE(CheckCCompilerFlag)
 INCLUDE(FindPkgConfig)
 
@@ -12,15 +11,17 @@ LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 SET(CPACK_PACKAGE_NAME "black_hole_solver")
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Black Hole Solver")
 SET(CPACK_PACKAGE_VENDOR "Shlomi Fish")
-SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/README.txt")
-SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/COPYING.txt")
+SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/README")
+SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/COPYING")
 
 # Process and extract the version number.
-FILE( READ "ver.txt" VERSION)
+FILE( READ "${CMAKE_CURRENT_SOURCE_DIR}/ver.txt" VERSION)
 
 CHOMP (VERSION)
 
 STRING (REGEX MATCHALL "([0-9]+)" VERSION_DIGITS "${VERSION}")
+
+
 
 LIST(GET VERSION_DIGITS 0 CPACK_PACKAGE_VERSION_MAJOR)
 LIST(GET VERSION_DIGITS 1 CPACK_PACKAGE_VERSION_MINOR)
@@ -35,6 +36,7 @@ SET (FCS_IA_PACK_SIZE 64 CACHE STRING "Size of a single pack in kilo-bytes.")
 SET (IA_STATE_PACKS_GROW_BY 32 CACHE STRING "Amount to Grow State Packs By")
 SET (base_with_ver "black_hole_solver-[0-9]+\\\\.[0-9]+\\\\.[0-9]+")
 SET(CPACK_SOURCE_IGNORE_FILES
+    "/build"
     "/_CPack_Packages/"
     "/CMakeFiles/"
     "/.deps/"
@@ -46,7 +48,7 @@ SET(CPACK_SOURCE_IGNORE_FILES
     "/(fc-solve|freecell-solver-range-parallel-solve|freecell-solver-fc-pro-range-solve|freecell-solver-multi-thread-solve|freecell-solver-fork-solve|measure-depth-dep-tests-order-perf)$"
     "/lib(fcs|freecell-solver)\\\\.(a|la)$"
     "\\\\.so(\\\\.[0-9]+)*$"
-    "/\\\\.svn/"
+    "/\\.svn/"
     "\\\\.(pdf|fo)$"
     "/t/t/.*\\\\.exe$"
     "/t/Presets"
@@ -64,6 +66,7 @@ SET(CPACK_SOURCE_IGNORE_FILES
     "/install_manifest\\\\.txt$"
     "/t/card-test-(parse|render)\\\\.c$"
     "/Testing/"
+    "\\.swp$"
     "ids-whitelist\\\\.txt"
 )
 
@@ -208,3 +211,4 @@ ADD_DEPENDENCIES(
     "all"
 )
 
+INCLUDE(CPack)
