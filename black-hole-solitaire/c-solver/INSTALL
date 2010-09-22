@@ -42,6 +42,8 @@ To test the Black Hole Solitaire Solver, you need to:
 
 1. Configure it.
 
-2. Run "make test".
+2. Build it.
+
+3. Run "make test".
 
 Please report any errors to me ( http://www.shlomifish.org/me/contact-me/ ).
