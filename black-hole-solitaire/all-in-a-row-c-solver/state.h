@@ -3,15 +3,15 @@
 #define BHS_STATE_H
 
 
-#define MAX_NUM_COLUMNS 17
-#define MAX_NUM_CARDS_IN_COL 3
+#define MAX_NUM_COLUMNS 13
+#define MAX_NUM_CARDS_IN_COL 4
 
 
 typedef char bhs_card_string_t[3];
 typedef char bhs_rank_t;
 
 /* We allocate 2-bits for the length of every column */
-#define NUM_DATA_CHARS (MAX_NUM_COLUMNS * 2 / 8 + 1)
+#define NUM_DATA_CHARS (MAX_NUM_COLUMNS * 4 / 8 + 1)
 typedef struct
 {
     unsigned char data[NUM_DATA_CHARS];
