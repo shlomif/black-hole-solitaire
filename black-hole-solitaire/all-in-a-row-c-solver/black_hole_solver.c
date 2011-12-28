@@ -225,11 +225,12 @@ extern int DLLEXPORT black_hole_solver_read_board(
         s++;
     }
 
-    if ((*s) == '\n')
+    if ((*s) == '-')
     {
         /* A non-initialized foundation. */
         solver->initial_foundation_string[0] = '\0';
         solver->initial_foundation = -1;
+        s++;
     }
     else
     {
@@ -243,12 +244,12 @@ extern int DLLEXPORT black_hole_solver_read_board(
             *error_line_number = 1;
             return ret_code;
         }
+    }
 
-        if (*(s++) != '\n')
-        {
-            *error_line_number = 1;
-            return BLACK_HOLE_SOLVER__TRAILING_CHARS;
-        }
+    if (*(s++) != '\n')
+    {
+        *error_line_number = 1;
+        return BLACK_HOLE_SOLVER__TRAILING_CHARS;
     }
 
     for(col_idx = 0; col_idx < MAX_NUM_COLUMNS; col_idx++)
@@ -321,7 +322,7 @@ extern int DLLEXPORT black_hole_solver_run(
     bhs_state_key_value_pair_t state;
     bhs_state_key_value_pair_t next_state;
 
-    int four_cols_idx, four_cols_offset;
+    int two_cols_idx, two_cols_offset;
     bhs_state_key_value_pair_t * queue;
     int queue_len, queue_max_len;
     int foundations;
@@ -344,20 +345,18 @@ extern int DLLEXPORT black_hole_solver_run(
         max_iters_limit = LONG_MAX;
     }
 
-    for (four_cols_idx = 0, four_cols_offset = 0; four_cols_idx < 4; four_cols_idx++, four_cols_offset += 4)
+    for (two_cols_idx = 0, two_cols_offset = 0; two_cols_idx < (MAX_NUM_COLUMNS / 2); two_cols_idx++, two_cols_offset += 2)
     {
-        init_state->key.data[four_cols_idx] =
+        init_state->key.data[two_cols_idx] =
             (unsigned char)
             (
-              (solver->initial_lens[four_cols_offset]) 
-            | (solver->initial_lens[four_cols_offset+1] << 2)    
-            | (solver->initial_lens[four_cols_offset+2] << 4)    
-            | (solver->initial_lens[four_cols_offset+3] << 6)    
+              (solver->initial_lens[two_cols_offset]) 
+            | (solver->initial_lens[two_cols_offset+1] << 4)    
             )
             ;
     }
     /* Only one left. */
-    init_state->key.data[four_cols_idx] = (unsigned char)(solver->initial_lens[four_cols_offset]);
+    init_state->key.data[two_cols_idx] = (unsigned char)(solver->initial_lens[two_cols_offset]);
 
     num_states_in_collection = 0;
     iterations_num = 0;
@@ -385,27 +384,25 @@ extern int DLLEXPORT black_hole_solver_run(
 
         no_cards = TRUE;
 
-        for (col_idx = 0 ; col_idx < MAX_NUM_COLUMNS ; col_idx++)
+        if (foundations == -1)
         {
-            if ((pos = (
-                (state.key.data[(col_idx >> 2)] >> ((col_idx&(4-1))<<1))
-                    &
-                    (4-1)
-                )
-            ))
+            for (col_idx = 0 ; col_idx < MAX_NUM_COLUMNS ; col_idx++)
             {
-                no_cards = FALSE;
-
-                card = solver->board_values[col_idx][pos-1];
-                
-                if (abs(card-foundations)%(MAX_RANK-1) == 1)
+                if ((pos = (
+                    (state.key.data[(col_idx >> 1)] >> ((col_idx&(2-1))<<4))
+                        &
+                        (16-1)
+                    )
+                ))
                 {
+                    no_cards = FALSE;
+                    card = solver->board_values[col_idx][pos-1];
                     next_state = state;
                     next_state.key.foundations = card;
-                    next_state.key.data[(col_idx>>2)] &= 
-                        (~(0x3 << ((col_idx&0x3)<<1)));
-                    next_state.key.data[(col_idx>>2)] |=
-                        ((pos-1) << ((col_idx&0x3)<<1));
+                    next_state.key.data[(col_idx>>1)] &= 
+                        (~(((1<<4)-1) << ((col_idx&(2-1))<<4)));
+                    next_state.key.data[(col_idx>>1)] |=
+                        ((pos-1) << ((col_idx&(2-1)<<4)));
                     next_state.value.parent_state = state.key;
                     next_state.value.col_idx = col_idx;
 
@@ -425,6 +422,55 @@ extern int DLLEXPORT black_hole_solver_run(
                                 queue,
                                 sizeof(queue[0]) * (queue_max_len += 64)
                             );
+                        }
+                    }
+
+                }
+            }
+        }
+        else
+        {
+            for (col_idx = 0 ; col_idx < MAX_NUM_COLUMNS ; col_idx++)
+            {
+                if ((pos = (
+                    (state.key.data[(col_idx >> 2)] >> ((col_idx&(4-1))<<1))
+                        &
+                        (4-1)
+                    )
+                ))
+                {
+                    no_cards = FALSE;
+
+                    card = solver->board_values[col_idx][pos-1];
+                    
+                    if (abs(card-foundations)%(MAX_RANK-1) == 1)
+                    {
+                        next_state = state;
+                        next_state.key.foundations = card;
+                        next_state.key.data[(col_idx>>1)] &= 
+                            (~(((1<<4)-1) << ((col_idx&(2-1))<<4)));
+                        next_state.key.data[(col_idx>>1)] |=
+                            ((pos-1) << ((col_idx&(2-1)<<4)));
+                        next_state.value.parent_state = state.key;
+                        next_state.value.col_idx = col_idx;
+
+                        if (! bh_solve_hash_insert(
+                            &(solver->positions),
+                            &next_state
+                            )
+                        )
+                        {
+                            num_states_in_collection++;
+                            /* It's a new state - put it in the queue. */
+                            queue[queue_len++] = next_state;
+
+                            if (queue_len == queue_max_len)
+                            {
+                                queue = realloc(
+                                    queue,
+                                    sizeof(queue[0]) * (queue_max_len += 64)
+                                );
+                            }
                         }
                     }
                 }
@@ -579,9 +625,9 @@ DLLEXPORT extern int black_hole_solver_get_next_move(
         height =
         (
         (
-            (next_state.key.data[(*col_idx_ptr)>>2]
+            (next_state.key.data[(*col_idx_ptr)>>1]
                 >>
-            (((*col_idx_ptr)&0x3) << 1)) & 0x3
+            (((*col_idx_ptr)&0xF) << 1)) & 0xF
         )
         );
 
