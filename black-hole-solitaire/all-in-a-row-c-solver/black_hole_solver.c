@@ -629,7 +629,7 @@ DLLEXPORT extern int black_hole_solver_get_next_move(
         (
             (next_state.key.data[(*col_idx_ptr)>>1]
                 >>
-            (((*col_idx_ptr)&0xF) << 1)) & 0xF
+            (((*col_idx_ptr)&(2-1)) << 2)) & 0xF
         )
         );
 
