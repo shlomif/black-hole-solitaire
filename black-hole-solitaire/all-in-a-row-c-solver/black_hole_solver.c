@@ -388,8 +388,10 @@ extern int DLLEXPORT black_hole_solver_run(
         {
             for (col_idx = 0 ; col_idx < MAX_NUM_COLUMNS ; col_idx++)
             {
+#define BYTE_POS() (col_idx >> 1)
+#define BIT_OFFSET() ((col_idx&(2-1))<<2)
                 if ((pos = (
-                    (state.key.data[(col_idx >> 1)] >> ((col_idx&(2-1))<<4))
+                    (state.key.data[BYTE_POS()] >> BIT_OFFSET())
                         &
                         (16-1)
                     )
@@ -399,10 +401,10 @@ extern int DLLEXPORT black_hole_solver_run(
                     card = solver->board_values[col_idx][pos-1];
                     next_state = state;
                     next_state.key.foundations = card;
-                    next_state.key.data[(col_idx>>1)] &= 
-                        (~(((1<<4)-1) << ((col_idx&(2-1))<<4)));
-                    next_state.key.data[(col_idx>>1)] |=
-                        ((pos-1) << ((col_idx&(2-1)<<4)));
+                    next_state.key.data[BYTE_POS()] &= 
+                        (~(((1<<4)-1) << (BIT_OFFSET())));
+                    next_state.key.data[BYTE_POS()] |=
+                        ((pos-1) << (BIT_OFFSET()));
                     next_state.value.parent_state = state.key;
                     next_state.value.col_idx = col_idx;
 
@@ -433,9 +435,9 @@ extern int DLLEXPORT black_hole_solver_run(
             for (col_idx = 0 ; col_idx < MAX_NUM_COLUMNS ; col_idx++)
             {
                 if ((pos = (
-                    (state.key.data[(col_idx >> 2)] >> ((col_idx&(4-1))<<1))
+                    (state.key.data[BYTE_POS()] >> (BIT_OFFSET()))
                         &
-                        (4-1)
+                        (16-1)
                     )
                 ))
                 {
@@ -447,10 +449,10 @@ extern int DLLEXPORT black_hole_solver_run(
                     {
                         next_state = state;
                         next_state.key.foundations = card;
-                        next_state.key.data[(col_idx>>1)] &= 
-                            (~(((1<<4)-1) << ((col_idx&(2-1))<<4)));
+                        next_state.key.data[BYTE_POS()] &= 
+                            (~(((1<<4)-1) << (BIT_OFFSET())));
                         next_state.key.data[(col_idx>>1)] |=
-                            ((pos-1) << ((col_idx&(2-1)<<4)));
+                            ((pos-1) << (BIT_OFFSET()));
                         next_state.value.parent_state = state.key;
                         next_state.value.col_idx = col_idx;
 
