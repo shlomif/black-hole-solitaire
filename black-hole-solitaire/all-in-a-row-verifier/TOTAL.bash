@@ -1,5 +1,3 @@
-#!/bin/bash
-
 function solve()
 {
     deal_idx="$1"
@@ -14,5 +12,3 @@ function solve()
         echo "Unsolved";
     fi
 }
-
-solve "$1"
