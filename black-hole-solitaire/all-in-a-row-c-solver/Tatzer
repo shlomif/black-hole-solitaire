@@ -44,12 +44,34 @@ my %themes =
 (
     tt => [qw(-r --notest-suite --static)],
     bench => [qw(-l tt --omit-frame)],
-    fc_bench => [qw(-l bench --fc-only)],
-    p4b => [qw(-l fc_bench --arch=pentium4)],
-    x64b => [qw(-l fc_bench --arch=barcelona)],
-    p4bb => [qw(-l bench --arch=pentium4)],
-    x64bb => [qw(-l bench --arch=barcelona)],
+    fc_bench => [qw(-l bench)],
 );
+
+foreach my $rec (
+    {id => "p4", a => "pentium4"},
+    {id => "x64", a => "barcelona"},
+    {id => "c2", a => "core2",},
+    {id => "ci7", a => "corei7-avx",}
+)
+{
+    my $id = $rec->{id};
+    my $arch = $rec->{a};
+
+    $themes{$id} = ["--arch=$arch"];
+    # Benchmark for freecell only
+    $themes{$id.'b'} = [qw(-l fc_bench -l), $id];
+    # Generalised benchmark - not freecell-only - should pass the tests.
+    $themes{$id.'bb'} = [qw(-l bench -l), $id];
+    # Memory conserving theme - for freecell only
+    $themes{$id.'m'} = [qw(-l fc_reduce_mem -l), $id];
+    # Generalised Memory conserving theme - not only for freecell
+    $themes{$id.'mm'} = [qw(-l reduce_mem -l), $id];
+    # Testing theme - aims to run the tests quickly
+    $themes{$id.'t'} = ['-l', $id.'bb', '--rwd', '--dbm=kaztree', '--test-suite',];
+
+    # For use by PySolFC
+    $themes{$id . "_pysol"} = ['-l', $id.'bb', '--num-stacks=14', "--prefix=$ENV{HOME}/apps/fcs-for-pysol",];
+}
 
 my @new_argv = @ARGV;
 
@@ -145,7 +167,6 @@ unlink("CMakeCache.txt");
 my @cmd= ("cmake",
     "-DCMAKE_BUILD_TYPE=$build_type",
     "-DBHS_STATE_STORAGE=BHS_STATE_STORAGE_$state_storage",
-    "-DMAX_NUM_BENCHMARK_THREADS=$max_bench_threads_num",
     "-DCMAKE_INSTALL_PREFIX=$prefix",
     "-DDATADIR=$prefix/share",
     ((!$build_static_lib) ? ("-DBUILD_STATIC_LIBRARY=") : ()),
@@ -164,14 +185,6 @@ my @cmd= ("cmake",
     (exists($ENV{"LIBAVL2_SOURCE_DIR"})
         ? ("-DLIBAVL2_SOURCE_DIR=$ENV{LIBAVL2_SOURCE_DIR}")
         : ()
-    ),
-    ($with_context_var
-        ? "-DFCS_WITH_CONTEXT_VARIABLE=1"
-        : "-DFCS_WITH_CONTEXT_VARIABLE="
-    ),
-    ($link_to_static
-        ? ("-DFCS_LINK_TO_STATIC=1")
-        : ("-DFCS_LINK_TO_STATIC=")
     ),
     $dir
 );
