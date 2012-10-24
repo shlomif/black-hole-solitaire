@@ -48,7 +48,7 @@ my %themes =
     p4b => [qw(-l fc_bench --arch=pentium4)],
     x64b => [qw(-l fc_bench --arch=barcelona)],
     p4bb => [qw(-l bench --arch=pentium4)],
-    x64bb => [qw(-l bench --arch=barcelona)],    
+    x64bb => [qw(-l bench --arch=barcelona)],
 );
 
 my @new_argv = @ARGV;
@@ -70,7 +70,7 @@ for (my $idx = 0; $idx < @new_argv ; $idx++)
         {
             splice (@new_argv, $start_idx, $idx-$start_idx+1, @$cmd);
         }
-        
+
         $idx = $start_idx;
         redo CALC_NEW_ARGV;
     }
@@ -89,10 +89,10 @@ GetOptions(
     },
     'r|release' => sub {
         my ($opt, $val) = @_;
-        if ($val) 
+        if ($val)
         {
             $build_type = "release";
-        } 
+        }
         elsif ($build_type eq "release")
         {
             $build_type = "debug";
@@ -109,10 +109,10 @@ GetOptions(
     'static' => \$build_static_lib,
     'profile' => sub {
         my ($opt, $val) = @_;
-        if ($val) 
+        if ($val)
         {
             $build_type = "profile";
-        } 
+        }
         elsif ($build_type eq "profile")
         {
             $build_type = "debug";
