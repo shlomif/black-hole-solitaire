@@ -145,12 +145,10 @@ unlink("CMakeCache.txt");
 my @cmd= ("cmake",
     "-DCMAKE_BUILD_TYPE=$build_type",
     "-DBHS_STATE_STORAGE=BHS_STATE_STORAGE_$state_storage",
-    "-DMAX_NUM_BENCHMARK_THREADS=$max_bench_threads_num",
     "-DCMAKE_INSTALL_PREFIX=$prefix",
     "-DDATADIR=$prefix/share",
     ((!$build_static_lib) ? ("-DBUILD_STATIC_LIBRARY=") : ()),
     (defined($pack_size) ? ("-DFCS_IA_PACK_SIZE=$pack_size") : ()),
-    ($test_suite ? ("-DFCS_WITH_TEST_SUITE=1") : ()),
     (defined($cpu_arch) ? ("-DCPU_ARCH=$cpu_arch") : ()),
     ($omit_frame ? "-DOPTIMIZATION_OMIT_FRAME_POINTER=1" : ()),
     ($state_storage_libavl2_tree
@@ -164,14 +162,6 @@ my @cmd= ("cmake",
     (exists($ENV{"LIBAVL2_SOURCE_DIR"})
         ? ("-DLIBAVL2_SOURCE_DIR=$ENV{LIBAVL2_SOURCE_DIR}")
         : ()
-    ),
-    ($with_context_var
-        ? "-DFCS_WITH_CONTEXT_VARIABLE=1"
-        : "-DFCS_WITH_CONTEXT_VARIABLE="
-    ),
-    ($link_to_static
-        ? ("-DFCS_LINK_TO_STATIC=1")
-        : ("-DFCS_LINK_TO_STATIC=")
     ),
     $dir
 );
