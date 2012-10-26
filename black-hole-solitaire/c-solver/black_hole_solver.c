@@ -46,7 +46,7 @@
 
 #include "alloc.h"
 
-typedef struct 
+typedef struct
 {
     /*
      * TODO : rename from board_values.
@@ -69,7 +69,7 @@ typedef struct
 
     bhs_state_key_value_pair_t * states_in_solution;
     int num_states_in_solution, current_state_in_solution_idx;
-    
+
     long iterations_num, num_states_in_collection, max_iters_limit;
 } bhs_solver_t;
 
@@ -118,7 +118,7 @@ static int parse_card(
         case 'A':
             *foundation = 0;
             break;
-        
+
         case '2':
             *foundation = 1;
             break;
@@ -134,23 +134,23 @@ static int parse_card(
         case '5':
             *foundation = 4;
             break;
- 
+
         case '6':
             *foundation = 5;
             break;
- 
+
         case '7':
             *foundation = 6;
             break;
- 
+
         case '8':
             *foundation = 7;
             break;
- 
+
         case '9':
             *foundation = 8;
             break;
- 
+
         case 'T':
             *foundation = 9;
             break;
@@ -198,7 +198,7 @@ extern int DLLEXPORT black_hole_solver_read_board(
     const char * s, * match;
     bhs_solver_t * solver;
     int ret_code, col_idx;
-    
+
     solver = (bhs_solver_t *)instance_proto;
 
     s = board_string;
@@ -253,13 +253,13 @@ extern int DLLEXPORT black_hole_solver_read_board(
                     &(solver->board_values[col_idx][pos_idx]),
                     solver->initial_board_card_strings[col_idx][pos_idx]
                 );
-            
+
             if (ret_code)
             {
                 *error_line_number = 2+col_idx;
                 return ret_code;
             }
-            
+
             while ((*s) == ' ')
             {
                 s++;
@@ -335,10 +335,10 @@ extern int DLLEXPORT black_hole_solver_run(
         init_state->key.data[four_cols_idx] =
             (unsigned char)
             (
-              (solver->initial_lens[four_cols_offset]) 
-            | (solver->initial_lens[four_cols_offset+1] << 2)    
-            | (solver->initial_lens[four_cols_offset+2] << 4)    
-            | (solver->initial_lens[four_cols_offset+3] << 6)    
+              (solver->initial_lens[four_cols_offset])
+            | (solver->initial_lens[four_cols_offset+1] << 2)
+            | (solver->initial_lens[four_cols_offset+2] << 4)
+            | (solver->initial_lens[four_cols_offset+3] << 6)
             )
             ;
     }
@@ -383,12 +383,12 @@ extern int DLLEXPORT black_hole_solver_run(
                 no_cards = FALSE;
 
                 card = solver->board_values[col_idx][pos-1];
-                
+
                 if (abs(card-foundations)%(MAX_RANK-1) == 1)
                 {
                     next_state = state;
                     next_state.key.foundations = card;
-                    next_state.key.data[(col_idx>>2)] &= 
+                    next_state.key.data[(col_idx>>2)] &=
                         (~(0x3 << ((col_idx&0x3)<<1)));
                     next_state.key.data[(col_idx>>2)] |=
                         ((pos-1) << ((col_idx&0x3)<<1));
@@ -505,7 +505,7 @@ DLLEXPORT extern int black_hole_solver_get_next_move(
         max_num_states = 53;
 
         states = malloc(sizeof(states[0]) * max_num_states);
-        
+
         states[num_states] = (solver->final_state);
 
         while (memcmp(
@@ -522,7 +522,7 @@ DLLEXPORT extern int black_hole_solver_get_next_move(
                         sizeof(states[0]) * (max_num_states += 16)
                     );
             }
-         
+
             key_ptr = (bhs_state_key_value_pair_t *)&(states[num_states].value.parent_state);
             /* Look up the next state in the positions associative array. */
             bh_solve_hash_get(
