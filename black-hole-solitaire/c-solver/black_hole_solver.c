@@ -29,6 +29,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <limits.h>
+#include <ctype.h>
 
 #include "config.h"
 #include "black_hole_solver.h"
