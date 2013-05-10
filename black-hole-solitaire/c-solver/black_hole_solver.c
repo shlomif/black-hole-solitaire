@@ -220,16 +220,30 @@ extern int DLLEXPORT black_hole_solver_read_board(
 
     s += strlen(match);
 
-    ret_code =
-        parse_card(&s,
-            &(solver->initial_foundation),
-            solver->initial_foundation_string
-        );
-
-    if (ret_code)
+    while (isspace(*s) && ((*s) != '\n'))
     {
-        *error_line_number = 1;
-        return ret_code;
+        s++;
+    }
+
+    if ((*s) == '-')
+    {
+        /* A non-initialized foundation. */
+        solver->initial_foundation_string[0] = '\0';
+        solver->initial_foundation = -1;
+        s++;
+    }
+    else
+    {
+        ret_code =
+            parse_card(&s,
+                    &(solver->initial_foundation),
+                    solver->initial_foundation_string
+                    );
+        if (ret_code)
+        {
+            *error_line_number = 1;
+            return ret_code;
+        }
     }
 
     if (*(s++) != '\n')
