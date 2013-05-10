@@ -62,7 +62,7 @@ void bh_solve_compact_allocator_extend(
     {
         allocator->packs = (char * *)realloc(
             allocator->packs,
-            sizeof(allocator->packs[0]) * 
+            sizeof(allocator->packs[0]) *
                 ((allocator->num_packs) + IA_STATE_PACKS_GROW_BY)
         );
     }

@@ -67,7 +67,7 @@ int main(int argc, char * argv[])
     }
 
     black_hole_solver_set_max_iters_limit(solver, max_iters_limit);
-    
+
     if (argc > arg_idx)
     {
         if (strcmp(argv[arg_idx], "-"))
@@ -123,7 +123,7 @@ int main(int argc, char * argv[])
             &card_suit
             )) == BLACK_HOLE_SOLVER__SUCCESS)
         {
-            printf ("Move a card from stack %d to the foundations\n\n" 
+            printf ("Move a card from stack %d to the foundations\n\n"
                 "Info: Card moved is %c%c\n\n\n====================\n\n",
                 col_idx,
                 (("0A23456789TJQK")[card_rank]), ("HCDS")[card_suit]
@@ -133,7 +133,7 @@ int main(int argc, char * argv[])
         if (next_move_ret_code != BLACK_HOLE_SOLVER__END)
         {
             fprintf(
-                stderr, 
+                stderr,
                 "%s - %d\n",
                 "Get next move routine returned the wrong error code.",
                 next_move_ret_code
@@ -152,7 +152,7 @@ int main(int argc, char * argv[])
         ret = -1;
     }
 
-    printf("\n\n--------------------\n" 
+    printf("\n\n--------------------\n"
         "Total number of states checked is %ld.\n"
         "This scan generated %ld states.\n",
         black_hole_solver_get_iterations_num(solver),

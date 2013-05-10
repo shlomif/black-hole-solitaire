@@ -11,15 +11,15 @@ use File::Spec::Functions qw( catpath splitpath rel2abs );
 
 my $bin_dir = catpath( ( splitpath( rel2abs $0 ) )[ 0, 1 ] );
 
-use Test::Trap 
-    qw( 
-    trap $trap :flow:stderr(systemsafe):stdout(systemsafe):warn 
+use Test::Trap
+    qw(
+    trap $trap :flow:stderr(systemsafe):stdout(systemsafe):warn
     );
 
 
 trap
 {
-    system("./black-hole-solve", 
+    system("./black-hole-solve",
         File::Spec->catfile(
             $bin_dir, "data", "26464608654870335080.bh.board.txt"
         )
@@ -400,7 +400,7 @@ eq_or_diff ($trap->stdout(), $expected_output, "Right output.");
 
 trap
 {
-    system("./black-hole-solve", 
+    system("./black-hole-solve",
         File::Spec->catfile(
             $bin_dir, "data", "1.bh.board.txt"
         )
@@ -804,7 +804,7 @@ eq_or_diff ($trap->stdout(), $expected_output, "Right output.");
 
 trap
 {
-    system("./black-hole-solve", 
+    system("./black-hole-solve",
         File::Spec->catfile(
             $bin_dir, "data", "1.bh.board.txt"
         )
