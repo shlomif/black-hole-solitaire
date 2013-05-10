@@ -63,7 +63,7 @@ struct bh_solve_hash_symlink_item_struct
 
 typedef struct bh_solve_hash_symlink_item_struct bh_solve_hash_symlink_item_t;
 
-typedef struct 
+typedef struct
 {
     bh_solve_hash_symlink_item_t * first_item;
 } bh_solve_hash_symlink_t;
