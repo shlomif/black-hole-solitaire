@@ -73,7 +73,7 @@ SET(CPACK_SOURCE_IGNORE_FILES
 
 ### This is to set the RPATH correctly, so when installed under a prefix
 ### the executables will find the libraries.
-### 
+###
 ### See:
 ###
 ### http://www.cmake.org/Wiki/CMake_RPATH_handling
@@ -85,7 +85,7 @@ SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
 
 # when building, don't use the install RPATH already
 # (but later on when installing)
-SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE) 
+SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
 
 # the RPATH to be used when installing
 SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
@@ -118,16 +118,16 @@ IF (${BHS_STATE_STORAGE} STREQUAL "BHS_STATE_STORAGE_TOKYO_CAB_HASH")
 
     SET (LIBTOKYO_CAB_LIBS ${TOKYO_CAB_LIBRARIES})
 ENDIF (${BHS_STATE_STORAGE} STREQUAL "BHS_STATE_STORAGE_TOKYO_CAB_HASH")
- 
+
 # Add the google_hash.cpp if (and only if) it is being used.
-# 
+#
 IF (${BHS_STATE_STORAGE} STREQUAL "BHS_STATE_STORAGE_GOOGLE_SPARSE_HASH")
 
     LIST(APPEND BLACK_HOLE_SOLVER_MODULES google_hash.cpp)
 
 ENDIF (${BHS_STATE_STORAGE} STREQUAL "BHS_STATE_STORAGE_GOOGLE_SPARSE_HASH")
 
-SET(COMPILER_FLAGS_TO_CHECK 
+SET(COMPILER_FLAGS_TO_CHECK
     "-Wall" "-Werror=implicit-function-declaration" "-fvisibility=hidden"
 )
 
