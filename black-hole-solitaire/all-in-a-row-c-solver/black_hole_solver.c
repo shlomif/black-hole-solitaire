@@ -206,6 +206,8 @@ extern int DLLEXPORT black_hole_solver_read_board(
 
     solver = (bhs_solver_t *)instance_proto;
 
+    solver->num_columns = num_columns;
+
     s = board_string;
 
     /* Read the foundations. */
@@ -359,6 +361,7 @@ extern int DLLEXPORT black_hole_solver_run(
         (
             (num_columns % BHS__ALL_IN_A_ROW__COLS_PER_BYTE ) ? 1 : 0
         )
+        - 1
     );
 
     for (two_cols_idx = 0, two_cols_offset = 0;
