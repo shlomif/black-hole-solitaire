@@ -1,0 +1,16 @@
+Build.PL
+Changes
+contrib/make_pysol_board.py
+inc/Test/Run/Builder.pm
+lib/Games/Solitaire/BlackHole/Solver/App.pm
+lib/Games/Solitaire/BlackHole/Solver.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+scripts/black-hole-solve
+t/00-load.t
+t/01-run.t
+t/data/26464608654870335080.bh.board.txt
+t/pod-coverage.t
+t/pod.t

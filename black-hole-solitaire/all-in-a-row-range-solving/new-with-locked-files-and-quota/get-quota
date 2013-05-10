@@ -1,0 +1,45 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Fcntl ':flock';
+
+my $quota = shift(@ARGV);
+
+open my $lock_fh, "<", "bhs.lock";
+flock($lock_fh, LOCK_EX());
+
+my ($start, $max);
+{
+open my $params_fh, "<", "bhs.params.txt";
+my $line = <$params_fh>;
+chomp($line);
+($start, $max) = split(/\s+/, $line);
+close($params_fh);
+}
+
+my $next = $start + $quota;
+
+if ($next > $max)
+{
+    $next = $max;
+}
+
+{
+open my $params_fh, ">", "bhs.params.txt";
+print {$params_fh} $next+1, " ", $max, "\n";
+close($params_fh);
+}
+
+flock($lock_fh, LOCK_UN());
+close($lock_fh);
+
+if ($start > $max)
+{
+    print "-1 -1\n";
+}
+else
+{
+    print "$start $next\n";
+}

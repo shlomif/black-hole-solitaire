@@ -1,0 +1,21 @@
+#!/usr/bin/perl
+
+use Dancer;
+use IO::All;
+
+my ($id, $end_at) = io->file("params.txt")->chomp->getlines();
+
+get '/id' => sub {
+    content_type 'text/plain';
+    if ($id == $end_at)
+    {
+        return "-1\n";
+    }
+    else
+    {
+        return (($id--)."\n");
+    }
+};
+
+dance;
+

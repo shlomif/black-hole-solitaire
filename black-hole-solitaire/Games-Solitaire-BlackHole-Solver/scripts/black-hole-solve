@@ -1,0 +1,62 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Games::Solitaire::BlackHole::Solver::App;
+
+Games::Solitaire::BlackHole::Solver::App->new->run;
+
+=head1 NAME
+
+black-hole-solve - a solver for Black Hole Solitaire deals.
+
+=head1 SYNOPSIS
+
+B<black-hole-solve> [-o output-file.txt] /path/to/board
+
+make_pysol_board.py 500 black_hole | B<black-hole-solve> [-o output-file.txt] -
+
+=head1 DESCRIPTION
+
+This is a solver for Black Hole solitaire.
+
+=head1 SEE ALSO
+
+L<http://search.cpan.org/dist/Games-Solitaire-BlackHole-Solver/> - File-Dir-Dumper on the CPAN.
+
+L<http://pysolfc.sourceforge.net/doc/rules/blackhole.html>
+
+L<Games::Solitaire::BlackHole::Solver::App>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2010 Shlomi Fish
+
+Permission is hereby granted, free of charge, to any person
+obtaining a copy of this software and associated documentation
+files (the "Software"), to deal in the Software without
+restriction, including without limitation the rights to use,
+copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+
+=head1 AUTHOR
+
+Shlomi Fish, L<http://www.shlomifish.org/>
+
+=cut
+

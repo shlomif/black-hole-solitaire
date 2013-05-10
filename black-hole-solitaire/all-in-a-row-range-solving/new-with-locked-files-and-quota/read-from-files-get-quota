@@ -1,0 +1,41 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Fcntl ':flock';
+
+my $IDS_FILENAME = "black-hole-solver-intractables-4.txt";
+my $quota = shift(@ARGV);
+
+open my $lock_fh, "<", "bhs.lock";
+flock($lock_fh, LOCK_EX());
+
+my ($next_id, @lines);
+
+{
+open my $params_fh, "<", $IDS_FILENAME;
+@lines = <$params_fh>;
+$next_id = shift(@lines);
+close($params_fh);
+}
+
+{
+open my $params_fh, ">", $IDS_FILENAME;
+print {$params_fh} @lines;
+close($params_fh);
+}
+
+flock($lock_fh, LOCK_UN());
+close($lock_fh);
+
+if (defined($next_id))
+{
+    chomp($next_id);
+    print "$next_id $next_id\n";
+}
+else
+{
+    print "-1 -1\n";
+}
+
