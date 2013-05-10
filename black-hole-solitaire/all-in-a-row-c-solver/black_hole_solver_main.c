@@ -32,6 +32,8 @@
 
 #include "black_hole_solver.h"
 
+#include "state.h"
+
 #define MAX_LEN_BOARD_STRING 4092
 
 int main(int argc, char * argv[])
@@ -98,7 +100,9 @@ int main(int argc, char * argv[])
     if (black_hole_solver_read_board(
         solver,
         board,
-        &error_line_num
+        &error_line_num,
+        BHS__ALL_IN_A_ROW__NUM_COLUMNS,
+        BHS__ALL_IN_A_ROW__MAX_NUM_CARDS_IN_COL
         ))
     {
         fprintf(stderr, "Error reading the board at line No. %d!\n", error_line_num);

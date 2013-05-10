@@ -55,15 +55,15 @@ typedef struct
      * This is the ranks of the cards in the columns. It remains constant
      * for the duration of the game.
      * */
-    bhs_rank_t board_values[MAX_NUM_COLUMNS][MAX_NUM_CARDS_IN_COL];
+    bhs_rank_t board_values[BHS__MAX_NUM_COLUMNS][BHS__MAX_NUM_CARDS_IN_COL];
 
     bhs_rank_t initial_foundation;
 
     bh_solve_hash_t positions;
 
     bhs_card_string_t initial_foundation_string;
-    bhs_card_string_t initial_board_card_strings[MAX_NUM_COLUMNS][MAX_NUM_CARDS_IN_COL];
-    int initial_lens[MAX_NUM_COLUMNS];
+    bhs_card_string_t initial_board_card_strings[BHS__MAX_NUM_COLUMNS][BHS__MAX_NUM_CARDS_IN_COL];
+    int initial_lens[BHS__MAX_NUM_COLUMNS];
 
     bhs_state_key_value_pair_t init_state;
     bhs_state_key_value_pair_t final_state;
@@ -72,6 +72,8 @@ typedef struct
     int num_states_in_solution, current_state_in_solution_idx;
 
     long iterations_num, num_states_in_collection, max_iters_limit;
+
+    int num_columns;
 } bhs_solver_t;
 
 int DLLEXPORT black_hole_solver_create(
@@ -193,7 +195,9 @@ static int parse_card(
 extern int DLLEXPORT black_hole_solver_read_board(
     black_hole_solver_instance_t * instance_proto,
     const char * board_string,
-    int * error_line_number
+    int * error_line_number,
+    int num_columns,
+    int max_num_cards_in_col
 )
 {
     const char * s, * match;
@@ -252,12 +256,12 @@ extern int DLLEXPORT black_hole_solver_read_board(
         return BLACK_HOLE_SOLVER__TRAILING_CHARS;
     }
 
-    for(col_idx = 0; col_idx < MAX_NUM_COLUMNS; col_idx++)
+    for(col_idx = 0; col_idx < num_columns; col_idx++)
     {
         int pos_idx = 0;
         while ((*s != '\n') && (*s != '\0'))
         {
-            if (pos_idx == MAX_NUM_CARDS_IN_COL)
+            if (pos_idx == max_num_cards_in_col)
             {
                 *error_line_number = 2+col_idx;
                 return BLACK_HOLE_SOLVER__TOO_MANY_CARDS;
@@ -331,8 +335,11 @@ extern int DLLEXPORT black_hole_solver_run(
     bhs_rank_t card;
     long iterations_num, num_states_in_collection;
     long max_iters_limit;
+    int num_columns;
 
     solver = (bhs_solver_t *)ret_instance;
+
+    num_columns = solver->num_columns;
 
     init_state = &(solver->init_state);
     memset(init_state, '\0', sizeof(*init_state));
@@ -345,13 +352,24 @@ extern int DLLEXPORT black_hole_solver_run(
         max_iters_limit = LONG_MAX;
     }
 
-    for (two_cols_idx = 0, two_cols_offset = 0; two_cols_idx < (MAX_NUM_COLUMNS / 2); two_cols_idx++, two_cols_offset += 2)
+    int cols_idx_limit =
+    (
+        (num_columns / BHS__ALL_IN_A_ROW__COLS_PER_BYTE)
+            +
+        (
+            (num_columns % BHS__ALL_IN_A_ROW__COLS_PER_BYTE ) ? 1 : 0
+        )
+    );
+
+    for (two_cols_idx = 0, two_cols_offset = 0;
+        two_cols_idx < cols_idx_limit ;
+        two_cols_idx++, two_cols_offset += BHS__ALL_IN_A_ROW__COLS_PER_BYTE)
     {
         init_state->key.data[two_cols_idx] =
             (unsigned char)
             (
               (solver->initial_lens[two_cols_offset])
-            | (solver->initial_lens[two_cols_offset+1] << 4)
+            | (solver->initial_lens[two_cols_offset+1] << BHS__ALL_IN_A_ROW__BITS_PER_COL)
             )
             ;
     }
@@ -386,7 +404,7 @@ extern int DLLEXPORT black_hole_solver_run(
 
         if (foundations == -1)
         {
-            for (col_idx = 0 ; col_idx < MAX_NUM_COLUMNS ; col_idx++)
+            for (col_idx = 0 ; col_idx < num_columns ; col_idx++)
             {
 #define BYTE_POS() (col_idx >> 1)
 #define BIT_OFFSET() ((col_idx&(2-1))<<2)
@@ -432,7 +450,7 @@ extern int DLLEXPORT black_hole_solver_run(
         }
         else
         {
-            for (col_idx = 0 ; col_idx < MAX_NUM_COLUMNS ; col_idx++)
+            for (col_idx = 0 ; col_idx < num_columns ; col_idx++)
             {
                 if ((pos = (
                     (state.key.data[BYTE_POS()] >> (BIT_OFFSET()))

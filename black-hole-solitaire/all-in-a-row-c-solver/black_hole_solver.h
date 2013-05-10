@@ -75,7 +75,9 @@ DLLEXPORT extern int black_hole_solver_create(
 DLLEXPORT extern int black_hole_solver_read_board(
     black_hole_solver_instance_t * ret_instance,
     const char * board_string,
-    int * error_line_number
+    int * error_line_number,
+    int num_columns,
+    int max_num_cards_in_col
 );
 
 DLLEXPORT extern int black_hole_solver_set_max_iters_limit(
