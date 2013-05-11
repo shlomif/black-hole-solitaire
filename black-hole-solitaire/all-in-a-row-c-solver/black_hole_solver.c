@@ -60,6 +60,8 @@ typedef struct
     bhs_unpacked_state_t unpacked;
 } bhs_queue_item_t;
 
+typedef bhs_queue_item_t bhs_solution_state_t;
+
 typedef struct
 {
     /*
@@ -81,7 +83,7 @@ typedef struct
     bhs_state_key_value_pair_t init_state;
     bhs_state_key_value_pair_t final_state;
 
-    bhs_state_key_value_pair_t * states_in_solution;
+    bhs_solution_state_t * states_in_solution;
     int num_states_in_solution, current_state_in_solution_idx;
 
     long iterations_num, num_states_in_collection, max_iters_limit;
@@ -577,9 +579,9 @@ DLLEXPORT extern int black_hole_solver_get_next_move(
 
     if (! solver->states_in_solution)
     {
-        bhs_state_key_value_pair_t * states;
+        bhs_solution_state_t * states;
         bhs_state_key_value_pair_t * key_ptr;
-        bhs_state_key_value_pair_t temp_state;
+        bhs_solution_state_t temp_state;
 
         int i, num_states, max_num_states;
 
@@ -588,12 +590,12 @@ DLLEXPORT extern int black_hole_solver_get_next_move(
 
         states = malloc(sizeof(states[0]) * max_num_states);
 
-        states[num_states] = (solver->final_state);
+        states[num_states].packed = (solver->final_state);
 
         while (memcmp(
-            &(states[num_states].key),
+            &(states[num_states].packed.key),
             &(solver->init_state.key),
-            sizeof(states[num_states].key)
+            sizeof(states[num_states].packed.key)
         ))
         {
             if (num_states == max_num_states)
@@ -605,12 +607,12 @@ DLLEXPORT extern int black_hole_solver_get_next_move(
                     );
             }
 
-            key_ptr = (bhs_state_key_value_pair_t *)&(states[num_states].value.parent_state);
+            key_ptr = (bhs_state_key_value_pair_t *)&(states[num_states].packed.value.parent_state);
             /* Look up the next state in the positions associative array. */
             bh_solve_hash_get(
                 &(solver->positions),
                 key_ptr,
-                states+(++num_states)
+                &(states[++num_states].packed)
             );
         }
 
@@ -641,7 +643,7 @@ DLLEXPORT extern int black_hole_solver_get_next_move(
 
         next_state = solver->states_in_solution[
             ++solver->current_state_in_solution_idx
-            ];
+            ].packed;
 
         *col_idx_ptr = next_state.value.col_idx;
         height =
