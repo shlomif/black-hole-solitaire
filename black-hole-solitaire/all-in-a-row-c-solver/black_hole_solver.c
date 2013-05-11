@@ -321,7 +321,7 @@ DLLEXPORT extern int black_hole_solver_set_max_iters_limit(
 typedef struct
 {
     unsigned char heights[BHS__MAX_NUM_COLUMNS];
-    unsigned char foundations;
+    signed char foundations;
 } bhs_unpacked_state_t;
 
 typedef struct
