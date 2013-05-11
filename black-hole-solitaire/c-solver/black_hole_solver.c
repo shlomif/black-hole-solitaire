@@ -387,7 +387,7 @@ static GCC_INLINE void queue_item_unpack(
     }
 }
 
-static void GCC_INLINE perform_move(
+static GCC_INLINE void perform_move(
     bhs_solver_t * solver,
     bhs_rank_t card,
     int col_idx,
