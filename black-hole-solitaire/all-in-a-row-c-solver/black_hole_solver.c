@@ -89,6 +89,7 @@ typedef struct
     long iterations_num, num_states_in_collection, max_iters_limit;
 
     int num_columns;
+    int bits_per_column;
 
     bhs_queue_item_t * queue;
     int queue_len, queue_max_len;
@@ -215,7 +216,8 @@ extern int DLLEXPORT black_hole_solver_read_board(
     const char * board_string,
     int * error_line_number,
     int num_columns,
-    int max_num_cards_in_col
+    int max_num_cards_in_col,
+    int bits_per_column
 )
 {
     const char * s, * match;
@@ -225,6 +227,7 @@ extern int DLLEXPORT black_hole_solver_read_board(
     solver = (bhs_solver_t *)instance_proto;
 
     solver->num_columns = num_columns;
+    solver->bits_per_column = bits_per_column;
 
     s = board_string;
 
@@ -344,6 +347,7 @@ static GCC_INLINE void queue_item_populate_packed(
     fc_solve_bit_writer_t bit_w;
     int col;
     int num_columns = solver->num_columns;
+    int bits_per_column = solver->bits_per_column;
 
     queue_item->packed.key.foundations = queue_item->unpacked.foundations;
 
@@ -353,7 +357,7 @@ static GCC_INLINE void queue_item_populate_packed(
     {
         fc_solve_bit_writer_write(
             &bit_w,
-            BHS__ALL_IN_A_ROW__BITS_PER_COL,
+            bits_per_column,
             queue_item->unpacked.heights[col]
         );
     }
@@ -367,6 +371,7 @@ static GCC_INLINE void queue_item_unpack(
     fc_solve_bit_reader_t bit_r;
     int col;
     int num_columns = solver->num_columns;
+    int bits_per_column = solver->bits_per_column;
 
     queue_item->unpacked.foundations = queue_item->packed.key.foundations;
 
@@ -377,7 +382,7 @@ static GCC_INLINE void queue_item_unpack(
         queue_item->unpacked.heights[col] =
             fc_solve_bit_reader_read(
                 &bit_r,
-                BHS__ALL_IN_A_ROW__BITS_PER_COL
+                bits_per_column
             );
     }
 }
