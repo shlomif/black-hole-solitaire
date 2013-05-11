@@ -369,7 +369,7 @@ static GCC_INLINE void queue_item_populate_packed(
     queue_item->packed.key.data[two_cols_idx] = (unsigned char)(queue_item->unpacked.heights[two_cols_offset]);
 }
 
-static void GCC_INLINE foobar(
+static void GCC_INLINE perform_move(
     bhs_solver_t * solver,
     bhs_unpacked_state_t * next_state_ptr,
     bhs_unpacked_state_t * state_ptr,
@@ -499,8 +499,8 @@ extern int DLLEXPORT black_hole_solver_run(
                     no_cards = FALSE;
                     card = solver->board_values[col_idx][pos-1];
 
-#define CALL_foobar() \
-                    foobar( \
+#define CALL_perform_move() \
+                    perform_move( \
                         solver, \
                         &next_state, \
                         &state, \
@@ -509,7 +509,7 @@ extern int DLLEXPORT black_hole_solver_run(
                         &queue_item_copy \
                     )
 
-                    CALL_foobar();
+                    CALL_perform_move();
 
                 }
             }
@@ -526,7 +526,7 @@ extern int DLLEXPORT black_hole_solver_run(
 
                     if (abs(card-foundations)%(MAX_RANK-1) == 1)
                     {
-                        CALL_foobar();
+                        CALL_perform_move();
                     }
                 }
             }
