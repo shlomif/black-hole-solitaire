@@ -1,1 +1,5 @@
 * Make sure that failed malloc() / realloc() / etc. are handled gracefully.
+
+* Add black-hole-solitaire functionality.
+
+* Make the bits-per-column of up-to-4-cards as "3 bits" instead of "4 bits".

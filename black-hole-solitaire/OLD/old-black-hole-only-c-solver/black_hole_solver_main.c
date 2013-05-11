@@ -32,16 +32,7 @@
 
 #include "black_hole_solver.h"
 
-#include "state.h"
-
 #define MAX_LEN_BOARD_STRING 4092
-
-enum GAME_TYPE
-{
-    GAME__UNKNOWN = 0,
-    GAME__BH,
-    GAME__ALL
-};
 
 int main(int argc, char * argv[])
 {
@@ -53,7 +44,6 @@ int main(int argc, char * argv[])
     FILE * fh;
     int arg_idx;
     long max_iters_limit = -1;
-    enum GAME_TYPE game_type = GAME__UNKNOWN;
 
     if (black_hole_solver_create(&solver))
     {
@@ -62,7 +52,7 @@ int main(int argc, char * argv[])
     }
 
     arg_idx = 1;
-    while (argc > arg_idx)
+    if (argc > arg_idx)
     {
         if (!strcmp(argv[arg_idx], "--max-iters"))
         {
@@ -74,40 +64,6 @@ int main(int argc, char * argv[])
             }
             max_iters_limit = atol(argv[arg_idx++]);
         }
-        else if (!strcmp(argv[arg_idx], "--game"))
-        {
-            arg_idx++;
-            if (argc == arg_idx)
-            {
-                fprintf(stderr, "Error! --game requires an arguments.\n");
-                exit(-1);
-            }
-            char * g = argv[arg_idx++];
-
-            if (!strcmp(g, "black-hole"))
-            {
-                game_type = GAME__BH;
-            }
-            else if (!strcmp(g, "all-in-a-row"))
-            {
-                game_type = GAME__ALL;
-            }
-            else
-            {
-                fprintf(stderr, "%s\n", "Error! --game should be either \"black-hole\" or \"all-in-a-row\".");
-                exit(-1);
-            }
-        }
-        else
-        {
-            break;
-        }
-    }
-
-    if (game_type == GAME__UNKNOWN)
-    {
-        fprintf(stderr, "%s\n", "Error! Must specify game type using --game.");
-        exit(-1);
     }
 
     black_hole_solver_set_max_iters_limit(solver, max_iters_limit);
@@ -142,24 +98,8 @@ int main(int argc, char * argv[])
     if (black_hole_solver_read_board(
         solver,
         board,
-        &error_line_num,
-        (
-            (game_type == GAME__BH)
-            ? BHS__BLACK_HOLE__NUM_COLUMNS
-            : BHS__ALL_IN_A_ROW__NUM_COLUMNS
-        ),
-        (
-            (game_type == GAME__BH)
-            ? BHS__BLACK_HOLE__MAX_NUM_CARDS_IN_COL
-            : BHS__ALL_IN_A_ROW__MAX_NUM_CARDS_IN_COL
-        ),
-        (
-            (game_type == GAME__BH)
-            ? BHS__BLACK_HOLE__BITS_PER_COL
-            : BHS__ALL_IN_A_ROW__BITS_PER_COL
-        )
-        )
-    )
+        &error_line_num
+        ))
     {
         fprintf(stderr, "Error reading the board at line No. %d!\n", error_line_num);
         exit(-1);
