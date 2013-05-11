@@ -94,7 +94,7 @@ SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 # which point to directories outside the build tree to the install RPATH
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
-SET (LIB_BASE "all_in_a_row_solver")
+SET (LIB_BASE "black_hole_solver")
 
 SET (BLACK_HOLE_SOLVER_MODULES "alloc.c" "black_hole_solver.c")
 
