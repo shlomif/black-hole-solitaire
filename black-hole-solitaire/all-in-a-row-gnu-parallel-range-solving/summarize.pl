@@ -16,7 +16,7 @@ if (-e $final_fn)
     exit(0);
 }
 
-my $text= `make_pysol_freecell_board.py -F -t $board_idx all_in_a_row | all-in-a-row-solve`;
+my $text= `make_pysol_freecell_board.py -F -t $board_idx all_in_a_row | black-hole-solve --game all-in-a-row -`;
 
 my ($verdict, $checked, $gen) = ($text =~ m{(Solved|Unsolved).*?^Total number of states checked is (\d+)\..*?^This scan generated (\d+) states\.}ms);
 
