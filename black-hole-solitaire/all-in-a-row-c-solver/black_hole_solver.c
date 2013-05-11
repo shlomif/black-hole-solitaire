@@ -49,6 +49,18 @@
 
 typedef struct
 {
+    unsigned char heights[BHS__MAX_NUM_COLUMNS];
+    signed char foundations;
+} bhs_unpacked_state_t;
+
+typedef struct
+{
+    bhs_state_key_value_pair_t packed;
+    bhs_unpacked_state_t unpacked;
+} bhs_queue_item_t;
+
+typedef struct
+{
     /*
      * TODO : rename from board_values.
      *
@@ -74,6 +86,9 @@ typedef struct
     long iterations_num, num_states_in_collection, max_iters_limit;
 
     int num_columns;
+
+    bhs_queue_item_t * queue;
+    int queue_len, queue_max_len;
 } bhs_solver_t;
 
 int DLLEXPORT black_hole_solver_create(
@@ -318,18 +333,6 @@ DLLEXPORT extern int black_hole_solver_set_max_iters_limit(
     return BLACK_HOLE_SOLVER__SUCCESS;
 }
 
-typedef struct
-{
-    unsigned char heights[BHS__MAX_NUM_COLUMNS];
-    signed char foundations;
-} bhs_unpacked_state_t;
-
-typedef struct
-{
-    bhs_state_key_value_pair_t packed;
-    bhs_unpacked_state_t unpacked;
-} bhs_queue_item_t;
-
 static GCC_INLINE void queue_item_populate_packed(
     bhs_queue_item_t * queue_item,
     int num_columns
@@ -373,10 +376,7 @@ static void GCC_INLINE foobar(
     bhs_rank_t card,
     int col_idx,
     bhs_queue_item_t * queue_item_copy_ptr,
-    int num_columns,
-    bhs_queue_item_t * * queue_ptr,
-    int * queue_len_ptr,
-    int * queue_max_len_ptr
+    int num_columns
 )
 {
     *next_state_ptr = *state_ptr;
@@ -404,13 +404,13 @@ static void GCC_INLINE foobar(
     {
         solver->num_states_in_collection++;
         /* It's a new state - put it in the queue. */
-        (*queue_ptr)[(*queue_len_ptr)++] = next_queue_item;
+        solver->queue[(solver->queue_len)++] = next_queue_item;
 
-        if ((*queue_len_ptr) == (*queue_max_len_ptr))
+        if (solver->queue_len == solver->queue_max_len)
         {
-            (*queue_ptr) = realloc(
-                (*queue_ptr),
-                sizeof((*queue_ptr)[0]) * ((*queue_max_len_ptr) += 64)
+            solver->queue = realloc(
+                solver->queue,
+                sizeof(solver->queue[0]) * (solver->queue_max_len += 64)
             );
         }
     }
@@ -424,8 +424,7 @@ extern int DLLEXPORT black_hole_solver_run(
     bhs_state_key_value_pair_t * init_state;
     bhs_unpacked_state_t state, next_state;
 
-    bhs_queue_item_t * queue, * new_queue_item, queue_item_copy;
-    int queue_len, queue_max_len;
+    bhs_queue_item_t * new_queue_item, queue_item_copy;
     int foundations;
     fcs_bool_t no_cards;
     int col_idx, pos;
@@ -448,13 +447,13 @@ extern int DLLEXPORT black_hole_solver_run(
         max_iters_limit = LONG_MAX;
     }
 
-    queue_max_len = 64;
+    solver->queue_max_len = 64;
 
-    queue = malloc(sizeof(queue[0]) * queue_max_len);
+    solver->queue = malloc(sizeof(solver->queue[0]) * solver->queue_max_len);
 
-    queue_len = 0;
+    solver->queue_len = 0;
 
-    new_queue_item = &(queue[queue_len]);
+    new_queue_item = &(solver->queue[solver->queue_len]);
 
     /* Populate the unpacked state. */
     for (i = 0 ; i < num_columns ; i++)
@@ -469,7 +468,7 @@ extern int DLLEXPORT black_hole_solver_run(
     queue_item_populate_packed( new_queue_item, num_columns );
 
     *init_state = new_queue_item->packed;
-    queue_len++;
+    solver->queue_len++;
 
     solver->num_states_in_collection = 0;
     iterations_num = 0;
@@ -480,10 +479,10 @@ extern int DLLEXPORT black_hole_solver_run(
     );
 
     solver->num_states_in_collection++;
-    while (queue_len > 0)
+    while (solver->queue_len > 0)
     {
-        queue_len--;
-        queue_item_copy = queue[queue_len];
+        solver->queue_len--;
+        queue_item_copy = solver->queue[solver->queue_len];
         state = queue_item_copy.unpacked;
 
         iterations_num++;
@@ -509,10 +508,7 @@ extern int DLLEXPORT black_hole_solver_run(
                         card, \
                         col_idx, \
                         &queue_item_copy, \
-                        num_columns, \
-                        &queue, \
-                        &queue_len, \
-                        &queue_max_len \
+                        num_columns \
                     )
 
                     CALL_foobar();
@@ -544,7 +540,8 @@ extern int DLLEXPORT black_hole_solver_run(
 
             solver->iterations_num = iterations_num;
 
-            free(queue);
+            free(solver->queue);
+            solver->queue = NULL;
 
             return BLACK_HOLE_SOLVER__SUCCESS;
         }
@@ -554,7 +551,8 @@ extern int DLLEXPORT black_hole_solver_run(
             {
                 solver->iterations_num = iterations_num;
 
-                free(queue);
+                free(solver->queue);
+                solver->queue = NULL;
 
                 return BLACK_HOLE_SOLVER__OUT_OF_ITERS;
             }
@@ -563,7 +561,8 @@ extern int DLLEXPORT black_hole_solver_run(
 
     solver->iterations_num = iterations_num;
 
-    free(queue);
+    free(solver->queue);
+    solver->queue = NULL;
 
     return BLACK_HOLE_SOLVER__NOT_SOLVABLE;
 }
