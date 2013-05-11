@@ -662,25 +662,17 @@ DLLEXPORT extern int black_hole_solver_get_next_move(
     }
 
     {
-        bhs_state_key_value_pair_t next_state;
-        int height;
-
-        next_state = solver->states_in_solution[
+        bhs_solution_state_t next_state = solver->states_in_solution[
             ++solver->current_state_in_solution_idx
-            ].packed;
+            ];
 
-        *col_idx_ptr = next_state.value.col_idx;
-        height =
-        (
-        (
-            (next_state.key.data[(*col_idx_ptr)>>1]
-                >>
-            (((*col_idx_ptr)&(2-1)) << 2)) & 0xF
-        )
-        );
+        int col_idx = next_state.packed.value.col_idx;
+        int height = next_state.unpacked.heights[col_idx];
 
-        (*card_rank_ptr) = solver->board_values[*col_idx_ptr][height]+1;
-        (*card_suit_ptr) = suit_char_to_index(solver->initial_board_card_strings[*col_idx_ptr][height][1]);
+        *col_idx_ptr = col_idx;
+
+        (*card_rank_ptr) = solver->board_values[col_idx][height]+1;
+        (*card_suit_ptr) = suit_char_to_index(solver->initial_board_card_strings[col_idx][height][1]);
 
         return BLACK_HOLE_SOLVER__SUCCESS;
     }
