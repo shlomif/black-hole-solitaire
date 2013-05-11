@@ -34,6 +34,7 @@
 #include "config.h"
 #include "black_hole_solver.h"
 #include "state.h"
+#include "bit_rw.h"
 
 #if (BHS_STATE_STORAGE == BHS_STATE_STORAGE_TOKYO_CAB_HASH)
 #include "tokyo_cab_hash.h"
@@ -338,35 +339,21 @@ static GCC_INLINE void queue_item_populate_packed(
     int num_columns
 )
 {
-    int two_cols_idx;
-    int two_cols_offset;
-
-    int cols_idx_limit =
-    (
-        (num_columns / BHS__ALL_IN_A_ROW__COLS_PER_BYTE)
-            +
-        (
-            (num_columns % BHS__ALL_IN_A_ROW__COLS_PER_BYTE ) ? 1 : 0
-        )
-        - 1
-    );
+    fc_solve_bit_writer_t bit_w;
+    int col;
 
     queue_item->packed.key.foundations = queue_item->unpacked.foundations;
 
-    for (two_cols_idx = 0, two_cols_offset = 0;
-        two_cols_idx < cols_idx_limit ;
-        two_cols_idx++, two_cols_offset += BHS__ALL_IN_A_ROW__COLS_PER_BYTE)
+    fc_solve_bit_writer_init(&bit_w, queue_item->packed.key.data);
+
+    for (col = 0; col < num_columns ; col++)
     {
-        queue_item->packed.key.data[two_cols_idx] =
-            (unsigned char)
-            (
-              (queue_item->unpacked.heights[two_cols_offset])
-            | (queue_item->unpacked.heights[two_cols_offset+1] << BHS__ALL_IN_A_ROW__BITS_PER_COL)
-            )
-            ;
+        fc_solve_bit_writer_write(
+            &bit_w,
+            BHS__ALL_IN_A_ROW__BITS_PER_COL,
+            queue_item->unpacked.heights[col]
+        );
     }
-    /* Only one left. */
-    queue_item->packed.key.data[two_cols_idx] = (unsigned char)(queue_item->unpacked.heights[two_cols_offset]);
 }
 
 static void GCC_INLINE perform_move(
