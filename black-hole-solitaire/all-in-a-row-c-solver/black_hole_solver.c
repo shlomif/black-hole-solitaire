@@ -330,6 +330,42 @@ typedef struct
     bhs_unpacked_state_t unpacked;
 } bhs_queue_item_t;
 
+static GCC_INLINE void queue_item_populate_packed(
+    bhs_queue_item_t * queue_item,
+    int num_columns
+)
+{
+    int two_cols_idx;
+    int two_cols_offset;
+
+    int cols_idx_limit =
+    (
+        (num_columns / BHS__ALL_IN_A_ROW__COLS_PER_BYTE)
+            +
+        (
+            (num_columns % BHS__ALL_IN_A_ROW__COLS_PER_BYTE ) ? 1 : 0
+        )
+        - 1
+    );
+
+    queue_item->packed_item.key.foundations = queue_item->unpacked.foundations;
+
+    for (two_cols_idx = 0, two_cols_offset = 0;
+        two_cols_idx < cols_idx_limit ;
+        two_cols_idx++, two_cols_offset += BHS__ALL_IN_A_ROW__COLS_PER_BYTE)
+    {
+        queue_item->packed_item.key.data[two_cols_idx] =
+            (unsigned char)
+            (
+              (queue_item->unpacked.heights[two_cols_offset])
+            | (queue_item->unpacked.heights[two_cols_offset+1] << BHS__ALL_IN_A_ROW__BITS_PER_COL)
+            )
+            ;
+    }
+    /* Only one left. */
+    queue_item->packed_item.key.data[two_cols_idx] = (unsigned char)(queue_item->unpacked.heights[two_cols_offset]);
+}
+
 extern int DLLEXPORT black_hole_solver_run(
     black_hole_solver_instance_t * ret_instance
 )
@@ -339,7 +375,6 @@ extern int DLLEXPORT black_hole_solver_run(
     bhs_state_key_value_pair_t state;
     bhs_state_key_value_pair_t next_state;
 
-    int two_cols_idx, two_cols_offset;
     bhs_queue_item_t * queue, * queue_item;
     int queue_len, queue_max_len;
     int foundations;
@@ -364,16 +399,6 @@ extern int DLLEXPORT black_hole_solver_run(
         max_iters_limit = LONG_MAX;
     }
 
-    int cols_idx_limit =
-    (
-        (num_columns / BHS__ALL_IN_A_ROW__COLS_PER_BYTE)
-            +
-        (
-            (num_columns % BHS__ALL_IN_A_ROW__COLS_PER_BYTE ) ? 1 : 0
-        )
-        - 1
-    );
-
     queue_max_len = 64;
 
     queue = malloc(sizeof(queue[0]) * queue_max_len);
@@ -392,21 +417,7 @@ extern int DLLEXPORT black_hole_solver_run(
     /* Populate the packed_item from the unpacked one. */
     memset(&(queue_item->packed_item), '\0', sizeof(queue_item->packed_item));
 
-    queue_item->packed_item.key.foundations = queue_item->unpacked.foundations;
-    for (two_cols_idx = 0, two_cols_offset = 0;
-        two_cols_idx < cols_idx_limit ;
-        two_cols_idx++, two_cols_offset += BHS__ALL_IN_A_ROW__COLS_PER_BYTE)
-    {
-        queue_item->packed_item.key.data[two_cols_idx] =
-            (unsigned char)
-            (
-              (queue_item->unpacked.heights[two_cols_offset])
-            | (queue_item->unpacked.heights[two_cols_offset+1] << BHS__ALL_IN_A_ROW__BITS_PER_COL)
-            )
-            ;
-    }
-    /* Only one left. */
-    queue_item->packed_item.key.data[two_cols_idx] = (unsigned char)(solver->initial_lens[two_cols_offset]);
+    queue_item_populate_packed( queue_item, num_columns );
 
     *init_state = queue_item->packed_item;
     queue_len++;
