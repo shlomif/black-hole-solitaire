@@ -19,7 +19,7 @@ use Test::Trap
 
 trap
 {
-    system('./all-in-a-row-solve',
+    system('./black-hole-solve',
         '--game', 'all-in-a-row',
         File::Spec->catfile(
             $bin_dir, 'data', '24.all_in_a_row.board.txt'

@@ -19,7 +19,7 @@ use Test::Trap
 
 trap
 {
-    system('./all-in-a-row-solve',
+    system('./black-hole-solve',
         '--game', 'black-hole',
         File::Spec->catfile(
             $bin_dir, "data", "26464608654870335080.bh.board.txt"
@@ -401,7 +401,7 @@ eq_or_diff ($trap->stdout(), $expected_output, "Right output.");
 
 trap
 {
-    system('./all-in-a-row-solve',
+    system('./black-hole-solve',
         '--game', 'black-hole',
         File::Spec->catfile(
             $bin_dir, "data", "1.bh.board.txt"
@@ -424,7 +424,7 @@ eq_or_diff ($trap->stdout(), $expected_output, "Right output.");
 
 trap
 {
-    system('./all-in-a-row-solve',
+    system('./black-hole-solve',
         '--game', 'black-hole',
         "--max-iters", "10000",
         File::Spec->catfile(
@@ -807,7 +807,7 @@ eq_or_diff ($trap->stdout(), $expected_output, "Right output.");
 
 trap
 {
-    system('./all-in-a-row-solve',
+    system('./black-hole-solve',
         '--game', 'black-hole',
         File::Spec->catfile(
             $bin_dir, "data", "1.bh.board.txt"
