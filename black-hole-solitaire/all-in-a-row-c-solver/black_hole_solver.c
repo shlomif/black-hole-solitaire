@@ -496,8 +496,6 @@ extern int DLLEXPORT black_hole_solver_run(
         {
             for (col_idx = 0 ; col_idx < num_columns ; col_idx++)
             {
-#define BYTE_POS() (col_idx >> 1)
-#define BIT_OFFSET() ((col_idx&(2-1))<<2)
                 if ((pos = state.heights[col_idx]))
                 {
                     no_cards = FALSE;
