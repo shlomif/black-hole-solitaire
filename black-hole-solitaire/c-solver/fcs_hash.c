@@ -32,7 +32,7 @@
 #define BUILDING_DLL 1
 #include "config.h"
 
-#if (FCS_STATE_STORAGE == FCS_STATE_STORAGE_INTERNAL_HASH) || (defined(INDIRECT_STACK_STATES) && (FCS_STACK_STORAGE == FCS_STACK_STORAGE_INTERNAL_HASH))
+#if (BHS_STATE_STORAGE == BHS_STATE_STORAGE_INTERNAL_HASH)
 
 #include <stdlib.h>
 #include <string.h>
@@ -65,7 +65,7 @@ static GCC_INLINE ub4 perl_hash_function(bhs_state_key_t key)
     return hash_value_int;
 }
 
-static void GCC_INLINE bh_solve_hash_rehash(bh_solve_hash_t * hash);
+static GCC_INLINE void bh_solve_hash_rehash(bh_solve_hash_t * hash);
 
 
 
@@ -239,7 +239,7 @@ fcs_bool_t bh_solve_hash_insert(
     hash table, allowing for smaller chains, and faster lookup.
 
   */
-static void GCC_INLINE bh_solve_hash_rehash(
+static GCC_INLINE void bh_solve_hash_rehash(
     bh_solve_hash_t * hash
     )
 {
@@ -296,4 +296,4 @@ static void GCC_INLINE bh_solve_hash_rehash(
 /* ANSI C doesn't allow empty compilation */
 static void bh_solve_hash_c_dummy();
 
-#endif /* (FCS_STATE_STORAGE == FCS_STATE_STORAGE_INTERNAL_HASH) || defined(INDIRECT_STACK_STATES) */
+#endif /* (BHS_STATE_STORAGE == BHS_STATE_STORAGE_INTERNAL_HASH) || defined(INDIRECT_STACK_STATES) */
