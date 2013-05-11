@@ -48,10 +48,8 @@ GetOptions(
         ;
 
     local $ENV{HARNESS_PLUGINS} =
-        "ColorSummary ColorFileVerdicts AlternateInterpreters TrimDisplayedFilenames"
+        "ColorSummary ColorFileVerdicts AlternateInterpreters"
         ;
-
-    local $ENV{HARNESS_TRIM_FNS} = 'keep:1';
 
     if (system("make", "-s"))
     {
