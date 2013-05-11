@@ -326,7 +326,7 @@ typedef struct
 
 typedef struct
 {
-    bhs_state_key_value_pair_t packed_item;
+    bhs_state_key_value_pair_t packed;
     bhs_unpacked_state_t unpacked;
 } bhs_queue_item_t;
 
@@ -348,13 +348,13 @@ static GCC_INLINE void queue_item_populate_packed(
         - 1
     );
 
-    queue_item->packed_item.key.foundations = queue_item->unpacked.foundations;
+    queue_item->packed.key.foundations = queue_item->unpacked.foundations;
 
     for (two_cols_idx = 0, two_cols_offset = 0;
         two_cols_idx < cols_idx_limit ;
         two_cols_idx++, two_cols_offset += BHS__ALL_IN_A_ROW__COLS_PER_BYTE)
     {
-        queue_item->packed_item.key.data[two_cols_idx] =
+        queue_item->packed.key.data[two_cols_idx] =
             (unsigned char)
             (
               (queue_item->unpacked.heights[two_cols_offset])
@@ -363,7 +363,7 @@ static GCC_INLINE void queue_item_populate_packed(
             ;
     }
     /* Only one left. */
-    queue_item->packed_item.key.data[two_cols_idx] = (unsigned char)(queue_item->unpacked.heights[two_cols_offset]);
+    queue_item->packed.key.data[two_cols_idx] = (unsigned char)(queue_item->unpacked.heights[two_cols_offset]);
 }
 
 extern int DLLEXPORT black_hole_solver_run(
@@ -413,12 +413,12 @@ extern int DLLEXPORT black_hole_solver_run(
     }
     new_queue_item->unpacked.foundations = solver->initial_foundation;
 
-    /* Populate the packed_item from the unpacked one. */
-    memset(&(new_queue_item->packed_item), '\0', sizeof(new_queue_item->packed_item));
+    /* Populate the packed item from the unpacked one. */
+    memset(&(new_queue_item->packed), '\0', sizeof(new_queue_item->packed));
 
     queue_item_populate_packed( new_queue_item, num_columns );
 
-    *init_state = new_queue_item->packed_item;
+    *init_state = new_queue_item->packed;
     queue_len++;
 
     num_states_in_collection = 0;
@@ -459,10 +459,10 @@ extern int DLLEXPORT black_hole_solver_run(
                     bhs_queue_item_t next_queue_item;
 
                     next_queue_item.unpacked = next_state;
-                    memset(&(next_queue_item.packed_item), '\0', sizeof(next_queue_item.packed_item));
+                    memset(&(next_queue_item.packed), '\0', sizeof(next_queue_item.packed));
 
-                    next_queue_item.packed_item.value.parent_state = queue_item_copy.packed_item.key;
-                    next_queue_item.packed_item.value.col_idx = col_idx;
+                    next_queue_item.packed.value.parent_state = queue_item_copy.packed.key;
+                    next_queue_item.packed.value.col_idx = col_idx;
 
                     queue_item_populate_packed(
                         &(next_queue_item),
@@ -471,7 +471,7 @@ extern int DLLEXPORT black_hole_solver_run(
 
                     if (! bh_solve_hash_insert(
                         &(solver->positions),
-                        &(next_queue_item.packed_item)
+                        &(next_queue_item.packed)
                         )
                     )
                     {
@@ -510,10 +510,10 @@ extern int DLLEXPORT black_hole_solver_run(
                         bhs_queue_item_t next_queue_item;
 
                         next_queue_item.unpacked = next_state;
-                        memset(&(next_queue_item.packed_item), '\0', sizeof(next_queue_item.packed_item));
+                        memset(&(next_queue_item.packed), '\0', sizeof(next_queue_item.packed));
 
-                        next_queue_item.packed_item.value.parent_state = queue_item_copy.packed_item.key;
-                        next_queue_item.packed_item.value.col_idx = col_idx;
+                        next_queue_item.packed.value.parent_state = queue_item_copy.packed.key;
+                        next_queue_item.packed.value.col_idx = col_idx;
 
                         queue_item_populate_packed(
                             &(next_queue_item),
@@ -522,7 +522,7 @@ extern int DLLEXPORT black_hole_solver_run(
 
                         if (! bh_solve_hash_insert(
                             &(solver->positions),
-                            &(next_queue_item.packed_item)
+                            &(next_queue_item.packed)
                             )
                         )
                         {
@@ -545,7 +545,7 @@ extern int DLLEXPORT black_hole_solver_run(
 
         if (no_cards)
         {
-            solver->final_state = queue_item_copy.packed_item;
+            solver->final_state = queue_item_copy.packed;
 
             solver->iterations_num = iterations_num;
             solver->num_states_in_collection = num_states_in_collection;
