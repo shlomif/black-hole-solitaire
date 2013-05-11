@@ -367,15 +367,54 @@ static GCC_INLINE void queue_item_populate_packed(
 }
 
 static void GCC_INLINE foobar(
+    bhs_solver_t * solver,
     bhs_unpacked_state_t * next_state_ptr,
     bhs_unpacked_state_t * state_ptr,
     bhs_rank_t card,
-    int col_idx
+    int col_idx,
+    bhs_queue_item_t * queue_item_copy_ptr,
+    int num_columns,
+    long * num_states_in_collection_ptr,
+    bhs_queue_item_t * * queue_ptr,
+    int * queue_len_ptr,
+    int * queue_max_len_ptr
 )
 {
     *next_state_ptr = *state_ptr;
     next_state_ptr->foundations = card;
     next_state_ptr->heights[col_idx]--;
+
+    bhs_queue_item_t next_queue_item;
+
+    next_queue_item.unpacked = *next_state_ptr;
+    memset(&(next_queue_item.packed), '\0', sizeof(next_queue_item.packed));
+
+    next_queue_item.packed.value.parent_state = queue_item_copy_ptr->packed.key;
+    next_queue_item.packed.value.col_idx = col_idx;
+
+    queue_item_populate_packed(
+        &(next_queue_item),
+        num_columns
+    );
+
+    if (! bh_solve_hash_insert(
+            &(solver->positions),
+            &(next_queue_item.packed)
+    )
+    )
+    {
+        (*num_states_in_collection_ptr)++;
+        /* It's a new state - put it in the queue. */
+        (*queue_ptr)[(*queue_len_ptr)++] = next_queue_item;
+
+        if ((*queue_len_ptr) == (*queue_max_len_ptr))
+        {
+            (*queue_ptr) = realloc(
+                (*queue_ptr),
+                sizeof((*queue_ptr)[0]) * ((*queue_max_len_ptr) += 64)
+            );
+        }
+    }
 }
 
 extern int DLLEXPORT black_hole_solver_run(
@@ -465,44 +504,22 @@ extern int DLLEXPORT black_hole_solver_run(
                     no_cards = FALSE;
                     card = solver->board_values[col_idx][pos-1];
 
-                    foobar(
-                        &next_state,
-                        &state,
-                        card,
-                        col_idx
-                    );
-
-                    bhs_queue_item_t next_queue_item;
-
-                    next_queue_item.unpacked = next_state;
-                    memset(&(next_queue_item.packed), '\0', sizeof(next_queue_item.packed));
-
-                    next_queue_item.packed.value.parent_state = queue_item_copy.packed.key;
-                    next_queue_item.packed.value.col_idx = col_idx;
-
-                    queue_item_populate_packed(
-                        &(next_queue_item),
-                        num_columns
-                    );
-
-                    if (! bh_solve_hash_insert(
-                        &(solver->positions),
-                        &(next_queue_item.packed)
-                        )
+#define CALL_foobar() \
+                    foobar( \
+                        solver, \
+                        &next_state, \
+                        &state, \
+                        card, \
+                        col_idx, \
+                        &queue_item_copy, \
+                        num_columns, \
+                        &num_states_in_collection, \
+                        &queue, \
+                        &queue_len, \
+                        &queue_max_len \
                     )
-                    {
-                        num_states_in_collection++;
-                        /* It's a new state - put it in the queue. */
-                        queue[queue_len++] = next_queue_item;
 
-                        if (queue_len == queue_max_len)
-                        {
-                            queue = realloc(
-                                queue,
-                                sizeof(queue[0]) * (queue_max_len += 64)
-                            );
-                        }
-                    }
+                    CALL_foobar();
 
                 }
             }
@@ -519,44 +536,7 @@ extern int DLLEXPORT black_hole_solver_run(
 
                     if (abs(card-foundations)%(MAX_RANK-1) == 1)
                     {
-                        foobar(
-                            &next_state,
-                            &state,
-                            card,
-                            col_idx
-                        );
-
-                        bhs_queue_item_t next_queue_item;
-
-                        next_queue_item.unpacked = next_state;
-                        memset(&(next_queue_item.packed), '\0', sizeof(next_queue_item.packed));
-
-                        next_queue_item.packed.value.parent_state = queue_item_copy.packed.key;
-                        next_queue_item.packed.value.col_idx = col_idx;
-
-                        queue_item_populate_packed(
-                            &(next_queue_item),
-                            num_columns
-                        );
-
-                        if (! bh_solve_hash_insert(
-                            &(solver->positions),
-                            &(next_queue_item.packed)
-                            )
-                        )
-                        {
-                            num_states_in_collection++;
-                            /* It's a new state - put it in the queue. */
-                            queue[queue_len++] = next_queue_item;
-
-                            if (queue_len == queue_max_len)
-                            {
-                                queue = realloc(
-                                    queue,
-                                    sizeof(queue[0]) * (queue_max_len += 64)
-                                );
-                            }
-                        }
+                        CALL_foobar();
                     }
                 }
             }
