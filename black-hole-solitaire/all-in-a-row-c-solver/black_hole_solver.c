@@ -374,7 +374,6 @@ static void GCC_INLINE foobar(
     int col_idx,
     bhs_queue_item_t * queue_item_copy_ptr,
     int num_columns,
-    long * num_states_in_collection_ptr,
     bhs_queue_item_t * * queue_ptr,
     int * queue_len_ptr,
     int * queue_max_len_ptr
@@ -403,7 +402,7 @@ static void GCC_INLINE foobar(
     )
     )
     {
-        (*num_states_in_collection_ptr)++;
+        solver->num_states_in_collection++;
         /* It's a new state - put it in the queue. */
         (*queue_ptr)[(*queue_len_ptr)++] = next_queue_item;
 
@@ -431,7 +430,7 @@ extern int DLLEXPORT black_hole_solver_run(
     fcs_bool_t no_cards;
     int col_idx, pos;
     bhs_rank_t card;
-    long iterations_num, num_states_in_collection;
+    long iterations_num;
     long max_iters_limit;
     int num_columns;
     int i;
@@ -472,7 +471,7 @@ extern int DLLEXPORT black_hole_solver_run(
     *init_state = new_queue_item->packed;
     queue_len++;
 
-    num_states_in_collection = 0;
+    solver->num_states_in_collection = 0;
     iterations_num = 0;
 
     bh_solve_hash_insert(
@@ -480,7 +479,7 @@ extern int DLLEXPORT black_hole_solver_run(
         init_state
     );
 
-    num_states_in_collection++;
+    solver->num_states_in_collection++;
     while (queue_len > 0)
     {
         queue_len--;
@@ -513,7 +512,6 @@ extern int DLLEXPORT black_hole_solver_run(
                         col_idx, \
                         &queue_item_copy, \
                         num_columns, \
-                        &num_states_in_collection, \
                         &queue, \
                         &queue_len, \
                         &queue_max_len \
@@ -547,7 +545,6 @@ extern int DLLEXPORT black_hole_solver_run(
             solver->final_state = queue_item_copy.packed;
 
             solver->iterations_num = iterations_num;
-            solver->num_states_in_collection = num_states_in_collection;
 
             free(queue);
 
@@ -558,7 +555,6 @@ extern int DLLEXPORT black_hole_solver_run(
             if (iterations_num == max_iters_limit)
             {
                 solver->iterations_num = iterations_num;
-                solver->num_states_in_collection = num_states_in_collection;
 
                 free(queue);
 
@@ -568,7 +564,6 @@ extern int DLLEXPORT black_hole_solver_run(
     }
 
     solver->iterations_num = iterations_num;
-    solver->num_states_in_collection = num_states_in_collection;
 
     free(queue);
 
