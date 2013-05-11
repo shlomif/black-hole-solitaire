@@ -102,7 +102,8 @@ int main(int argc, char * argv[])
         board,
         &error_line_num,
         BHS__ALL_IN_A_ROW__NUM_COLUMNS,
-        BHS__ALL_IN_A_ROW__MAX_NUM_CARDS_IN_COL
+        BHS__ALL_IN_A_ROW__MAX_NUM_CARDS_IN_COL,
+        BHS__ALL_IN_A_ROW__BITS_PER_COL
         ))
     {
         fprintf(stderr, "Error reading the board at line No. %d!\n", error_line_num);
