@@ -375,8 +375,7 @@ static void GCC_INLINE foobar(
     bhs_unpacked_state_t * state_ptr,
     bhs_rank_t card,
     int col_idx,
-    bhs_queue_item_t * queue_item_copy_ptr,
-    int num_columns
+    bhs_queue_item_t * queue_item_copy_ptr
 )
 {
     *next_state_ptr = *state_ptr;
@@ -393,7 +392,7 @@ static void GCC_INLINE foobar(
 
     queue_item_populate_packed(
         &(next_queue_item),
-        num_columns
+        solver->num_columns
     );
 
     if (! bh_solve_hash_insert(
@@ -507,8 +506,7 @@ extern int DLLEXPORT black_hole_solver_run(
                         &state, \
                         card, \
                         col_idx, \
-                        &queue_item_copy, \
-                        num_columns \
+                        &queue_item_copy \
                     )
 
                     CALL_foobar();
