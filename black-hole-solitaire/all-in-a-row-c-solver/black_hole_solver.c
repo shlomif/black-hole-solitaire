@@ -670,9 +670,10 @@ DLLEXPORT extern int black_hole_solver_get_next_move(
         int height = next_state.unpacked.heights[col_idx];
 
         *col_idx_ptr = col_idx;
-
-        (*card_rank_ptr) = solver->board_values[col_idx][height]+1;
-        (*card_suit_ptr) = suit_char_to_index(solver->initial_board_card_strings[col_idx][height][1]);
+        *card_rank_ptr = solver->board_values[col_idx][height]+1;
+        *card_suit_ptr = suit_char_to_index(
+            solver->initial_board_card_strings[col_idx][height][1]
+        );
 
         return BLACK_HOLE_SOLVER__SUCCESS;
     }
