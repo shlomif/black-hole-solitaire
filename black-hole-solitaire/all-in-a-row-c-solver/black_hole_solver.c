@@ -320,8 +320,14 @@ DLLEXPORT extern int black_hole_solver_set_max_iters_limit(
 
 typedef struct
 {
+    unsigned char heights[BHS__MAX_NUM_COLUMNS];
+    unsigned char foundations;
+} bhs_unpacked_state_t;
+
+typedef struct
+{
     bhs_state_key_value_pair_t packed_item;
-    unsigned char unpacked_heights[BHS__MAX_NUM_COLUMNS];
+    bhs_unpacked_state_t unpacked;
 } bhs_queue_item_t;
 
 extern int DLLEXPORT black_hole_solver_run(
@@ -378,12 +384,14 @@ extern int DLLEXPORT black_hole_solver_run(
 
     for (i = 0 ; i < num_columns ; i++)
     {
-        queue_item->unpacked_heights[i] = solver->initial_lens[i];
+        queue_item->unpacked.heights[i] = solver->initial_lens[i];
     }
+    queue_item->unpacked.foundations = solver->initial_foundation;
 
+    /* Populate the packed_item from the unpacked one. */
     memset(&(queue_item->packed_item), '\0', sizeof(queue_item->packed_item));
-    queue_item->packed_item.key.foundations = solver->initial_foundation;
 
+    queue_item->packed_item.key.foundations = queue_item->unpacked.foundations;
     for (two_cols_idx = 0, two_cols_offset = 0;
         two_cols_idx < cols_idx_limit ;
         two_cols_idx++, two_cols_offset += BHS__ALL_IN_A_ROW__COLS_PER_BYTE)
@@ -391,8 +399,8 @@ extern int DLLEXPORT black_hole_solver_run(
         queue_item->packed_item.key.data[two_cols_idx] =
             (unsigned char)
             (
-              (queue_item->unpacked_heights[two_cols_offset])
-            | (queue_item->unpacked_heights[two_cols_offset+1] << BHS__ALL_IN_A_ROW__BITS_PER_COL)
+              (queue_item->unpacked.heights[two_cols_offset])
+            | (queue_item->unpacked.heights[two_cols_offset+1] << BHS__ALL_IN_A_ROW__BITS_PER_COL)
             )
             ;
     }
