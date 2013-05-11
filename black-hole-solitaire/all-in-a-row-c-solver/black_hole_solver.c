@@ -371,20 +371,21 @@ static GCC_INLINE void queue_item_populate_packed(
 
 static void GCC_INLINE perform_move(
     bhs_solver_t * solver,
-    bhs_unpacked_state_t * next_state_ptr,
     bhs_unpacked_state_t * state_ptr,
     bhs_rank_t card,
     int col_idx,
     bhs_queue_item_t * queue_item_copy_ptr
 )
 {
-    *next_state_ptr = *state_ptr;
-    next_state_ptr->foundations = card;
-    next_state_ptr->heights[col_idx]--;
+    bhs_unpacked_state_t next_state;
+
+    next_state = *state_ptr;
+    next_state.foundations = card;
+    next_state.heights[col_idx]--;
 
     bhs_queue_item_t next_queue_item;
 
-    next_queue_item.unpacked = *next_state_ptr;
+    next_queue_item.unpacked = next_state;
     memset(&(next_queue_item.packed), '\0', sizeof(next_queue_item.packed));
 
     next_queue_item.packed.value.parent_state = queue_item_copy_ptr->packed.key;
@@ -421,7 +422,7 @@ extern int DLLEXPORT black_hole_solver_run(
 {
     bhs_solver_t * solver;
     bhs_state_key_value_pair_t * init_state;
-    bhs_unpacked_state_t state, next_state;
+    bhs_unpacked_state_t state;
 
     bhs_queue_item_t * new_queue_item, queue_item_copy;
     int foundations;
@@ -502,7 +503,6 @@ extern int DLLEXPORT black_hole_solver_run(
 #define CALL_perform_move() \
                     perform_move( \
                         solver, \
-                        &next_state, \
                         &state, \
                         card, \
                         col_idx, \
