@@ -337,12 +337,13 @@ DLLEXPORT extern int black_hole_solver_set_max_iters_limit(
 }
 
 static GCC_INLINE void queue_item_populate_packed(
-    bhs_queue_item_t * queue_item,
-    int num_columns
+    bhs_solver_t * solver,
+    bhs_queue_item_t * queue_item
 )
 {
     fc_solve_bit_writer_t bit_w;
     int col;
+    int num_columns = solver->num_columns;
 
     queue_item->packed.key.foundations = queue_item->unpacked.foundations;
 
@@ -359,12 +360,13 @@ static GCC_INLINE void queue_item_populate_packed(
 }
 
 static GCC_INLINE void queue_item_unpack(
-    bhs_queue_item_t * queue_item,
-    int num_columns
+    bhs_solver_t * solver,
+    bhs_queue_item_t * queue_item
 )
 {
     fc_solve_bit_reader_t bit_r;
     int col;
+    int num_columns = solver->num_columns;
 
     queue_item->unpacked.foundations = queue_item->packed.key.foundations;
 
@@ -402,8 +404,8 @@ static void GCC_INLINE perform_move(
     next_queue_item.packed.value.col_idx = col_idx;
 
     queue_item_populate_packed(
-        &(next_queue_item),
-        solver->num_columns
+        solver,
+        &(next_queue_item)
     );
 
     if (! bh_solve_hash_insert(
@@ -475,7 +477,7 @@ extern int DLLEXPORT black_hole_solver_run(
     /* Populate the packed item from the unpacked one. */
     memset(&(new_queue_item->packed), '\0', sizeof(new_queue_item->packed));
 
-    queue_item_populate_packed( new_queue_item, num_columns );
+    queue_item_populate_packed( solver, new_queue_item );
 
     *init_state = new_queue_item->packed;
     solver->queue_len++;
@@ -613,7 +615,7 @@ DLLEXPORT extern int black_hole_solver_get_next_move(
         states = malloc(sizeof(states[0]) * max_num_states);
 
         states[num_states].packed = (solver->final_state);
-        queue_item_unpack(&states[num_states], solver->num_columns);
+        queue_item_unpack(solver, &states[num_states]);
 
         while (memcmp(
             &(states[num_states].packed.key),
@@ -637,7 +639,7 @@ DLLEXPORT extern int black_hole_solver_get_next_move(
                 key_ptr,
                 &(states[++num_states].packed)
             );
-            queue_item_unpack(&states[num_states], solver->num_columns);
+            queue_item_unpack(solver, &states[num_states]);
         }
 
         num_states++;
