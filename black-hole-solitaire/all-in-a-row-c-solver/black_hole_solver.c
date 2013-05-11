@@ -358,6 +358,28 @@ static GCC_INLINE void queue_item_populate_packed(
     }
 }
 
+static GCC_INLINE void queue_item_unpack(
+    bhs_queue_item_t * queue_item,
+    int num_columns
+)
+{
+    fc_solve_bit_reader_t bit_r;
+    int col;
+
+    queue_item->unpacked.foundations = queue_item->packed.key.foundations;
+
+    fc_solve_bit_reader_init(&bit_r, queue_item->packed.key.data);
+
+    for (col = 0; col < num_columns ; col++)
+    {
+        queue_item->unpacked.heights[col] =
+            fc_solve_bit_reader_read(
+                &bit_r,
+                BHS__ALL_IN_A_ROW__BITS_PER_COL
+            );
+    }
+}
+
 static void GCC_INLINE perform_move(
     bhs_solver_t * solver,
     bhs_rank_t card,
@@ -591,6 +613,7 @@ DLLEXPORT extern int black_hole_solver_get_next_move(
         states = malloc(sizeof(states[0]) * max_num_states);
 
         states[num_states].packed = (solver->final_state);
+        queue_item_unpack(&states[num_states], solver->num_columns);
 
         while (memcmp(
             &(states[num_states].packed.key),
@@ -614,6 +637,7 @@ DLLEXPORT extern int black_hole_solver_get_next_move(
                 key_ptr,
                 &(states[++num_states].packed)
             );
+            queue_item_unpack(&states[num_states], solver->num_columns);
         }
 
         num_states++;
