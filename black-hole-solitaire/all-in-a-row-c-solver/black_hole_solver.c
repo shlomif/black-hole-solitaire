@@ -573,6 +573,12 @@ extern int DLLEXPORT black_hole_solver_free(
 
     bh_solve_hash_free(&(solver->positions));
 
+    if (solver->states_in_solution)
+    {
+        free(solver->states_in_solution);
+        solver->states_in_solution = NULL;
+    }
+
     free(solver);
 
     return BLACK_HOLE_SOLVER__SUCCESS;
