@@ -382,6 +382,7 @@ extern int DLLEXPORT black_hole_solver_run(
 
     queue_item = &(queue[queue_len]);
 
+    /* Populate the unpacked state. */
     for (i = 0 ; i < num_columns ; i++)
     {
         queue_item->unpacked.heights[i] = solver->initial_lens[i];
