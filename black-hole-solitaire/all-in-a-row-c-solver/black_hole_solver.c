@@ -321,7 +321,7 @@ DLLEXPORT extern int black_hole_solver_set_max_iters_limit(
 typedef struct
 {
     unsigned char heights[BHS__MAX_NUM_COLUMNS];
-    unsigned char foundations;
+    signed char foundations;
 } bhs_unpacked_state_t;
 
 typedef struct
@@ -372,10 +372,9 @@ extern int DLLEXPORT black_hole_solver_run(
 {
     bhs_solver_t * solver;
     bhs_state_key_value_pair_t * init_state;
-    bhs_state_key_value_pair_t state;
-    bhs_state_key_value_pair_t next_state;
+    bhs_unpacked_state_t state, next_state;
 
-    bhs_queue_item_t * queue, * queue_item;
+    bhs_queue_item_t * queue, * new_queue_item, queue_item_copy;
     int queue_len, queue_max_len;
     int foundations;
     fcs_bool_t no_cards;
@@ -405,21 +404,21 @@ extern int DLLEXPORT black_hole_solver_run(
 
     queue_len = 0;
 
-    queue_item = &(queue[queue_len]);
+    new_queue_item = &(queue[queue_len]);
 
     /* Populate the unpacked state. */
     for (i = 0 ; i < num_columns ; i++)
     {
-        queue_item->unpacked.heights[i] = solver->initial_lens[i];
+        new_queue_item->unpacked.heights[i] = solver->initial_lens[i];
     }
-    queue_item->unpacked.foundations = solver->initial_foundation;
+    new_queue_item->unpacked.foundations = solver->initial_foundation;
 
     /* Populate the packed_item from the unpacked one. */
-    memset(&(queue_item->packed_item), '\0', sizeof(queue_item->packed_item));
+    memset(&(new_queue_item->packed_item), '\0', sizeof(new_queue_item->packed_item));
 
-    queue_item_populate_packed( queue_item, num_columns );
+    queue_item_populate_packed( new_queue_item, num_columns );
 
-    *init_state = queue_item->packed_item;
+    *init_state = new_queue_item->packed_item;
     queue_len++;
 
     num_states_in_collection = 0;
@@ -433,10 +432,13 @@ extern int DLLEXPORT black_hole_solver_run(
     num_states_in_collection++;
     while (queue_len > 0)
     {
-        state = queue[--queue_len].packed_item;
+        queue_len--;
+        queue_item_copy = queue[queue_len];
+        state = queue_item_copy.unpacked;
+
         iterations_num++;
 
-        foundations = state.key.foundations;
+        foundations = state.foundations;
 
         no_cards = TRUE;
 
@@ -446,33 +448,36 @@ extern int DLLEXPORT black_hole_solver_run(
             {
 #define BYTE_POS() (col_idx >> 1)
 #define BIT_OFFSET() ((col_idx&(2-1))<<2)
-                if ((pos = (
-                    (state.key.data[BYTE_POS()] >> BIT_OFFSET())
-                        &
-                        (16-1)
-                    )
-                ))
+                if ((pos = state.heights[col_idx]))
                 {
                     no_cards = FALSE;
                     card = solver->board_values[col_idx][pos-1];
                     next_state = state;
-                    next_state.key.foundations = card;
-                    next_state.key.data[BYTE_POS()] &=
-                        (~(((1<<4)-1) << (BIT_OFFSET())));
-                    next_state.key.data[BYTE_POS()] |=
-                        ((pos-1) << (BIT_OFFSET()));
-                    next_state.value.parent_state = state.key;
-                    next_state.value.col_idx = col_idx;
+                    next_state.foundations = card;
+                    next_state.heights[col_idx]--;
+
+                    bhs_queue_item_t next_queue_item;
+
+                    next_queue_item.unpacked = next_state;
+                    memset(&(next_queue_item.packed_item), '\0', sizeof(next_queue_item.packed_item));
+
+                    next_queue_item.packed_item.value.parent_state = queue_item_copy.packed_item.key;
+                    next_queue_item.packed_item.value.col_idx = col_idx;
+
+                    queue_item_populate_packed(
+                        &(next_queue_item),
+                        num_columns
+                    );
 
                     if (! bh_solve_hash_insert(
                         &(solver->positions),
-                        &next_state
+                        &(next_queue_item.packed_item)
                         )
                     )
                     {
                         num_states_in_collection++;
                         /* It's a new state - put it in the queue. */
-                        queue[queue_len++].packed_item = next_state;
+                        queue[queue_len++] = next_queue_item;
 
                         if (queue_len == queue_max_len)
                         {
@@ -490,12 +495,7 @@ extern int DLLEXPORT black_hole_solver_run(
         {
             for (col_idx = 0 ; col_idx < num_columns ; col_idx++)
             {
-                if ((pos = (
-                    (state.key.data[BYTE_POS()] >> (BIT_OFFSET()))
-                        &
-                        (16-1)
-                    )
-                ))
+                if ( (pos = state.heights[col_idx] ) )
                 {
                     no_cards = FALSE;
 
@@ -504,23 +504,31 @@ extern int DLLEXPORT black_hole_solver_run(
                     if (abs(card-foundations)%(MAX_RANK-1) == 1)
                     {
                         next_state = state;
-                        next_state.key.foundations = card;
-                        next_state.key.data[BYTE_POS()] &=
-                            (~(((1<<4)-1) << (BIT_OFFSET())));
-                        next_state.key.data[(col_idx>>1)] |=
-                            ((pos-1) << (BIT_OFFSET()));
-                        next_state.value.parent_state = state.key;
-                        next_state.value.col_idx = col_idx;
+                        next_state.foundations = card;
+                        next_state.heights[col_idx]--;
+
+                        bhs_queue_item_t next_queue_item;
+
+                        next_queue_item.unpacked = next_state;
+                        memset(&(next_queue_item.packed_item), '\0', sizeof(next_queue_item.packed_item));
+
+                        next_queue_item.packed_item.value.parent_state = queue_item_copy.packed_item.key;
+                        next_queue_item.packed_item.value.col_idx = col_idx;
+
+                        queue_item_populate_packed(
+                            &(next_queue_item),
+                            num_columns
+                        );
 
                         if (! bh_solve_hash_insert(
                             &(solver->positions),
-                            &next_state
+                            &(next_queue_item.packed_item)
                             )
                         )
                         {
                             num_states_in_collection++;
                             /* It's a new state - put it in the queue. */
-                            queue[queue_len++].packed_item = next_state;
+                            queue[queue_len++] = next_queue_item;
 
                             if (queue_len == queue_max_len)
                             {
@@ -537,7 +545,7 @@ extern int DLLEXPORT black_hole_solver_run(
 
         if (no_cards)
         {
-            solver->final_state = state;
+            solver->final_state = queue_item_copy.packed_item;
 
             solver->iterations_num = iterations_num;
             solver->num_states_in_collection = num_states_in_collection;
