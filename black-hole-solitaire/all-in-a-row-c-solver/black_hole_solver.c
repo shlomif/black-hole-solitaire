@@ -498,21 +498,18 @@ extern int DLLEXPORT black_hole_solver_run(
                 no_cards = FALSE;
                 card = solver->board_values[col_idx][pos-1];
 
-#define CALL_perform_move() \
-                perform_move( \
-                    solver, \
-                    &state, \
-                    card, \
-                    col_idx, \
-                    &queue_item_copy \
-                )
-
                 if ( (foundations == -1)
                         ||
                      (abs(card-foundations)%(MAX_RANK-1) == 1)
                 )
                 {
-                    CALL_perform_move();
+                    perform_move(
+                        solver,
+                        &state,
+                        card,
+                        col_idx,
+                        &queue_item_copy
+                    );
                 }
             }
         }
