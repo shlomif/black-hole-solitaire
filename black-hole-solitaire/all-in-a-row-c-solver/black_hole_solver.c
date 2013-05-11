@@ -366,6 +366,18 @@ static GCC_INLINE void queue_item_populate_packed(
     queue_item->packed.key.data[two_cols_idx] = (unsigned char)(queue_item->unpacked.heights[two_cols_offset]);
 }
 
+static void GCC_INLINE foobar(
+    bhs_unpacked_state_t * next_state_ptr,
+    bhs_unpacked_state_t * state_ptr,
+    bhs_rank_t card,
+    int col_idx
+)
+{
+    *next_state_ptr = *state_ptr;
+    next_state_ptr->foundations = card;
+    next_state_ptr->heights[col_idx]--;
+}
+
 extern int DLLEXPORT black_hole_solver_run(
     black_hole_solver_instance_t * ret_instance
 )
@@ -452,9 +464,13 @@ extern int DLLEXPORT black_hole_solver_run(
                 {
                     no_cards = FALSE;
                     card = solver->board_values[col_idx][pos-1];
-                    next_state = state;
-                    next_state.foundations = card;
-                    next_state.heights[col_idx]--;
+
+                    foobar(
+                        &next_state,
+                        &state,
+                        card,
+                        col_idx
+                    );
 
                     bhs_queue_item_t next_queue_item;
 
@@ -503,9 +519,12 @@ extern int DLLEXPORT black_hole_solver_run(
 
                     if (abs(card-foundations)%(MAX_RANK-1) == 1)
                     {
-                        next_state = state;
-                        next_state.foundations = card;
-                        next_state.heights[col_idx]--;
+                        foobar(
+                            &next_state,
+                            &state,
+                            card,
+                            col_idx
+                        );
 
                         bhs_queue_item_t next_queue_item;
 
