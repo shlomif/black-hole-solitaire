@@ -16,15 +16,17 @@ it.
 
 Next, run:
 
-    cmake-gui .         # For the GUI configuration applet
+    mkdir build
+    cd build
+    cmake-gui ..         # For the GUI configuration applet
 
 Or:
 
-    ccmake .            # For the Curses-based configuration applet
+    ccmake ..            # For the Curses-based configuration applet
 
 With a fallback to:
 
-    cmake .             # Non-interactive application.
+    cmake ..             # Non-interactive application.
 
 This will build and install the "black_hole_solver" shared library,
 and "black-hole-solve" which is the executable for you.
