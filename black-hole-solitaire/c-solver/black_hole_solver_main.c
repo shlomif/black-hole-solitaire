@@ -84,11 +84,11 @@ int main(int argc, char * argv[])
             }
             char * g = argv[arg_idx++];
 
-            if (!strcmp(g, "black-hole"))
+            if (!strcmp(g, "black_hole"))
             {
                 game_type = GAME__BH;
             }
-            else if (!strcmp(g, "all-in-a-row"))
+            else if (!strcmp(g, "all_in_a_row"))
             {
                 game_type = GAME__ALL;
             }

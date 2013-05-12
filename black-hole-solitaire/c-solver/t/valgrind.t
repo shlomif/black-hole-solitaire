@@ -70,12 +70,12 @@ sub test_using_valgrind
 # TEST
 test_using_valgrind(
     [
-        '--game', 'all-in-a-row',
+        '--game', 'all_in_a_row',
         File::Spec->catfile(
             $bin_dir, 'data', '24.all_in_a_row.board.txt'
         ),
     ],
-    qq{all-in-a-row deal #24.}
+    qq{valgrind all_in_a_row deal #24.}
 );
 
 =head1 COPYRIGHT AND LICENSE
