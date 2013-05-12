@@ -1,13 +1,15 @@
 Black Hole Solitaire Solver
 ===========================
 
-This is a solver for the Solitaire/Patience card game "Black Hole",
-implemented in C as a command line application. For more information
-about Black Hole Solitaire, see:
+This is a solver for the Solitaire/Patience card games "Black Hole"
+and "All in a Row" - implemented in C as a command line application. For
+more information about these games, see:
 
 * http://pysolfc.sourceforge.net/doc/rules/blackhole.html
 
 * http://en.wikipedia.org/wiki/Black_Hole_%28solitaire%29
+
+* http://en.wikipedia.org/wiki/All_in_a_Row_%28Solitaire%29
 
 Installation
 ------------
@@ -17,21 +19,21 @@ To install this module, see the INSTALL file.
 Support and Documentation
 -------------------------
 
-After installing, you can find documentation for this module with the
-man command.
+After installation, you can find documentation for this module with the
+--help command
 
-    man black-hole-solve
+    black-hole-solve --help
 
 You can also look for information at:
 
-    http://www.shlomifish.org/open-source/projects/black-hole-solitaire-solver/
+* http://www.shlomifish.org/open-source/projects/black-hole-solitaire-solver/
 
-        - The Black Hole Solitaire Solver Homepage
+    - The Black Hole Solitaire Solver Homepage
 
 Usage
 -----
 
-The format of the board is similar to that:
+The format of a Black Hole board is similar to that:
 
 -------------------------------------
 Foundations: AS
@@ -63,11 +65,15 @@ if you want to generate PySolFC deals instead of the original PySol ones).
 
 These solver can be called with such a board layout like this:
 
-$ ./black-hole-solve 2.bh.board
+$ ./black-hole-solve --game black_hole 2.bh.board
 
 Or:
 
-$ make_pysol_freecell_board.py -F -t 2 black_hole | ./black-hole-solve -
+$ make_pysol_freecell_board.py -F -t 2 black_hole | ./black-hole-solve --game black_hole
+
+Similary "All in a Row" deals can be dealt using:
+
+$ make_pysol_freecell_board.py -F -t 24 all_in_a_row | ./black-hole-solve --game all_in_a_row -
 
 Copyright and Licence
 ---------------------
