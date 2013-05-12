@@ -94,7 +94,7 @@ int main(int argc, char * argv[])
             }
             else
             {
-                fprintf(stderr, "%s\n", "Error! --game should be either \"black-hole\" or \"all-in-a-row\".");
+                fprintf(stderr, "%s\n", "Error! --game should be either \"black_hole\" or \"all_in_a_row\".");
                 exit(-1);
             }
         }
