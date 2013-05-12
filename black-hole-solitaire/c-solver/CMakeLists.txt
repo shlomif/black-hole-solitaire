@@ -8,7 +8,7 @@ INCLUDE(FindPkgConfig)
 LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # This is the equivalent to perform a "make dist"/"make distdir" etc.
-SET(CPACK_PACKAGE_NAME "black_hole_solver")
+SET(CPACK_PACKAGE_NAME "black-hole-solver")
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Black Hole Solver")
 SET(CPACK_PACKAGE_VENDOR "Shlomi Fish")
 SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/README")
@@ -36,7 +36,7 @@ SET (FCS_IA_PACK_SIZE 64 CACHE STRING "Size of a single pack in kilo-bytes.")
 SET (IA_STATE_PACKS_GROW_BY 32 CACHE STRING "Amount to Grow State Packs By")
 SET (base_with_ver "black_hole_solver-[0-9]+\\\\.[0-9]+\\\\.[0-9]+")
 SET(CPACK_SOURCE_IGNORE_FILES
-    "/build"
+    "/(build|B/)"
     "/_CPack_Packages/"
     "/CMakeFiles/"
     "/.deps/"
@@ -48,7 +48,6 @@ SET(CPACK_SOURCE_IGNORE_FILES
     "/(fc-solve|freecell-solver-range-parallel-solve|freecell-solver-fc-pro-range-solve|freecell-solver-multi-thread-solve|freecell-solver-fork-solve|measure-depth-dep-tests-order-perf)$"
     "/lib(fcs|freecell-solver)\\\\.(a|la)$"
     "\\\\.so(\\\\.[0-9]+)*$"
-    "/\\.svn/"
     "\\\\.(pdf|fo)$"
     "/t/t/.*\\\\.exe$"
     "/t/Presets"
@@ -66,7 +65,7 @@ SET(CPACK_SOURCE_IGNORE_FILES
     "/install_manifest\\\\.txt$"
     "/t/card-test-(parse|render)\\\\.c$"
     "/Testing/"
-    "\\.swp$"
+    "\\\\.swp$"
     "ids-whitelist\\\\.txt"
 )
 
