@@ -48,6 +48,23 @@
 
 #include "alloc.h"
 
+static int suit_char_to_index(char suit)
+{
+    switch (suit)
+    {
+        case 'H':
+            return 0;
+        case 'C':
+            return 1;
+        case 'D':
+            return 2;
+        case 'S':
+            return 3;
+        default:
+            return -1;
+    }
+}
+
 typedef struct
 {
     unsigned char heights[BHS__MAX_NUM_COLUMNS];
@@ -93,6 +110,7 @@ typedef struct
 
     bhs_queue_item_t * queue;
     int queue_len, queue_max_len;
+    int sol_foundations_card_rank, sol_foundations_card_suit;
 } bhs_solver_t;
 
 int DLLEXPORT black_hole_solver_create(
@@ -129,7 +147,8 @@ int DLLEXPORT black_hole_solver_create(
 static int parse_card(
     const char * * s,
     bhs_rank_t * foundation,
-    bhs_card_string_t card
+    bhs_card_string_t card,
+    int * suit_ptr
 )
 {
     strncpy(card, (*s), 2);
@@ -201,6 +220,10 @@ static int parse_card(
         case 'S':
         case 'D':
         case 'C':
+            if (suit_ptr)
+            {
+                *suit_ptr = suit_char_to_index(*(*(s)));
+            }
             break;
         default:
             return BLACK_HOLE_SOLVER__UNKNOWN_SUIT;
@@ -257,6 +280,8 @@ extern int DLLEXPORT black_hole_solver_read_board(
         /* A non-initialized foundation. */
         solver->initial_foundation_string[0] = '\0';
         solver->initial_foundation = -1;
+        solver->sol_foundations_card_rank = -1;
+        solver->sol_foundations_card_suit = -1;
         s++;
     }
     else
@@ -264,8 +289,12 @@ extern int DLLEXPORT black_hole_solver_read_board(
         ret_code =
             parse_card(&s,
                     &(solver->initial_foundation),
-                    solver->initial_foundation_string
+                    solver->initial_foundation_string,
+                    &(solver->sol_foundations_card_suit)
                     );
+
+        solver->sol_foundations_card_rank = solver->initial_foundation;
+
         if (ret_code)
         {
             *error_line_number = 1;
@@ -293,7 +322,8 @@ extern int DLLEXPORT black_hole_solver_read_board(
             ret_code =
                 parse_card(&s,
                     &(solver->board_values[col_idx][pos_idx]),
-                    solver->initial_board_card_strings[col_idx][pos_idx]
+                    solver->initial_board_card_strings[col_idx][pos_idx],
+                    NULL
                 );
 
             if (ret_code)
@@ -584,22 +614,6 @@ extern int DLLEXPORT black_hole_solver_free(
     return BLACK_HOLE_SOLVER__SUCCESS;
 }
 
-static int suit_char_to_index(char suit)
-{
-    switch (suit)
-    {
-        case 'H':
-            return 0;
-        case 'C':
-            return 1;
-        case 'D':
-            return 2;
-        case 'S':
-            return 3;
-        default:
-            return -1;
-    }
-}
 
 DLLEXPORT extern int black_hole_solver_get_next_move(
     black_hole_solver_instance_t * instance_proto,
@@ -683,10 +697,12 @@ DLLEXPORT extern int black_hole_solver_get_next_move(
         int height = next_state.unpacked.heights[col_idx];
 
         *col_idx_ptr = col_idx;
-        *card_rank_ptr = solver->board_values[col_idx][height]+1;
-        *card_suit_ptr = suit_char_to_index(
-            solver->initial_board_card_strings[col_idx][height][1]
-        );
+        solver->sol_foundations_card_rank = *card_rank_ptr
+            = solver->board_values[col_idx][height]+1;
+        solver->sol_foundations_card_suit = *card_suit_ptr
+            = suit_char_to_index(
+                solver->initial_board_card_strings[col_idx][height][1]
+            );
 
         return BLACK_HOLE_SOLVER__SUCCESS;
     }
