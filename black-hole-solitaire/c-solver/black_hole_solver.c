@@ -722,3 +722,13 @@ DLLEXPORT extern long black_hole_solver_get_iterations_num(
     return ((bhs_solver_t *)instance_proto)->iterations_num;
 }
 
+DLLEXPORT extern int black_hole_solver_get_current_solution_board(
+    black_hole_solver_instance_t * instance_proto,
+    char * * ret_str
+)
+{
+    *ret_str = NULL;
+
+    return -1;
+}
+

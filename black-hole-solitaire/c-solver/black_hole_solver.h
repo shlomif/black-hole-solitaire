@@ -109,6 +109,11 @@ DLLEXPORT extern long black_hole_solver_get_iterations_num(
     black_hole_solver_instance_t * instance_proto
 );
 
+DLLEXPORT extern int black_hole_solver_get_current_solution_board(
+    black_hole_solver_instance_t * instance_proto,
+    char * * ret_str
+);
+
 #ifdef __cplusplus
 }
 #endif
