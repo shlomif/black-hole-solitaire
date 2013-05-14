@@ -727,8 +727,48 @@ DLLEXPORT extern int black_hole_solver_get_current_solution_board(
     char * * ret_str
 )
 {
-    *ret_str = NULL;
+    bhs_solver_t * solver;
 
-    return -1;
+    solver = (bhs_solver_t *)instance_proto;
+
+    char * ret, * s;
+
+    ret = malloc(
+        /* 3 bytes per card. */
+        (3 * 4 * 13)
+            +
+        /* newline and a leading ":" per column */
+        (2 * BHS__MAX_NUM_COLUMNS)
+            +
+        /* For the foundations. */
+        20
+    );
+
+    if (ret == NULL)
+    {
+        *ret_str = NULL;
+        return BLACK_HOLE_SOLVER__OUT_OF_MEMORY;
+    }
+
+    s = ret;
+
+    s += sprintf(s, "Foundations: ");
+
+    if (solver->sol_foundations_card_rank < 0)
+    {
+        s += sprintf(s, "-");
+    }
+    else
+    {
+        s += sprintf(s, "%c%c",
+            (("0A23456789TJQK")[solver->sol_foundations_card_rank+1]), ("HCDS")[solver->sol_foundations_card_suit]
+        );
+    }
+
+    s += sprintf(s, "\n");
+
+    *ret_str = s;
+
+    return BLACK_HOLE_SOLVER__SUCCESS;
 }
 
