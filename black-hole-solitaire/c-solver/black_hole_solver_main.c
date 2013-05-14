@@ -30,8 +30,9 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "black_hole_solver.h"
+#include "bool.h"
 
+#include "black_hole_solver.h"
 #include "state.h"
 
 #define MAX_LEN_BOARD_STRING 4092
@@ -42,6 +43,33 @@ enum GAME_TYPE
     GAME__BH,
     GAME__ALL
 };
+
+static void out_board(
+    black_hole_solver_instance_t * solver,
+    fcs_bool_t display_boards
+)
+{
+    char * board = NULL;
+
+    if (! display_boards)
+    {
+        return;
+    }
+
+    black_hole_solver_get_current_solution_board(
+        solver,
+        &board
+    );
+
+    if (board)
+    {
+        printf("[START BOARD]\n%s\n[END BOARD]\n\n", board);
+        free(board);
+        board = NULL;
+    }
+
+    return;
+}
 
 int main(int argc, char * argv[])
 {
@@ -54,12 +82,8 @@ int main(int argc, char * argv[])
     int arg_idx;
     long max_iters_limit = -1;
     enum GAME_TYPE game_type = GAME__UNKNOWN;
+    fcs_bool_t display_boards = FALSE;
 
-    if (black_hole_solver_create(&solver))
-    {
-        fprintf(stderr, "%s\n", "Could not initialise solver (out-of-memory)");
-        exit(-1);
-    }
 
     arg_idx = 1;
     while (argc > arg_idx)
@@ -98,10 +122,21 @@ int main(int argc, char * argv[])
                 exit(-1);
             }
         }
+        else if (!strcmp(argv[arg_idx], "--display-boards"))
+        {
+            arg_idx++;
+            display_boards = TRUE;
+        }
         else
         {
             break;
         }
+    }
+
+    if (black_hole_solver_create(&solver))
+    {
+        fprintf(stderr, "%s\n", "Could not initialise solver (out-of-memory)");
+        exit(-1);
     }
 
     if (game_type == GAME__UNKNOWN)
@@ -174,7 +209,9 @@ int main(int argc, char * argv[])
         int col_idx, card_rank, card_suit;
         int next_move_ret_code;
 
-        printf("Solved!\n");
+        printf("%s\n", "Solved!");
+
+        out_board(solver, display_boards);
 
         while ((next_move_ret_code = black_hole_solver_get_next_move(
             solver,
@@ -188,6 +225,8 @@ int main(int argc, char * argv[])
                 col_idx,
                 (("0A23456789TJQK")[card_rank]), ("HCDS")[card_suit]
             );
+
+            out_board(solver, display_boards);
         }
 
         if (next_move_ret_code != BLACK_HOLE_SOLVER__END)
@@ -203,12 +242,12 @@ int main(int argc, char * argv[])
     }
     else if (solver_ret_code == BLACK_HOLE_SOLVER__OUT_OF_ITERS)
     {
-        printf("Intractable!\n");
+        printf("%s\n", "Intractable!");
         ret = -2;
     }
     else
     {
-        printf("Unsolved!\n");
+        printf("%s\n", "Unsolved!");
         ret = -1;
     }
 
