@@ -1,6 +1,6 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
-INCLUDE( "${CMAKE_CURRENT_SOURCE_DIR}/Common.cmake" )
+INCLUDE(Shlomif_Common)
 
 INCLUDE(CheckCCompilerFlag)
 INCLUDE(FindPkgConfig)
