@@ -63,7 +63,7 @@ static void out_board(
 
     if (board)
     {
-        printf("[START BOARD]\n%s\n[END BOARD]\n\n", board);
+        printf("\n[START BOARD]\n%s[END BOARD]\n\n\n", board);
         free(board);
         board = NULL;
     }

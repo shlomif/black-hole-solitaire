@@ -614,18 +614,8 @@ extern int DLLEXPORT black_hole_solver_free(
     return BLACK_HOLE_SOLVER__SUCCESS;
 }
 
-
-DLLEXPORT extern int black_hole_solver_get_next_move(
-    black_hole_solver_instance_t * instance_proto,
-    int * col_idx_ptr,
-    int * card_rank_ptr,
-    int * card_suit_ptr /*  H=0, C=1, D=2, S=3 */
-)
+static void initialize_states_in_solution(bhs_solver_t * solver)
 {
-    bhs_solver_t * solver;
-
-    solver = (bhs_solver_t *)instance_proto;
-
     if (! solver->states_in_solution)
     {
         bhs_solution_state_t * states;
@@ -682,6 +672,23 @@ DLLEXPORT extern int black_hole_solver_get_next_move(
         solver->current_state_in_solution_idx = 0;
     }
 
+    return;
+}
+
+DLLEXPORT extern int black_hole_solver_get_next_move(
+    black_hole_solver_instance_t * instance_proto,
+    int * col_idx_ptr,
+    int * card_rank_ptr,
+    int * card_suit_ptr /*  H=0, C=1, D=2, S=3 */
+)
+{
+    bhs_solver_t * solver;
+
+    solver = (bhs_solver_t *)instance_proto;
+
+
+    initialize_states_in_solution(solver);
+
     if (solver->current_state_in_solution_idx == solver->num_states_in_solution-1)
     {
         *col_idx_ptr = *card_rank_ptr = *card_suit_ptr = -1;
@@ -724,12 +731,16 @@ DLLEXPORT extern long black_hole_solver_get_iterations_num(
 
 DLLEXPORT extern int black_hole_solver_get_current_solution_board(
     black_hole_solver_instance_t * instance_proto,
-    char * * ret_str
+    char * * ptr_to_ret
 )
 {
     bhs_solver_t * solver;
 
     solver = (bhs_solver_t *)instance_proto;
+
+    initialize_states_in_solution(solver);
+
+    *ptr_to_ret = NULL;
 
     char * ret, * s;
 
@@ -746,7 +757,6 @@ DLLEXPORT extern int black_hole_solver_get_current_solution_board(
 
     if (ret == NULL)
     {
-        *ret_str = NULL;
         return BLACK_HOLE_SOLVER__OUT_OF_MEMORY;
     }
 
@@ -761,13 +771,32 @@ DLLEXPORT extern int black_hole_solver_get_current_solution_board(
     else
     {
         s += sprintf(s, "%c%c",
-            (("0A23456789TJQK")[solver->sol_foundations_card_rank+1]), ("HCDS")[solver->sol_foundations_card_suit]
+            (("0A23456789TJQK")[solver->sol_foundations_card_rank]), ("HCDS")[solver->sol_foundations_card_suit]
         );
     }
 
     s += sprintf(s, "\n");
 
-    *ret_str = s;
+    bhs_solution_state_t next_state = solver->states_in_solution[
+        solver->current_state_in_solution_idx
+    ];
+
+    int num_columns = solver->num_columns;
+    int col_idx;
+    for (col_idx = 0; col_idx < num_columns; col_idx++)
+    {
+        s += sprintf(s, "%c", ':');
+        int h;
+        for (h = 0; h < next_state.unpacked.heights[col_idx]; h++)
+        {
+            s += sprintf(s, " %s",
+                solver->initial_board_card_strings[col_idx][h]
+            );
+        }
+        s += sprintf(s, "\n");
+    }
+
+    *ptr_to_ret = ret;
 
     return BLACK_HOLE_SOLVER__SUCCESS;
 }
