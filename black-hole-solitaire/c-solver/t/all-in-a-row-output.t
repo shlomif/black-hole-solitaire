@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 2;
+use Test::More tests => 4;
 use Test::Differences;
 
 use File::Spec;
@@ -11,26 +11,24 @@ use File::Spec::Functions qw( catpath splitpath rel2abs );
 
 my $bin_dir = catpath( ( splitpath( rel2abs $0 ) )[ 0, 1 ] );
 
-use Test::Trap
-    qw(
-    trap $trap :flow:stderr(systemsafe):stdout(systemsafe):warn
-    );
+use Test::Trap qw( trap $trap :flow:stderr(systemsafe):stdout(systemsafe):warn);
 
 
-trap
 {
-    system('./black-hole-solve',
-        '--game', 'all_in_a_row',
-        File::Spec->catfile(
-            $bin_dir, 'data', '24.all_in_a_row.board.txt'
-        )
-    );
-};
+    trap
+    {
+        system('./black-hole-solve',
+            '--game', 'all_in_a_row',
+            File::Spec->catfile(
+                $bin_dir, 'data', '24.all_in_a_row.board.txt'
+            )
+        );
+    };
 
-# TEST
-ok (! ($trap->exit), "Running the program successfully for board #24.");
+    # TEST
+    ok (! ($trap->exit), "Running the program successfully for board #24.");
 
-my $expected_output = <<'EOF';
+    my $expected_output = <<'EOF';
 Solved!
 Move a card from stack 12 to the foundations
 
@@ -403,5 +401,108 @@ Total number of states checked is 18022.
 This scan generated 18056 states.
 EOF
 
-# TEST
-eq_or_diff ($trap->stdout(), $expected_output, "Right output from board 24.");
+    # TEST
+    eq_or_diff ($trap->stdout(), $expected_output, "Right output from board 24.");
+}
+
+{
+    trap
+    {
+        system('./black-hole-solve',
+            '--game', 'all_in_a_row',
+            '--display-boards',
+            File::Spec->catfile(
+                $bin_dir, 'data', '24.all_in_a_row.board.txt'
+            )
+        );
+    };
+
+    # TEST
+    ok (! ($trap->exit), "Exit code for --display-boardsfor board #24.");
+
+    my $expected_prefix = <<'EOF';
+Solved!
+
+[START BOARD]
+Foundations: -
+: 4C JS 9H 8S
+: 5H 5S 5C 4S
+: QC 6C TC 4H
+: 5D 9C TS KS
+: 2D 3C AD 6D
+: 7H 6H 4D 8D
+: AH JC QS 7C
+: 7S TH 3H JD
+: 2C KH 3S 9D
+: QH 6S JH 2H
+: 9S 7D TD QD
+: 2S 8C KC 3D
+: KD AC 8H AS
+[END BOARD]
+
+
+Move a card from stack 12 to the foundations
+
+Info: Card moved is AS
+
+
+====================
+
+
+[START BOARD]
+Foundations: AS
+: 4C JS 9H 8S
+: 5H 5S 5C 4S
+: QC 6C TC 4H
+: 5D 9C TS KS
+: 2D 3C AD 6D
+: 7H 6H 4D 8D
+: AH JC QS 7C
+: 7S TH 3H JD
+: 2C KH 3S 9D
+: QH 6S JH 2H
+: 9S 7D TD QD
+: 2S 8C KC 3D
+: KD AC 8H
+[END BOARD]
+
+
+Move a card from stack 3 to the foundations
+
+Info: Card moved is KS
+
+
+====================
+
+
+[START BOARD]
+Foundations: KS
+: 4C JS 9H 8S
+: 5H 5S 5C 4S
+: QC 6C TC 4H
+: 5D 9C TS
+: 2D 3C AD 6D
+: 7H 6H 4D 8D
+: AH JC QS 7C
+: 7S TH 3H JD
+: 2C KH 3S 9D
+: QH 6S JH 2H
+: 9S 7D TD QD
+: 2S 8C KC 3D
+: KD AC 8H
+[END BOARD]
+
+
+Move a card from stack 10 to the foundations
+
+Info: Card moved is QD
+
+EOF
+
+    my $stdout = $trap->stdout();
+
+    my $got_prefix = substr($stdout, 0, length($expected_prefix));
+
+    # TEST
+    eq_or_diff ($got_prefix, $expected_prefix, "Right output from board 24 with --display-boards.");
+}
