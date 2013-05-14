@@ -1,1 +1,0 @@
-* Make sure that failed malloc() / realloc() / etc. are handled gracefully.
