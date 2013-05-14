@@ -1,4 +1,0 @@
----
-- cmd: unity
-  pattern: \.exe\z
-  type: regex
