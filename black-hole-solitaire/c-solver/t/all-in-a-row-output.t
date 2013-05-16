@@ -3,11 +3,13 @@
 use strict;
 use warnings;
 
-use Test::More tests => 4;
+use Test::More tests => 5;
 use Test::Differences;
 
 use File::Spec;
 use File::Spec::Functions qw( catpath splitpath rel2abs );
+
+use IO::All;
 
 my $bin_dir = catpath( ( splitpath( rel2abs $0 ) )[ 0, 1 ] );
 
@@ -505,4 +507,16 @@ EOF
 
     # TEST
     eq_or_diff ($got_prefix, $expected_prefix, "Right output from board 24 with --display-boards.");
+
+    my $expected_stdout = io->file(
+        File::Spec->catfile(
+            $bin_dir, 'data',
+            '24.all_in_a_row.sol-with-display-boards.txt',
+        )
+    )->slurp;
+
+    # TEST
+    eq_or_diff ($stdout, $expected_stdout,
+        "Complete Right output from board 24 with --display-boards."
+    );
 }
