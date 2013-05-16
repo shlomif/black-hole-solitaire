@@ -71,6 +71,17 @@ static void out_board(
     return;
 }
 
+static const char const * help_text =
+"black-hole-solve --game {all_in_a_row|black_hole} [more options] [/path/to/board_layout.txt]\n"
+"\n"
+"--help                      displays this help.\n"
+"--max-iters [iter_count]    limit the iterations.\n"
+"--game all_in_a_row         solve All in a Row games.\n"
+"--game black_hole           solve Black Hole games.\n"
+"--displays-boards           display the layout of the board at every step.\n"
+"\n"
+    ;
+
 int main(int argc, char * argv[])
 {
     black_hole_solver_instance_t * solver;
@@ -88,7 +99,12 @@ int main(int argc, char * argv[])
     arg_idx = 1;
     while (argc > arg_idx)
     {
-        if (!strcmp(argv[arg_idx], "--max-iters"))
+        if (!strcmp(argv[arg_idx], "--help"))
+        {
+            printf ("%s", help_text);
+            exit(0);
+        }
+        else if (!strcmp(argv[arg_idx], "--max-iters"))
         {
             arg_idx++;
             if (argc == arg_idx)
