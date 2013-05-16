@@ -1,0 +1,15 @@
+0.4.0       ( 12 May 2013):
+===========================
+
+* Add support for All in a Row Solitaire in addition to Black Hole
+Solitaire.
+
+0.2.0       ( 22 Sep 2010):
+===========================
+
+* Translate to C.
+
+0.0.1       ( 11 Jan 2010 ):
+============================
+
+* Initial release as a Perl CPAN module.
