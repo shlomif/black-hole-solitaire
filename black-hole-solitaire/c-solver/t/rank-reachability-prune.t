@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 1;
+use Test::More tests => 2;
 
 use lib './t/lib';
 
@@ -60,7 +60,10 @@ sub _verdict_to_s
         $backend = $backend_var;
 
         # TEST:$c++;
-        $test->(-1, [(1)x13], 'SUCCESS', "Always true on foundation of -1.");
+        $test->(-1, [(1) x 13], 'SUCCESS', "Always true on foundation of -1.");
+
+        # TEST:$c++;
+        $test->(0, [(1) x 13], 'SUCCESS', "All is all-ranks-reachable.");
     }
 
     # TEST:$per_backend_tests=$c;
