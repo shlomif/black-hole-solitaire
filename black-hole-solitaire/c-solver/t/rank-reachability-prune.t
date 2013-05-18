@@ -54,6 +54,24 @@ sub _verdict_to_s
         );
     };
 
+    # Test the unreachability for all indexes
+    my $test_unreachable_for_all = sub {
+        my ($rank_counts, $blurb) = @_;
+
+        local $Test::Builder::Level = $Test::Builder::Level + 1;
+
+        # TEST:$unr=13;
+        for my $foundation (0 .. (13-1))
+        {
+            $test->(
+                $foundation,
+                $rank_counts,
+                'NOT_REACHABLE',
+                "$blurb with [start == $foundation]",
+            );
+        }
+    };
+
     # TEST:$c=0;
     foreach my $backend_var (@backend_specs)
     {
@@ -107,15 +125,11 @@ sub _verdict_to_s
             "Two islands.",
         );
 
-        foreach my $start_idx (0 .. (13-1))
-        {
-            # TEST:$c=$c+13;
-            $test->(
-                $start_idx, [3,0,0,2,1,0,0,1,0,1,0,0,0,],
-                'NOT_REACHABLE',
-                "Three islands with start_idx == $start_idx.",
-            );
-        }
+        # TEST:$c=$c+$unr;
+        $test_unreachable_for_all->(
+            [3,0,0,2,1,0,0,1,0,1,0,0,0,],
+            "Three islands",
+        );
     }
 
     # TEST:$per_backend_tests=$c;
