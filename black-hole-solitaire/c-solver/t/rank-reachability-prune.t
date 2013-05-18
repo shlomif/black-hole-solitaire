@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 9;
+use Test::More tests => 21;
 
 use lib './t/lib';
 
@@ -107,12 +107,15 @@ sub _verdict_to_s
             "Two islands.",
         );
 
-        # TEST:$c++;
-        $test->(
-            2, [3,0,0,2,1,0,0,1,0,1,0,0,0,],
-            'NOT_REACHABLE',
-            "Three islands.",
-        );
+        foreach my $start_idx (0 .. (13-1))
+        {
+            # TEST:$c=$c+13;
+            $test->(
+                $start_idx, [3,0,0,2,1,0,0,1,0,1,0,0,0,],
+                'NOT_REACHABLE',
+                "Three islands with start_idx == $start_idx.",
+            );
+        }
     }
 
     # TEST:$per_backend_tests=$c;
