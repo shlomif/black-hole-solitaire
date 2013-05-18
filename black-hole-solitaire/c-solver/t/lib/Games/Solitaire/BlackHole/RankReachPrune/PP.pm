@@ -29,7 +29,7 @@ sub prune
     my @reached = (($FALSE) x @$rank_counts);
 
     MAIN:
-    while (($full_count < $full_max) || @queue)
+    while (($full_count < $full_max) && @queue)
     {
         my $rank = pop(@queue);
 
