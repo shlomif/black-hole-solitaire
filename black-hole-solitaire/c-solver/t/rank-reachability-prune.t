@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 21;
+use Test::More tests => 33;
 
 use lib './t/lib';
 
@@ -118,10 +118,9 @@ sub _verdict_to_s
             "One island.",
         );
 
-        # TEST:$c++;
-        $test->(
-            2, [0,0,0,2,1,0,0,1,0,1,0,0,0,],
-            'NOT_REACHABLE',
+        # TEST:$c=$c+$unr;
+        $test_unreachable_for_all->(
+            [0,0,0,2,1,0,0,1,0,1,0,0,0,],
             "Two islands.",
         );
 
