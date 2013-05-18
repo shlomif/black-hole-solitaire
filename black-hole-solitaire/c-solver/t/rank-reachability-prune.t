@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 2;
+use Test::More tests => 3;
 
 use lib './t/lib';
 
@@ -64,6 +64,13 @@ sub _verdict_to_s
 
         # TEST:$c++;
         $test->(0, [(1) x 13], 'SUCCESS', "All is all-ranks-reachable.");
+
+        # TEST:$c++;
+        $test->(
+            0, [((1) x 10),((0) x 3)],
+            'SUCCESS',
+            "All is all-ranks-reachable."
+        );
     }
 
     # TEST:$per_backend_tests=$c;
