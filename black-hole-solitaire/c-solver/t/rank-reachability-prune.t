@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 6;
+use Test::More tests => 9;
 
 use lib './t/lib';
 
@@ -91,6 +91,27 @@ sub _verdict_to_s
             2, [0,0,0,2,1,0,0,0,0,0,0,0,0,],
             'SUCCESS',
             "two reachable segment",
+        );
+
+        # TEST:$c++;
+        $test->(
+            2, [0,0,0,2,1,0,0,1,0,0,0,0,0,],
+            'NOT_REACHABLE',
+            "One island.",
+        );
+
+        # TEST:$c++;
+        $test->(
+            2, [0,0,0,2,1,0,0,1,0,1,0,0,0,],
+            'NOT_REACHABLE',
+            "Two islands.",
+        );
+
+        # TEST:$c++;
+        $test->(
+            2, [3,0,0,2,1,0,0,1,0,1,0,0,0,],
+            'NOT_REACHABLE',
+            "Three islands.",
         );
     }
 

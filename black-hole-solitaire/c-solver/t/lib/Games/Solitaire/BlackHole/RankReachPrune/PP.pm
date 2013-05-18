@@ -24,6 +24,12 @@ sub prune
 
     my $full_max = grep { $_ > 0 } @$rank_counts;
 
+    # Count the foundation - the starting point - in.
+    if ($rank_counts->[$foundation] == 0)
+    {
+        $full_max++;
+    }
+
     my $full_count = 0;
 
     my @reached = (($FALSE) x @$rank_counts);
