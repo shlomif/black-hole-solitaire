@@ -3,16 +3,17 @@
 use strict;
 use warnings;
 
-use Test::More tests => 59;
+use Test::More tests => 118;
 
 use lib './t/lib';
 
 use Games::Solitaire::BlackHole::RankReachPrune::PP;
+use Games::Solitaire::BlackHole::RankReachPrune::XS;
 
 my $SUCCESS = $Games::Solitaire::BlackHole::RankReachPrune::PP::SUCCESS;
 my $NOT_REACHABLE = $Games::Solitaire::BlackHole::RankReachPrune::PP::NOT_REACHABLE;
 
-# TEST:$b=1;
+# TEST:$b=2;
 my @backend_specs =
 (
     {
@@ -20,6 +21,17 @@ my @backend_specs =
         backend => sub {
             my ($foundation, $rank_counts) = @_;
             return Games::Solitaire::BlackHole::RankReachPrune::PP->
+                prune(
+                    $foundation,
+                    $rank_counts,
+                );
+        },
+    },
+    {
+        id => "c_backend",
+        backend => sub {
+            my ($foundation, $rank_counts) = @_;
+            return Games::Solitaire::BlackHole::RankReachPrune::XS->
                 prune(
                     $foundation,
                     $rank_counts,
