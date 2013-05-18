@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 33;
+use Test::More tests => 59;
 
 use lib './t/lib';
 
@@ -128,6 +128,18 @@ sub _verdict_to_s
         $test_unreachable_for_all->(
             [3,0,0,2,1,0,0,1,0,1,0,0,0,],
             "Three islands",
+        );
+
+        # TEST:$c=$c+$unr;
+        $test_unreachable_for_all->(
+            [3,0,0,2,1,0,0,1,0,1,0,0,0,],
+            "Three islands",
+        );
+
+        # TEST:$c=$c+$unr;
+        $test_unreachable_for_all->(
+            [0,1,1,1,0,0,0,0,2,2,0,0,0,],
+            "Two separated islands.",
         );
     }
 
