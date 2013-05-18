@@ -3,70 +3,134 @@
 use strict;
 use warnings;
 
+use autodie;
+
 # use File::Which;
 # use File::Basename;
 use Cwd;
-use FindBin;
 use File::Spec;
 use File::Copy;
 use File::Path;
 use Getopt::Long;
 use Env::Path;
+use File::Basename qw( basename dirname );
 
-use File::Spec::Functions qw( catpath splitpath rel2abs );
 
-my $bin_dir = catpath( ( splitpath( rel2abs $0 ) )[ 0, 1 ] );
+my $bindir = dirname( __FILE__ );
+my $abs_bindir = File::Spec->rel2abs($bindir);
+
+# Whether to use prove instead of runprove.
+my $use_prove = $ENV{FCS_USE_TEST_RUN} ? 0 : 1;
+my $num_jobs = $ENV{TEST_JOBS};
+
+sub _is_parallized
+{
+    return ($use_prove && $num_jobs);
+}
+
+sub _calc_prove
+{
+    return ['prove', (defined($num_jobs) ? sprintf("-j%d", $num_jobs) : ())];
+}
 
 sub run_tests
 {
     my $tests = shift;
 
-    exec("runprove", @$tests);
+    exec(($use_prove ? @{_calc_prove()} : 'runprove'), @$tests);
 }
 
 my $tests_glob = "*.{exe,py,t}";
 
 GetOptions(
     '--glob=s' => \$tests_glob,
-);
+    '--prove!' => \$use_prove,
+    '--jobs|j=n' => \$num_jobs,
+) or die "--glob='tests_glob'";
 
 {
-    local $ENV{FCS_PATH} = Cwd::getcwd();
+    my $fcs_path = Cwd::getcwd();
+    local $ENV{FCS_PATH} = $fcs_path;
+    local $ENV{FCS_SRC_PATH} = $abs_bindir;
 
+    my $testing_preset_rc;
+
+    local $ENV{FREECELL_SOLVER_QUIET} = 1;
     Env::Path->PATH->Prepend(
         File::Spec->catdir(Cwd::getcwd(), "board_gen"),
-        File::Spec->catdir(Cwd::getcwd(), "t", "scripts"),
+        File::Spec->catdir($abs_bindir, "t", "scripts"),
     );
 
-    local $ENV{HARNESS_ALT_INTRP_FILE} =
+    Env::Path->CPATH->Prepend(
+        $abs_bindir,
+    );
+
+    Env::Path->LD_LIBRARY_PATH->Prepend(
+        $fcs_path
+    );
+
+    foreach my $add_lib (Env::Path->PERL5LIB() , Env::Path->PYTHONPATH())
+    {
+        $add_lib->Append(
+            File::Spec->catdir($abs_bindir, "t", "lib"),
+        );
+    }
+
+    my $get_config_fn = sub {
+        my $basename = shift;
+
+        return
         File::Spec->rel2abs(
             File::Spec->catdir(
-                $bin_dir,
-                "t", "config", "alternate-interpreters.yml",
+                $bindir,
+                "t", "config", $basename
             ),
         )
         ;
+    };
 
-    local $ENV{HARNESS_PLUGINS} =
-        "ColorSummary ColorFileVerdicts AlternateInterpreters TrimDisplayedFilenames"
-        ;
+    local $ENV{HARNESS_ALT_INTRP_FILE} =
+        $get_config_fn->("alternate-interpreters.yml");
 
     local $ENV{HARNESS_TRIM_FNS} = 'keep:1';
 
-    if (system("make", "-s"))
+    local $ENV{HARNESS_PLUGINS} = join(' ', qw(
+        BreakOnFailure ColorSummary ColorFileVerdicts AlternateInterpreters
+        TrimDisplayedFilenames
+        )
+    );
+
+    my $is_ninja = (-e "build.ninja");
+
+    if (! $is_ninja)
     {
-        die "make failed";
+        if (system("make", "-s"))
+        {
+            die "make failed";
+        }
     }
 
     # Put the valgrind test last because it takes a long time.
     my @tests =
         sort
         {
-            (($a =~ /valgrind/) <=> ($b =~ /valgrind/))
+            (
+                (($a =~ /valgrind/) <=> ($b =~ /valgrind/))
+                    *
+                (_is_parallized() ? -1 : 1)
+            )
+                ||
+            (basename($a) cmp basename($b))
                 ||
             ($a cmp $b)
         }
-        glob("$bin_dir/t/$tests_glob")
+        (glob("t/$tests_glob"),
+            (
+                ($fcs_path ne $abs_bindir)
+                ? (glob("$abs_bindir/t/$tests_glob"))
+                : ()
+            ),
+        )
         ;
 
     if (! $ENV{FCS_TEST_BUILD})
@@ -74,9 +138,14 @@ GetOptions(
         @tests = grep { !/build-process/ } @tests;
     }
 
+    if ($ENV{FCS_TEST_WITHOUT_VALGRIND})
     {
-        # local $ENV{FCS_PATH} = dirname(which("fc-solve"));
+        @tests = grep { !/valgrind/ } @tests;
+    }
+
+    {
         print STDERR "FCS_PATH = $ENV{FCS_PATH}\n";
+        print STDERR "FCS_SRC_PATH = $ENV{FCS_SRC_PATH}\n";
         run_tests(\@tests);
     }
 }
