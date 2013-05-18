@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 4;
+use Test::More tests => 5;
 
 use lib './t/lib';
 
@@ -69,14 +69,21 @@ sub _verdict_to_s
         $test->(
             0, [((1) x 10),((0) x 3)],
             'SUCCESS',
-            "All is all-ranks-reachable."
+            "First 10 ranks",
         );
 
         # TEST:$c++;
         $test->(
             0, [((1) x 10),0,1,0],
             'NOT_REACHABLE',
-            "All is all-ranks-reachable."
+            "Unreachable island.",
+        );
+
+        # TEST:$c++;
+        $test->(
+            4, [0,0,0,2,1,2,0,0,0,0,0,0,0,],
+            'SUCCESS',
+            "two reachable segment",
         );
     }
 
