@@ -194,6 +194,12 @@ ADD_LIBRARY (
     ${BLACK_HOLE_SOLVER_MODULES}
     )
 
+ADD_LIBRARY (
+    "bhs_rank_reach_prune"
+    SHARED
+    "rank_reach_prune.c"
+    )
+
 INSTALL (
     TARGETS "${LIB_BASE}"
     DESTINATION "lib"
