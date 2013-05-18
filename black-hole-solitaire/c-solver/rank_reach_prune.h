@@ -28,25 +28,11 @@
 #ifndef BHS__RANK_REACH_PRUNE_H
 #define BHS__RANK_REACH_PRUNE_H
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#ifdef _MSC_VER
-  #ifdef BUILDING_DLL
-    #define DLLEXPORT __declspec(dllexport)
-  #else
-    #define DLLEXPORT __declspec(dllimport)
-  #endif
-  #define DLLLOCAL
-#elif defined(__GNUC__)
-    #define DLLEXPORT __attribute__ ((visibility("default")))
-    #define DLLLOCAL __attribute__ ((visibility("hidden")))
-#else
-    #define DLLEXPORT
-    #define DLLLOCAL
-#endif
+#include "fcs_dllexport.h"
 
 DLLEXPORT int bhs_find_rank_reachability(
     signed char foundation,
