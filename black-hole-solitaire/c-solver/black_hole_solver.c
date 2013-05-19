@@ -569,15 +569,30 @@ extern int DLLEXPORT black_hole_solver_run(
     );
 
     solver->num_states_in_collection++;
+
+    fcs_bool_t is_rank_reachability_prune_enabled = solver->is_rank_reachability_prune_enabled;
+
     while (solver->queue_len > 0)
     {
         solver->queue_len--;
         queue_item_copy = solver->queue[solver->queue_len];
         state = queue_item_copy.s.unpacked;
+        foundations = state.foundations;
+
+        if (is_rank_reachability_prune_enabled)
+        {
+            if (! (bhs_find_rank_reachability(
+                        foundations,
+                        queue_item_copy.rank_counts.c
+            ) == RANK_REACH__SUCCESS)
+            )
+            {
+                continue;
+            }
+        }
 
         iterations_num++;
 
-        foundations = state.foundations;
 
         no_cards = TRUE;
 
