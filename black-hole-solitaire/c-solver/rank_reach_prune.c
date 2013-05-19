@@ -35,17 +35,12 @@
 
 #include "bool.h"
 
-enum VERDICTS
-{
-    SUCCESS = 0,
-    NOT_REACHABLE = 1,
-};
 
 #define NUM_RANKS 13
 
 static const int LINKS[2] = {-1,1};
 
-DLLEXPORT int bhs_find_rank_reachability(
+DLLEXPORT enum RANK_REACH_VERDICT bhs_find_rank_reachability(
     signed char foundation,
     const unsigned char * rank_counts
 )
@@ -53,7 +48,7 @@ DLLEXPORT int bhs_find_rank_reachability(
     int i, link_idx;
     if (foundation < 0)
     {
-        return SUCCESS;
+        return RANK_REACH__SUCCESS;
     }
 
     /* The 20 is a margin */
@@ -86,7 +81,6 @@ DLLEXPORT int bhs_find_rank_reachability(
         reached[i] = FALSE;
     }
 
-    MAIN:
     while ((full_count < full_max) && (queue_ptr > physical_queue))
     {
         signed char rank = *(--queue_ptr);
@@ -116,5 +110,11 @@ DLLEXPORT int bhs_find_rank_reachability(
         }
     }
 
-    return ((full_count == full_max) ? SUCCESS : NOT_REACHABLE);
+    return
+    (
+        (full_count == full_max)
+            ? RANK_REACH__SUCCESS
+            : RANK_REACH__NOT_REACHABLE
+    );
 }
+
