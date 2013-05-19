@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 118;
+use Test::More tests => 120;
 
 use lib './t/lib';
 
@@ -90,6 +90,13 @@ sub _verdict_to_s
         $backend = $backend_var;
 
         # TEST:$c++;
+        $test->(
+            8, [2,3,2,1,1,2,2,1,0,0,1,2,2],
+            'SUCCESS',
+            "Failure in C backend No. 1",
+        );
+
+        # TEST:$c++;
         $test->(-1, [(1) x 13], 'SUCCESS', "Always true on foundation of -1.");
 
         # TEST:$c++;
@@ -153,6 +160,7 @@ sub _verdict_to_s
             [0,1,1,1,0,0,0,0,2,2,0,0,0,],
             "Two separated islands.",
         );
+
     }
 
     # TEST:$per_backend_tests=$c;
