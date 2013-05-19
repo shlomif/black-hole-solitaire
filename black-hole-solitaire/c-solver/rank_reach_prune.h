@@ -34,7 +34,13 @@ extern "C" {
 
 #include "fcs_dllexport.h"
 
-DLLEXPORT int bhs_find_rank_reachability(
+enum RANK_REACH_VERDICT
+{
+    RANK_REACH__SUCCESS = 0,
+    RANK_REACH__NOT_REACHABLE = 1,
+};
+
+DLLEXPORT enum RANK_REACH_VERDICT bhs_find_rank_reachability(
     signed char foundation,
     const unsigned char * rank_counts
 );
