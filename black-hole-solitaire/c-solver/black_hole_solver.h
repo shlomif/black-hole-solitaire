@@ -34,6 +34,7 @@ extern "C" {
 #endif
 
 #include "fcs_dllexport.h"
+#include "bool.h"
 
 enum
 {
@@ -71,6 +72,11 @@ DLLEXPORT extern int black_hole_solver_read_board(
 DLLEXPORT extern int black_hole_solver_set_max_iters_limit(
     black_hole_solver_instance_t * instance_proto,
     long limit
+);
+
+DLLEXPORT extern int black_hole_solver_enable_rank_reachability_prune(
+    black_hole_solver_instance_t * instance_proto,
+    fcs_bool_t enabled_status
 );
 
 DLLEXPORT extern int black_hole_solver_run(
