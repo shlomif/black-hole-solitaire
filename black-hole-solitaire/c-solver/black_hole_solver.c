@@ -47,6 +47,7 @@
 #endif
 
 #include "alloc.h"
+#include "rank_reach_prune.h"
 
 static int suit_char_to_index(char suit)
 {
@@ -75,9 +76,18 @@ typedef struct
 {
     bhs_state_key_value_pair_t packed;
     bhs_unpacked_state_t unpacked;
-} bhs_queue_item_t;
+} bhs_solution_state_t;
 
-typedef bhs_queue_item_t bhs_solution_state_t;
+typedef struct
+{
+    unsigned char c[13];
+} bhs_rank_counts_t;
+
+typedef struct
+{
+    bhs_solution_state_t s;
+    bhs_rank_counts_t rank_counts;
+} bhs_queue_item_t;
 
 typedef struct
 {
@@ -111,6 +121,7 @@ typedef struct
     bhs_queue_item_t * queue;
     int queue_len, queue_max_len;
     int sol_foundations_card_rank, sol_foundations_card_suit;
+    fcs_bool_t is_rank_reachability_prune_enabled;
 } bhs_solver_t;
 
 int DLLEXPORT black_hole_solver_create(
@@ -133,6 +144,7 @@ int DLLEXPORT black_hole_solver_create(
         ret->iterations_num = 0;
         ret->num_states_in_collection = 0;
         ret->max_iters_limit = -1;
+        ret->is_rank_reachability_prune_enabled = FALSE;
 
         bh_solve_hash_init(&(ret->positions));
 
@@ -140,6 +152,19 @@ int DLLEXPORT black_hole_solver_create(
 
         return BLACK_HOLE_SOLVER__SUCCESS;
     }
+}
+
+DLLEXPORT extern int black_hole_solver_enable_rank_reachability_prune(
+    black_hole_solver_instance_t * instance_proto,
+    fcs_bool_t enabled_status
+)
+{
+    bhs_solver_t * solver;
+
+    solver = (bhs_solver_t *)instance_proto;
+    solver->is_rank_reachability_prune_enabled = enabled_status ? TRUE : FALSE;
+
+    return BLACK_HOLE_SOLVER__SUCCESS;
 }
 
 #define MAX_RANK 12
@@ -379,23 +404,23 @@ static GCC_INLINE void queue_item_populate_packed(
     int num_columns = solver->num_columns;
     int bits_per_column = solver->bits_per_column;
 
-    queue_item->packed.key.foundations = queue_item->unpacked.foundations;
+    queue_item->s.packed.key.foundations = queue_item->s.unpacked.foundations;
 
-    fc_solve_bit_writer_init(&bit_w, queue_item->packed.key.data);
+    fc_solve_bit_writer_init(&bit_w, queue_item->s.packed.key.data);
 
     for (col = 0; col < num_columns ; col++)
     {
         fc_solve_bit_writer_write(
             &bit_w,
             bits_per_column,
-            queue_item->unpacked.heights[col]
+            queue_item->s.unpacked.heights[col]
         );
     }
 }
 
 static GCC_INLINE void queue_item_unpack(
     bhs_solver_t * solver,
-    bhs_queue_item_t * queue_item
+    bhs_solution_state_t * queue_item
 )
 {
     fc_solve_bit_reader_t bit_r;
@@ -426,26 +451,29 @@ static GCC_INLINE void perform_move(
 {
     bhs_unpacked_state_t next_state;
 
-    next_state = queue_item_copy_ptr->unpacked;
+    next_state = queue_item_copy_ptr->s.unpacked;
     next_state.foundations = card;
     next_state.heights[col_idx]--;
 
     bhs_queue_item_t next_queue_item;
 
-    next_queue_item.unpacked = next_state;
-    memset(&(next_queue_item.packed), '\0', sizeof(next_queue_item.packed));
+    next_queue_item.s.unpacked = next_state;
+    memset(&(next_queue_item.s.packed), '\0', sizeof(next_queue_item.s.packed));
 
-    next_queue_item.packed.value.parent_state = queue_item_copy_ptr->packed.key;
-    next_queue_item.packed.value.col_idx = col_idx;
+    next_queue_item.s.packed.value.parent_state = queue_item_copy_ptr->s.packed.key;
+    next_queue_item.s.packed.value.col_idx = col_idx;
 
     queue_item_populate_packed(
         solver,
         &(next_queue_item)
     );
 
+    next_queue_item.rank_counts = queue_item_copy_ptr->rank_counts;
+    next_queue_item.rank_counts.c[(ssize_t)card]--;
+
     if (! bh_solve_hash_insert(
             &(solver->positions),
-            &(next_queue_item.packed)
+            &(next_queue_item.s.packed)
     )
     )
     {
@@ -505,16 +533,31 @@ extern int DLLEXPORT black_hole_solver_run(
     /* Populate the unpacked state. */
     for (i = 0 ; i < num_columns ; i++)
     {
-        new_queue_item->unpacked.heights[i] = solver->initial_lens[i];
+        new_queue_item->s.unpacked.heights[i] = solver->initial_lens[i];
     }
-    new_queue_item->unpacked.foundations = solver->initial_foundation;
+    new_queue_item->s.unpacked.foundations = solver->initial_foundation;
 
     /* Populate the packed item from the unpacked one. */
-    memset(&(new_queue_item->packed), '\0', sizeof(new_queue_item->packed));
+    memset(&(new_queue_item->s.packed), '\0', sizeof(new_queue_item->s.packed));
 
     queue_item_populate_packed( solver, new_queue_item );
 
-    *init_state = new_queue_item->packed;
+    memset( &(new_queue_item->rank_counts), '\0',
+        sizeof(new_queue_item->rank_counts));
+
+    for (col_idx = 0 ; col_idx < num_columns ; col_idx++)
+    {
+        int h;
+
+        for (h = 0; h < new_queue_item->s.unpacked.heights[col_idx]; h++)
+        {
+            new_queue_item->rank_counts.c[
+                (ssize_t)solver->board_values[col_idx][h]
+            ]++;
+        }
+    }
+
+    *init_state = new_queue_item->s.packed;
     solver->queue_len++;
 
     solver->num_states_in_collection = 0;
@@ -530,7 +573,7 @@ extern int DLLEXPORT black_hole_solver_run(
     {
         solver->queue_len--;
         queue_item_copy = solver->queue[solver->queue_len];
-        state = queue_item_copy.unpacked;
+        state = queue_item_copy.s.unpacked;
 
         iterations_num++;
 
@@ -562,7 +605,7 @@ extern int DLLEXPORT black_hole_solver_run(
 
         if (no_cards)
         {
-            solver->final_state = queue_item_copy.packed;
+            solver->final_state = queue_item_copy.s.packed;
 
             solver->iterations_num = iterations_num;
 
