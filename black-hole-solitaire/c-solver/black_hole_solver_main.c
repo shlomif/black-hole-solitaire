@@ -79,6 +79,7 @@ static const char const * help_text =
 "--game all_in_a_row         solve All in a Row games.\n"
 "--game black_hole           solve Black Hole games.\n"
 "--displays-boards           display the layout of the board at every step.\n"
+"--rank-reach-prune          Enable the Rank Reachability Prune.\n"
 "\n"
     ;
 
@@ -94,7 +95,7 @@ int main(int argc, char * argv[])
     long max_iters_limit = -1;
     enum GAME_TYPE game_type = GAME__UNKNOWN;
     fcs_bool_t display_boards = FALSE;
-
+    fcs_bool_t is_rank_reachability_prune_enabled = FALSE;
 
     arg_idx = 1;
     while (argc > arg_idx)
@@ -143,6 +144,11 @@ int main(int argc, char * argv[])
             arg_idx++;
             display_boards = TRUE;
         }
+        else if (!strcmp(argv[arg_idx], "--rank-reach-prune"))
+        {
+            arg_idx++;
+            is_rank_reachability_prune_enabled = TRUE;
+        }
         else
         {
             break;
@@ -162,6 +168,10 @@ int main(int argc, char * argv[])
     }
 
     black_hole_solver_set_max_iters_limit(solver, max_iters_limit);
+    black_hole_solver_enable_rank_reachability_prune(
+        solver,
+        is_rank_reachability_prune_enabled
+    );
 
     if (argc > arg_idx)
     {

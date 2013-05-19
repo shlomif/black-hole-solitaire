@@ -95,7 +95,7 @@ SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 SET (LIB_BASE "black_hole_solver")
 
-SET (BLACK_HOLE_SOLVER_MODULES "alloc.c" "black_hole_solver.c")
+SET (BLACK_HOLE_SOLVER_MODULES "alloc.c" "black_hole_solver.c" "rank_reach_prune")
 
 IF (${BHS_STATE_STORAGE} STREQUAL "BHS_STATE_STORAGE_INTERNAL_HASH")
 
