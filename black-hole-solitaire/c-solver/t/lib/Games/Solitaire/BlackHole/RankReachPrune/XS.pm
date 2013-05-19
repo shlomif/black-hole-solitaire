@@ -36,7 +36,7 @@ int call_prune(
 
 EOF
     CLEAN_AFTER_BUILD => 0,
-    INC => "-I" . $ENV{FCS_PATH},
+    INC => "-I$ENV{FCS_PATH} -I$ENV{FCS_SRC_PATH}",
     LIBS => "-L" . $ENV{FCS_PATH} . " -lbhs_rank_reach_prune",
     # LDDLFLAGS => "$Config{lddlflags} -L$FindBin::Bin -lfcs_delta_states_test",
     # CCFLAGS => "-L$FindBin::Bin -lfcs_delta_states_test",

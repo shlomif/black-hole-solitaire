@@ -98,7 +98,16 @@ DLLEXPORT enum RANK_REACH_VERDICT bhs_find_rank_reachability(
         {
             int link = LINKS[link_idx];
 
-            signed char offset_rank = (signed char)((rank+link)%NUM_RANKS);
+            signed char offset_rank = (signed char)(rank+link);
+
+            if (offset_rank == NUM_RANKS)
+            {
+                offset_rank = 0;
+            }
+            else if (offset_rank == -1)
+            {
+                offset_rank = NUM_RANKS-1;
+            }
 
             if (rank_counts[offset_rank] > 0)
             {
