@@ -5,7 +5,7 @@ use warnings;
 use autodie;
 
 use List::Util qw(first);
-
+use File::Copy qw(copy);
 use Env::Path;
 
 my $p = Env::Path->PATH;
@@ -37,4 +37,5 @@ open my $out_fh, '>', $temp_fn;
 print {$out_fh} "$board_idx\t$v\t$checked\t$gen\n";
 close ($out_fh);
 
-rename ($temp_fn, $final_fn);
+copy ($temp_fn, $final_fn);
+unlink ($temp_fn);
