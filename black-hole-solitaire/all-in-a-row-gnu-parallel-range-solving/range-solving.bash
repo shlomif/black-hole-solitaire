@@ -12,4 +12,6 @@ if test -f SUMMARY.txt ; then
     let start_idx++
 fi
 
-seq "${start_idx//,/}" "${end_idx//,/}" | parallel -j"$num_cpus" perl summarize.pl {}
+seq "${start_idx//,/}" "${end_idx//,/}" | \
+    parallel --ungroup --sshlogin 4/sh --sshlogin 2/lap \
+    perl "$(pwd)"/summarize.pl {}
