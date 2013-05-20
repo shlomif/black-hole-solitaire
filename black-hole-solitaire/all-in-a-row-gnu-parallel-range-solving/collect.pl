@@ -10,11 +10,16 @@ use IO::All;
 my $THRESHOLD = 5;
 my $SUMMARY_FN = "SUMMARY.txt";
 
+sub sum_fh
+{
+    return io->file($SUMMARY_FN);
+}
+
 my $time = time() - $THRESHOLD;
 
 my $start_idx;
 
-if (my $last_line = io($SUMMARY_FN)->[-1])
+if (my $last_line = sum_fh()->[-1])
 {
     ($start_idx) = $last_line =~ m/\A(\d+)/;
     $start_idx++;
@@ -38,7 +43,7 @@ sub fh
 
 while ((-e fn()) && (fh()->mtime() <= $time))
 {
-    fh() >> io($SUMMARY_FN);
+    fh() >> sum_fh();
     fh()->unlink();
 }
 continue
