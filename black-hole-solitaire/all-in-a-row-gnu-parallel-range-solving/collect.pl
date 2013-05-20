@@ -41,9 +41,11 @@ sub fh
     return io->file(fn());
 }
 
+my $sum_fh = sum_fh();
+
 while ((-e fn()) && (fh()->mtime() <= $time))
 {
-    fh() >> sum_fh();
+    $sum_fh->append(fh()->all());
     fh()->unlink();
 }
 continue
