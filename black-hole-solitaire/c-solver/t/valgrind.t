@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 1;
+use Test::More tests => 2;
 use Carp;
 use Data::Dumper;
 use String::ShellQuote;
@@ -76,6 +76,18 @@ test_using_valgrind(
         ),
     ],
     qq{valgrind all_in_a_row deal #24.}
+);
+
+# TEST
+test_using_valgrind(
+    [
+        '--game', 'all_in_a_row',
+        '--display-boards', '--rank-reach-prune',
+        File::Spec->catfile(
+            $bin_dir, 'data', '24.all_in_a_row.board.txt'
+        ),
+    ],
+    qq{valgrind --display-boards --rank-reach-prune all_in_a_row deal #24.}
 );
 
 =head1 COPYRIGHT AND LICENSE
