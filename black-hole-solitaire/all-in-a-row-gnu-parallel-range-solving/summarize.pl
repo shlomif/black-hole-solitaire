@@ -7,11 +7,32 @@ use autodie;
 use List::Util qw(first);
 use File::Copy qw(copy);
 use Env::Path;
+use Getopt::Long qw(GetOptions);
 
 my $p = Env::Path->PATH;
 
 my $bhs_dir = "$ENV{HOME}/apps/black-hole-solver";
 $p->Prepend("$bhs_dir/bin");
+
+my $game;
+my $is_prune = 0;
+if (! GetOptions(
+    'prune!' => \$is_prune,
+    'game|g=s' => \$game,
+))
+{
+    die "Invalid options!";
+}
+
+if (!defined($game))
+{
+    die "--game|-g was not specified!";
+}
+
+if (not (($game eq 'black_hole') || ($game eq 'all_in_a_row')))
+{
+    die "Invalid game type";
+}
 
 my $board_idx = shift(@ARGV);
 
@@ -23,9 +44,14 @@ if (-e $final_fn)
     exit(0);
 }
 
-my $game = 'all_in_a_row';
-my @args = (qw(--rank-reach-prune));
-my $text= `make_pysol_freecell_board.py -F -t $board_idx $game | black-hole-solve --game $game @args -`;
+my @args;
+
+if ($is_prune)
+{
+    push @args, (qw(--rank-reach-prune));
+}
+
+my $text = `make_pysol_freecell_board.py -F -t $board_idx $game | black-hole-solve --game $game @args -`;
 
 my ($verdict, $checked, $gen) = ($text =~ m{(Solved|Unsolved).*?^Total number of states checked is (\d+)\..*?^This scan generated (\d+) states\.}ms);
 
