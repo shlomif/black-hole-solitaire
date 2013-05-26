@@ -9,4 +9,5 @@ black-hole-solitaire/all-in-a-row-gnu-parallel-range-solving/SUMMARY.txt
 black-hole-solitaire/all-in-a-row-gnu-parallel-range-solving/archived_SUMMARIES
 black-hole-solitaire/c-solver/B
 black-hole-solitaire/c-solver/build
+black-hole-solitaire/c-solver/cmake/Shlomif_Common.cmake
 black-hole-solitaire/c-solver/tags

@@ -1,6 +1,10 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
+SET (private_mod_path "${CMAKE_SOURCE_DIR}/cmake")
+LIST (APPEND CMAKE_MODULE_PATH "${private_mod_path}")
 INCLUDE(Shlomif_Common)
+
+SHLOMIF_COMMON_SETUP("${private_mod_path}")
 
 INCLUDE(CheckCCompilerFlag)
 INCLUDE(FindPkgConfig)
