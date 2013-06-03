@@ -33,6 +33,11 @@ extern "C" {
 #endif
 
 #include "fcs_dllexport.h"
+#include "bool.h"
+#include "inline.h"
+
+#define NUM_RANKS 13
+
 
 enum RANK_REACH_VERDICT
 {
@@ -44,6 +49,95 @@ DLLEXPORT enum RANK_REACH_VERDICT bhs_find_rank_reachability(
     signed char foundation,
     const unsigned char * rank_counts
 );
+
+static GCC_INLINE enum RANK_REACH_VERDICT bhs_find_rank_reachability__inline(
+    signed char foundation,
+    const unsigned char * rank_counts
+)
+{
+    static const int LINKS[2] = {-1,1};
+
+    int i, link_idx;
+    if (foundation < 0)
+    {
+        return RANK_REACH__SUCCESS;
+    }
+
+    /* The 20 is a margin */
+    signed char physical_queue[NUM_RANKS + 20];
+
+    signed char * queue_ptr = physical_queue;
+
+    *(queue_ptr++) = foundation;
+
+    int full_max = 0;
+    for (i = 0; i < NUM_RANKS ; i++)
+    {
+        if (rank_counts[i] > 0)
+        {
+            full_max++;
+        }
+    }
+    /* Count the foundation - the starting point - in. */
+    if (rank_counts[foundation] == 0)
+    {
+        full_max++;
+    }
+
+    int full_count = 0;
+
+    fcs_bool_t reached[NUM_RANKS];
+
+    for (i = 0; i < NUM_RANKS ; i++)
+    {
+        reached[i] = FALSE;
+    }
+
+    while ((full_count < full_max) && (queue_ptr > physical_queue))
+    {
+        signed char rank = *(--queue_ptr);
+
+        if (reached[rank])
+        {
+            continue;
+        }
+
+        reached[rank] = TRUE;
+        full_count++;
+
+        for (link_idx = 0; link_idx < (sizeof(LINKS)/sizeof(LINKS[0])) ;
+            link_idx++)
+        {
+            int link = LINKS[link_idx];
+
+            signed char offset_rank = (signed char)(rank+link);
+
+            if (offset_rank == NUM_RANKS)
+            {
+                offset_rank = 0;
+            }
+            else if (offset_rank == -1)
+            {
+                offset_rank = NUM_RANKS-1;
+            }
+
+            if (rank_counts[offset_rank] > 0)
+            {
+                if (! reached[offset_rank])
+                {
+                    *(queue_ptr++) = offset_rank;
+                }
+            }
+        }
+    }
+
+    return
+    (
+        (full_count == full_max)
+            ? RANK_REACH__SUCCESS
+            : RANK_REACH__NOT_REACHABLE
+    );
+}
 
 #ifdef __cplusplus
 }
