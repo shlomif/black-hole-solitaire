@@ -581,7 +581,7 @@ extern int DLLEXPORT black_hole_solver_run(
 
         if (is_rank_reachability_prune_enabled)
         {
-            if (! (bhs_find_rank_reachability(
+            if (! (bhs_find_rank_reachability__inline(
                         foundations,
                         queue_item_copy.rank_counts.c
             ) == RANK_REACH__SUCCESS)
