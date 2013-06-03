@@ -1,3 +1,10 @@
+* Add the --rank-reach-prune option and
+black_hole_solver_enable_rank_reachability_prune().
+
+* Add the API function black_hole_solver_get_lib_version().
+
+* Add the --version flag.
+
 0.6.0       ( 16 May 2013):
 ===========================
 
