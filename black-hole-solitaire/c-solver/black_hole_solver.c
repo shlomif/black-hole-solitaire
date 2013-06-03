@@ -289,6 +289,22 @@ static int parse_card(
     return BLACK_HOLE_SOLVER__SUCCESS;
 }
 
+static GCC_INLINE fcs_bool_t string_find_prefix(
+    const char * * s,
+    const char * const prefix
+)
+{
+    register size_t len = strlen(prefix);
+
+    if (strncmp(*s, prefix, len) != 0)
+    {
+        return FALSE;
+    }
+
+    (*s) += len;
+
+    return TRUE;
+}
 
 extern int DLLEXPORT black_hole_solver_read_board(
     black_hole_solver_instance_t * instance_proto,
@@ -299,7 +315,7 @@ extern int DLLEXPORT black_hole_solver_read_board(
     int bits_per_column
 )
 {
-    const char * s, * match;
+    const char * s;
     bhs_solver_t * solver;
     int ret_code, col_idx;
     int line_num = 1;
@@ -319,21 +335,16 @@ extern int DLLEXPORT black_hole_solver_read_board(
         s++;
     }
 
-    match = "Foundations: ";
-
 #define MYRET(code) \
     { \
         *error_line_number = line_num; \
         return code; \
     }
 
-    /* TODO : a bug - should be if (!strncmp(s, match, strlen(match)) */
-    if (!strcmp(s, match))
+    if (! string_find_prefix(&s, "Foundations: "))
     {
         MYRET (BLACK_HOLE_SOLVER__FOUNDATIONS_NOT_FOUND_AT_START);
     }
-
-    s += strlen(match);
 
     while (isspace(*s) && ((*s) != '\n'))
     {
