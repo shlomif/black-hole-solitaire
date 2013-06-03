@@ -65,6 +65,8 @@ extern "C" {
 
 #define BHS_STATE_STORAGE ${BHS_STATE_STORAGE}
 
+#define VERSION "${VERSION}"
+
 #ifdef __cplusplus
 }
 #endif

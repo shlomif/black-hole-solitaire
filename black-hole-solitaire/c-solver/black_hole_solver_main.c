@@ -100,7 +100,15 @@ int main(int argc, char * argv[])
     arg_idx = 1;
     while (argc > arg_idx)
     {
-        if (!strcmp(argv[arg_idx], "--help"))
+        if (!strcmp(argv[arg_idx], "--version"))
+        {
+            printf("black-hole-solver version %s\nLibrary version %s\n",
+                VERSION,
+                VERSION
+            );
+            exit(0);
+        }
+        else if (!strcmp(argv[arg_idx], "--help"))
         {
             printf ("%s", help_text);
             exit(0);

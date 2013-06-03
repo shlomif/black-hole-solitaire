@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 6;
+use Test::More tests => 8;
 use Test::Differences;
 
 use File::Spec;
@@ -826,3 +826,18 @@ EOF
 
 # TEST
 eq_or_diff ($trap->stdout(), $expected_output, "Right output for --max-iters.");
+
+my $ret_code;
+trap
+{
+    $ret_code = system('./black-hole-solve', '--version');
+};
+
+# TEST
+is ($ret_code, 0, "Exited successfully.");
+
+# TEST
+like ($trap->stdout(),
+    qr/\Ablack-hole-solver version (\d+(?:\.\d+){2})\nLibrary version \1\n\z/,
+    "Right otuput for --version."
+);

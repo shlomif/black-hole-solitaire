@@ -859,3 +859,8 @@ DLLEXPORT extern int black_hole_solver_get_current_solution_board(
     return BLACK_HOLE_SOLVER__SUCCESS;
 }
 
+DLLEXPORT const char * black_hole_solver_get_lib_version(void)
+{
+    return VERSION;
+}
+

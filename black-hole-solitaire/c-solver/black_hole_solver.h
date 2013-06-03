@@ -107,6 +107,8 @@ DLLEXPORT extern int black_hole_solver_get_current_solution_board(
     char * * ret_str
 );
 
+DLLEXPORT const char * black_hole_solver_get_lib_version(void);
+
 #ifdef __cplusplus
 }
 #endif
