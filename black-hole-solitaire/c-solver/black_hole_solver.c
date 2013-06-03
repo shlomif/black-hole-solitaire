@@ -49,6 +49,7 @@
 #include "alloc.h"
 #include "rank_reach_prune.h"
 
+#define NUM_SUITS 4
 enum BHS_SUITS
 {
     SUIT_H,
@@ -723,6 +724,8 @@ extern int DLLEXPORT black_hole_solver_free(
     return BLACK_HOLE_SOLVER__SUCCESS;
 }
 
+#define NUM_STATES_INCREMENT 16
+
 static void initialize_states_in_solution(bhs_solver_t * solver)
 {
     if (! solver->states_in_solution)
@@ -734,7 +737,7 @@ static void initialize_states_in_solution(bhs_solver_t * solver)
         int i, num_states, max_num_states;
 
         num_states = 0;
-        max_num_states = 53;
+        max_num_states = NUM_SUITS * NUM_RANKS + 1;
 
         states = malloc(sizeof(states[0]) * max_num_states);
 
@@ -752,7 +755,7 @@ static void initialize_states_in_solution(bhs_solver_t * solver)
                 states =
                     realloc(
                         states,
-                        sizeof(states[0]) * (max_num_states += 16)
+                        sizeof(states[0]) * (max_num_states += NUM_STATES_INCREMENT)
                     );
             }
 
@@ -855,7 +858,7 @@ DLLEXPORT extern int black_hole_solver_get_current_solution_board(
 
     ret = malloc(
         /* 3 bytes per card. */
-        (3 * 4 * 13)
+        (3 * NUM_SUITS * NUM_RANKS)
             +
         /* newline and a leading ":" per column */
         (2 * BHS__MAX_NUM_COLUMNS)
