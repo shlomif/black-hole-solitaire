@@ -302,6 +302,7 @@ extern int DLLEXPORT black_hole_solver_read_board(
     const char * s, * match;
     bhs_solver_t * solver;
     int ret_code, col_idx;
+    int line_num = 1;
 
     solver = (bhs_solver_t *)instance_proto;
 
@@ -314,14 +315,22 @@ extern int DLLEXPORT black_hole_solver_read_board(
 
     while ((*s) == '\n')
     {
+        line_num++;
         s++;
     }
 
     match = "Foundations: ";
+
+#define MYRET(code) \
+    { \
+        *error_line_number = line_num; \
+        return code; \
+    }
+
+    /* TODO : a bug - should be if (!strncmp(s, match, strlen(match)) */
     if (!strcmp(s, match))
     {
-        *error_line_number = 1;
-        return BLACK_HOLE_SOLVER__FOUNDATIONS_NOT_FOUND_AT_START;
+        MYRET (BLACK_HOLE_SOLVER__FOUNDATIONS_NOT_FOUND_AT_START);
     }
 
     s += strlen(match);
@@ -353,26 +362,24 @@ extern int DLLEXPORT black_hole_solver_read_board(
 
         if (ret_code)
         {
-            *error_line_number = 1;
-            return ret_code;
+            MYRET (ret_code);
         }
     }
 
     if (*(s++) != '\n')
     {
-        *error_line_number = 1;
-        return BLACK_HOLE_SOLVER__TRAILING_CHARS;
+        MYRET (BLACK_HOLE_SOLVER__TRAILING_CHARS);
     }
+    line_num++;
 
-    for(col_idx = 0; col_idx < num_columns; col_idx++)
+    for(col_idx = 0; col_idx < num_columns; col_idx++, line_num++)
     {
         int pos_idx = 0;
         while ((*s != '\n') && (*s != '\0'))
         {
             if (pos_idx == max_num_cards_in_col)
             {
-                *error_line_number = 2+col_idx;
-                return BLACK_HOLE_SOLVER__TOO_MANY_CARDS;
+                MYRET (BLACK_HOLE_SOLVER__TOO_MANY_CARDS);
             }
 
             ret_code =
@@ -384,8 +391,7 @@ extern int DLLEXPORT black_hole_solver_read_board(
 
             if (ret_code)
             {
-                *error_line_number = 2+col_idx;
-                return ret_code;
+                MYRET (ret_code);
             }
 
             while ((*s) == ' ')
@@ -400,8 +406,7 @@ extern int DLLEXPORT black_hole_solver_read_board(
 
         if (*s == '\0')
         {
-            *error_line_number = 2+col_idx;
-            return BLACK_HOLE_SOLVER__NOT_ENOUGH_COLUMNS;
+            MYRET ( BLACK_HOLE_SOLVER__NOT_ENOUGH_COLUMNS );
         }
         else
         {
@@ -409,8 +414,12 @@ extern int DLLEXPORT black_hole_solver_read_board(
         }
     }
 
+    *error_line_number = -1;
     return BLACK_HOLE_SOLVER__SUCCESS;
 }
+
+#undef MYRET
+
 
 DLLEXPORT extern int black_hole_solver_set_max_iters_limit(
     black_hole_solver_instance_t * instance_proto,
