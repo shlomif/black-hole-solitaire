@@ -211,55 +211,55 @@ static int parse_card(
     switch(*(*s))
     {
         case 'A':
-            v = 0;
+            v = RANK_A;
             break;
 
         case '2':
-            v = 1;
+            v = RANK_2;
             break;
 
         case '3':
-            v = 2;
+            v = RANK_3;
             break;
 
         case '4':
-            v = 3;
+            v = RANK_4;
             break;
 
         case '5':
-            v = 4;
+            v = RANK_5;
             break;
 
         case '6':
-            v = 5;
+            v = RANK_6;
             break;
 
         case '7':
-            v = 6;
+            v = RANK_7;
             break;
 
         case '8':
-            v = 7;
+            v = RANK_8;
             break;
 
         case '9':
-            v = 8;
+            v = RANK_9;
             break;
 
         case 'T':
-            v = 9;
+            v = RANK_T;
             break;
 
         case 'J':
-            v = 10;
+            v = RANK_J;
             break;
 
         case 'Q':
-            v = 11;
+            v = RANK_Q;
             break;
 
         case 'K':
-            v = 12;
+            v = RANK_K;
             break;
 
         default:
