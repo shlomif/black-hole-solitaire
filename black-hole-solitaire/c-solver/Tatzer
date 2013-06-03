@@ -10,6 +10,7 @@ use strict;
 use warnings;
 
 use Getopt::Long;
+use File::Basename qw(dirname);
 
 my $build_type = "debug";
 my $state_storage;
@@ -154,7 +155,21 @@ GetOptions(
 ) or
     die "Wrong options";
 
-my $dir = shift(@ARGV) || '.';
+my $path_to_source_dir;
+
+if (@ARGV)
+{
+    $path_to_source_dir = shift(@ARGV);
+
+    if (@ARGV)
+    {
+        die "Junk at the end of ARGV - <@ARGV>";
+    }
+}
+else
+{
+    $path_to_source_dir = dirname($0);
+}
 
 if ($state_storage_libavl2_tree)
 {
@@ -186,7 +201,7 @@ my @cmd= ("cmake",
         ? ("-DLIBAVL2_SOURCE_DIR=$ENV{LIBAVL2_SOURCE_DIR}")
         : ()
     ),
-    $dir
+    $path_to_source_dir
 );
 
 print(join(" ", @cmd), "\n");
