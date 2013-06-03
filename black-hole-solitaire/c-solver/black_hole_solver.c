@@ -49,20 +49,29 @@
 #include "alloc.h"
 #include "rank_reach_prune.h"
 
+enum BHS_SUITS
+{
+    SUIT_H,
+    SUIT_C,
+    SUIT_D,
+    SUIT_S,
+    INVALID_SUIT = -1
+};
+
 static int suit_char_to_index(char suit)
 {
     switch (suit)
     {
         case 'H':
-            return 0;
+            return SUIT_H;
         case 'C':
-            return 1;
+            return SUIT_C;
         case 'D':
-            return 2;
+            return SUIT_D;
         case 'S':
-            return 3;
+            return SUIT_S;
         default:
-            return -1;
+            return INVALID_SUIT;
     }
 }
 
