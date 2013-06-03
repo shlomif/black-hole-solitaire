@@ -1,3 +1,6 @@
+0.8.0       ( 03 Jun 2013):
+===========================
+
 * Add the --rank-reach-prune option and
 black_hole_solver_enable_rank_reachability_prune().
 
