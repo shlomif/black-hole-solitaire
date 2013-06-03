@@ -13,7 +13,8 @@
 #define BHS__BLACK_HOLE__BITS_PER_COL 2
 #define BHS__BLACK_HOLE__COLS_PER_BYTE 4
 
-typedef char bhs_card_string_t[3];
+#define BHS_CARD_STRING_LEN 2
+typedef char bhs_card_string_t[BHS_CARD_STRING_LEN + 1];
 typedef char bhs_rank_t;
 
 #define max(a,b) ( ( (a)>(b) ) ? (a) : (b) )
