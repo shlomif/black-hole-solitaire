@@ -89,7 +89,7 @@ typedef struct
 
 typedef struct
 {
-    unsigned char c[13];
+    unsigned char c[NUM_RANKS];
 } bhs_rank_counts_t;
 
 typedef struct
@@ -176,7 +176,24 @@ DLLEXPORT extern int black_hole_solver_enable_rank_reachability_prune(
     return BLACK_HOLE_SOLVER__SUCCESS;
 }
 
-#define MAX_RANK 12
+#define MAX_RANK (NUM_RANKS-1)
+
+enum BHS_RANKS
+{
+    RANK_A,
+    RANK_2,
+    RANK_3,
+    RANK_4,
+    RANK_5,
+    RANK_6,
+    RANK_7,
+    RANK_8,
+    RANK_9,
+    RANK_T,
+    RANK_J,
+    RANK_Q,
+    RANK_K,
+};
 
 static int parse_card(
     const char * * s,
@@ -185,66 +202,71 @@ static int parse_card(
     int * suit_ptr
 )
 {
-    strncpy(card, (*s), 2);
-    card[2] = '\0';
+    strncpy(card, (*s), BHS_CARD_STRING_LEN);
+    card[BHS_CARD_STRING_LEN] = '\0';
+
+    /* Short for value. */
+    bhs_rank_t v;
 
     switch(*(*s))
     {
         case 'A':
-            *foundation = 0;
+            v = 0;
             break;
 
         case '2':
-            *foundation = 1;
+            v = 1;
             break;
 
         case '3':
-            *foundation = 2;
+            v = 2;
             break;
 
         case '4':
-            *foundation = 3;
+            v = 3;
             break;
 
         case '5':
-            *foundation = 4;
+            v = 4;
             break;
 
         case '6':
-            *foundation = 5;
+            v = 5;
             break;
 
         case '7':
-            *foundation = 6;
+            v = 6;
             break;
 
         case '8':
-            *foundation = 7;
+            v = 7;
             break;
 
         case '9':
-            *foundation = 8;
+            v = 8;
             break;
 
         case 'T':
-            *foundation = 9;
+            v = 9;
             break;
 
         case 'J':
-            *foundation = 10;
+            v = 10;
             break;
 
         case 'Q':
-            *foundation = 11;
+            v = 11;
             break;
 
         case 'K':
-            *foundation = 12;
+            v = 12;
             break;
 
         default:
             return BLACK_HOLE_SOLVER__UNKNOWN_RANK;
     }
+
+    *foundation = v;
 
     (*s)++;
 
