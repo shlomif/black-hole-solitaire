@@ -5,7 +5,8 @@ source 'prepare.bash'
 # Configuration
 start_idx="1"
 # end_idx="1,000,000"
-end_idx="10,000"
+# end_idx="10,000"
+end_idx="100"
 num_cpus="4"
 game="black_hole"
 prune="true"
