@@ -6,7 +6,7 @@ source 'prepare.bash'
 start_idx="1"
 # end_idx="1,000,000"
 # end_idx="10,000"
-end_idx="100"
+end_idx="1,000"
 num_cpus="4"
 game="black_hole"
 prune="true"
@@ -25,4 +25,5 @@ fi
 seq "${start_idx//,/}" "${end_idx//,/}" | \
     # parallel --ungroup --sshlogin 4/sh --sshlogin 2/lap \
     parallel --ungroup -j4 \
+    --max-args 16 \
     perl "$(pwd)"/summarize.pl $args {}

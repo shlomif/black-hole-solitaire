@@ -69,5 +69,7 @@ sub process_board_idx
     unlink ($temp_fn);
 }
 
-my $board_idx = shift(@ARGV);
-process_board_idx($board_idx);
+foreach my $board_idx (@ARGV)
+{
+    process_board_idx($board_idx);
+}
