@@ -1,0 +1,50 @@
+From: Shlomi Fish <shlomif@shlomifish.org>
+Date: Thu, 25 Oct 2012 09:50:04 +0200
+Subject: Proposed Prune for Black Hole Solitaire and All in a Row Solitaire
+
+Hi all,
+
+you can read about Black Hole Solitaire here:
+http://en.wikipedia.org/wiki/Black_Hole_%28solitaire%29 and about All in a Row
+Solitaire here: http://www.goodsol.com/pgshelp/all_in_a_row.htm . I have written
+solvers for them:
+
+* https://bitbucket.org/shlomif/black-hole-solitaire
+
+Now, what this games do is shed all cards from the columns into an
+effectively single-active-card foundation by putting cards that are one higher
+or one lower in rank (where King and Ace wrap). So I've been thinking that if
+the solver reaches a situation where there are two or more separate
+sub-sequences of ranks separated by ranks of which there are no cards, then
+I can prune this state as unsolvable. E.g:
+
+Rank 3 - 0 cards left
+Rank 4 - 2 cards left
+Rank 5 - 3 cards left
+Rank 6 - 0 cards left
+Rank 7 - 2 cards left
+
+There is no way I will be able to put both the rank 7 cards and the rank 5 cards
+there.
+
+Another situation I've thought about is something like:
+
+3: 0
+4: 2
+5: 1
+
+Where 4->5 and 5->4 will yield the same problem, but generalising this will
+require more complex analysis, and also some analysis of a
+http://en.wikipedia.org/wiki/Hamiltonian_path , which is an NP-complete problem.
+
+Regards,
+
+	Shlomi Fish
+
+-----------------------------------------------------------------
+Shlomi Fish       http://www.shlomifish.org/
+Understand what Open Source is - http://shlom.in/oss-fs
+
+Larry Wall has more dollars in the bank than in his Perl code.
+
+Please reply to list if it's a mailing list post - http://shlom.in/reply .

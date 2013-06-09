@@ -1,0 +1,1377 @@
+Solved!
+
+[START BOARD]
+Foundations: -
+: 4C JS 9H 8S
+: 5H 5S 5C 4S
+: QC 6C TC 4H
+: 5D 9C TS KS
+: 2D 3C AD 6D
+: 7H 6H 4D 8D
+: AH JC QS 7C
+: 7S TH 3H JD
+: 2C KH 3S 9D
+: QH 6S JH 2H
+: 9S 7D TD QD
+: 2S 8C KC 3D
+: KD AC 8H AS
+[END BOARD]
+
+
+Move a card from stack 12 to the foundations
+
+Info: Card moved is AS
+
+
+====================
+
+
+[START BOARD]
+Foundations: AS
+: 4C JS 9H 8S
+: 5H 5S 5C 4S
+: QC 6C TC 4H
+: 5D 9C TS KS
+: 2D 3C AD 6D
+: 7H 6H 4D 8D
+: AH JC QS 7C
+: 7S TH 3H JD
+: 2C KH 3S 9D
+: QH 6S JH 2H
+: 9S 7D TD QD
+: 2S 8C KC 3D
+: KD AC 8H
+[END BOARD]
+
+
+Move a card from stack 3 to the foundations
+
+Info: Card moved is KS
+
+
+====================
+
+
+[START BOARD]
+Foundations: KS
+: 4C JS 9H 8S
+: 5H 5S 5C 4S
+: QC 6C TC 4H
+: 5D 9C TS
+: 2D 3C AD 6D
+: 7H 6H 4D 8D
+: AH JC QS 7C
+: 7S TH 3H JD
+: 2C KH 3S 9D
+: QH 6S JH 2H
+: 9S 7D TD QD
+: 2S 8C KC 3D
+: KD AC 8H
+[END BOARD]
+
+
+Move a card from stack 10 to the foundations
+
+Info: Card moved is QD
+
+
+====================
+
+
+[START BOARD]
+Foundations: QD
+: 4C JS 9H 8S
+: 5H 5S 5C 4S
+: QC 6C TC 4H
+: 5D 9C TS
+: 2D 3C AD 6D
+: 7H 6H 4D 8D
+: AH JC QS 7C
+: 7S TH 3H JD
+: 2C KH 3S 9D
+: QH 6S JH 2H
+: 9S 7D TD
+: 2S 8C KC 3D
+: KD AC 8H
+[END BOARD]
+
+
+Move a card from stack 7 to the foundations
+
+Info: Card moved is JD
+
+
+====================
+
+
+[START BOARD]
+Foundations: JD
+: 4C JS 9H 8S
+: 5H 5S 5C 4S
+: QC 6C TC 4H
+: 5D 9C TS
+: 2D 3C AD 6D
+: 7H 6H 4D 8D
+: AH JC QS 7C
+: 7S TH 3H
+: 2C KH 3S 9D
+: QH 6S JH 2H
+: 9S 7D TD
+: 2S 8C KC 3D
+: KD AC 8H
+[END BOARD]
+
+
+Move a card from stack 10 to the foundations
+
+Info: Card moved is TD
+
+
+====================
+
+
+[START BOARD]
+Foundations: TD
+: 4C JS 9H 8S
+: 5H 5S 5C 4S
+: QC 6C TC 4H
+: 5D 9C TS
+: 2D 3C AD 6D
+: 7H 6H 4D 8D
+: AH JC QS 7C
+: 7S TH 3H
+: 2C KH 3S 9D
+: QH 6S JH 2H
+: 9S 7D
+: 2S 8C KC 3D
+: KD AC 8H
+[END BOARD]
+
+
+Move a card from stack 8 to the foundations
+
+Info: Card moved is 9D
+
+
+====================
+
+
+[START BOARD]
+Foundations: 9D
+: 4C JS 9H 8S
+: 5H 5S 5C 4S
+: QC 6C TC 4H
+: 5D 9C TS
+: 2D 3C AD 6D
+: 7H 6H 4D 8D
+: AH JC QS 7C
+: 7S TH 3H
+: 2C KH 3S
+: QH 6S JH 2H
+: 9S 7D
+: 2S 8C KC 3D
+: KD AC 8H
+[END BOARD]
+
+
+Move a card from stack 12 to the foundations
+
+Info: Card moved is 8H
+
+
+====================
+
+
+[START BOARD]
+Foundations: 8H
+: 4C JS 9H 8S
+: 5H 5S 5C 4S
+: QC 6C TC 4H
+: 5D 9C TS
+: 2D 3C AD 6D
+: 7H 6H 4D 8D
+: AH JC QS 7C
+: 7S TH 3H
+: 2C KH 3S
+: QH 6S JH 2H
+: 9S 7D
+: 2S 8C KC 3D
+: KD AC
+[END BOARD]
+
+
+Move a card from stack 10 to the foundations
+
+Info: Card moved is 7D
+
+
+====================
+
+
+[START BOARD]
+Foundations: 7D
+: 4C JS 9H 8S
+: 5H 5S 5C 4S
+: QC 6C TC 4H
+: 5D 9C TS
+: 2D 3C AD 6D
+: 7H 6H 4D 8D
+: AH JC QS 7C
+: 7S TH 3H
+: 2C KH 3S
+: QH 6S JH 2H
+: 9S
+: 2S 8C KC 3D
+: KD AC
+[END BOARD]
+
+
+Move a card from stack 0 to the foundations
+
+Info: Card moved is 8S
+
+
+====================
+
+
+[START BOARD]
+Foundations: 8S
+: 4C JS 9H
+: 5H 5S 5C 4S
+: QC 6C TC 4H
+: 5D 9C TS
+: 2D 3C AD 6D
+: 7H 6H 4D 8D
+: AH JC QS 7C
+: 7S TH 3H
+: 2C KH 3S
+: QH 6S JH 2H
+: 9S
+: 2S 8C KC 3D
+: KD AC
+[END BOARD]
+
+
+Move a card from stack 0 to the foundations
+
+Info: Card moved is 9H
+
+
+====================
+
+
+[START BOARD]
+Foundations: 9H
+: 4C JS
+: 5H 5S 5C 4S
+: QC 6C TC 4H
+: 5D 9C TS
+: 2D 3C AD 6D
+: 7H 6H 4D 8D
+: AH JC QS 7C
+: 7S TH 3H
+: 2C KH 3S
+: QH 6S JH 2H
+: 9S
+: 2S 8C KC 3D
+: KD AC
+[END BOARD]
+
+
+Move a card from stack 3 to the foundations
+
+Info: Card moved is TS
+
+
+====================
+
+
+[START BOARD]
+Foundations: TS
+: 4C JS
+: 5H 5S 5C 4S
+: QC 6C TC 4H
+: 5D 9C
+: 2D 3C AD 6D
+: 7H 6H 4D 8D
+: AH JC QS 7C
+: 7S TH 3H
+: 2C KH 3S
+: QH 6S JH 2H
+: 9S
+: 2S 8C KC 3D
+: KD AC
+[END BOARD]
+
+
+Move a card from stack 3 to the foundations
+
+Info: Card moved is 9C
+
+
+====================
+
+
+[START BOARD]
+Foundations: 9C
+: 4C JS
+: 5H 5S 5C 4S
+: QC 6C TC 4H
+: 5D
+: 2D 3C AD 6D
+: 7H 6H 4D 8D
+: AH JC QS 7C
+: 7S TH 3H
+: 2C KH 3S
+: QH 6S JH 2H
+: 9S
+: 2S 8C KC 3D
+: KD AC
+[END BOARD]
+
+
+Move a card from stack 5 to the foundations
+
+Info: Card moved is 8D
+
+
+====================
+
+
+[START BOARD]
+Foundations: 8D
+: 4C JS
+: 5H 5S 5C 4S
+: QC 6C TC 4H
+: 5D
+: 2D 3C AD 6D
+: 7H 6H 4D
+: AH JC QS 7C
+: 7S TH 3H
+: 2C KH 3S
+: QH 6S JH 2H
+: 9S
+: 2S 8C KC 3D
+: KD AC
+[END BOARD]
+
+
+Move a card from stack 6 to the foundations
+
+Info: Card moved is 7C
+
+
+====================
+
+
+[START BOARD]
+Foundations: 7C
+: 4C JS
+: 5H 5S 5C 4S
+: QC 6C TC 4H
+: 5D
+: 2D 3C AD 6D
+: 7H 6H 4D
+: AH JC QS
+: 7S TH 3H
+: 2C KH 3S
+: QH 6S JH 2H
+: 9S
+: 2S 8C KC 3D
+: KD AC
+[END BOARD]
+
+
+Move a card from stack 4 to the foundations
+
+Info: Card moved is 6D
+
+
+====================
+
+
+[START BOARD]
+Foundations: 6D
+: 4C JS
+: 5H 5S 5C 4S
+: QC 6C TC 4H
+: 5D
+: 2D 3C AD
+: 7H 6H 4D
+: AH JC QS
+: 7S TH 3H
+: 2C KH 3S
+: QH 6S JH 2H
+: 9S
+: 2S 8C KC 3D
+: KD AC
+[END BOARD]
+
+
+Move a card from stack 3 to the foundations
+
+Info: Card moved is 5D
+
+
+====================
+
+
+[START BOARD]
+Foundations: 5D
+: 4C JS
+: 5H 5S 5C 4S
+: QC 6C TC 4H
+:
+: 2D 3C AD
+: 7H 6H 4D
+: AH JC QS
+: 7S TH 3H
+: 2C KH 3S
+: QH 6S JH 2H
+: 9S
+: 2S 8C KC 3D
+: KD AC
+[END BOARD]
+
+
+Move a card from stack 5 to the foundations
+
+Info: Card moved is 4D
+
+
+====================
+
+
+[START BOARD]
+Foundations: 4D
+: 4C JS
+: 5H 5S 5C 4S
+: QC 6C TC 4H
+:
+: 2D 3C AD
+: 7H 6H
+: AH JC QS
+: 7S TH 3H
+: 2C KH 3S
+: QH 6S JH 2H
+: 9S
+: 2S 8C KC 3D
+: KD AC
+[END BOARD]
+
+
+Move a card from stack 11 to the foundations
+
+Info: Card moved is 3D
+
+
+====================
+
+
+[START BOARD]
+Foundations: 3D
+: 4C JS
+: 5H 5S 5C 4S
+: QC 6C TC 4H
+:
+: 2D 3C AD
+: 7H 6H
+: AH JC QS
+: 7S TH 3H
+: 2C KH 3S
+: QH 6S JH 2H
+: 9S
+: 2S 8C KC
+: KD AC
+[END BOARD]
+
+
+Move a card from stack 1 to the foundations
+
+Info: Card moved is 4S
+
+
+====================
+
+
+[START BOARD]
+Foundations: 4S
+: 4C JS
+: 5H 5S 5C
+: QC 6C TC 4H
+:
+: 2D 3C AD
+: 7H 6H
+: AH JC QS
+: 7S TH 3H
+: 2C KH 3S
+: QH 6S JH 2H
+: 9S
+: 2S 8C KC
+: KD AC
+[END BOARD]
+
+
+Move a card from stack 1 to the foundations
+
+Info: Card moved is 5C
+
+
+====================
+
+
+[START BOARD]
+Foundations: 5C
+: 4C JS
+: 5H 5S
+: QC 6C TC 4H
+:
+: 2D 3C AD
+: 7H 6H
+: AH JC QS
+: 7S TH 3H
+: 2C KH 3S
+: QH 6S JH 2H
+: 9S
+: 2S 8C KC
+: KD AC
+[END BOARD]
+
+
+Move a card from stack 5 to the foundations
+
+Info: Card moved is 6H
+
+
+====================
+
+
+[START BOARD]
+Foundations: 6H
+: 4C JS
+: 5H 5S
+: QC 6C TC 4H
+:
+: 2D 3C AD
+: 7H
+: AH JC QS
+: 7S TH 3H
+: 2C KH 3S
+: QH 6S JH 2H
+: 9S
+: 2S 8C KC
+: KD AC
+[END BOARD]
+
+
+Move a card from stack 1 to the foundations
+
+Info: Card moved is 5S
+
+
+====================
+
+
+[START BOARD]
+Foundations: 5S
+: 4C JS
+: 5H
+: QC 6C TC 4H
+:
+: 2D 3C AD
+: 7H
+: AH JC QS
+: 7S TH 3H
+: 2C KH 3S
+: QH 6S JH 2H
+: 9S
+: 2S 8C KC
+: KD AC
+[END BOARD]
+
+
+Move a card from stack 2 to the foundations
+
+Info: Card moved is 4H
+
+
+====================
+
+
+[START BOARD]
+Foundations: 4H
+: 4C JS
+: 5H
+: QC 6C TC
+:
+: 2D 3C AD
+: 7H
+: AH JC QS
+: 7S TH 3H
+: 2C KH 3S
+: QH 6S JH 2H
+: 9S
+: 2S 8C KC
+: KD AC
+[END BOARD]
+
+
+Move a card from stack 7 to the foundations
+
+Info: Card moved is 3H
+
+
+====================
+
+
+[START BOARD]
+Foundations: 3H
+: 4C JS
+: 5H
+: QC 6C TC
+:
+: 2D 3C AD
+: 7H
+: AH JC QS
+: 7S TH
+: 2C KH 3S
+: QH 6S JH 2H
+: 9S
+: 2S 8C KC
+: KD AC
+[END BOARD]
+
+
+Move a card from stack 9 to the foundations
+
+Info: Card moved is 2H
+
+
+====================
+
+
+[START BOARD]
+Foundations: 2H
+: 4C JS
+: 5H
+: QC 6C TC
+:
+: 2D 3C AD
+: 7H
+: AH JC QS
+: 7S TH
+: 2C KH 3S
+: QH 6S JH
+: 9S
+: 2S 8C KC
+: KD AC
+[END BOARD]
+
+
+Move a card from stack 12 to the foundations
+
+Info: Card moved is AC
+
+
+====================
+
+
+[START BOARD]
+Foundations: AC
+: 4C JS
+: 5H
+: QC 6C TC
+:
+: 2D 3C AD
+: 7H
+: AH JC QS
+: 7S TH
+: 2C KH 3S
+: QH 6S JH
+: 9S
+: 2S 8C KC
+: KD
+[END BOARD]
+
+
+Move a card from stack 11 to the foundations
+
+Info: Card moved is KC
+
+
+====================
+
+
+[START BOARD]
+Foundations: KC
+: 4C JS
+: 5H
+: QC 6C TC
+:
+: 2D 3C AD
+: 7H
+: AH JC QS
+: 7S TH
+: 2C KH 3S
+: QH 6S JH
+: 9S
+: 2S 8C
+: KD
+[END BOARD]
+
+
+Move a card from stack 6 to the foundations
+
+Info: Card moved is QS
+
+
+====================
+
+
+[START BOARD]
+Foundations: QS
+: 4C JS
+: 5H
+: QC 6C TC
+:
+: 2D 3C AD
+: 7H
+: AH JC
+: 7S TH
+: 2C KH 3S
+: QH 6S JH
+: 9S
+: 2S 8C
+: KD
+[END BOARD]
+
+
+Move a card from stack 9 to the foundations
+
+Info: Card moved is JH
+
+
+====================
+
+
+[START BOARD]
+Foundations: JH
+: 4C JS
+: 5H
+: QC 6C TC
+:
+: 2D 3C AD
+: 7H
+: AH JC
+: 7S TH
+: 2C KH 3S
+: QH 6S
+: 9S
+: 2S 8C
+: KD
+[END BOARD]
+
+
+Move a card from stack 7 to the foundations
+
+Info: Card moved is TH
+
+
+====================
+
+
+[START BOARD]
+Foundations: TH
+: 4C JS
+: 5H
+: QC 6C TC
+:
+: 2D 3C AD
+: 7H
+: AH JC
+: 7S
+: 2C KH 3S
+: QH 6S
+: 9S
+: 2S 8C
+: KD
+[END BOARD]
+
+
+Move a card from stack 0 to the foundations
+
+Info: Card moved is JS
+
+
+====================
+
+
+[START BOARD]
+Foundations: JS
+: 4C
+: 5H
+: QC 6C TC
+:
+: 2D 3C AD
+: 7H
+: AH JC
+: 7S
+: 2C KH 3S
+: QH 6S
+: 9S
+: 2S 8C
+: KD
+[END BOARD]
+
+
+Move a card from stack 2 to the foundations
+
+Info: Card moved is TC
+
+
+====================
+
+
+[START BOARD]
+Foundations: TC
+: 4C
+: 5H
+: QC 6C
+:
+: 2D 3C AD
+: 7H
+: AH JC
+: 7S
+: 2C KH 3S
+: QH 6S
+: 9S
+: 2S 8C
+: KD
+[END BOARD]
+
+
+Move a card from stack 10 to the foundations
+
+Info: Card moved is 9S
+
+
+====================
+
+
+[START BOARD]
+Foundations: 9S
+: 4C
+: 5H
+: QC 6C
+:
+: 2D 3C AD
+: 7H
+: AH JC
+: 7S
+: 2C KH 3S
+: QH 6S
+:
+: 2S 8C
+: KD
+[END BOARD]
+
+
+Move a card from stack 11 to the foundations
+
+Info: Card moved is 8C
+
+
+====================
+
+
+[START BOARD]
+Foundations: 8C
+: 4C
+: 5H
+: QC 6C
+:
+: 2D 3C AD
+: 7H
+: AH JC
+: 7S
+: 2C KH 3S
+: QH 6S
+:
+: 2S
+: KD
+[END BOARD]
+
+
+Move a card from stack 7 to the foundations
+
+Info: Card moved is 7S
+
+
+====================
+
+
+[START BOARD]
+Foundations: 7S
+: 4C
+: 5H
+: QC 6C
+:
+: 2D 3C AD
+: 7H
+: AH JC
+:
+: 2C KH 3S
+: QH 6S
+:
+: 2S
+: KD
+[END BOARD]
+
+
+Move a card from stack 9 to the foundations
+
+Info: Card moved is 6S
+
+
+====================
+
+
+[START BOARD]
+Foundations: 6S
+: 4C
+: 5H
+: QC 6C
+:
+: 2D 3C AD
+: 7H
+: AH JC
+:
+: 2C KH 3S
+: QH
+:
+: 2S
+: KD
+[END BOARD]
+
+
+Move a card from stack 5 to the foundations
+
+Info: Card moved is 7H
+
+
+====================
+
+
+[START BOARD]
+Foundations: 7H
+: 4C
+: 5H
+: QC 6C
+:
+: 2D 3C AD
+:
+: AH JC
+:
+: 2C KH 3S
+: QH
+:
+: 2S
+: KD
+[END BOARD]
+
+
+Move a card from stack 2 to the foundations
+
+Info: Card moved is 6C
+
+
+====================
+
+
+[START BOARD]
+Foundations: 6C
+: 4C
+: 5H
+: QC
+:
+: 2D 3C AD
+:
+: AH JC
+:
+: 2C KH 3S
+: QH
+:
+: 2S
+: KD
+[END BOARD]
+
+
+Move a card from stack 1 to the foundations
+
+Info: Card moved is 5H
+
+
+====================
+
+
+[START BOARD]
+Foundations: 5H
+: 4C
+:
+: QC
+:
+: 2D 3C AD
+:
+: AH JC
+:
+: 2C KH 3S
+: QH
+:
+: 2S
+: KD
+[END BOARD]
+
+
+Move a card from stack 0 to the foundations
+
+Info: Card moved is 4C
+
+
+====================
+
+
+[START BOARD]
+Foundations: 4C
+:
+:
+: QC
+:
+: 2D 3C AD
+:
+: AH JC
+:
+: 2C KH 3S
+: QH
+:
+: 2S
+: KD
+[END BOARD]
+
+
+Move a card from stack 8 to the foundations
+
+Info: Card moved is 3S
+
+
+====================
+
+
+[START BOARD]
+Foundations: 3S
+:
+:
+: QC
+:
+: 2D 3C AD
+:
+: AH JC
+:
+: 2C KH
+: QH
+:
+: 2S
+: KD
+[END BOARD]
+
+
+Move a card from stack 11 to the foundations
+
+Info: Card moved is 2S
+
+
+====================
+
+
+[START BOARD]
+Foundations: 2S
+:
+:
+: QC
+:
+: 2D 3C AD
+:
+: AH JC
+:
+: 2C KH
+: QH
+:
+:
+: KD
+[END BOARD]
+
+
+Move a card from stack 4 to the foundations
+
+Info: Card moved is AD
+
+
+====================
+
+
+[START BOARD]
+Foundations: AD
+:
+:
+: QC
+:
+: 2D 3C
+:
+: AH JC
+:
+: 2C KH
+: QH
+:
+:
+: KD
+[END BOARD]
+
+
+Move a card from stack 12 to the foundations
+
+Info: Card moved is KD
+
+
+====================
+
+
+[START BOARD]
+Foundations: KD
+:
+:
+: QC
+:
+: 2D 3C
+:
+: AH JC
+:
+: 2C KH
+: QH
+:
+:
+:
+[END BOARD]
+
+
+Move a card from stack 9 to the foundations
+
+Info: Card moved is QH
+
+
+====================
+
+
+[START BOARD]
+Foundations: QH
+:
+:
+: QC
+:
+: 2D 3C
+:
+: AH JC
+:
+: 2C KH
+:
+:
+:
+:
+[END BOARD]
+
+
+Move a card from stack 6 to the foundations
+
+Info: Card moved is JC
+
+
+====================
+
+
+[START BOARD]
+Foundations: JC
+:
+:
+: QC
+:
+: 2D 3C
+:
+: AH
+:
+: 2C KH
+:
+:
+:
+:
+[END BOARD]
+
+
+Move a card from stack 2 to the foundations
+
+Info: Card moved is QC
+
+
+====================
+
+
+[START BOARD]
+Foundations: QC
+:
+:
+:
+:
+: 2D 3C
+:
+: AH
+:
+: 2C KH
+:
+:
+:
+:
+[END BOARD]
+
+
+Move a card from stack 8 to the foundations
+
+Info: Card moved is KH
+
+
+====================
+
+
+[START BOARD]
+Foundations: KH
+:
+:
+:
+:
+: 2D 3C
+:
+: AH
+:
+: 2C
+:
+:
+:
+:
+[END BOARD]
+
+
+Move a card from stack 6 to the foundations
+
+Info: Card moved is AH
+
+
+====================
+
+
+[START BOARD]
+Foundations: AH
+:
+:
+:
+:
+: 2D 3C
+:
+:
+:
+: 2C
+:
+:
+:
+:
+[END BOARD]
+
+
+Move a card from stack 8 to the foundations
+
+Info: Card moved is 2C
+
+
+====================
+
+
+[START BOARD]
+Foundations: 2C
+:
+:
+:
+:
+: 2D 3C
+:
+:
+:
+:
+:
+:
+:
+:
+[END BOARD]
+
+
+Move a card from stack 4 to the foundations
+
+Info: Card moved is 3C
+
+
+====================
+
+
+[START BOARD]
+Foundations: 3C
+:
+:
+:
+:
+: 2D
+:
+:
+:
+:
+:
+:
+:
+:
+[END BOARD]
+
+
+Move a card from stack 4 to the foundations
+
+Info: Card moved is 2D
+
+
+====================
+
+
+[START BOARD]
+Foundations: 2D
+:
+:
+:
+:
+:
+:
+:
+:
+:
+:
+:
+:
+:
+[END BOARD]
+
+
+
+
+--------------------
+Total number of states checked is 18022.
+This scan generated 18056 states.
