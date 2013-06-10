@@ -22,7 +22,12 @@ if $prune ; then
     args+=" --prune"
 fi
 
+# --sshlogin 4/sh --sshlogin 2/lap \
+# -j4 \
+
+
 seq "${start_idx//,/}" "${end_idx//,/}" | \
-    parallel --ungroup --sshlogin 4/sh --sshlogin 2/lap \
+    parallel --ungroup \
+    -j4 \
     --max-args 16 \
     perl "$(pwd)"/summarize.pl $args {}
