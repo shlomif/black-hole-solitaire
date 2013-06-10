@@ -19,8 +19,9 @@ my $time = time() - $THRESHOLD;
 
 my $start_idx;
 
-if (my $last_line = sum_fh()->[-1])
+if (-e $SUMMARY_FN)
 {
+    my $last_line = `tail -1 "$SUMMARY_FN"`;
     ($start_idx) = $last_line =~ m/\A(\d+)/;
     $start_idx++;
 }
