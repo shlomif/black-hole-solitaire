@@ -13,9 +13,11 @@ $(ARC_TAR): $(DOCS)
 	tar -cvf $@ $(DOCS)
 
 $(BASE)/all_in_a_row_SUMMARY-no-prune.txt $(BASE)/all_in_a_row_SUMMARY-prune.txt : $(BASE)/%: archived_SUMMARIES/% compress-output.pl Makefile
+	mkdir -p $(BASE)
 	perl compress-output.pl < $< > $@
 
 $(BASE)/README.txt $(BASE)/expand.pl: $(BASE)/%: docs/%
+	mkdir -p $(BASE)
 	cp -f $< $@
 
 test: $(ARC_TAR)
