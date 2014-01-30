@@ -1,8 +1,11 @@
 black-hole-solitaire/B
 black-hole-solitaire/BUILD
 black-hole-solitaire/Games-Solitaire-BlackHole-Solver/Build
+black-hole-solitaire/Games-Solitaire-BlackHole-Solver/META.json
+black-hole-solitaire/Games-Solitaire-BlackHole-Solver/META.yml
 black-hole-solitaire/Games-Solitaire-BlackHole-Solver/MYMETA.json
 black-hole-solitaire/Games-Solitaire-BlackHole-Solver/MYMETA.yml
+black-hole-solitaire/Games-Solitaire-BlackHole-Solver/Makefile.PL
 black-hole-solitaire/Games-Solitaire-BlackHole-Solver/_build
 black-hole-solitaire/Games-Solitaire-BlackHole-Solver/blib
 black-hole-solitaire/Games-Solitaire-BlackHole-Solver/bliba
