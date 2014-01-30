@@ -36,7 +36,7 @@ And then from the command-line:
 A script that encapsulates this application accepts a filename pointing
 at the file containing the board or C<"-"> for specifying the standard input.
 
-A board looks like this and can be generated for PySol using the 
+A board looks like this and can be generated for PySol using the
 make_pysol_board.py in the contrib/ .
 
     Foundations: AS

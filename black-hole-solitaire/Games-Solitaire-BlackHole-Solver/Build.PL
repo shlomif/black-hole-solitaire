@@ -46,7 +46,7 @@ my $builder = Test::Run::Builder->new(
             "solver",
             "solving",
         ],
-    },    
+    },
 );
 
 $builder->create_build_script();

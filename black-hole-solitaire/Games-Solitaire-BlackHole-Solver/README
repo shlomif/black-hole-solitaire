@@ -1,6 +1,6 @@
 Games-Solitaire-BlackHole-Solver
 
-This is a solver for the Solitaire "Black Hole", implemented in Perl as a 
+This is a solver for the Solitaire "Black Hole", implemented in Perl as a
 command line application. See:
 
 http://pysolfc.sourceforge.net/doc/rules/blackhole.html

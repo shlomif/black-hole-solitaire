@@ -1,6 +1,8 @@
 Revision history for Games-Solitaire-BlackHole-Solver
 
+0.0.2   2014-01-30
         - Add the LICENSE file (CPANTS Kwalitee).
+        - Add t/cpan-changes.t and t/style-trailing-space.t .
 
-0.0.1   Mon Jan 11 17:53:01 IST 2010
+0.0.1   2010-01-11
         First version, with rudimentary features but is working.
