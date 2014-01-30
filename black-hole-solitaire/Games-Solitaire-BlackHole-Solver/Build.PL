@@ -18,6 +18,7 @@ my $builder = Test::Run::Builder->new(
         'warnings' => 0,
         'Getopt::Long' => 0,
         'Pod::Usage' => 0,
+        'perl' => '5.008',
     },
     build_requires => {
         'Test::More' => 0,
