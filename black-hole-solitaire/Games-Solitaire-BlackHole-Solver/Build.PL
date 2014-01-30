@@ -9,7 +9,10 @@ my $builder = Test::Run::Builder->new(
     module_name         => 'Games::Solitaire::BlackHole::Solver',
     license             => 'mit',
     dist_author         => q{Shlomi Fish <shlomif@iglu.org.il>},
-    dist_version_from   => 'lib/Games/Solitaire/BlackHole/Solver.pm',
+    dist_version_from    => 'lib/Games/Solitaire/BlackHole/Solver.pm',
+    configure_requires => {
+        'Module::Build' => '0.36',
+    },
     requires => {
         'strict' => 0,
         'warnings' => 0,
