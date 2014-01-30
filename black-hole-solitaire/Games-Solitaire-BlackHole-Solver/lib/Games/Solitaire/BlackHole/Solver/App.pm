@@ -3,6 +3,8 @@ package Games::Solitaire::BlackHole::Solver::App;
 use strict;
 use warnings;
 
+use 5.008;
+
 use Getopt::Long;
 use Pod::Usage;
 
