@@ -179,6 +179,9 @@ if ($state_storage_libavl2_tree)
 # This cache is sometimes causing problems.
 unlink("CMakeCache.txt");
 
+# Removed:
+# ($test_suite ? ("-DFCS_WITH_TEST_SUITE=1") : ()),
+
 my @cmd= ("cmake",
     "-DCMAKE_BUILD_TYPE=$build_type",
     "-DBHS_STATE_STORAGE=BHS_STATE_STORAGE_$state_storage",
@@ -186,7 +189,6 @@ my @cmd= ("cmake",
     "-DDATADIR=$prefix/share",
     ((!$build_static_lib) ? ("-DBUILD_STATIC_LIBRARY=") : ()),
     (defined($pack_size) ? ("-DFCS_IA_PACK_SIZE=$pack_size") : ()),
-    ($test_suite ? ("-DFCS_WITH_TEST_SUITE=1") : ()),
     (defined($cpu_arch) ? ("-DCPU_ARCH=$cpu_arch") : ()),
     ($omit_frame ? "-DOPTIMIZATION_OMIT_FRAME_POINTER=1" : ()),
     ($state_storage_libavl2_tree

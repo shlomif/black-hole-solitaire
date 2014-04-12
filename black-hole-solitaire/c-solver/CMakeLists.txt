@@ -261,14 +261,16 @@ ADD_CUSTOM_COMMAND(
     ARGS "config.h.in"
 )
 
-ADD_CUSTOM_TARGET(
-    "test"
-    "perl" "${CMAKE_CURRENT_SOURCE_DIR}/run-tests.pl"
+ENABLE_TESTING()
+
+ADD_TEST(
+    NAME perl_run_tests
+    COMMAND "perl" "${CMAKE_CURRENT_SOURCE_DIR}/run-tests.pl"
 )
 
-ADD_DEPENDENCIES(
-    "test"
-    "all"
+ADD_CUSTOM_TARGET(
+    "check"
+    "perl" "${CMAKE_CURRENT_SOURCE_DIR}/run-tests.pl"
 )
 
 INCLUDE(CPack)
