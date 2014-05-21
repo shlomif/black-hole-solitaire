@@ -1,5 +1,5 @@
-0.10.0      ( 21 May 2014):
-===========================
+0.10.0      ( 21 May 2014 ):
+============================
 
 * Add the API function black_hole_solver_set_iters_display_step
 
@@ -7,8 +7,8 @@
 
 * Fixed for CMake-3.0.0.
 
-0.8.0       ( 03 Jun 2013):
-===========================
+0.8.0       ( 03 Jun 2013 ):
+============================
 
 * Add the --rank-reach-prune option and
 black_hole_solver_enable_rank_reachability_prune().
@@ -17,21 +17,21 @@ black_hole_solver_enable_rank_reachability_prune().
 
 * Add the --version flag.
 
-0.6.0       ( 16 May 2013):
-===========================
+0.6.0       ( 16 May 2013 ):
+============================
 
 * Add the --display-boards flag.
 
 * Add the --help flag.
 
-0.4.0       ( 12 May 2013):
-===========================
+0.4.0       ( 12 May 2013 ):
+============================
 
 * Add support for All in a Row Solitaire in addition to Black Hole
 Solitaire.
 
-0.2.0       ( 22 Sep 2010):
-===========================
+0.2.0       ( 22 Sep 2010 ):
+============================
 
 * Translate to C.
 
