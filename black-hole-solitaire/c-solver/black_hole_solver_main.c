@@ -74,12 +74,13 @@ static void out_board(
 static const char const * help_text =
 "black-hole-solve --game {all_in_a_row|black_hole} [more options] [/path/to/board_layout.txt]\n"
 "\n"
-"--help                      displays this help.\n"
-"--max-iters [iter_count]    limit the iterations.\n"
-"--game all_in_a_row         solve All in a Row games.\n"
-"--game black_hole           solve Black Hole games.\n"
-"--displays-boards           display the layout of the board at every step.\n"
-"--rank-reach-prune          Enable the Rank Reachability Prune.\n"
+"--help                        displays this help.\n"
+"--max-iters [iter_count]      limit the iterations.\n"
+"--game all_in_a_row           solve All in a Row games.\n"
+"--game black_hole             solve Black Hole games.\n"
+"--displays-boards             display the layout of the board at every step.\n"
+"--rank-reach-prune            enable the Rank Reachability Prune.\n"
+"--iters-display-step [step]   Display a trace every certain step.\n"
 "\n"
     ;
 
