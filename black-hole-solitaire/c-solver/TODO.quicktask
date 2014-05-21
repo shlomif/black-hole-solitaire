@@ -1,6 +1,8 @@
 # Quicktask v1.2
 
 CURRENT TASKS:
+  - Add the [--iters-update-step N] flag to display a progress trace.
+    @ Added [Wed 2014-05-21]
   - Make sure that failed malloc() / realloc() / etc. are handled gracefully.
     @ Added [Sun 2013-05-12]
 COMPLETED TASKS:
