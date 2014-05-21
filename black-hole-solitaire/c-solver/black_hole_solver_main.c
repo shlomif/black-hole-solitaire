@@ -74,12 +74,13 @@ static void out_board(
 static const char const * help_text =
 "black-hole-solve --game {all_in_a_row|black_hole} [more options] [/path/to/board_layout.txt]\n"
 "\n"
-"--help                      displays this help.\n"
-"--max-iters [iter_count]    limit the iterations.\n"
-"--game all_in_a_row         solve All in a Row games.\n"
-"--game black_hole           solve Black Hole games.\n"
-"--displays-boards           display the layout of the board at every step.\n"
-"--rank-reach-prune          Enable the Rank Reachability Prune.\n"
+"--help                        displays this help.\n"
+"--max-iters [iter_count]      limit the iterations.\n"
+"--game all_in_a_row           solve All in a Row games.\n"
+"--game black_hole             solve Black Hole games.\n"
+"--displays-boards             display the layout of the board at every step.\n"
+"--rank-reach-prune            enable the Rank Reachability Prune.\n"
+"--iters-display-step [step]   Display a trace every certain step.\n"
 "\n"
     ;
 
@@ -93,6 +94,7 @@ int main(int argc, char * argv[])
     FILE * fh;
     int arg_idx;
     long max_iters_limit = -1;
+    long iters_display_step = 0;
     enum GAME_TYPE game_type = GAME__UNKNOWN;
     fcs_bool_t display_boards = FALSE;
     fcs_bool_t is_rank_reachability_prune_enabled = FALSE;
@@ -157,6 +159,22 @@ int main(int argc, char * argv[])
             arg_idx++;
             is_rank_reachability_prune_enabled = TRUE;
         }
+        else if (!strcmp(argv[arg_idx], "--iters-display-step"))
+        {
+            arg_idx++;
+            if (argc == arg_idx)
+            {
+                fprintf(stderr, "Error! --iters-display-step requires an arguments.\n");
+                exit(-1);
+            }
+            iters_display_step = atol(argv[arg_idx++]);
+
+            if (iters_display_step < 0)
+            {
+                fprintf(stderr, "Error! --iters-display-step should be positive or zero.\n");
+                exit(-1);
+            }
+        }
         else
         {
             break;
@@ -176,6 +194,7 @@ int main(int argc, char * argv[])
     }
 
     black_hole_solver_set_max_iters_limit(solver, max_iters_limit);
+    black_hole_solver_set_iters_display_step(solver, iters_display_step);
     black_hole_solver_enable_rank_reachability_prune(
         solver,
         is_rank_reachability_prune_enabled
