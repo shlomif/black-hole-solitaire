@@ -124,6 +124,7 @@ typedef struct
     int num_states_in_solution, current_state_in_solution_idx;
 
     long iterations_num, num_states_in_collection, max_iters_limit;
+    long iters_display_step;
 
     int num_columns;
     int bits_per_column;
@@ -155,6 +156,8 @@ int DLLEXPORT black_hole_solver_create(
         ret->num_states_in_collection = 0;
         ret->max_iters_limit = -1;
         ret->is_rank_reachability_prune_enabled = FALSE;
+        ret->iters_display_step = 0;
+        ret->num_columns = 0;
 
         bh_solve_hash_init(&(ret->positions));
 
@@ -321,6 +324,11 @@ extern int DLLEXPORT black_hole_solver_read_board(
     int ret_code, col_idx;
     int line_num = 1;
 
+    if (num_columns > BHS__MAX_NUM_COLUMNS)
+    {
+        return BLACK_HOLE_SOLVER__INVALID_INPUT;
+    }
+
     solver = (bhs_solver_t *)instance_proto;
 
     solver->num_columns = num_columns;
@@ -446,6 +454,21 @@ DLLEXPORT extern int black_hole_solver_set_max_iters_limit(
     return BLACK_HOLE_SOLVER__SUCCESS;
 }
 
+DLLEXPORT extern int black_hole_solver_set_iters_display_step(
+    black_hole_solver_instance_t * const instance_proto,
+    const long iters_display_step
+)
+{
+    if (iters_display_step < 0)
+    {
+        return BLACK_HOLE_SOLVER__INVALID_INPUT;
+    }
+    bhs_solver_t * const solver = (bhs_solver_t *)instance_proto;
+    solver->iters_display_step = iters_display_step;
+
+    return BLACK_HOLE_SOLVER__SUCCESS;
+}
+
 static GCC_INLINE void queue_item_populate_packed(
     bhs_solver_t * solver,
     bhs_queue_item_t * queue_item
@@ -558,6 +581,8 @@ extern int DLLEXPORT black_hole_solver_run(
     bhs_rank_t card;
     long iterations_num;
     long max_iters_limit;
+    long iters_display_step;
+    long next_iterations_display_point;
     int num_columns;
     int i;
 
@@ -568,6 +593,16 @@ extern int DLLEXPORT black_hole_solver_run(
     init_state = &(solver->init_state);
 
     max_iters_limit = solver->max_iters_limit;
+    iters_display_step = solver->iters_display_step;
+
+    if (iters_display_step > 0)
+    {
+        next_iterations_display_point = iters_display_step;
+    }
+    else
+    {
+        next_iterations_display_point = LONG_MAX;
+    }
 
     if (max_iters_limit < 0)
     {
@@ -692,6 +727,13 @@ extern int DLLEXPORT black_hole_solver_run(
 
                 return BLACK_HOLE_SOLVER__OUT_OF_ITERS;
             }
+        }
+
+        if (iterations_num == next_iterations_display_point)
+        {
+            printf("Iteration: %ld\n", iterations_num);
+            fflush(stdout);
+            next_iterations_display_point += iters_display_step;
         }
     }
 
