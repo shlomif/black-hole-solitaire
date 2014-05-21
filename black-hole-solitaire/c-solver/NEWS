@@ -1,3 +1,12 @@
+0.10.0      ( 21 May 2014):
+===========================
+
+* Add the API function black_hole_solver_set_iters_display_step
+
+* Add the --iters-display-step command line flag.
+
+* Fixed for CMake-3.0.0.
+
 0.8.0       ( 03 Jun 2013):
 ===========================
 
