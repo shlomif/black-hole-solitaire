@@ -444,14 +444,11 @@ extern int DLLEXPORT black_hole_solver_read_board(
 
 
 DLLEXPORT extern int black_hole_solver_set_max_iters_limit(
-    black_hole_solver_instance_t * instance_proto,
-    long limit
+    black_hole_solver_instance_t * const instance_proto,
+    const long limit
 )
 {
-    bhs_solver_t * solver;
-
-    solver = (bhs_solver_t *)instance_proto;
-    solver->max_iters_limit = limit;
+    ((bhs_solver_t * const)instance_proto)->max_iters_limit = limit;
 
     return BLACK_HOLE_SOLVER__SUCCESS;
 }
