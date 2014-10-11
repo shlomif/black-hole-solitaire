@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 12;
+use Test::More tests => 14;
 use Test::Differences;
 
 use File::Spec;
@@ -1233,21 +1233,37 @@ EOF
 # TEST
 eq_or_diff ($trap->stdout(), $expected_output, "Right output for iterations step.");
 
-trap
-{
-    system('./black-hole-solve',
+# TEST:$c=2;
+foreach my $command (
+    [
+        './black-hole-solve',
         '--game', 'black_hole',
         '--iters-display-step', '1100',
         File::Spec->catfile(
             $bin_dir, "data", "26464608654870335080.bh.board.txt"
         )
-    );
-};
+    ],
+    [
+        './black-hole-solve-resume-api',
+        '--game', 'black_hole',
+        '--iters-display-step', '1100',
+        File::Spec->catfile(
+            $bin_dir, "data", "26464608654870335080.bh.board.txt"
+        )
+    ],
+)
+{
 
-# TEST
-ok (! ($trap->exit), "iters-display-step second step: running the program successfully.");
 
-$expected_output = <<'EOF';
+    trap
+    {
+        system( @$command);
+    };
+
+    # TEST*$c
+    ok (! ($trap->exit), "iters-display-step second step: running the program successfully.");
+
+    $expected_output = <<'EOF';
 Iteration: 1100
 Iteration: 2200
 Iteration: 3300
@@ -1620,5 +1636,7 @@ Total number of states checked is 8636.
 This scan generated 8672 states.
 EOF
 
-# TEST
-eq_or_diff ($trap->stdout(), $expected_output, "Right output for iterations step on a second step.");
+    # TEST*$c
+    eq_or_diff ($trap->stdout(), $expected_output, "Right output for iterations step on a second step.");
+
+}
