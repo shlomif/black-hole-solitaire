@@ -289,4 +289,8 @@ ADD_CUSTOM_TARGET(
     "perl" "${CMAKE_CURRENT_SOURCE_DIR}/run-tests.pl"
 )
 
+SUBDIRS(
+    "man"
+)
+
 INCLUDE(CPack)
