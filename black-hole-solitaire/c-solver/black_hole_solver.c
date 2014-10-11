@@ -836,10 +836,10 @@ static void initialize_states_in_solution(bhs_solver_t * solver)
 }
 
 DLLEXPORT extern int black_hole_solver_get_next_move(
-    black_hole_solver_instance_t * instance_proto,
-    int * col_idx_ptr,
-    int * card_rank_ptr,
-    int * card_suit_ptr /*  H=0, C=1, D=2, S=3 */
+    black_hole_solver_instance_t * const instance_proto,
+    int * const col_idx_ptr,
+    int * const card_rank_ptr,
+    int * const card_suit_ptr /*  H=0, C=1, D=2, S=3 */
 )
 {
     bhs_solver_t * const solver = (bhs_solver_t *)instance_proto;
