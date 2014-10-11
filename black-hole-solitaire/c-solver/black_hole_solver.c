@@ -720,9 +720,6 @@ extern int DLLEXPORT black_hole_solver_run(
 
             solver->iterations_num = iterations_num;
 
-            free(solver->queue);
-            solver->queue = NULL;
-
             return BLACK_HOLE_SOLVER__SUCCESS;
         }
         else
@@ -730,9 +727,6 @@ extern int DLLEXPORT black_hole_solver_run(
             if (iterations_num == max_iters_limit)
             {
                 solver->iterations_num = iterations_num;
-
-                free(solver->queue);
-                solver->queue = NULL;
 
                 return BLACK_HOLE_SOLVER__OUT_OF_ITERS;
             }
@@ -747,9 +741,6 @@ extern int DLLEXPORT black_hole_solver_run(
     }
 
     solver->iterations_num = iterations_num;
-
-    free(solver->queue);
-    solver->queue = NULL;
 
     return BLACK_HOLE_SOLVER__NOT_SOLVABLE;
 }
@@ -769,6 +760,9 @@ extern int DLLEXPORT black_hole_solver_free(
         free(solver->states_in_solution);
         solver->states_in_solution = NULL;
     }
+
+    free(solver->queue);
+    solver->queue = NULL;
 
     free(solver);
 
