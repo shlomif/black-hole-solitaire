@@ -570,11 +570,9 @@ extern int DLLEXPORT black_hole_solver_run(
     black_hole_solver_instance_t * ret_instance
 )
 {
-    bhs_unpacked_state_t state;
-
     bhs_queue_item_t * new_queue_item, queue_item_copy;
     int foundations;
-    int col_idx, pos;
+    int pos;
     bhs_rank_t card;
     long iterations_num;
     long max_iters_limit;
@@ -627,7 +625,7 @@ extern int DLLEXPORT black_hole_solver_run(
     memset( &(new_queue_item->rank_counts), '\0',
         sizeof(new_queue_item->rank_counts));
 
-    for (col_idx = 0 ; col_idx < num_columns ; col_idx++)
+    for (int col_idx = 0 ; col_idx < num_columns ; col_idx++)
     {
         int h;
 
@@ -658,7 +656,8 @@ extern int DLLEXPORT black_hole_solver_run(
     {
         solver->queue_len--;
         queue_item_copy = solver->queue[solver->queue_len];
-        state = queue_item_copy.s.unpacked;
+        const typeof(queue_item_copy.s.unpacked) state
+            = queue_item_copy.s.unpacked;
         foundations = state.foundations;
 
         if (is_rank_reachability_prune_enabled)
@@ -678,7 +677,7 @@ extern int DLLEXPORT black_hole_solver_run(
 
         fcs_bool_t no_cards = TRUE;
 
-        for (col_idx = 0 ; col_idx < num_columns ; col_idx++)
+        for (int col_idx = 0 ; col_idx < num_columns ; col_idx++)
         {
             if ( (pos = state.heights[col_idx]) )
             {
