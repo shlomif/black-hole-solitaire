@@ -651,7 +651,7 @@ extern int DLLEXPORT black_hole_solver_run(
         = solver->is_rank_reachability_prune_enabled
         ;
 
-    typeof(solver->iterations_num) iterations_num = 0;
+    typeof(solver->iterations_num) iterations_num = solver->iterations_num;
 
     long next_iterations_display_point =
     (
