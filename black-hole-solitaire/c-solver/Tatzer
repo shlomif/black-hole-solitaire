@@ -71,7 +71,7 @@ foreach my $rec (
     $themes{$id.'t'} = ['-l', $id.'bb', '--rwd', '--dbm=kaztree', '--test-suite',];
 
     # For use by PySolFC
-    $themes{$id . "_pysol"} = ['-l', $id.'bb', '--num-stacks=14', "--prefix=$ENV{HOME}/apps/fcs-for-pysol",];
+    $themes{$id . "_pysol"} = ['-l', $id.'bb', "--prefix=$ENV{HOME}/apps/fcs-for-pysol",];
 }
 
 my @new_argv = @ARGV;
