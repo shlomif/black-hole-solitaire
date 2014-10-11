@@ -524,9 +524,9 @@ static GCC_INLINE void perform_move(
     const bhs_queue_item_t * const queue_item_copy_ptr
 )
 {
-    bhs_unpacked_state_t next_state;
+    bhs_unpacked_state_t next_state
+        = queue_item_copy_ptr->s.unpacked;
 
-    next_state = queue_item_copy_ptr->s.unpacked;
     next_state.foundations = card;
     next_state.heights[col_idx]--;
 
