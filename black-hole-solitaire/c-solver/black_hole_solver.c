@@ -519,9 +519,9 @@ static GCC_INLINE void queue_item_unpack(
 
 static GCC_INLINE void perform_move(
     bhs_solver_t * solver,
-    bhs_rank_t card,
-    int col_idx,
-    bhs_queue_item_t * queue_item_copy_ptr
+    const bhs_rank_t card,
+    const int col_idx,
+    const bhs_queue_item_t * const queue_item_copy_ptr
 )
 {
     bhs_unpacked_state_t next_state;
@@ -575,7 +575,7 @@ extern int DLLEXPORT black_hole_solver_run(
     black_hole_solver_instance_t * ret_instance
 )
 {
-    bhs_queue_item_t * new_queue_item, queue_item_copy;
+    bhs_queue_item_t * new_queue_item;
     bhs_solver_t * const solver = (bhs_solver_t *)ret_instance;
 
     typeof(solver->num_columns) num_columns = solver->num_columns;
@@ -649,7 +649,8 @@ extern int DLLEXPORT black_hole_solver_run(
     while (solver->queue_len > 0)
     {
         solver->queue_len--;
-        queue_item_copy = solver->queue[solver->queue_len];
+        const typeof(solver->queue[solver->queue_len]) queue_item_copy
+            = solver->queue[solver->queue_len];
         const typeof(queue_item_copy.s.unpacked) state
             = queue_item_copy.s.unpacked;
         const typeof(state.foundations) foundations = state.foundations;
