@@ -566,39 +566,26 @@ static GCC_INLINE void perform_move(
     }
 }
 
+static GCC_INLINE long maxify(long n)
+{
+    return ((n < 0) ? LONG_MAX : n);
+}
+
 extern int DLLEXPORT black_hole_solver_run(
     black_hole_solver_instance_t * ret_instance
 )
 {
     bhs_queue_item_t * new_queue_item, queue_item_copy;
-    bhs_rank_t card;
-    long iterations_num;
-    long max_iters_limit;
-    long iters_display_step;
-    long next_iterations_display_point;
-
     bhs_solver_t * const solver = (bhs_solver_t *)ret_instance;
 
     typeof(solver->num_columns) num_columns = solver->num_columns;
 
     bhs_state_key_value_pair_t * const init_state = &(solver->init_state);
 
-    max_iters_limit = solver->max_iters_limit;
-    iters_display_step = solver->iters_display_step;
-
-    if (iters_display_step > 0)
-    {
-        next_iterations_display_point = iters_display_step;
-    }
-    else
-    {
-        next_iterations_display_point = LONG_MAX;
-    }
-
-    if (max_iters_limit < 0)
-    {
-        max_iters_limit = LONG_MAX;
-    }
+    const typeof(solver->max_iters_limit) max_iters_limit
+        = maxify( solver->max_iters_limit );
+    const typeof(solver->iters_display_step) iters_display_step
+        = solver->iters_display_step;
 
     solver->queue_max_len = 64;
 
@@ -639,7 +626,7 @@ extern int DLLEXPORT black_hole_solver_run(
     solver->queue_len++;
 
     solver->num_states_in_collection = 0;
-    iterations_num = 0;
+    typeof(solver->iterations_num) iterations_num = 0;
 
     bh_solve_hash_insert(
         &(solver->positions),
@@ -649,6 +636,12 @@ extern int DLLEXPORT black_hole_solver_run(
     solver->num_states_in_collection++;
 
     fcs_bool_t is_rank_reachability_prune_enabled = solver->is_rank_reachability_prune_enabled;
+
+    long next_iterations_display_point =
+    (
+        (iters_display_step <= 0) ? LONG_MAX :
+        (iterations_num + iters_display_step - (iterations_num % iters_display_step))
+    );
 
     while (solver->queue_len > 0)
     {
@@ -681,7 +674,8 @@ extern int DLLEXPORT black_hole_solver_run(
             if ( pos )
             {
                 no_cards = FALSE;
-                card = solver->board_values[col_idx][pos-1];
+                const typeof(solver->board_values[col_idx][pos-1]) card =
+                    solver->board_values[col_idx][pos-1];
 
                 if ( (foundations == -1)
                         ||
