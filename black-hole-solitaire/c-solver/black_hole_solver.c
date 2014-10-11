@@ -570,27 +570,22 @@ extern int DLLEXPORT black_hole_solver_run(
     black_hole_solver_instance_t * ret_instance
 )
 {
-    bhs_solver_t * solver;
-    bhs_state_key_value_pair_t * init_state;
     bhs_unpacked_state_t state;
 
     bhs_queue_item_t * new_queue_item, queue_item_copy;
     int foundations;
-    fcs_bool_t no_cards;
     int col_idx, pos;
     bhs_rank_t card;
     long iterations_num;
     long max_iters_limit;
     long iters_display_step;
     long next_iterations_display_point;
-    int num_columns;
-    int i;
 
-    solver = (bhs_solver_t *)ret_instance;
+    bhs_solver_t * const solver = (bhs_solver_t *)ret_instance;
 
-    num_columns = solver->num_columns;
+    typeof(solver->num_columns) num_columns = solver->num_columns;
 
-    init_state = &(solver->init_state);
+    bhs_state_key_value_pair_t * const init_state = &(solver->init_state);
 
     max_iters_limit = solver->max_iters_limit;
     iters_display_step = solver->iters_display_step;
@@ -618,7 +613,7 @@ extern int DLLEXPORT black_hole_solver_run(
     new_queue_item = &(solver->queue[solver->queue_len]);
 
     /* Populate the unpacked state. */
-    for (i = 0 ; i < num_columns ; i++)
+    for (int i = 0 ; i < num_columns ; i++)
     {
         new_queue_item->s.unpacked.heights[i] = solver->initial_lens[i];
     }
@@ -681,7 +676,7 @@ extern int DLLEXPORT black_hole_solver_run(
         iterations_num++;
 
 
-        no_cards = TRUE;
+        fcs_bool_t no_cards = TRUE;
 
         for (col_idx = 0 ; col_idx < num_columns ; col_idx++)
         {
