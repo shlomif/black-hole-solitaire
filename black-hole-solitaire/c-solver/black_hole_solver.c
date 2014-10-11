@@ -731,14 +731,11 @@ extern int DLLEXPORT black_hole_solver_run(
 
             return BLACK_HOLE_SOLVER__SUCCESS;
         }
-        else
+        else if (iterations_num == max_iters_limit)
         {
-            if (iterations_num == max_iters_limit)
-            {
-                solver->iterations_num = iterations_num;
+            solver->iterations_num = iterations_num;
 
-                return BLACK_HOLE_SOLVER__OUT_OF_ITERS;
-            }
+            return BLACK_HOLE_SOLVER__OUT_OF_ITERS;
         }
 
         if (iterations_num == next_iterations_display_point)
