@@ -758,22 +758,20 @@ extern int DLLEXPORT black_hole_solver_free(
     black_hole_solver_instance_t * instance_proto
 )
 {
-    bhs_solver_t * solver;
+    bhs_solver_t * const solver = (bhs_solver_t *)instance_proto;
 
-    solver = (bhs_solver_t *)instance_proto;
-
-    bh_solve_hash_free(&(solver->positions));
+    bh_solve_hash_free( &(solver->positions) );
 
     if (solver->states_in_solution)
     {
-        free(solver->states_in_solution);
+        free (solver->states_in_solution);
         solver->states_in_solution = NULL;
     }
 
-    free(solver->queue);
+    free (solver->queue);
     solver->queue = NULL;
 
-    free(solver);
+    free (solver);
 
     return BLACK_HOLE_SOLVER__SUCCESS;
 }
@@ -784,16 +782,10 @@ static void initialize_states_in_solution(bhs_solver_t * solver)
 {
     if (! solver->states_in_solution)
     {
-        bhs_solution_state_t * states;
-        bhs_state_key_value_pair_t * key_ptr;
-        bhs_solution_state_t temp_state;
+        int num_states = 0;
+        int max_num_states = NUM_SUITS * NUM_RANKS + 1;
 
-        int i, num_states, max_num_states;
-
-        num_states = 0;
-        max_num_states = NUM_SUITS * NUM_RANKS + 1;
-
-        states = malloc(sizeof(states[0]) * max_num_states);
+        bhs_solution_state_t * states = malloc(sizeof(states[0]) * max_num_states);
 
         states[num_states].packed = (solver->final_state);
         queue_item_unpack(solver, &states[num_states]);
@@ -813,22 +805,24 @@ static void initialize_states_in_solution(bhs_solver_t * solver)
                     );
             }
 
-            key_ptr = (bhs_state_key_value_pair_t *)&(states[num_states].packed.value.parent_state);
             /* Look up the next state in the positions associative array. */
             bh_solve_hash_get(
                 &(solver->positions),
-                key_ptr,
-                &(states[++num_states].packed)
+                (
+                    (bhs_state_key_value_pair_t *)
+                    &(states[num_states].packed.value.parent_state)
+                ),
+                &(states[num_states+1].packed)
             );
-            queue_item_unpack(solver, &states[num_states]);
+            queue_item_unpack(solver, &states[++num_states]);
         }
 
         num_states++;
 
         /* Reverse the list in place. */
-        for (i = 0 ; i < (num_states >> 1) ; i++)
+        for (int i = 0 ; i < (num_states >> 1) ; i++)
         {
-            temp_state = states[i];
+            const typeof(states[i]) temp_state = states[i];
             states[i] = states[num_states-1-i];
             states[num_states-1-i] = temp_state;
         }
