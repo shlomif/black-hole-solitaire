@@ -269,6 +269,11 @@ CONFIGURE_FILE(
     ${CMAKE_CURRENT_BINARY_DIR}/config.h
     )
 
+CONFIGURE_FILE(
+    ${CMAKE_CURRENT_SOURCE_DIR}/${CPACK_PACKAGE_NAME}.spec.in
+    ${CMAKE_CURRENT_SOURCE_DIR}/${CPACK_PACKAGE_NAME}.spec
+    )
+
 # Rebuild config.h if ver.txt has changed.
 ADD_CUSTOM_COMMAND(
     OUTPUT "config.h.in"
