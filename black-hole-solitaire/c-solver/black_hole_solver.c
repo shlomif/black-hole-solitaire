@@ -842,10 +842,7 @@ DLLEXPORT extern int black_hole_solver_get_next_move(
     int * card_suit_ptr /*  H=0, C=1, D=2, S=3 */
 )
 {
-    bhs_solver_t * solver;
-
-    solver = (bhs_solver_t *)instance_proto;
-
+    bhs_solver_t * const solver = (bhs_solver_t *)instance_proto;
 
     initialize_states_in_solution(solver);
 
@@ -856,12 +853,12 @@ DLLEXPORT extern int black_hole_solver_get_next_move(
     }
 
     {
-        bhs_solution_state_t next_state = solver->states_in_solution[
+        const bhs_solution_state_t next_state = solver->states_in_solution[
             ++solver->current_state_in_solution_idx
             ];
 
-        int col_idx = next_state.packed.value.col_idx;
-        int height = next_state.unpacked.heights[col_idx];
+        const int col_idx = next_state.packed.value.col_idx;
+        const int height = next_state.unpacked.heights[col_idx];
 
         *col_idx_ptr = col_idx;
         solver->sol_foundations_card_rank = *card_rank_ptr
