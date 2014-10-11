@@ -894,17 +894,13 @@ DLLEXPORT extern int black_hole_solver_get_current_solution_board(
     char * * ptr_to_ret
 )
 {
-    bhs_solver_t * solver;
-
-    solver = (bhs_solver_t *)instance_proto;
+    bhs_solver_t * const solver = (bhs_solver_t *)instance_proto;
 
     initialize_states_in_solution(solver);
 
     *ptr_to_ret = NULL;
 
-    char * ret, * s;
-
-    ret = malloc(
+    char * const ret = malloc(
         /* 3 bytes per card. */
         (3 * NUM_SUITS * NUM_RANKS)
             +
@@ -920,7 +916,7 @@ DLLEXPORT extern int black_hole_solver_get_current_solution_board(
         return BLACK_HOLE_SOLVER__OUT_OF_MEMORY;
     }
 
-    s = ret;
+    char * s = ret;
 
     s += sprintf(s, "Foundations: ");
 
@@ -941,13 +937,11 @@ DLLEXPORT extern int black_hole_solver_get_current_solution_board(
         solver->current_state_in_solution_idx
     ];
 
-    int num_columns = solver->num_columns;
-    int col_idx;
-    for (col_idx = 0; col_idx < num_columns; col_idx++)
+    const typeof(solver->num_columns) num_columns = solver->num_columns;
+    for (int col_idx = 0; col_idx < num_columns; col_idx++)
     {
         s += sprintf(s, "%c", ':');
-        int h;
-        for (h = 0; h < next_state.unpacked.heights[col_idx]; h++)
+        for (int h = 0; h < next_state.unpacked.heights[col_idx]; h++)
         {
             s += sprintf(s, " %s",
                 solver->initial_board_card_strings[col_idx][h]
