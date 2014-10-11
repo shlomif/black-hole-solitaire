@@ -133,6 +133,7 @@ typedef struct
     int queue_len, queue_max_len;
     int sol_foundations_card_rank, sol_foundations_card_suit;
     fcs_bool_t is_rank_reachability_prune_enabled;
+    fcs_bool_t require_initialization;
 } bhs_solver_t;
 
 int DLLEXPORT black_hole_solver_create(
@@ -151,6 +152,7 @@ int DLLEXPORT black_hole_solver_create(
     }
     else
     {
+        ret->require_initialization = TRUE;
         ret->states_in_solution = NULL;
         ret->iterations_num = 0;
         ret->num_states_in_collection = 0;
@@ -637,7 +639,11 @@ extern int DLLEXPORT black_hole_solver_run(
 {
     bhs_solver_t * const solver = (bhs_solver_t *)ret_instance;
 
-    setup_init_state(solver);
+    if (solver->require_initialization)
+    {
+        setup_init_state(solver);
+        solver->require_initialization = FALSE;
+    }
 
     const typeof(solver->num_columns) num_columns = solver->num_columns;
 
@@ -681,7 +687,6 @@ extern int DLLEXPORT black_hole_solver_run(
         }
 
         iterations_num++;
-
 
         fcs_bool_t no_cards = TRUE;
 
