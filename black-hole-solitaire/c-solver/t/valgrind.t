@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 3;
+use Test::More tests => 4;
 use Carp;
 use Data::Dumper;
 use String::ShellQuote;
@@ -102,6 +102,21 @@ test_using_valgrind(
     qq{valgrind --display-boards --rank-reach-prune black_hole deal.}
 );
 
+# TEST
+test_using_valgrind(
+    {
+        prog => './black-hole-solve-resume-api',
+        argv =>
+        [
+            '--game', 'black_hole',
+            '--iters-display-step', '1100',
+            File::Spec->catfile(
+                $bin_dir, "data", "26464608654870335080.bh.board.txt"
+            )
+        ],
+    },
+    qq{valgrind --iters-display-step resume api},
+);
 =head1 COPYRIGHT AND LICENSE
 
 Copyright (c) 2009 Shlomi Fish
