@@ -633,17 +633,26 @@ static GCC_INLINE void setup_init_state(
     return;
 }
 
+static GCC_INLINE void setup_once(
+    bhs_solver_t * const solver
+)
+{
+    if (solver->require_initialization)
+    {
+        setup_init_state(solver);
+        solver->require_initialization = FALSE;
+    }
+
+    return;
+}
+
 extern int DLLEXPORT black_hole_solver_run(
     black_hole_solver_instance_t * ret_instance
 )
 {
     bhs_solver_t * const solver = (bhs_solver_t *)ret_instance;
 
-    if (solver->require_initialization)
-    {
-        setup_init_state(solver);
-        solver->require_initialization = FALSE;
-    }
+    setup_once(solver);
 
     const typeof(solver->num_columns) num_columns = solver->num_columns;
 
