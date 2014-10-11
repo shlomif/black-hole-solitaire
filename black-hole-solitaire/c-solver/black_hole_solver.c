@@ -571,29 +571,14 @@ static GCC_INLINE long maxify(long n)
     return ((n < 0) ? LONG_MAX : n);
 }
 
-extern int DLLEXPORT black_hole_solver_run(
-    black_hole_solver_instance_t * ret_instance
+static GCC_INLINE const bhs_state_key_value_pair_t setup_first_queue_item(
+    bhs_solver_t * const solver
 )
 {
-    bhs_queue_item_t * new_queue_item;
-    bhs_solver_t * const solver = (bhs_solver_t *)ret_instance;
+    const typeof(solver->num_columns) num_columns = solver->num_columns;
 
-    typeof(solver->num_columns) num_columns = solver->num_columns;
-
-    bhs_state_key_value_pair_t * const init_state = &(solver->init_state);
-
-    const typeof(solver->max_iters_limit) max_iters_limit
-        = maxify( solver->max_iters_limit );
-    const typeof(solver->iters_display_step) iters_display_step
-        = solver->iters_display_step;
-
-    solver->queue_max_len = 64;
-
-    solver->queue = malloc(sizeof(solver->queue[0]) * solver->queue_max_len);
-
-    solver->queue_len = 0;
-
-    new_queue_item = &(solver->queue[solver->queue_len]);
+    typeof(solver->queue[solver->queue_len]) * const new_queue_item =
+        &(solver->queue[solver->queue_len]);
 
     /* Populate the unpacked state. */
     for (int i = 0 ; i < num_columns ; i++)
@@ -612,20 +597,39 @@ extern int DLLEXPORT black_hole_solver_run(
 
     for (int col_idx = 0 ; col_idx < num_columns ; col_idx++)
     {
-        int h;
-
-        for (h = 0; h < new_queue_item->s.unpacked.heights[col_idx]; h++)
+        for (int h = 0; h < new_queue_item->s.unpacked.heights[col_idx]; h++)
         {
             new_queue_item->rank_counts.c[
                 (ssize_t)solver->board_values[col_idx][h]
             ]++;
         }
     }
-
-    *init_state = new_queue_item->s.packed;
     solver->queue_len++;
 
+    return new_queue_item->s.packed;
+}
+
+extern int DLLEXPORT black_hole_solver_run(
+    black_hole_solver_instance_t * ret_instance
+)
+{
+    bhs_solver_t * const solver = (bhs_solver_t *)ret_instance;
+
+    const typeof(solver->num_columns) num_columns = solver->num_columns;
+
+    const typeof(solver->max_iters_limit) max_iters_limit
+        = maxify( solver->max_iters_limit );
+    const typeof(solver->iters_display_step) iters_display_step
+        = solver->iters_display_step;
+
+    solver->queue_max_len = 64;
+    solver->queue = malloc(sizeof(solver->queue[0]) * solver->queue_max_len);
+    solver->queue_len = 0;
     solver->num_states_in_collection = 0;
+
+    bhs_state_key_value_pair_t * const init_state = &(solver->init_state);
+    *init_state = setup_first_queue_item(solver);
+
     typeof(solver->iterations_num) iterations_num = 0;
 
     bh_solve_hash_insert(
