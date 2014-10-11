@@ -472,20 +472,19 @@ DLLEXPORT extern int black_hole_solver_set_iters_display_step(
 }
 
 static GCC_INLINE void queue_item_populate_packed(
-    bhs_solver_t * solver,
-    bhs_queue_item_t * queue_item
+    bhs_solver_t * const solver,
+    bhs_queue_item_t * const queue_item
 )
 {
-    fc_solve_bit_writer_t bit_w;
-    int col;
-    int num_columns = solver->num_columns;
-    int bits_per_column = solver->bits_per_column;
-
     queue_item->s.packed.key.foundations = queue_item->s.unpacked.foundations;
 
+    fc_solve_bit_writer_t bit_w;
     fc_solve_bit_writer_init(&bit_w, queue_item->s.packed.key.data);
 
-    for (col = 0; col < num_columns ; col++)
+    const typeof(solver->num_columns) num_columns = solver->num_columns;
+    const typeof(solver->bits_per_column) bits_per_column
+        = solver->bits_per_column;
+    for (int col = 0; col < num_columns ; col++)
     {
         fc_solve_bit_writer_write(
             &bit_w,
