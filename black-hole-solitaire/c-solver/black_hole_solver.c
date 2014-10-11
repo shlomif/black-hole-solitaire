@@ -635,7 +635,10 @@ extern int DLLEXPORT black_hole_solver_run(
 
     solver->num_states_in_collection++;
 
-    fcs_bool_t is_rank_reachability_prune_enabled = solver->is_rank_reachability_prune_enabled;
+    const typeof(solver->is_rank_reachability_prune_enabled)
+        is_rank_reachability_prune_enabled
+        = solver->is_rank_reachability_prune_enabled
+        ;
 
     long next_iterations_display_point =
     (
