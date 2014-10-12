@@ -202,6 +202,24 @@ ADD_LIBRARY (
     ${BLACK_HOLE_SOLVER_MODULES}
     )
 
+SET (S_LIB "${LIB_BASE}-static")
+ADD_LIBRARY (
+    "${S_LIB}"
+    STATIC
+    ${BLACK_HOLE_SOLVER_MODULES}
+    )
+SET_TARGET_PROPERTIES(
+    "${S_LIB}"
+    PROPERTIES OUTPUT_NAME "${LIB_BASE}"
+)
+
+SET (LIBS "${S_LIB}" "${LIB_BASE}")
+
+SET_TARGET_PROPERTIES(
+    ${LIBS}
+    PROPERTIES CLEAN_DIRECT_OUTPUT 1
+)
+
 ADD_LIBRARY (
     "bhs_rank_reach_prune"
     SHARED
@@ -209,8 +227,9 @@ ADD_LIBRARY (
     )
 
 INSTALL (
-    TARGETS "${LIB_BASE}"
-    DESTINATION "lib${LIB_SUFFIX}"
+    TARGETS ${LIBS}
+    LIBRARY DESTINATION "lib${LIB_SUFFIX}"
+    ARCHIVE DESTINATION "lib${LIB_SUFFIX}"
 )
 
 TARGET_LINK_LIBRARIES("${LIB_BASE}" ${LIBTOKYO_CAB_LIBS})
@@ -271,6 +290,13 @@ INSTALL(
         "include/black-hole-solver/fcs_dllexport.h"
     DESTINATION
         "include/black-hole-solver"
+)
+
+INSTALL(
+    FILES
+        "${CMAKE_CURRENT_BINARY_DIR}/lib${CPACK_PACKAGE_NAME}.pc"
+    DESTINATION
+        "lib${LIB_SUFFIX}/pkgconfig"
 )
 
 CONFIGURE_FILE(

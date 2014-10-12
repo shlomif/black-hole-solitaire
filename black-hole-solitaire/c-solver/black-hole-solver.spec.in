@@ -78,7 +78,7 @@ It is not generally required.
 
 %check
 cd build
-%make test
+%make check
 
 %install
 rm -rf %buildroot
@@ -99,13 +99,13 @@ rm -f %buildroot/usr/bin/make-microsoft-freecell-board
 
 %files
 %defattr(-,root,root)
-/usr/bin/black-hole-solve
+%{_bindir}/black-hole-solve
 %{_mandir}/*/*
 %doc README NEWS
 
 %files -n libblack_hole_solver0-devel
 %defattr(-,root,root)
-/usr/include/black_hole_solver/*.
+/usr/include/black-hole-solver/*.h
 %{_libdir}/pkgconfig/*.pc
 
 %clean
