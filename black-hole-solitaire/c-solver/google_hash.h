@@ -35,7 +35,7 @@ extern "C" {
 
 #include "config.h"
 
-#include "bool.h"
+#include <black-hole-solver/bool.h>
 #include "state.h"
 
 #if (FCS_STATE_STORAGE == FCS_STATE_STORAGE_GOOGLE_DENSE_HASH)

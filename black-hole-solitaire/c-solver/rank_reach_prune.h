@@ -32,8 +32,8 @@
 extern "C" {
 #endif
 
-#include "fcs_dllexport.h"
-#include "bool.h"
+#include <black-hole-solver/bool.h>
+#include <black-hole-solver/fcs_dllexport.h>
 #include "inline.h"
 
 #define NUM_RANKS 13

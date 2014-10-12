@@ -32,7 +32,7 @@
 #include <ctype.h>
 
 #include "config.h"
-#include "black_hole_solver.h"
+#include <black-hole-solver/black_hole_solver.h>
 #include "state.h"
 #include "bit_rw.h"
 

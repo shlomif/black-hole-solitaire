@@ -1,0 +1,12 @@
+prefix="@CMAKE_INSTALL_PREFIX@"
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name:  Black Hole Solitaire Solver
+Description: Library for Solving Black Hole and All in a Row Solitaires
+Version: @VERSION@
+URL: http://www.shlomifish.org/open-source/projects/black-hole-solitaire-solver/
+Libs: -L${libdir} -lblack_hole_solver
+Libs.private: -lm
+Cflags: -I${includedir}
