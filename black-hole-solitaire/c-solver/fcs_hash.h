@@ -38,7 +38,7 @@ extern "C" {
 #include "alloc.h"
 
 #include "inline.h"
-#include "bool.h"
+#include <black-hole-solver/bool.h>
 #include "state.h"
 
 typedef int bh_solve_hash_value_t;

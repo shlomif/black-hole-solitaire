@@ -30,10 +30,12 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "bool.h"
+#include <black-hole-solver/bool.h>
 
-#include "black_hole_solver.h"
+#include <black-hole-solver/black_hole_solver.h>
 #include "state.h"
+
+#include "config.h"
 
 #define MAX_LEN_BOARD_STRING 4092
 

@@ -42,7 +42,7 @@ extern "C" {
 #include "config.h"
 
 #include "inline.h"
-#include "bool.h"
+#include <black-hole-solver/bool.h>
 
 #include "state.h"
 

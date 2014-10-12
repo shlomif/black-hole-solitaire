@@ -30,8 +30,6 @@
 #ifndef FC_SOLVE__BOOL_H
 #define FC_SOLVE__BOOL_H
 
-#include "config.h"
-
 typedef int fcs_bool_t;
 
 #ifndef FALSE

@@ -194,7 +194,7 @@ FOREACH (CFLAG_TO_CHECK "-fwhole-program")
 ENDFOREACH(CFLAG_TO_CHECK)
 
 # So it can find config.h
-INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
+INCLUDE_DIRECTORIES(BEFORE "${CMAKE_CURRENT_BINARY_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
 ADD_LIBRARY (
     "${LIB_BASE}"
@@ -264,6 +264,15 @@ TARGET_LINK_LIBRARIES(
 
 INSTALL (TARGETS "${BHS_EXE}" DESTINATION "bin")
 
+INSTALL(
+    FILES
+        "include/black-hole-solver/black_hole_solver.h"
+        "include/black-hole-solver/bool.h"
+        "include/black-hole-solver/fcs_dllexport.h"
+    DESTINATION
+        "include/black-hole-solver"
+)
+
 CONFIGURE_FILE(
     ${CMAKE_CURRENT_SOURCE_DIR}/config.h.in
     ${CMAKE_CURRENT_BINARY_DIR}/config.h
@@ -272,6 +281,12 @@ CONFIGURE_FILE(
 CONFIGURE_FILE(
     ${CMAKE_CURRENT_SOURCE_DIR}/${CPACK_PACKAGE_NAME}.spec.in
     ${CMAKE_CURRENT_SOURCE_DIR}/${CPACK_PACKAGE_NAME}.spec
+    )
+
+CONFIGURE_FILE(
+    ${CMAKE_CURRENT_SOURCE_DIR}/lib${CPACK_PACKAGE_NAME}.pc.in
+    ${CMAKE_CURRENT_BINARY_DIR}/lib${CPACK_PACKAGE_NAME}.pc
+    @ONLY
     )
 
 # Rebuild config.h if ver.txt has changed.
