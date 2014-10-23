@@ -60,8 +60,6 @@ static GCC_INLINE enum RANK_REACH_VERDICT bhs_find_rank_reachability__inline(
         return RANK_REACH__SUCCESS;
     }
 
-    static const int LINKS[2] = {-1,1};
-
     /* The 20 is a margin */
     signed char physical_queue[NUM_RANKS + 1];
 
@@ -99,6 +97,7 @@ static GCC_INLINE enum RANK_REACH_VERDICT bhs_find_rank_reachability__inline(
     {
         const signed char rank = *(--queue_ptr);
 
+        static const int LINKS[2] = {-1,1};
         for (int link_idx = 0; link_idx < (sizeof(LINKS)/sizeof(LINKS[0])) ;
             link_idx++)
         {
