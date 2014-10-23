@@ -39,7 +39,7 @@
 #define ALLOCED_SIZE (FCS_IA_PACK_SIZE*1024-(256+128))
 
 void bh_solve_compact_allocator_init(
-    bhs_compact_allocator_t * allocator
+    bhs_compact_allocator_t * const allocator
     )
 {
     allocator->packs = (char * *)malloc(sizeof(allocator->packs[0]) * IA_STATE_PACKS_GROW_BY);
@@ -54,11 +54,11 @@ void bh_solve_compact_allocator_init(
 }
 
 void bh_solve_compact_allocator_extend(
-    bhs_compact_allocator_t * allocator
+    bhs_compact_allocator_t * const allocator
         )
 {
     /* Allocate a new pack */
-    if (! ((++allocator->num_packs) & (IA_STATE_PACKS_GROW_BY-1)))
+    if (! ((++ ( allocator->num_packs )) & (IA_STATE_PACKS_GROW_BY-1)))
     {
         allocator->packs = (char * *)realloc(
             allocator->packs,
@@ -76,11 +76,10 @@ void bh_solve_compact_allocator_extend(
 }
 
 
-void bh_solve_compact_allocator_finish(bhs_compact_allocator_t * allocator)
+void bh_solve_compact_allocator_finish(bhs_compact_allocator_t * const allocator)
 {
-    char * * curr_pack, * * packs_end;
-
-    packs_end = (curr_pack = allocator->packs) + allocator->num_packs;
+    char * * curr_pack = allocator->packs;
+    char * const * const packs_end = curr_pack + allocator->num_packs;
 
     for ( ; curr_pack < packs_end ; curr_pack++)
     {

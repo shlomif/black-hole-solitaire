@@ -46,18 +46,22 @@ typedef struct
 } bhs_compact_allocator_t;
 
 extern void
-    bh_solve_compact_allocator_init(bhs_compact_allocator_t * allocator);
+bh_solve_compact_allocator_init(bhs_compact_allocator_t * const allocator);
 
 extern void bh_solve_compact_allocator_extend(
-    bhs_compact_allocator_t * allocator
+    bhs_compact_allocator_t * const allocator
         );
 
-static GCC_INLINE void * fcs_compact_alloc_ptr(bhs_compact_allocator_t * allocator, int how_much)
+static GCC_INLINE void * fcs_compact_alloc_ptr(
+    bhs_compact_allocator_t * const allocator,
+    const int how_much_proto
+)
 {
     /* Round ptr to the next pointer boundary */
-    how_much +=
+    const int how_much =
+        how_much_proto +
         (
-         (sizeof(char *)-((how_much)&(sizeof(char *)-1)))&(sizeof(char*)-1)
+         (sizeof(char *)-((how_much_proto)&(sizeof(char *)-1)))&(sizeof(char*)-1)
         );
 
     if (allocator->max_ptr - allocator->ptr < how_much)
@@ -78,7 +82,9 @@ static GCC_INLINE void * fcs_compact_alloc_ptr(bhs_compact_allocator_t * allocat
     (allocator)->ptr = (allocator)->rollback_ptr; \
 }
 
-extern void bh_solve_compact_allocator_finish(bhs_compact_allocator_t * allocator);
+extern void bh_solve_compact_allocator_finish(
+    bhs_compact_allocator_t * const allocator
+);
 
 #ifdef __cplusplus
 };
