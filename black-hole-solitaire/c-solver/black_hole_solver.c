@@ -454,8 +454,8 @@ DLLEXPORT extern int black_hole_solver_set_iters_display_step(
     {
         return BLACK_HOLE_SOLVER__INVALID_INPUT;
     }
-    bhs_solver_t * const solver = (bhs_solver_t *)instance_proto;
-    solver->iters_display_step = iters_display_step;
+    ((bhs_solver_t * const)instance_proto)->iters_display_step
+        = iters_display_step;
 
     return BLACK_HOLE_SOLVER__SUCCESS;
 }
@@ -484,20 +484,19 @@ static GCC_INLINE void queue_item_populate_packed(
 }
 
 static GCC_INLINE void queue_item_unpack(
-    bhs_solver_t * solver,
-    bhs_solution_state_t * queue_item
+    bhs_solver_t * const solver,
+    bhs_solution_state_t * const queue_item
 )
 {
-    fc_solve_bit_reader_t bit_r;
-    int col;
-    int num_columns = solver->num_columns;
-    int bits_per_column = solver->bits_per_column;
+    const int num_columns = solver->num_columns;
+    const int bits_per_column = solver->bits_per_column;
 
     queue_item->unpacked.foundations = queue_item->packed.key.foundations;
 
+    fc_solve_bit_reader_t bit_r;
     fc_solve_bit_reader_init(&bit_r, queue_item->packed.key.data);
 
-    for (col = 0; col < num_columns ; col++)
+    for (int col = 0; col < num_columns ; col++)
     {
         queue_item->unpacked.heights[col] =
             fc_solve_bit_reader_read(
@@ -508,7 +507,7 @@ static GCC_INLINE void queue_item_unpack(
 }
 
 static GCC_INLINE void perform_move(
-    bhs_solver_t * solver,
+    bhs_solver_t * const solver,
     const bhs_rank_t card,
     const int col_idx,
     const bhs_queue_item_t * const queue_item_copy_ptr
