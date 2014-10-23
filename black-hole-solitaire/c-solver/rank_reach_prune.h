@@ -63,24 +63,24 @@ static GCC_INLINE enum RANK_REACH_VERDICT bhs_find_rank_reachability__inline(
     static const int LINKS[2] = {-1,1};
 
     /* The 20 is a margin */
-    signed char physical_queue[NUM_RANKS + 20];
+    signed char physical_queue[NUM_RANKS + 1];
 
     signed char * queue_ptr = physical_queue;
 
     *(queue_ptr++) = foundation;
 
-    int full_max = 0;
+    int full_ranks_goal = 0;
     for (int i = 0; i < NUM_RANKS ; i++)
     {
         if (rank_counts[i] > 0)
         {
-            full_max++;
+            full_ranks_goal++;
         }
     }
     /* Count the foundation - the starting point - in. */
     if (rank_counts[foundation] == 0)
     {
-        full_max++;
+        full_ranks_goal++;
     }
 
     int full_count = 0;
@@ -92,17 +92,12 @@ static GCC_INLINE enum RANK_REACH_VERDICT bhs_find_rank_reachability__inline(
         reached[i] = FALSE;
     }
 
-    while ((full_count < full_max) && (queue_ptr > physical_queue))
+    reached[foundation] = TRUE;
+    full_count++;
+
+    while ((full_count < full_ranks_goal) && (queue_ptr > physical_queue))
     {
         const signed char rank = *(--queue_ptr);
-
-        if (reached[rank])
-        {
-            continue;
-        }
-
-        reached[rank] = TRUE;
-        full_count++;
 
         for (int link_idx = 0; link_idx < (sizeof(LINKS)/sizeof(LINKS[0])) ;
             link_idx++)
@@ -122,6 +117,8 @@ static GCC_INLINE enum RANK_REACH_VERDICT bhs_find_rank_reachability__inline(
             {
                 if (! reached[offset_rank])
                 {
+                    reached[offset_rank] = TRUE;
+                    full_count++;
                     *(queue_ptr++) = offset_rank;
                 }
             }
@@ -130,7 +127,7 @@ static GCC_INLINE enum RANK_REACH_VERDICT bhs_find_rank_reachability__inline(
 
     return
     (
-        (full_count == full_max)
+        (full_count == full_ranks_goal)
             ? RANK_REACH__SUCCESS
             : RANK_REACH__NOT_REACHABLE
     );
