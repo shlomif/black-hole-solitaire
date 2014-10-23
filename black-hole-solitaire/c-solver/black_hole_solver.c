@@ -316,7 +316,6 @@ extern int DLLEXPORT black_hole_solver_read_board(
     const int bits_per_column
 )
 {
-    int col_idx;
     int line_num = 1;
 
     if (num_columns > BHS__MAX_NUM_COLUMNS)
@@ -387,7 +386,7 @@ extern int DLLEXPORT black_hole_solver_read_board(
     }
     line_num++;
 
-    for(col_idx = 0; col_idx < num_columns; col_idx++, line_num++)
+    for (int col_idx = 0; col_idx < num_columns; col_idx++, line_num++)
     {
         int pos_idx = 0;
         while ((*s != '\n') && (*s != '\0'))
