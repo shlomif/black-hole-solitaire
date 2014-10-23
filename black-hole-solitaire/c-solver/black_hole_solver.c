@@ -140,10 +140,7 @@ int DLLEXPORT black_hole_solver_create(
     black_hole_solver_instance_t * * ret_instance
 )
 {
-    bhs_solver_t * ret;
-
-    ret = (bhs_solver_t *)malloc(sizeof(*ret));
-
+    bhs_solver_t * const ret = (bhs_solver_t *)malloc(sizeof(*ret));
 
     if (! ret)
     {
@@ -170,13 +167,11 @@ int DLLEXPORT black_hole_solver_create(
 }
 
 DLLEXPORT extern int black_hole_solver_enable_rank_reachability_prune(
-    black_hole_solver_instance_t * instance_proto,
-    fcs_bool_t enabled_status
+    black_hole_solver_instance_t * const instance_proto,
+    const fcs_bool_t enabled_status
 )
 {
-    bhs_solver_t * solver;
-
-    solver = (bhs_solver_t *)instance_proto;
+    bhs_solver_t * const solver = (bhs_solver_t *)instance_proto;
     solver->is_rank_reachability_prune_enabled = enabled_status ? TRUE : FALSE;
 
     return BLACK_HOLE_SOLVER__SUCCESS;
@@ -203,9 +198,9 @@ enum BHS_RANKS
 
 static int parse_card(
     const char * * s,
-    bhs_rank_t * foundation,
+    bhs_rank_t * const foundation,
     bhs_card_string_t card,
-    int * suit_ptr
+    int * const suit_ptr
 )
 {
     strncpy(card, (*s), BHS_CARD_STRING_LEN);
@@ -313,17 +308,15 @@ static GCC_INLINE fcs_bool_t string_find_prefix(
 }
 
 extern int DLLEXPORT black_hole_solver_read_board(
-    black_hole_solver_instance_t * instance_proto,
-    const char * board_string,
-    int * error_line_number,
-    int num_columns,
-    int max_num_cards_in_col,
-    int bits_per_column
+    black_hole_solver_instance_t * const instance_proto,
+    const char * const board_string,
+    int * const error_line_number,
+    const int num_columns,
+    const int max_num_cards_in_col,
+    const int bits_per_column
 )
 {
-    const char * s;
-    bhs_solver_t * solver;
-    int ret_code, col_idx;
+    int col_idx;
     int line_num = 1;
 
     if (num_columns > BHS__MAX_NUM_COLUMNS)
@@ -331,12 +324,12 @@ extern int DLLEXPORT black_hole_solver_read_board(
         return BLACK_HOLE_SOLVER__INVALID_INPUT;
     }
 
-    solver = (bhs_solver_t *)instance_proto;
+    bhs_solver_t * const solver = (bhs_solver_t *)instance_proto;
 
     solver->num_columns = num_columns;
     solver->bits_per_column = bits_per_column;
 
-    s = board_string;
+    const char * s = board_string;
 
     /* Read the foundations. */
 
@@ -373,7 +366,7 @@ extern int DLLEXPORT black_hole_solver_read_board(
     }
     else
     {
-        ret_code =
+        const int ret_code =
             parse_card(&s,
                     &(solver->initial_foundation),
                     solver->initial_foundation_string,
@@ -404,7 +397,7 @@ extern int DLLEXPORT black_hole_solver_read_board(
                 MYRET (BLACK_HOLE_SOLVER__TOO_MANY_CARDS);
             }
 
-            ret_code =
+            const int ret_code =
                 parse_card(&s,
                     &(solver->board_values[col_idx][pos_idx]),
                     solver->initial_board_card_strings[col_idx][pos_idx],
