@@ -55,13 +55,12 @@ static GCC_INLINE enum RANK_REACH_VERDICT bhs_find_rank_reachability__inline(
     const unsigned char * rank_counts
 )
 {
-    static const int LINKS[2] = {-1,1};
-
-    int i, link_idx;
     if (foundation < 0)
     {
         return RANK_REACH__SUCCESS;
     }
+
+    static const int LINKS[2] = {-1,1};
 
     /* The 20 is a margin */
     signed char physical_queue[NUM_RANKS + 20];
@@ -71,7 +70,7 @@ static GCC_INLINE enum RANK_REACH_VERDICT bhs_find_rank_reachability__inline(
     *(queue_ptr++) = foundation;
 
     int full_max = 0;
-    for (i = 0; i < NUM_RANKS ; i++)
+    for (int i = 0; i < NUM_RANKS ; i++)
     {
         if (rank_counts[i] > 0)
         {
@@ -88,7 +87,7 @@ static GCC_INLINE enum RANK_REACH_VERDICT bhs_find_rank_reachability__inline(
 
     fcs_bool_t reached[NUM_RANKS];
 
-    for (i = 0; i < NUM_RANKS ; i++)
+    for (int i = 0; i < NUM_RANKS ; i++)
     {
         reached[i] = FALSE;
     }
@@ -105,7 +104,7 @@ static GCC_INLINE enum RANK_REACH_VERDICT bhs_find_rank_reachability__inline(
         reached[rank] = TRUE;
         full_count++;
 
-        for (link_idx = 0; link_idx < (sizeof(LINKS)/sizeof(LINKS[0])) ;
+        for (int link_idx = 0; link_idx < (sizeof(LINKS)/sizeof(LINKS[0])) ;
             link_idx++)
         {
             int link = LINKS[link_idx];
