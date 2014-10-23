@@ -94,7 +94,7 @@ static GCC_INLINE enum RANK_REACH_VERDICT bhs_find_rank_reachability__inline(
 
     while ((full_count < full_max) && (queue_ptr > physical_queue))
     {
-        signed char rank = *(--queue_ptr);
+        const signed char rank = *(--queue_ptr);
 
         if (reached[rank])
         {
