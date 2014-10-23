@@ -107,9 +107,7 @@ static GCC_INLINE enum RANK_REACH_VERDICT bhs_find_rank_reachability__inline(
         for (int link_idx = 0; link_idx < (sizeof(LINKS)/sizeof(LINKS[0])) ;
             link_idx++)
         {
-            int link = LINKS[link_idx];
-
-            signed char offset_rank = (signed char)(rank+link);
+            signed char offset_rank = (signed char)(rank+LINKS[link_idx]);
 
             if (offset_rank == NUM_RANKS)
             {
