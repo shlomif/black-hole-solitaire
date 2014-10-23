@@ -46,13 +46,13 @@ enum RANK_REACH_VERDICT
 };
 
 DLLEXPORT enum RANK_REACH_VERDICT bhs_find_rank_reachability(
-    signed char foundation,
-    const unsigned char * rank_counts
+    const signed char foundation,
+    const unsigned char * const rank_counts
 );
 
 static GCC_INLINE enum RANK_REACH_VERDICT bhs_find_rank_reachability__inline(
-    signed char foundation,
-    const unsigned char * rank_counts
+    const signed char foundation,
+    const unsigned char * const rank_counts
 )
 {
     if (foundation < 0)
