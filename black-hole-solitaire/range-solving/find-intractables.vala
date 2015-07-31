@@ -12,7 +12,7 @@ class Demo.HelloWorld : GLib.Object {
                 }
                 string fn = deal.to_string() + ".rs";
                 // stdout.printf("%s\n", fn);
-                
+
                 var file = File.new_for_path(fn);
 
                 if (file.query_exists(null))
@@ -38,7 +38,7 @@ class Demo.HelloWorld : GLib.Object {
                 }
             }
         }
-        catch (Error e) 
+        catch (Error e)
         {
             error ("%s", e.message);
         }

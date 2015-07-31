@@ -62,12 +62,12 @@ sub process_solution
 
     my $assert_empty_line = sub {
         my ($s, $line_idx) = $get_line->();
-        
+
         if ($s ne '')
         {
             die "Line '$line_idx' is not empty, but '$s'";
         }
-        
+
         return;
     };
 
@@ -137,7 +137,7 @@ sub process_solution
                 die "Cannot put " . $top_card->to_string() . " in the foundations that contain " . $found_card->to_string();
             }
         }
-     
+
         # Now just perform the move.
         $self->_foundation->assign(0, $col->pop())
     }

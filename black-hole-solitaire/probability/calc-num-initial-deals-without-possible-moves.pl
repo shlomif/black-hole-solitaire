@@ -7,7 +7,7 @@ use Math::BigInt ":constant", lib => "GMP";
 
 # 1. We allocate 8 positions in the board below the top for the tnk-s:
 # npr($num_slots_for_twos_and_kings, $num_slots_for_twos_and_kings - 8)
-# 
+#
 # The order matters because each permutation is different.
 
 # 2. Next we must allocate the remaining $num_cards_in_layout - 8 cards.

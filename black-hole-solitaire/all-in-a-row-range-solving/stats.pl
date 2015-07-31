@@ -39,7 +39,7 @@ foreach my $n (1 .. 1_000_000)
     {
         if ($text !~ m{^Total number of states checked is (\d+)\.\nThis scan generated \1 states\.$}ms)
         {
-            die "Mismatching numbers in $fn.";            
+            die "Mismatching numbers in $fn.";
         }
         else
         {
