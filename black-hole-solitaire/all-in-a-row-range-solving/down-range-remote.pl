@@ -17,7 +17,7 @@ my $remote_dir = "\$HOME/progs/games/black-hole-solitaire/trunk/black-hole-solit
 sub fetch_id
 {
     my $response = $ua->get($url);
-    
+
     if ($response->is_success())
     {
         my $ret = $response->decoded_content();

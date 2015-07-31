@@ -66,10 +66,10 @@ sub _slurp
 my $unsolved_sth =
     $dbh->prepare("INSERT INTO $runs_table (idx, status, num_checked, num_generated) VALUES (?, 'U', ?, ?)");
 
-my $solved_sth = 
+my $solved_sth =
     $dbh->prepare("INSERT INTO $runs_table (idx, status, num_checked, num_generated) VALUES (?, 'S', ?, ?)");
 
-my $solution_sth = 
+my $solution_sth =
     $dbh->prepare("INSERT INTO $solutions_table (idx, solution) VALUES (?, ?)");
 
 foreach my $deal (1 .. 1_000_000)
@@ -79,17 +79,17 @@ foreach my $deal (1 .. 1_000_000)
     my $fn = "range-check/$deal.rs";
 
     my $text = _slurp($fn);
-   
+
     if ($text =~ m{\AUnsolved!})
     {
         if ($text !~ m{^Total number of states checked is (\d+)\.\nThis scan generated \1 states\.$}ms)
         {
-            die "Mismatching numbers in $fn.";            
+            die "Mismatching numbers in $fn.";
         }
         else
         {
             my $num = $1;
-       
+
             $unsolved_sth->execute($deal, $num, $num);
         }
     }
@@ -102,11 +102,11 @@ foreach my $deal (1 .. 1_000_000)
         else
         {
             my ($checked, $gen) = ($1, $2);
-            
+
             $solved_sth->execute($deal, $checked, $gen);
-            
+
             my @moves = ($text =~ m{^Move a card from stack (\d+) to the foundations\n\nInfo: Card moved is ($card_re)\n\n\n====================\n}gms);
-            
+
             if (@moves != 51*2)
             {
                 die "Incorrect number of moves in file $fn.";

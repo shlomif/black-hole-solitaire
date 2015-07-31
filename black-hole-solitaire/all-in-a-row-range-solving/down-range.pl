@@ -15,7 +15,7 @@ my $url = 'http://10.0.0.5:3000/id';
 sub fetch_id
 {
     my $response = $ua->get($url);
-    
+
     if ($response->is_success())
     {
         my $ret = $response->decoded_content();
