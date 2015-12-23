@@ -32,6 +32,8 @@
 extern "C" {
 #endif
 
+#include <stddef.h>
+
 #include <black-hole-solver/bool.h>
 #include <black-hole-solver/fcs_dllexport.h>
 #include "inline.h"
@@ -98,7 +100,7 @@ static GCC_INLINE enum RANK_REACH_VERDICT bhs_find_rank_reachability__inline(
         const signed char rank = *(--queue_ptr);
 
         static const int LINKS[2] = {-1,1};
-        for (int link_idx = 0; link_idx < (sizeof(LINKS)/sizeof(LINKS[0])) ;
+        for (size_t link_idx = 0; link_idx < (sizeof(LINKS)/sizeof(LINKS[0])) ;
             link_idx++)
         {
             signed char offset_rank = (signed char)(rank+LINKS[link_idx]);

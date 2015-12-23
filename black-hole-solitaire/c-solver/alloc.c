@@ -27,8 +27,6 @@
  * last allocation.
  */
 
-#define BUILDING_DLL 1
-
 #include <stdlib.h>
 #include <stdio.h>
 

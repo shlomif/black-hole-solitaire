@@ -34,15 +34,17 @@ extern "C"
 {
 #endif
 
+#include <stddef.h>
+
 #include "inline.h"
 
 typedef struct
 {
     char * * packs;
-    int num_packs;
     char * max_ptr;
     char * ptr;
     char * rollback_ptr;
+    unsigned long num_packs;
 } bhs_compact_allocator_t;
 
 extern void
@@ -54,14 +56,15 @@ extern void bh_solve_compact_allocator_extend(
 
 static GCC_INLINE void * fcs_compact_alloc_ptr(
     bhs_compact_allocator_t * const allocator,
-    const int how_much_proto
+    const ssize_t how_much_proto
 )
 {
     /* Round ptr to the next pointer boundary */
-    const int how_much =
+    const ssize_t how_much =
         how_much_proto +
+        (ssize_t)
         (
-         (sizeof(char *)-((how_much_proto)&(sizeof(char *)-1)))&(sizeof(char*)-1)
+         (sizeof(char *)-(((size_t)how_much_proto)&(sizeof(char *)-1)))&(sizeof(char*)-1)
         );
 
     if (allocator->max_ptr - allocator->ptr < how_much)
