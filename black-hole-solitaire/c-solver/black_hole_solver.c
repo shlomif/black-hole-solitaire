@@ -499,7 +499,7 @@ static GCC_INLINE void queue_item_unpack(
     for (int col = 0; col < num_columns ; col++)
     {
         queue_item->unpacked.heights[col] =
-            fc_solve_bit_reader_read(
+            (typeof(queue_item->unpacked.heights[col]))fc_solve_bit_reader_read(
                 &bit_r,
                 bits_per_column
             );
@@ -525,7 +525,7 @@ static GCC_INLINE void perform_move(
     memset(&(next_queue_item.s.packed), '\0', sizeof(next_queue_item.s.packed));
 
     next_queue_item.s.packed.value.parent_state = queue_item_copy_ptr->s.packed.key;
-    next_queue_item.s.packed.value.col_idx = col_idx;
+    next_queue_item.s.packed.value.col_idx = (typeof(next_queue_item.s.packed.value.col_idx))col_idx;
 
     queue_item_populate_packed(
         solver,
@@ -549,7 +549,7 @@ static GCC_INLINE void perform_move(
         {
             solver->queue = realloc(
                 solver->queue,
-                sizeof(solver->queue[0]) * (solver->queue_max_len += 64)
+                sizeof(solver->queue[0]) * (size_t)(solver->queue_max_len += 64)
             );
         }
     }
@@ -560,7 +560,7 @@ static GCC_INLINE long maxify(long n)
     return ((n < 0) ? LONG_MAX : n);
 }
 
-static GCC_INLINE const bhs_state_key_value_pair_t setup_first_queue_item(
+static GCC_INLINE bhs_state_key_value_pair_t setup_first_queue_item(
     bhs_solver_t * const solver
 )
 {
@@ -572,7 +572,7 @@ static GCC_INLINE const bhs_state_key_value_pair_t setup_first_queue_item(
     /* Populate the unpacked state. */
     for (int i = 0 ; i < num_columns ; i++)
     {
-        new_queue_item->s.unpacked.heights[i] = solver->initial_lens[i];
+        new_queue_item->s.unpacked.heights[i] = (typeof(new_queue_item->s.unpacked.heights[i]))solver->initial_lens[i];
     }
     new_queue_item->s.unpacked.foundations = solver->initial_foundation;
 
@@ -603,7 +603,7 @@ static GCC_INLINE void setup_init_state(
 )
 {
     solver->queue_max_len = 64;
-    solver->queue = malloc(sizeof(solver->queue[0]) * solver->queue_max_len);
+    solver->queue = malloc(sizeof(solver->queue[0]) * (size_t)solver->queue_max_len);
     solver->queue_len = 0;
     solver->num_states_in_collection = 0;
 
@@ -769,7 +769,7 @@ static void initialize_states_in_solution(bhs_solver_t * solver)
         int num_states = 0;
         int max_num_states = NUM_SUITS * NUM_RANKS + 1;
 
-        bhs_solution_state_t * states = malloc(sizeof(states[0]) * max_num_states);
+        bhs_solution_state_t * states = malloc(sizeof(states[0]) * (size_t)max_num_states);
 
         states[num_states].packed = (solver->final_state);
         queue_item_unpack(solver, &states[num_states]);
@@ -785,7 +785,7 @@ static void initialize_states_in_solution(bhs_solver_t * solver)
                 states =
                     realloc(
                         states,
-                        sizeof(states[0]) * (max_num_states += NUM_STATES_INCREMENT)
+                        sizeof(states[0]) * (size_t)(max_num_states += NUM_STATES_INCREMENT)
                     );
             }
 

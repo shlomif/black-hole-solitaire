@@ -54,7 +54,7 @@ enum
 
 typedef struct
 {
-    char nothing;
+    unsigned long nothing;
 } black_hole_solver_instance_t;
 
 DLLEXPORT extern int black_hole_solver_create(
