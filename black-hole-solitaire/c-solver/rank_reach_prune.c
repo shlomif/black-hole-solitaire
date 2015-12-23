@@ -33,8 +33,6 @@
 #include "config.h"
 #include "rank_reach_prune.h"
 
-#define NUM_RANKS 13
-
 DLLEXPORT enum RANK_REACH_VERDICT bhs_find_rank_reachability(
     const signed char foundation,
     const unsigned char * const rank_counts
