@@ -72,7 +72,7 @@ static void out_board(
     return;
 }
 
-static const char const * help_text =
+static const char * const help_text =
 "black-hole-solve --game {all_in_a_row|black_hole} [more options] [/path/to/board_layout.txt]\n"
 "\n"
 "--help                        displays this help.\n"
