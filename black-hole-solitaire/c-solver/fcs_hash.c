@@ -225,7 +225,6 @@ static GCC_INLINE void bh_solve_hash_rehash(
     )
 {
     int old_size, new_size_bitmask;
-    int i;
     bh_solve_hash_symlink_item_t * item, * next_item;
     int place;
     bh_solve_hash_symlink_t * new_entries;
@@ -238,7 +237,7 @@ static GCC_INLINE void bh_solve_hash_rehash(
     new_entries = calloc((size_t)new_size, sizeof(bh_solve_hash_symlink_t));
 
     /* Copy the items to the new hash while not allocating them again */
-    for(i=0;i<old_size;i++)
+    for (int i=0 ; i < old_size ; i++)
     {
         item = hash->entries[i].first_item;
         /* traverse the chain item by item */
