@@ -29,7 +29,6 @@
  *
  */
 
-#define BUILDING_DLL 1
 #include "config.h"
 
 #if (BHS_STATE_STORAGE == BHS_STATE_STORAGE_INTERNAL_HASH)
@@ -73,7 +72,7 @@ void bh_solve_hash_init(
     bh_solve_hash_t * hash
     )
 {
-    int size = 256;
+    const int size = 256;
 
     hash->size = size;
     hash->size_bitmask = size-1;
@@ -83,14 +82,14 @@ void bh_solve_hash_init(
 
     /* Allocate a table of size entries */
     hash->entries = (bh_solve_hash_symlink_t *)malloc(
-        sizeof(bh_solve_hash_symlink_t) * size
+        sizeof(bh_solve_hash_symlink_t) * (size_t)size
         );
 
     hash->list_of_vacant_items = NULL;
 
     /* Initialize all the cells of the hash table to NULL, which indicate
        that the cork of the linked list is right at the start */
-    memset(hash->entries, 0, sizeof(bh_solve_hash_symlink_t)*size);
+    memset(hash->entries, 0, sizeof(bh_solve_hash_symlink_t) * ((size_t)size));
 
     bh_solve_compact_allocator_init(&(hash->allocator));
 
@@ -106,9 +105,7 @@ void bh_solve_hash_get(
     bh_solve_hash_symlink_t * list;
     bh_solve_hash_symlink_item_t * item;
 
-    bh_solve_hash_value_t hash_value;
-
-    hash_value = perl_hash_function(key_ptr->key);
+    bh_solve_hash_value_t hash_value = ((typeof(hash_value))perl_hash_function(key_ptr->key));
 
 #define PLACE() (hash_value & (hash->size_bitmask))
     list = (hash->entries + PLACE());
@@ -145,12 +142,11 @@ fcs_bool_t bh_solve_hash_insert(
     bh_solve_hash_symlink_t * list;
     bh_solve_hash_symlink_item_t * item, * last_item;
     bh_solve_hash_symlink_item_t * * item_placeholder;
-    bh_solve_hash_value_t hash_value;
 #ifdef FCS_INLINED_HASH_COMPARISON
     enum FCS_INLINED_HASH_DATA_TYPE hash_type;
 #endif
 
-    hash_value = perl_hash_function(key->key);
+    bh_solve_hash_value_t hash_value = ((typeof(hash_value))perl_hash_function(key->key));
 
 #ifdef FCS_INLINED_HASH_COMPARISON
     hash_type = hash->hash_type;
@@ -173,21 +169,6 @@ fcs_bool_t bh_solve_hash_insert(
         /* Initialize item to the chain's first_item */
         item = list->first_item;
         last_item = NULL;
-
-#ifdef FCS_WITH_CONTEXT_VARIABLE
-#define MY_HASH_CONTEXT_VAR    , hash->context
-#else
-#define MY_HASH_CONTEXT_VAR
-#endif
-
-#ifdef FCS_INLINED_HASH_COMPARISON
-#define MY_HASH_COMPARE() (!(hash_type == FCS_INLINED_HASH__COLUMNS \
-                ? bh_solve_stack_compare_for_comparison(item->key, key) \
-                : bh_solve_state_compare(item->key, key) \
-                ))
-#else
-#define MY_HASH_COMPARE() (!(hash->compare_function(item->key, key MY_HASH_CONTEXT_VAR)))
-#endif
 
         while (item != NULL)
         {
@@ -243,7 +224,7 @@ static GCC_INLINE void bh_solve_hash_rehash(
     bh_solve_hash_t * hash
     )
 {
-    int old_size, new_size, new_size_bitmask;
+    int old_size, new_size_bitmask;
     int i;
     bh_solve_hash_symlink_item_t * item, * next_item;
     int place;
@@ -251,10 +232,10 @@ static GCC_INLINE void bh_solve_hash_rehash(
 
     old_size = hash->size;
 
-    new_size = old_size << 1;
+    const int new_size = old_size << 1;
     new_size_bitmask = new_size - 1;
 
-    new_entries = calloc(new_size, sizeof(bh_solve_hash_symlink_t));
+    new_entries = calloc((size_t)new_size, sizeof(bh_solve_hash_symlink_t));
 
     /* Copy the items to the new hash while not allocating them again */
     for(i=0;i<old_size;i++)
