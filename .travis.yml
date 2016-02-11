@@ -10,7 +10,7 @@ install:
       # - sudo easy_install3 pip
     - which python3
       # - /usr/bin/env python3 -m sys -m random2 -c 'print(sys.executable)'
-    - sudo cpanm IO::All Test::Differences Test::Trap Env::Path Games::Solitaire::Verify::Solution Inline::C Inline
+    - sudo cpanm IO::All Test::Differences Test::Trap Env::Path Games::Solitaire::Verify::Solution Inline::C Inline Test::CPAN::Changes Test::Pod::Coverage Test::Pod Test::TrailingSpace
     - wget http://web-cpan.shlomifish.org/downloads/libtap-1.12.0.tar.bz2
     - tar -xvf libtap-1.12.0.tar.bz2
     - ( mkdir B && cd B && cmake ../libtap-1.12.0 && make && sudo make install )
