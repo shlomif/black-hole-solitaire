@@ -14,7 +14,7 @@ install:
     - wget http://web-cpan.shlomifish.org/downloads/libtap-1.12.0.tar.bz2
     - tar -xvf libtap-1.12.0.tar.bz2
     - ( mkdir B && cd B && cmake ../libtap-1.12.0 && make && sudo make install )
-    - ( a="$(pwd)"; tgt="black-hole-solitaire/c-solve/cmake/"; mkdir B2 "$tgt" && cd B2 && hg clone https://bitbucket.org/shlomif/shlomif-cmake-modules && cd shlomif-cmake-modules/shlomif-cmake-modules && cp -f "$(pwd)"/Shlomif_Common.cmake "$a"/"$tgt" )
+    - ( a="$(pwd)"; tgt="black-hole-solitaire/c-solver/cmake/"; mkdir B2 "$tgt" && cd B2 && hg clone https://bitbucket.org/shlomif/shlomif-cmake-modules && cd shlomif-cmake-modules/shlomif-cmake-modules && cp -f "$(pwd)"/Shlomif_Common.cmake "$a"/"$tgt" )
 
 perl:
     - "5.22"
