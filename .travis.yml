@@ -1,0 +1,26 @@
+os: linux
+dist: trusty
+before_install:
+    - sudo apt-get update -qq
+    - sudo apt-get install -y cmake cmake-data ninja-build python3-pip ack-grep cpanminus mercurial perl libperl-dev valgrind
+    - sudo dpkg-divert --local --divert /usr/bin/ack --rename --add /usr/bin/ack-grep
+      # For cmake-3.x - probably not needed in trusty.
+      # - sudo add-apt-repository ppa:george-edison55/precise-backports -y
+install:
+    - ( cd fc-solve/source && hg clone -u make-code-suitable-for-fc-solve https://bitbucket.org/shlomif/patsolve-shlomif )
+      # - sudo easy_install3 pip
+    - sudo -H python3 -m pip install random2
+    - sudo -H `which python3` -m pip install random2
+    - which python3
+      # - /usr/bin/env python3 -m sys -m random2 -c 'print(sys.executable)'
+    - sudo cpanm IO::All Test::Differences Test::Trap Env::Path Games::Solitaire::Verify::Solution
+    - wget http://web-cpan.shlomifish.org/downloads/libtap-1.12.0.tar.bz2
+    - tar -xvf libtap-1.12.0.tar.bz2
+    - ( mkdir B && cd B && cmake ../libtap-1.12.0 && make && sudo make install )
+    - ( a="$(pwd)"; mkdir B2 && cd B2 && hg clone https://bitbucket.org/shlomif/shlomif-cmake-modules && cd shlomif-cmake-modules/shlomif-cmake-modules && cp -f "$(pwd)"/Shlomif_Common.cmake "$a"/black-hole-solitaire/c-solve/cmake/ )
+
+perl:
+    - "5.22"
+python:
+    - "3.5"
+script: "cd black-hole-solitaire/ && mkdir B && cd B && ../c-solver/Tatzer && make && make test"
