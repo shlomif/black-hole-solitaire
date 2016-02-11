@@ -7,7 +7,6 @@ before_install:
       # For cmake-3.x - probably not needed in trusty.
       # - sudo add-apt-repository ppa:george-edison55/precise-backports -y
 install:
-    - ( cd fc-solve/source && hg clone -u make-code-suitable-for-fc-solve https://bitbucket.org/shlomif/patsolve-shlomif )
       # - sudo easy_install3 pip
     - sudo -H python3 -m pip install random2
     - sudo -H `which python3` -m pip install random2
