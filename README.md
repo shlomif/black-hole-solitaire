@@ -5,3 +5,9 @@ and [“All in a Row”](http://en.wikipedia.org/wiki/All_in_a_Row_%28Solitaire%
 The interesting code in C is under the black-hole-solitaire/c-solver/
 directory and there's also some older code in Perl under
 black-hole-solitaire/Games-Solitaire-BlackHole-Solver/ .
+
+Some related links:
+
+* [Freecell Solver](http://fc-solve.shlomifish.org/) - a solver for Freecell
+and related solitaire games.
+* [Other patience solvers](http://fc-solve.shlomifish.org/links.html#other_solvers)
