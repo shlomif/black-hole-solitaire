@@ -20,4 +20,4 @@ perl:
     - "5.22"
 python:
     - "3.5"
-script: "cd black-hole-solitaire/ && mkdir B && cd B && ../c-solver/Tatzer && make && perl ../c-solver/run-tests.pl"
+script: "perl black-hole-solitaire/CI-testing/continuous-integration-testing.pl"
