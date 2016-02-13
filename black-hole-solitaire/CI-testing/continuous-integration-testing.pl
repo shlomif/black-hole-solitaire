@@ -18,4 +18,4 @@ sub do_system
 
 do_system({cmd => ["cd black-hole-solitaire/ && mkdir B && cd B && ../c-solver/Tatzer && make && $^X ../c-solver/run-tests.pl"]});
 
-do_system({cmd => ["cd black-hole-solitaire/Games-Solitaire-BlackHole-Solver/ && $^X Build.PL && ./Build && ./Build test && ./Build disttest"]});
+do_system({cmd => ["cd black-hole-solitaire/Games-Solitaire-BlackHole-Solver/ && dzil test --all"]});
