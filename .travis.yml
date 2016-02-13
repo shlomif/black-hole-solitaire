@@ -15,8 +15,8 @@ install:
     - tar -xvf libtap-1.12.0.tar.bz2
     - ( mkdir B && cd B && cmake ../libtap-1.12.0 && make && sudo make install )
     - ( a="$(pwd)"; tgt="black-hole-solitaire/c-solver/cmake/"; mkdir B2 && cd B2 && hg clone https://bitbucket.org/shlomif/shlomif-cmake-modules && cd shlomif-cmake-modules/shlomif-cmake-modules && cp -f "$(pwd)"/Shlomif_Common.cmake "$a"/"$tgt"/ )
-    - "cd black-hole-solitaire/Games-Solitaire-BlackHole-Solver/ && dzil authordeps --missing | grep -vP '[^\\w:]' | xargs -n 5 -P 10 sudo cpanm --quiet --notest"
-    - "cd black-hole-solitaire/Games-Solitaire-BlackHole-Solver/ && dzil listdeps --author --missing | grep -vP '[^\\w:]' | xargs sudo cpanm --verbose"
+    - "( cd black-hole-solitaire/Games-Solitaire-BlackHole-Solver/ && dzil authordeps --missing | grep -vP '[^\\w:]' | xargs -n 5 -P 10 sudo cpanm --quiet --notest )"
+    - "( cd black-hole-solitaire/Games-Solitaire-BlackHole-Solver/ && dzil listdeps --author --missing | grep -vP '[^\\w:]' | xargs sudo cpanm --verbose )"
 
 perl:
     - "5.22"
