@@ -98,7 +98,7 @@ EOF
 {
     my $sol_fn = _filename("26464608654870335080.bh.sol.txt");
     # TEST
-    ok (!system($^X, "-Mblib", File::Spec->catfile(File::Spec->curdir(), "scripts", "black-hole-solve"),
+    ok (!system($^X, "-Mblib", File::Spec->catfile(File::Spec->curdir(), "bin", "black-hole-solve"),
             "-o", $sol_fn,
             _filename("26464608654870335080.bh.board.txt")
         )
