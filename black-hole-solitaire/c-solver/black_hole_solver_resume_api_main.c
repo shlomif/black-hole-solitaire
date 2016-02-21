@@ -26,12 +26,15 @@
  * of the command line program.
  */
 
+#include <limits.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
 #include <black-hole-solver/bool.h>
 #include <black-hole-solver/black_hole_solver.h>
+
+#include "min_and_max.h"
 #include "state.h"
 
 #include "config.h"
@@ -94,11 +97,11 @@ int main(int argc, char * argv[])
     char * filename = NULL;
     FILE * fh;
     int arg_idx;
-    long max_iters_limit = -1;
     long iters_display_step = 0;
     enum GAME_TYPE game_type = GAME__UNKNOWN;
     fcs_bool_t display_boards = FALSE;
     fcs_bool_t is_rank_reachability_prune_enabled = FALSE;
+    long max_iters_limit = LONG_MAX;
 
     arg_idx = 1;
     while (argc > arg_idx)
@@ -121,7 +124,7 @@ int main(int argc, char * argv[])
             arg_idx++;
             if (argc == arg_idx)
             {
-                fprintf(stderr, "Error! --max-iters requires an arguments.\n");
+                fprintf(stderr, "Error! --max-iters requires an argument.\n");
                 exit(-1);
             }
             max_iters_limit = atol(argv[arg_idx++]);
@@ -131,7 +134,7 @@ int main(int argc, char * argv[])
             arg_idx++;
             if (argc == arg_idx)
             {
-                fprintf(stderr, "Error! --game requires an arguments.\n");
+                fprintf(stderr, "Error! --game requires an argument.\n");
                 exit(-1);
             }
             char * g = argv[arg_idx++];
@@ -194,8 +197,8 @@ int main(int argc, char * argv[])
         exit(-1);
     }
 
-    max_iters_limit = iters_display_step;
-    black_hole_solver_set_max_iters_limit(solver, max_iters_limit);
+    long iters_limit = min(iters_display_step, max_iters_limit);
+    black_hole_solver_set_max_iters_limit(solver, iters_limit);
     black_hole_solver_enable_rank_reachability_prune(
         solver,
         is_rank_reachability_prune_enabled
@@ -256,17 +259,23 @@ int main(int argc, char * argv[])
 
     ret = 0;
 
+    long iters_num;
+
     do
     {
         solver_ret_code = black_hole_solver_run(solver);
-        if (max_iters_limit == black_hole_solver_get_iterations_num(solver))
+        iters_num = black_hole_solver_get_iterations_num(solver);
+        if (iters_limit == iters_num)
         {
-            printf("Iteration: %ld\n", max_iters_limit);
+            printf("Iteration: %ld\n", iters_limit);
             fflush(stdout);
         }
-        max_iters_limit += iters_display_step;
-        black_hole_solver_set_max_iters_limit(solver, max_iters_limit);
-    } while (solver_ret_code == BLACK_HOLE_SOLVER__OUT_OF_ITERS);
+        iters_limit += iters_display_step;
+        iters_limit = min(iters_limit, max_iters_limit);
+        black_hole_solver_set_max_iters_limit(solver, iters_limit);
+    } while ((solver_ret_code == BLACK_HOLE_SOLVER__OUT_OF_ITERS)
+        && (iters_num < max_iters_limit)
+        );
 
     if (!solver_ret_code)
     {

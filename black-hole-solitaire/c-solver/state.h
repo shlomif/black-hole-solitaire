@@ -2,6 +2,7 @@
 #ifndef BHS_STATE_H
 #define BHS_STATE_H
 
+#include "min_and_max.h"
 
 #define BHS__ALL_IN_A_ROW__NUM_COLUMNS 13
 #define BHS__ALL_IN_A_ROW__MAX_NUM_CARDS_IN_COL 4
@@ -16,8 +17,6 @@
 #define BHS_CARD_STRING_LEN 2
 typedef char bhs_card_string_t[BHS_CARD_STRING_LEN + 1];
 typedef char bhs_rank_t;
-
-#define max(a,b) ( ( (a)>(b) ) ? (a) : (b) )
 
 #define BHS__MAX_NUM_COLUMNS (max(BHS__ALL_IN_A_ROW__NUM_COLUMNS , BHS__BLACK_HOLE__NUM_COLUMNS))
 #define BHS__MAX_NUM_CARDS_IN_COL (max(BHS__ALL_IN_A_ROW__MAX_NUM_CARDS_IN_COL , BHS__BLACK_HOLE__MAX_NUM_CARDS_IN_COL))
