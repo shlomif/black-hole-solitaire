@@ -1,3 +1,17 @@
+0.14.0      ( 24 Feb 2016 ):
+============================
+
+* Move the version control system to Git and GitHub and enabled Travis-CI:
+    - https://github.com/shlomif/black-hole-solitaire
+    - https://travis-ci.org/shlomif/black-hole-solitaire
+    - Part of it was done due to my problems in finding a good alternative
+    to Travis-CI for Bitbucket.
+
+* Add an SOVERSION to the library.
+
+* Fixed a minor problem in the testing code as reported by Coverity Scan.
+    - the global --max-iters was ignored.
+
 0.12.0      ( 11 Oct 2014 ):
 ============================
 
