@@ -22,12 +22,10 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 /*
- * fcs_hash.h - header file of Freecell Solver's internal hash implementation.
+ * tokyo_cab_hash.h - header file of the Tokyo Cabinet hash.
  *
  */
-
-#ifndef BH_SOLVE__TOKYO_CAB_H
-#define BH_SOLVE__TOKYO_CAB_H
+#pragma once
 
 #ifdef __cplusplus
 extern "C" {
@@ -118,9 +116,3 @@ static GCC_INLINE void bh_solve_hash_get(
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* FBH_SOLVE__TOKYO_CAB_H */
-
-
-
-

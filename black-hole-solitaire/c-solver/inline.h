@@ -26,10 +26,7 @@
  * macro.
  *
  */
-
-#ifndef FC_SOLVE__INLINE_H
-#define FC_SOLVE__INLINE_H
-
+#pragma once
 #include "config.h"
 
 #if defined(HAVE_C_INLINE)
@@ -38,7 +35,4 @@
 #define GCC_INLINE inline
 #else
 #define GCC_INLINE
-#endif
-
-
 #endif

@@ -24,9 +24,7 @@
 /*
  * black_hole_solver.h - a solver for Black Hole Solitaire - header of the API.
  */
-
-#ifndef BHS__RANK_REACH_PRUNE_H
-#define BHS__RANK_REACH_PRUNE_H
+#pragma once
 
 #ifdef __cplusplus
 extern "C" {
@@ -137,5 +135,3 @@ static GCC_INLINE enum RANK_REACH_VERDICT bhs_find_rank_reachability__inline(
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* BHS__RANK_REACH_PRUNE_H */

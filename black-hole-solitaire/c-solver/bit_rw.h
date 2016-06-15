@@ -24,9 +24,8 @@
 /*
  * bit_rw.h - bit readers and writers. Used by delta_states.c .
  */
+#pragma once
 
-#ifndef FC_SOLVE_BIT_RW_H
-#define FC_SOLVE_BIT_RW_H
 #include "config.h"
 #include "unused.h"
 #include "inline.h"
@@ -97,5 +96,3 @@ static GCC_INLINE fc_solve_bit_data_t fc_solve_bit_reader_read(fc_solve_bit_read
 
     return ret;
 }
-
-#endif /*  FC_SOLVE_BIT_RW_H */

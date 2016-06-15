@@ -25,9 +25,7 @@
  * google_hash.h - header file for Google's dense_hash_map as adapted
  * for Freecell Solver.
  */
-
-#ifndef FC_SOLVE__GOOGLE_HASH_H
-#define FC_SOLVE__GOOGLE_HASH_H
+#pragma once
 
 #ifdef __cplusplus
 extern "C" {
@@ -75,5 +73,3 @@ extern void bh_solve_hash_get(
 #ifdef __cplusplus
 }
 #endif
-
-#endif /*  FC_SOLVE__GOOGLE_HASH_H */

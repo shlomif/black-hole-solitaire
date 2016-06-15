@@ -26,8 +26,7 @@
  * columns and other small allocations of a short size. Is able to revert the
  * last allocation.
  */
-#ifndef FC_SOLVE__ALLOC_H
-#define FC_SOLVE__ALLOC_H
+#pragma once
 
 #ifdef __cplusplus
 extern "C"
@@ -91,6 +90,4 @@ extern void bh_solve_compact_allocator_finish(
 
 #ifdef __cplusplus
 };
-#endif
-
 #endif

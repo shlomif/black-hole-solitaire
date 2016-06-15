@@ -25,9 +25,7 @@
  * fcs_hash.h - header file of Freecell Solver's internal hash implementation.
  *
  */
-
-#ifndef FC_SOLVE__FCS_HASH_H
-#define FC_SOLVE__FCS_HASH_H
+#pragma once
 
 #ifdef __cplusplus
 extern "C" {
@@ -128,9 +126,3 @@ extern void bh_solve_hash_get(
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* FC_SOLVE__FCS_HASH_H */
-
-
-
-

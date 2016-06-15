@@ -1,6 +1,4 @@
-
-#ifndef BHS_STATE_H
-#define BHS_STATE_H
+#pragma once
 
 #include "min_and_max.h"
 
@@ -49,5 +47,3 @@ typedef struct
     bhs_state_key_t key;
     bhs_state_value_t value;
 } bhs_state_key_value_pair_t;
-
-#endif /*  BHS_STATE_H */
