@@ -12,9 +12,10 @@ install:
     - SET PERL_MB_OPT=--install_base C:/Perl5
     - SET PERL_MM_OPT=INSTALL_BASE=C:/Perl5
     - cpanm --notest Dist::Zilla IO::All Test::Differences Test::Trap Env::Path Games::Solitaire::Verify::Solution Inline::C Inline Pod::Weaver::Section::Support Test::CPAN::Changes Test::Pod::Coverage Test::Pod Test::TrailingSpace
-    - cd Sky-uploader\App-Sky
+    - cd black-hole-solitaire\Games-Solitaire-BlackHole-Solver
     - dzil authordeps --missing | cpanm -n
     - dzil listdeps   --missing | cpanm -n
+# TODO : add the build/test of the rest of the cmake C version.
 
 build: off
 
