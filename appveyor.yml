@@ -15,7 +15,7 @@ install:
     - cd black-hole-solitaire
     - mkdir B
     - cd B
-    - perl ..\c-solver\Tatzer --gen="MinGW Makefiles"
+    - perl ..\c-solver\Tatzer --gen="MSYS Makefiles"
     - cd ..\..
     - cd black-hole-solitaire\Games-Solitaire-BlackHole-Solver
     - dzil authordeps --missing | cpanm -n

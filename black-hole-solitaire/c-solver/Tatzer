@@ -71,8 +71,11 @@ foreach my $rec (
     # Testing theme - aims to run the tests quickly
     $themes{$id.'t'} = ['-l', $id.'bb', '--rwd', '--dbm=kaztree', '--test-suite',];
 
-    # For use by PySolFC
-    $themes{$id . "_pysol"} = ['-l', $id.'bb', "--prefix=$ENV{HOME}/apps/fcs-for-pysol",];
+    if (defined(my $HOME = $ENV{HOME}))
+    {
+        # For use by PySolFC
+        $themes{$id . "_pysol"} = ['-l', $id.'bb', "--prefix=$HOME/apps/fcs-for-pysol",];
+    }
 }
 
 my @new_argv = @ARGV;
