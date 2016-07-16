@@ -14,6 +14,7 @@ use File::Basename qw(dirname);
 
 my $build_type = "debug";
 my $state_storage;
+my $generate_what;
 my $prefix = "/usr";
 my $build_static_lib = 0;
 my $test_suite = 1;
@@ -152,6 +153,7 @@ GetOptions(
     'max-bench-threads-num=i' => \$max_bench_threads_num,
     'pack-size=i' => \$pack_size,
     'static!' => \$link_to_static,
+    'gen=s' => \$generate_what,
 ) or
     die "Wrong options";
 
@@ -183,6 +185,7 @@ unlink("CMakeCache.txt");
 # ($test_suite ? ("-DFCS_WITH_TEST_SUITE=1") : ()),
 
 my @cmd= ("cmake",
+    (defined($generate_what) ? ("-G", $generate_what) : ()),
     "-DCMAKE_BUILD_TYPE=$build_type",
     "-DBHS_STATE_STORAGE=BHS_STATE_STORAGE_$state_storage",
     "-DCMAKE_INSTALL_PREFIX=$prefix",
@@ -207,7 +210,10 @@ my @cmd= ("cmake",
 );
 
 print(join(" ", @cmd), "\n");
-exec(@cmd);
+if (system(@cmd))
+{
+    exit(-1);
+}
 
 =head1 COPYRIGHT AND LICENSE
 
