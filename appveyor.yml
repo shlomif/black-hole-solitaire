@@ -16,7 +16,7 @@ install:
     - mkdir B
     - cd B
     - set CMAKE_MAKE_PROGRAM=C:\strawberry\c\bin\gmake.exe
-    - perl ..\c-solver\Tatzer --gen="MSYS Makefiles"
+    - perl ..\c-solver\Tatzer --gen="MinGW Makefiles"
     - cd ..\..
     - cd black-hole-solitaire\Games-Solitaire-BlackHole-Solver
     - dzil authordeps --missing | cpanm -n
