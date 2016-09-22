@@ -9,6 +9,7 @@
 use strict;
 use warnings;
 
+use File::Path qw(rmtree);
 use File::Basename qw(dirname);
 use Getopt::Long;
 
@@ -194,9 +195,8 @@ else
 
 # This cache is sometimes causing problems.
 unlink("CMakeCache.txt");
-
-# Removed:
-# ($test_suite ? ("-DFCS_WITH_TEST_SUITE=1") : ()),
+rmtree(['_Inline', 't/_Inline']);
+unlink(glob("*.so"));
 
 my @cmd= ("cmake",
     (defined($generate_what) ? ("-G", $generate_what) : ()),
@@ -208,14 +208,16 @@ my @cmd= ("cmake",
     (defined($pack_size) ? ("-DFCS_IA_PACK_SIZE=$pack_size") : ()),
     (defined($cpu_arch) ? ("-DCPU_ARCH=$cpu_arch") : ()),
     ($omit_frame ? "-DOPTIMIZATION_OMIT_FRAME_POINTER=1" : ()),
-    $path_to_source_dir
 );
 
-print(join(" ", @cmd), "\n");
-if (system(@cmd))
+if (defined ($path_to_source_dir))
 {
-    exit(-1);
+    push @cmd, $path_to_source_dir;
 }
+
+print(join(" ", @cmd), "\n");
+my $exit_code = system(@cmd);
+exit($exit_code);
 
 =head1 COPYRIGHT AND LICENSE
 
