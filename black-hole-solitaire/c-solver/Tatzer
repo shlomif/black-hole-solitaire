@@ -9,8 +9,8 @@
 use strict;
 use warnings;
 
-use Getopt::Long;
 use File::Basename qw(dirname);
+use Getopt::Long;
 
 my $build_type = "debug";
 my $state_storage;
@@ -45,6 +45,7 @@ my %themes =
     tt => [qw(-r --notest-suite --static)],
     bench => [qw(-l tt --omit-frame)],
     fc_bench => [qw(-l bench)],
+    testing => [qw(--rwd --dbm=kaztree --test-suite)],
 );
 
 foreach my $rec (
@@ -58,21 +59,35 @@ foreach my $rec (
     my $arch = $rec->{a};
 
     $themes{$id} = ["--arch=$arch"];
+
+    my $def = sub {
+        my ($suffix, $theme) = @_;
+        $themes{$id.$suffix} = [@$theme];
+        return;
+    };
+    my $id_def = sub {
+        my ($suffix, $theme) = @_;
+        return $def->($suffix, ['-l', $theme, '-l', $id]);
+    };
+    my $bb_def = sub {
+        my ($suffix, $theme) = @_;
+        return $def->($suffix, ['-l', $id.'bb', @$theme]);
+    };
     # Benchmark for freecell only
-    $themes{$id.'b'} = [qw(-l fc_bench -l), $id];
+    $id_def->(b => 'fc_bench');
     # Generalised benchmark - not freecell-only - should pass the tests.
-    $themes{$id.'bb'} = [qw(-l bench -l), $id];
+    $id_def->(bb => 'bench');
     # Memory conserving theme - for freecell only
-    $themes{$id.'m'} = [qw(-l fc_reduce_mem -l), $id];
+    $id_def->(m => 'fc_reduce_mem');
     # Generalised Memory conserving theme - not only for freecell
-    $themes{$id.'mm'} = [qw(-l reduce_mem -l), $id];
+    $id_def->(mm => 'reduce_mem');
     # Testing theme - aims to run the tests quickly
-    $themes{$id.'t'} = ['-l', $id.'bb', '--rwd', '--dbm=kaztree', '--test-suite',];
+    $bb_def->(t => [qw(-l testing)]);
 
     if (defined(my $HOME = $ENV{HOME}))
     {
         # For use by PySolFC
-        $themes{$id . "_pysol"} = ['-l', $id.'bb', "--prefix=$HOME/apps/fcs-for-pysol",];
+        $bb_def->(pysol => ["--prefix=$HOME/apps/fcs-for-pysol",]);
     }
 }
 
