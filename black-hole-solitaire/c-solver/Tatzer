@@ -13,10 +13,23 @@ use File::Path qw(rmtree);
 use File::Basename qw(dirname);
 use Getopt::Long;
 
+my %STR_OPTS =
+(
+    'prefix' => {param => 'CMAKE_INSTALL_PREFIX',},
+);
+
+my @STR_OPTS__KEYS = keys %STR_OPTS;
+for my $k (@STR_OPTS__KEYS)
+{
+    $STR_OPTS{$k}{'value'} = undef();
+    $STR_OPTS{$k}{'prefix'} //= '';
+}
+
+$STR_OPTS{'prefix'}{value} = '/usr';
+
 my $build_type = "debug";
 my $state_storage;
 my $generate_what;
-my $prefix = "/usr";
 my $build_static_lib = 0;
 my $test_suite = 1;
 my $cpu_arch;
@@ -146,7 +159,6 @@ GetOptions(
         return;
     },
     'p|pos=s' => \$state_storage,
-    'prefix=s' => \$prefix,
     'test-suite!' => \$test_suite,
     'tokyo' => sub { return set_both("TOKYO_CAB_HASH"); },
     'hash' => \&set_hash,
@@ -174,6 +186,7 @@ GetOptions(
     'pack-size=i' => \$pack_size,
     'static!' => \$link_to_static,
     'gen=s' => \$generate_what,
+    (map {; "$_=s" => \($STR_OPTS{$_}{value}) } @STR_OPTS__KEYS),
 ) or
     die "Wrong options";
 
@@ -201,13 +214,13 @@ unlink(glob("*.so"));
 my @cmd= ("cmake",
     (defined($generate_what) ? ("-G", $generate_what) : ()),
     "-DCMAKE_BUILD_TYPE=$build_type",
+    "-DDATADIR=$STR_OPTS{prefix}{value}/share",
     "-DBHS_STATE_STORAGE=BHS_STATE_STORAGE_$state_storage",
-    "-DCMAKE_INSTALL_PREFIX=$prefix",
-    "-DDATADIR=$prefix/share",
     ((!$build_static_lib) ? ("-DBUILD_STATIC_LIBRARY=") : ()),
     (defined($pack_size) ? ("-DFCS_IA_PACK_SIZE=$pack_size") : ()),
     (defined($cpu_arch) ? ("-DCPU_ARCH=$cpu_arch") : ()),
     ($omit_frame ? "-DOPTIMIZATION_OMIT_FRAME_POINTER=1" : ()),
+    (map { my $k = $_; my $r = $STR_OPTS{$k}; my $v = $r->{value}; defined($v) ? ("-D$r->{param}=$r->{prefix}$v") : () } @STR_OPTS__KEYS),
 );
 
 if (defined ($path_to_source_dir))
