@@ -16,6 +16,15 @@ use Getopt::Long;
 my %STR_OPTS =
 (
     'prefix' => {param => 'CMAKE_INSTALL_PREFIX',},
+    (map
+        {
+            my ($key, $param) = @$_;
+            ($key => +{ prefix => "${param}_", param => $param })
+        }
+        (
+            ['p|pos' => 'BHS_STATE_STORAGE'],
+        )
+    ),
 );
 
 my @STR_OPTS__KEYS = keys %STR_OPTS;
@@ -28,7 +37,6 @@ for my $k (@STR_OPTS__KEYS)
 $STR_OPTS{'prefix'}{value} = '/usr';
 
 my $build_type = "debug";
-my $state_storage;
 my $generate_what;
 my $build_static_lib = 0;
 my $test_suite = 1;
@@ -42,8 +50,10 @@ my $link_to_static = 0;
 sub set_both
 {
     my $val = shift;
-    $state_storage = $val;
-
+    foreach my $k ('p|pos')
+    {
+        $STR_OPTS{$k}{'value'} = $val;
+    }
     return;
 }
 
@@ -158,7 +168,6 @@ GetOptions(
         }
         return;
     },
-    'p|pos=s' => \$state_storage,
     'test-suite!' => \$test_suite,
     'tokyo' => sub { return set_both("TOKYO_CAB_HASH"); },
     'hash' => \&set_hash,
@@ -215,7 +224,6 @@ my @cmd= ("cmake",
     (defined($generate_what) ? ("-G", $generate_what) : ()),
     "-DCMAKE_BUILD_TYPE=$build_type",
     "-DDATADIR=$STR_OPTS{prefix}{value}/share",
-    "-DBHS_STATE_STORAGE=BHS_STATE_STORAGE_$state_storage",
     ((!$build_static_lib) ? ("-DBUILD_STATIC_LIBRARY=") : ()),
     (defined($pack_size) ? ("-DFCS_IA_PACK_SIZE=$pack_size") : ()),
     (defined($cpu_arch) ? ("-DCPU_ARCH=$cpu_arch") : ()),
