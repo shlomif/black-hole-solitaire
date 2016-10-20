@@ -13,6 +13,18 @@ use File::Path qw(rmtree);
 use File::Basename qw(dirname);
 use Getopt::Long;
 
+my %INT_OPTS =
+(
+    'pack-size' => 'FCS_IA_PACK_SIZE',
+);
+
+my @INT_OPS__KEYS = keys %INT_OPTS;
+
+my %int_opts__values =
+(
+    map { $_ => undef() } @INT_OPS__KEYS
+);
+
 my %STR_OPTS =
 (
     'prefix' => {param => 'CMAKE_INSTALL_PREFIX',},
@@ -44,7 +56,6 @@ my $cpu_arch;
 my $omit_frame;
 my $with_context_var = 1;
 my $max_bench_threads_num = 4;
-my $pack_size;
 my $link_to_static = 0;
 
 sub set_both
@@ -192,9 +203,9 @@ GetOptions(
     'omit-frame!' => \$omit_frame,
     'with-ctx-var!' => \$with_context_var,
     'max-bench-threads-num=i' => \$max_bench_threads_num,
-    'pack-size=i' => \$pack_size,
     'static!' => \$link_to_static,
     'gen=s' => \$generate_what,
+    (map {; "$_=i" => \($int_opts__values{$_}) } @INT_OPS__KEYS),
     (map {; "$_=s" => \($STR_OPTS{$_}{value}) } @STR_OPTS__KEYS),
 ) or
     die "Wrong options";
@@ -225,9 +236,9 @@ my @cmd= ("cmake",
     "-DCMAKE_BUILD_TYPE=$build_type",
     "-DDATADIR=$STR_OPTS{prefix}{value}/share",
     ((!$build_static_lib) ? ("-DBUILD_STATIC_LIBRARY=") : ()),
-    (defined($pack_size) ? ("-DFCS_IA_PACK_SIZE=$pack_size") : ()),
     (defined($cpu_arch) ? ("-DCPU_ARCH=$cpu_arch") : ()),
     ($omit_frame ? "-DOPTIMIZATION_OMIT_FRAME_POINTER=1" : ()),
+    (map { defined($int_opts__values{$_}) ? ("-D" . $INT_OPTS{$_} . "=" . $int_opts__values{$_}) : () } @INT_OPS__KEYS),
     (map { my $k = $_; my $r = $STR_OPTS{$k}; my $v = $r->{value}; defined($v) ? ("-D$r->{param}=$r->{prefix}$v") : () } @STR_OPTS__KEYS),
 );
 
