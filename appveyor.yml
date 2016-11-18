@@ -15,11 +15,7 @@ install:
     - cd black-hole-solitaire
     - hg clone https://bitbucket.org/shlomif/shlomif-cmake-modules c-solver/cmake/sfc
     - copy c-solver\cmake\sfc\shlomif-cmake-modules\Shlomif_Common.cmake c-solver\cmake\
-    - mkdir B
-    - cd B
-    - set CMAKE_MAKE_PROGRAM=C:\strawberry\c\bin\gmake.exe
-    - perl ..\c-solver\Tatzer --gen="MSYS Makefiles"
-    - cd ..\..
+    - cd ..
     - cd black-hole-solitaire\Games-Solitaire-BlackHole-Solver
     - dzil authordeps --missing | cpanm -n
     - dzil listdeps   --missing | cpanm -n
@@ -29,8 +25,9 @@ build: off
 
 test_script:
     # - dzil test -v --all
+    - set CMAKE_MAKE_PROGRAM=C:\strawberry\c\bin\gmake.exe
     - cd ..\..
-    - perl black-hole-solitaire/CI-testing/continuous-integration-testing.pl
+    - perl black-hole-solitaire/CI-testing/continuous-integration-testing.pl --gen="MSYS Makefiles"
 
 cache:
     - C:\Perl5

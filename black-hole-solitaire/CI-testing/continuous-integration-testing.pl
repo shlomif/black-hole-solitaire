@@ -4,6 +4,8 @@ use strict;
 use warnings;
 use autodie;
 
+use Getopt::Long qw/GetOptions/;
+
 sub do_system
 {
     my ($args) = @_;
@@ -16,6 +18,10 @@ sub do_system
     }
 }
 
-do_system({cmd => ["cd black-hole-solitaire/ && mkdir B && cd B && ../c-solver/Tatzer && make && $^X ../c-solver/run-tests.pl"]});
+my $cmake_gen;
+GetOptions(
+    'gen=s' => \$cmake_gen,
+) or die 'Wrong options';
+do_system({cmd => ["cd black-hole-solitaire/ && mkdir B && cd B && ../c-solver/Tatzer " . (defined($cmake_gen) ? qq#--gen="$cmake_gen"# : "") . " && make && $^X ../c-solver/run-tests.pl"]});
 
 do_system({cmd => ["cd black-hole-solitaire/Games-Solitaire-BlackHole-Solver/ && dzil test --all"]});
