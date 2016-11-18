@@ -104,9 +104,11 @@ GetOptions(
 
     if (! $is_ninja)
     {
-        if (system("make", "-s"))
+        my $IS_WIN = ($^O eq "MSWin32");
+        my $MAKE = $IS_WIN ? 'gmake' : 'make';
+        if (system($MAKE, "-s"))
         {
-            die "make failed";
+            die "$MAKE failed";
         }
     }
 
