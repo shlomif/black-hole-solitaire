@@ -18,12 +18,14 @@ sub do_system
     }
 }
 
-my $SEP = ($^O eq "MSWin32") ? "\\" : '/';
+my $IS_WIN = ($^O eq "MSWin32");
+my $SEP = $IS_WIN ? "\\" : '/';
+my $MAKE = $IS_WIN ? 'gmake' : 'make';
 
 my $cmake_gen;
 GetOptions(
     'gen=s' => \$cmake_gen,
 ) or die 'Wrong options';
-do_system({cmd => ["cd black-hole-solitaire && mkdir B && cd B && $^X ..${SEP}c-solver${SEP}Tatzer " . (defined($cmake_gen) ? qq#--gen="$cmake_gen"# : "") . " && make && $^X ..${SEP}c-solver${SEP}run-tests.pl"]});
+do_system({cmd => ["cd black-hole-solitaire && mkdir B && cd B && $^X ..${SEP}c-solver${SEP}Tatzer " . (defined($cmake_gen) ? qq#--gen="$cmake_gen"# : "") . " && $MAKE && $^X ..${SEP}c-solver${SEP}run-tests.pl"]});
 
 do_system({cmd => ["cd black-hole-solitaire${SEP}Games-Solitaire-BlackHole-Solver && dzil test --all"]});
