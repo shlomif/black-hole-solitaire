@@ -13,6 +13,8 @@ install:
     - SET PERL_MM_OPT=INSTALL_BASE=C:/Perl5
     - cpanm --notest Dist::Zilla IO::All Test::Differences Test::Trap Env::Path Games::Solitaire::Verify::Solution Inline::C Inline Pod::Coverage::TrustPod Pod::Weaver::Section::Support Test::CPAN::Changes Test::Pod::Coverage Test::Pod Test::TrailingSpace
     - cd black-hole-solitaire
+    - hg clone https://bitbucket.org/shlomif/shlomif-cmake-modules c-solver/cmake/sfc
+    - copy c-solver\cmake\sfc\Shlomif_Common.cmake c-solver\cmake\
     - mkdir B
     - cd B
     - set CMAKE_MAKE_PROGRAM=C:\strawberry\c\bin\gmake.exe
