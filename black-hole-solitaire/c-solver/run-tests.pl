@@ -37,7 +37,9 @@ sub run_tests
 {
     my $tests = shift;
 
-    exec(($use_prove ? @{_calc_prove()} : 'runprove'), @$tests);
+    # Workaround for Windows spawning-SNAFU.
+    my $exit_code = system(($use_prove ? @{_calc_prove()} : 'runprove'), @$tests);
+    exit($exit_code);
 }
 
 my $tests_glob = "*.{exe,py,t}";
