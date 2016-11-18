@@ -28,7 +28,9 @@ install:
 build: off
 
 test_script:
-    - dzil test -v --all
+    # - dzil test -v --all
+    - cd ..\..
+    - perl black-hole-solitaire/CI-testing/continuous-integration-testing.pl
 
 cache:
     - C:\Perl5
