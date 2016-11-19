@@ -44,7 +44,7 @@ sub run_tests
     }
     # Workaround for Windows spawning-SNAFU.
     my $exit_code = system(@cmd);
-    exit($exit_code);
+    exit($exit_code ? (-1) : 0);
 }
 
 my $tests_glob = "*.{exe,py,t}";
