@@ -432,9 +432,9 @@ EOF
     };
 
     # TEST
-    ok (! ($trap->exit), "Exit code for --display-boardsfor board #24.");
+    ok (! ($trap->exit), "Exit code for --display-boards for board #24.");
 
-    my $expected_prefix = <<'EOF';
+    my $expected_prefix = _normalize_lf(<<'EOF');
 Solved!
 
 [START BOARD]
@@ -513,7 +513,7 @@ Info: Card moved is QD
 
 EOF
 
-    my $stdout = $trap->stdout();
+    my $stdout = _normalize_lf($trap->stdout());
 
     my $got_prefix = substr($stdout, 0, length($expected_prefix));
 
