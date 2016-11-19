@@ -16,6 +16,14 @@ use Test::Trap
     trap $trap :flow:stderr(systemsafe):stdout(systemsafe):warn
     );
 
+use Socket qw(:crlf);
+
+sub _normalize_lf
+{
+    my ($s) = @_;
+    $s =~ s#$CRLF#$LF#g;
+    return $s;
+}
 
 trap
 {
@@ -397,7 +405,7 @@ This scan generated 8672 states.
 EOF
 
 # TEST
-eq_or_diff ($trap->stdout(), $expected_output, "Right output.");
+eq_or_diff (_normalize_lf($trap->stdout()), _normalize_lf($expected_output), "Right output.");
 
 trap
 {
@@ -419,7 +427,8 @@ This scan generated 8 states.
 EOF
 
 # TEST
-eq_or_diff ($trap->stdout(), $expected_output, "Right output.");
+eq_or_diff (_normalize_lf($trap->stdout()),
+    _normalize_lf($expected_output), "Right output.");
 
 
 trap
@@ -803,7 +812,8 @@ This scan generated 8672 states.
 EOF
 
 # TEST
-eq_or_diff ($trap->stdout(), $expected_output, "Right output.");
+eq_or_diff (_normalize_lf($trap->stdout()), _normalize_lf($expected_output),
+    "Right output.");
 
 trap
 {
@@ -825,7 +835,8 @@ This scan generated 8 states.
 EOF
 
 # TEST
-eq_or_diff ($trap->stdout(), $expected_output, "Right output for --max-iters.");
+eq_or_diff (_normalize_lf($trap->stdout()), _normalize_lf($expected_output),
+    "Right output for --max-iters.");
 
 my $ret_code;
 trap
@@ -1231,7 +1242,7 @@ This scan generated 8672 states.
 EOF
 
 # TEST
-eq_or_diff ($trap->stdout(), $expected_output, "Right output for iterations step.");
+eq_or_diff (_normalize_lf($trap->stdout()), _normalize_lf($expected_output), "Right output for iterations step.");
 
 # TEST:$c=2;
 foreach my $command (
@@ -1637,6 +1648,9 @@ This scan generated 8672 states.
 EOF
 
     # TEST*$c
-    eq_or_diff ($trap->stdout(), $expected_output, "Right output for iterations step on a second step.");
+    eq_or_diff (_normalize_lf($trap->stdout()),
+        _normalize_lf($expected_output),
+        "Right output for iterations step on a second step."
+    );
 
 }

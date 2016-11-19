@@ -15,6 +15,14 @@ my $bin_dir = catpath( ( splitpath( rel2abs $0 ) )[ 0, 1 ] );
 
 use Test::Trap qw( trap $trap :flow:stderr(systemsafe):stdout(systemsafe):warn);
 
+use Socket qw(:crlf);
+
+sub _normalize_lf
+{
+    my ($s) = @_;
+    $s =~ s#$CRLF#$LF#g;
+    return $s;
+}
 
 {
     trap
@@ -404,7 +412,11 @@ This scan generated 18056 states.
 EOF
 
     # TEST
-    eq_or_diff ($trap->stdout(), $expected_output, "Right output from board 24.");
+    eq_or_diff (
+        _normalize_lf($trap->stdout()),
+        _normalize_lf($expected_output),
+        "Right output from board 24."
+    );
 }
 
 {
@@ -506,7 +518,11 @@ EOF
     my $got_prefix = substr($stdout, 0, length($expected_prefix));
 
     # TEST
-    eq_or_diff ($got_prefix, $expected_prefix, "Right output from board 24 with --display-boards.");
+    eq_or_diff (
+        _normalize_lf($got_prefix),
+        _normalize_lf($expected_prefix),
+        "Right output from board 24 with --display-boards."
+    );
 
     my $expected_stdout = io->file(
         File::Spec->catfile(
@@ -516,7 +532,7 @@ EOF
     )->slurp;
 
     # TEST
-    eq_or_diff ($stdout, $expected_stdout,
+    eq_or_diff (_normalize_lf($stdout), _normalize_lf($expected_stdout),
         "Complete Right output from board 24 with --display-boards."
     );
 }
