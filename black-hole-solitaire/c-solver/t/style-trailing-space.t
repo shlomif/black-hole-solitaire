@@ -3,21 +3,19 @@
 use strict;
 use warnings;
 
-use Test::More tests => 1;
+use Test::TrailingSpace ();
+use Test::More tests => 2;
 
+foreach my $path (@ENV{qw/FCS_SRC_PATH FCS_PATH/})
 {
-    open my $ack_fh, '-|', 'ack', '--perl', '--cc', '--cpp', '--python', '--ruby', '--shell', '--ignore-dir=CMakeFiles', '--ignore-dir=_Inline', q/[ \t]+\r?$/, $ENV{FCS_SRC_PATH}
-        or die "Cannot open ack for input - $!";
+    my $finder = Test::TrailingSpace->new(
+        {
+            root => $path,
+            filename_regex => qr/./,
+            abs_path_prune_re => qr#CMakeFiles|_Inline|(?:\.(?:xcf|patch)\z)|#,
+        }
+    );
 
-    my $count_lines = 0;
-    while (my $l = <$ack_fh>)
-    {
-        $count_lines++;
-        diag($l);
-    }
-
-    # TEST
-    is ($count_lines, 0, "Count lines is 0.");
-
-    close($ack_fh);
+    # TEST*2
+    $finder->no_trailing_space("No trailing whitespace was found.")
 }
