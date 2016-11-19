@@ -848,8 +848,8 @@ trap
 is ($ret_code, 0, "Exited successfully.");
 
 # TEST
-like ($trap->stdout(),
-    qr/\Ablack-hole-solver version (\d+(?:\.\d+){2})\nLibrary version \1\n\z/,
+like (_normalize_lf($trap->stdout()),
+    qr/\Ablack-hole-solver version (\d+(?:\.\d+){2})\r?\nLibrary version \1\r?\n\z/,
     "Right otuput for --version."
 );
 
