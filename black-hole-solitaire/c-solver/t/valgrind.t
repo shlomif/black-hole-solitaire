@@ -3,13 +3,24 @@
 use strict;
 use warnings;
 
-use Test::More tests => 4;
+use Test::More;
 use Carp;
 use Data::Dumper;
 use String::ShellQuote;
 use File::Spec;
 use File::Temp qw( tempdir );
 use File::Spec::Functions qw( catpath splitpath rel2abs );
+
+my $IS_WIN = ($^O eq "MSWin32");
+
+if ($IS_WIN)
+{
+    plan skip_all => 'valgrind is not available on Windows';
+}
+else
+{
+    plan tests => 4;
+}
 
 my $bin_dir = catpath( ( splitpath( rel2abs $0 ) )[ 0, 1 ] );
 
