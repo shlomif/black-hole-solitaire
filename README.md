@@ -6,6 +6,12 @@ and [“All in a Row”](http://en.wikipedia.org/wiki/All_in_a_Row_%28Solitaire%
 
 [![Build Status](https://travis-ci.org/shlomif/black-hole-solitaire.svg?branch=master)](https://travis-ci.org/shlomif/black-hole-solitaire) [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/yvne045w9dmd4h92?svg=true)](https://ci.appveyor.com/project/shlomif/black-hole-solitaire)
 
+## Screenshots
+
+![Running using PySol FC on KDE Plasma 5](<http://i.imgur.com/htp5UZq.jpg>)
+
+## Guide to the code
+
 The interesting code in C is under the black-hole-solitaire/c-solver/
 directory and there's also some older code in Perl under
 black-hole-solitaire/Games-Solitaire-BlackHole-Solver/ .
