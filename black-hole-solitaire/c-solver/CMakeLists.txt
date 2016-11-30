@@ -133,13 +133,16 @@ ENDIF (${BHS_STATE_STORAGE} STREQUAL "BHS_STATE_STORAGE_GOOGLE_SPARSE_HASH")
 SET(COMPILER_FLAGS_TO_CHECK
     "-Wall" "-Werror=implicit-function-declaration" "-fvisibility=hidden"
 )
+MACRO(add_flags)
+    LIST(APPEND COMPILER_FLAGS_TO_CHECK ${ARGV})
+ENDMACRO ()
 
 IF (CPU_ARCH)
-    LIST(APPEND COMPILER_FLAGS_TO_CHECK "-march=${CPU_ARCH}")
+    add_flags("-march=${CPU_ARCH}")
 ENDIF(CPU_ARCH)
 
 IF (OPTIMIZATION_OMIT_FRAME_POINTER)
-    LIST(APPEND COMPILER_FLAGS_TO_CHECK "-fomit-frame-pointer")
+    add_flags("-fomit-frame-pointer")
 ENDIF(OPTIMIZATION_OMIT_FRAME_POINTER)
 
 SET (IS_DEBUG)
@@ -147,7 +150,7 @@ IF ((CMAKE_BUILD_TYPE STREQUAL debug) OR (CMAKE_BUILD_TYPE STREQUAL RelWithDebIn
     SET (IS_DEBUG 1)
     # This slows down the program considerably.
     IF (CMAKE_BUILD_TYPE STREQUAL debug)
-        LIST(APPEND COMPILER_FLAGS_TO_CHECK "-DDEBUG=1")
+        add_flags("-DDEBUG=1")
     ENDIF (CMAKE_BUILD_TYPE STREQUAL debug)
 
     # Removed these flags because they emitted spurious warnings, which were of
@@ -165,14 +168,14 @@ IF (${CMAKE_COMPILER_IS_GNUCC})
 ENDIF (${CMAKE_COMPILER_IS_GNUCC})
 
 IF (CMAKE_BUILD_TYPE STREQUAL debug)
-    LIST(APPEND COMPILER_FLAGS_TO_CHECK "-DFCS_COMPILE_DEBUG_FUNCTIONS=1")
+    add_flags("-DFCS_COMPILE_DEBUG_FUNCTIONS=1")
 ENDIF (CMAKE_BUILD_TYPE STREQUAL debug)
 
 IF (CMAKE_BUILD_TYPE STREQUAL release)
-    LIST(APPEND COMPILER_FLAGS_TO_CHECK "-flto")
+    add_flags("-flto")
 ENDIF (CMAKE_BUILD_TYPE STREQUAL release)
 
-LIST(APPEND COMPILER_FLAGS_TO_CHECK "-Weverything" "-Wno-language-extension-token" "-Wno-padded")
+add_flags("-Weverything" "-Wno-language-extension-token" "-Wno-padded")
 
 SET (IDX 1)
 FOREACH (CFLAG_TO_CHECK ${COMPILER_FLAGS_TO_CHECK})
