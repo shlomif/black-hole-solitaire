@@ -117,9 +117,13 @@ IF (${BHS_STATE_STORAGE} STREQUAL "BHS_STATE_STORAGE_GOOGLE_SPARSE_HASH")
 
 ENDIF ()
 
-SET(COMPILER_FLAGS_TO_CHECK
-    "-Wall" "-Werror=implicit-function-declaration" "-fvisibility=hidden"
-)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
+
+IF (MSVC)
+    MESSAGE(FATAL_ERROR "Error! You are using Microsoft Visual C++ and Freecell Solver Requires a compiler that supports C99 and some GCC extensions. Possible alternatives are GCC, clang and Intel C++ Compiler")
+ENDIF ()
+
+SET (COMPILER_FLAGS_TO_CHECK "-fvisibility=hidden")
 MACRO(add_flags)
     LIST(APPEND COMPILER_FLAGS_TO_CHECK ${ARGV})
 ENDMACRO ()
