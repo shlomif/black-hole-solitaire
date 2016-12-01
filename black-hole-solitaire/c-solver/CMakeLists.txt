@@ -158,12 +158,8 @@ IF (${CMAKE_COMPILER_IS_GNUCC})
     ADD_DEFINITIONS("-std=gnu11")
 ENDIF ()
 
-IF (CMAKE_BUILD_TYPE STREQUAL debug)
-    add_flags("-DFCS_COMPILE_DEBUG_FUNCTIONS=1")
-ENDIF ()
-
 IF (CMAKE_BUILD_TYPE STREQUAL release)
-    add_flags("-flto")
+    add_flags("-flto" "-ffat-lto-objects")
 ENDIF ()
 
 add_flags("-Weverything" "-Wno-language-extension-token" "-Wno-padded")
