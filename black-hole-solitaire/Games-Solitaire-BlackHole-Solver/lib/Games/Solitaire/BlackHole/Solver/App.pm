@@ -13,14 +13,6 @@ use Pod::Usage;
 Games::Solitaire::BlackHole::Solver::App - a command line application
 implemented as a class to solve the Black Hole solitaire.
 
-=head1 VERSION
-
-Version 0.0.3
-
-=cut
-
-our $VERSION = '0.0.3';
-
 =head1 SYNOPSIS
 
     use Games::Solitaire::BlackHole::Solver::App;
@@ -151,7 +143,7 @@ sub run
 
     if ($version)
     {
-        print "black-hole-solve version $VERSION\n";
+        print "black-hole-solve version $Games::Solitaire::BlackHole::Solver::App::VERSION\n";
         exit(0);
     }
 

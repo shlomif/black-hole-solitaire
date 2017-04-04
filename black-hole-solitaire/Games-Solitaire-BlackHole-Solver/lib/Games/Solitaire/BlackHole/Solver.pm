@@ -1,21 +1,13 @@
 package Games::Solitaire::BlackHole::Solver;
 
-use warnings;
 use strict;
+use warnings;
 
 use 5.008;
 
 =head1 NAME
 
 Games::Solitaire::BlackHole::Solver - A solver for Black Hole Solitaire
-
-=head1 VERSION
-
-Version 0.0.3
-
-=cut
-
-our $VERSION = '0.0.3';
 
 =head1 SYNOPSIS
 
