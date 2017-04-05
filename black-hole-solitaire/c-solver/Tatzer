@@ -27,6 +27,7 @@ my %int_opts__values =
 
 my %STR_OPTS =
 (
+    'arch' => { param => 'CPU_ARCH', },
     'prefix' => {param => 'CMAKE_INSTALL_PREFIX',},
     (map
         {
@@ -52,7 +53,6 @@ my $build_type = "debug";
 my $generate_what;
 my $build_static_lib = 0;
 my $test_suite = 1;
-my $cpu_arch;
 my $omit_frame;
 my $with_context_var = 1;
 my $max_bench_threads_num = 4;
@@ -179,10 +179,7 @@ GetOptions(
         }
         return;
     },
-    'test-suite!' => \$test_suite,
-    'tokyo' => sub { return set_both("TOKYO_CAB_HASH"); },
     'hash' => \&set_hash,
-    'static' => \$build_static_lib,
     'profile' => sub {
         my ($opt, $val) = @_;
         if ($val)
@@ -199,12 +196,14 @@ GetOptions(
         $build_type = "MinSizeRel";
         return;
     },
-    'arch=s' => \$cpu_arch,
+    'gen=s' => \$generate_what,
+    'test-suite!' => \$test_suite,
+    'tokyo' => sub { return set_both("TOKYO_CAB_HASH"); },
+    'static' => \$build_static_lib,
     'omit-frame!' => \$omit_frame,
     'with-ctx-var!' => \$with_context_var,
     'max-bench-threads-num=i' => \$max_bench_threads_num,
     'static!' => \$link_to_static,
-    'gen=s' => \$generate_what,
     (map {; "$_=i" => \($int_opts__values{$_}) } @INT_OPS__KEYS),
     (map {; "$_=s" => \($STR_OPTS{$_}{value}) } @STR_OPTS__KEYS),
 ) or
@@ -237,7 +236,6 @@ my @cmd= ("cmake",
     "-DCMAKE_BUILD_TYPE=$build_type",
     "-DDATADIR=$STR_OPTS{prefix}{value}/share",
     ((!$build_static_lib) ? ("-DBUILD_STATIC_LIBRARY=") : ()),
-    (defined($cpu_arch) ? ("-DCPU_ARCH=$cpu_arch") : ()),
     ($omit_frame ? "-DOPTIMIZATION_OMIT_FRAME_POINTER=1" : ()),
     (map { defined($int_opts__values{$_}) ? ("-D" . $INT_OPTS{$_} . "=" . $int_opts__values{$_}) : () } @INT_OPS__KEYS),
     (map { my $k = $_; my $r = $STR_OPTS{$k}; my $v = $r->{value}; defined($v) ? ("-D$r->{param}=$r->{prefix}$v") : () } @STR_OPTS__KEYS),
