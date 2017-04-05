@@ -2,11 +2,11 @@ os: linux
 dist: trusty
 before_install:
     - sudo apt-get update -qq
-    - sudo apt-get install -y cmake cmake-data ninja-build python3-pip ack-grep cpanminus mercurial perl libperl-dev valgrind
+    - sudo apt-get install -y ack-grep cmake cmake-data cpanminus libperl-dev mercurial ninja-build perl python3-pip valgrind
     - sudo dpkg-divert --local --divert /usr/bin/ack --rename --add /usr/bin/ack-grep
 install:
     - which python3
-    - sudo cpanm --notest Dist::Zilla IO::All Test::Differences Test::Trap Env::Path Games::Solitaire::Verify::Solution Inline::C Inline Pod::Weaver::Section::Support Test::CPAN::Changes Test::Pod::Coverage Test::Pod Test::TrailingSpace
+    - sudo cpanm --notest Dist::Zilla Env::Path Games::Solitaire::Verify::Solution IO::All Inline Inline::C Pod::Weaver::Section::Support Test::CPAN::Changes Test::Differences Test::Pod Test::Pod::Coverage Test::TrailingSpace Test::Trap
     - wget http://web-cpan.shlomifish.org/downloads/libtap-1.12.0.tar.bz2
     - tar -xvf libtap-1.12.0.tar.bz2
     - ( mkdir B && cd B && cmake ../libtap-1.12.0 && make && sudo make install )
