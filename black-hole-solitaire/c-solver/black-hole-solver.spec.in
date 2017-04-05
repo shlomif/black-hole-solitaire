@@ -7,7 +7,6 @@ Source: http://fc-solve.shlomifish.org/downloads/fc-solve/black-hole-solver-%{ve
 URL: http://www.shlomifish.org/open-source/projects/black-hole-solitaire-solver/
 Requires: libblack_hole_solver0 = %{version}
 Summary: The Black Hole Solver Executable
-BuildRequires: ack
 BuildRequires: cmake
 BuildRequires: perl(base)
 BuildRequires: perl(Carp)

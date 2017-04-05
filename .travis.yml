@@ -2,8 +2,7 @@ os: linux
 dist: trusty
 before_install:
     - sudo apt-get update -qq
-    - sudo apt-get install -y ack-grep cmake cmake-data cpanminus libperl-dev mercurial ninja-build perl python3-pip valgrind
-    - sudo dpkg-divert --local --divert /usr/bin/ack --rename --add /usr/bin/ack-grep
+    - sudo apt-get install -y cmake cmake-data cpanminus libperl-dev mercurial ninja-build perl python3-pip valgrind
 install:
     - which python3
     - sudo cpanm --notest Dist::Zilla Env::Path Games::Solitaire::Verify::Solution IO::All Inline Inline::C Pod::Weaver::Section::Support Test::CPAN::Changes Test::Differences Test::Pod Test::Pod::Coverage Test::TrailingSpace Test::Trap
