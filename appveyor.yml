@@ -24,6 +24,6 @@ test_script:
     - set CMAKE_MAKE_PROGRAM=C:\strawberry\c\bin\gmake.exe
     - cd ..\..
     - perl black-hole-solitaire/CI-testing/continuous-integration-testing.pl --gen="MSYS Makefiles"
-cache:
-    - C:\Perl5
+# cache:
+#   - C:\Perl5
 shallow_clone: true
