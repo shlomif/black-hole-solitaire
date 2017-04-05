@@ -11,7 +11,7 @@ install:
     - SET PERL_LOCAL_LIB_ROOT=C:/Perl5
     - SET PERL_MB_OPT=--install_base C:/Perl5
     - SET PERL_MM_OPT=INSTALL_BASE=C:/Perl5
-    - cpanm --notest Dist::Zilla IO::All Test::Differences Test::Trap Env::Path Games::Solitaire::Verify::Solution Inline::C Inline Pod::Coverage::TrustPod Pod::Weaver::Section::Support String::ShellQuote Test::CPAN::Changes Test::Pod::Coverage Test::Pod Test::TrailingSpace
+    - cpanm --notest Dist::Zilla Env::Path Games::Solitaire::Verify::Solution IO::All Inline Inline::C Pod::Coverage::TrustPod Pod::Weaver::Section::Support String::ShellQuote Test::CPAN::Changes Test::Differences Test::Pod Test::Pod::Coverage Test::TrailingSpace Test::Trap
     - cd black-hole-solitaire
     - hg clone https://bitbucket.org/shlomif/shlomif-cmake-modules c-solver/cmake/sfc
     - copy c-solver\cmake\sfc\shlomif-cmake-modules\Shlomif_Common.cmake c-solver\cmake\
@@ -19,18 +19,11 @@ install:
     - cd black-hole-solitaire\Games-Solitaire-BlackHole-Solver
     - dzil authordeps --missing | cpanm -n
     - dzil listdeps   --missing | cpanm -n
-# TODO : add the build/test of the rest of the cmake C version.
-
 build: off
-
 test_script:
-    # - dzil test -v --all
     - set CMAKE_MAKE_PROGRAM=C:\strawberry\c\bin\gmake.exe
     - cd ..\..
     - perl black-hole-solitaire/CI-testing/continuous-integration-testing.pl --gen="MSYS Makefiles"
-
 cache:
     - C:\Perl5
-
 shallow_clone: true
-
