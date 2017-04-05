@@ -12,7 +12,7 @@ foreach my $path (@ENV{qw/FCS_SRC_PATH FCS_PATH/})
         {
             root => $path,
             filename_regex => qr/./,
-            abs_path_prune_re => qr#CMakeFiles|(?:CTestTestfile\.cmake\z)|_Inline|libblack_hole_solver\.so|(?:\.(?:xcf|patch)\z)#,
+            abs_path_prune_re => qr#CMakeFiles|(?:CTestTestfile\.cmake\z)|_Inline|libblack_hole_solver(?:\.a|\.so)|(?:\.(?:xcf|patch)\z)#,
         }
     );
 
