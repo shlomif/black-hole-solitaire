@@ -21,10 +21,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-/*
- * min_and_max.h - header file for the min(a,b) and max(a,b) macros.
- *
- */
+// min_and_max.h - header file for the min(a,b) and max(a,b) macros.
 #pragma once
 
 #ifndef min
