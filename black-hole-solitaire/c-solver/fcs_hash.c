@@ -87,8 +87,6 @@ void bh_solve_hash_init(
     memset(hash->entries, 0, sizeof(bh_solve_hash_symlink_t) * ((size_t)size));
 
     bh_solve_compact_allocator_init(&(hash->allocator));
-
-    return;
 }
 
 void bh_solve_hash_get(
@@ -114,7 +112,7 @@ void bh_solve_hash_get(
     while (item != NULL)
     {
         if (
-            (!memcmp(&(item->key.key), &(key_ptr->key), sizeof(bhs_state_key_t)))
+            !memcmp(&(item->key.key), &(key_ptr->key), sizeof(bhs_state_key_t))
         )
         {
             result->value = item->key.value;
@@ -124,9 +122,7 @@ void bh_solve_hash_get(
         item = item->next;
     }
 
-    assert(0);
-
-    return;
+    assert(FALSE);
 }
 
 fcs_bool_t bh_solve_hash_insert(

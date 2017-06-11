@@ -47,17 +47,16 @@ enum GAME_TYPE
 };
 
 static void out_board(
-    black_hole_solver_instance_t * solver,
-    fcs_bool_t display_boards
+    black_hole_solver_instance_t *const solver,
+    const fcs_bool_t display_boards
 )
 {
-    char * board = NULL;
-
     if (! display_boards)
     {
         return;
     }
 
+    char * board = NULL;
     black_hole_solver_get_current_solution_board(
         solver,
         &board
@@ -69,8 +68,6 @@ static void out_board(
         free(board);
         board = NULL;
     }
-
-    return;
 }
 
 static const char * const help_text =

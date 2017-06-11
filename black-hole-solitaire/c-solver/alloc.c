@@ -48,7 +48,6 @@ void bh_solve_compact_allocator_init(
         allocator->packs[0] =
         malloc(ALLOCED_SIZE))
             + ALLOCED_SIZE;
-    return;
 }
 
 void bh_solve_compact_allocator_extend(

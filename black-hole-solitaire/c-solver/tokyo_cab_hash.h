@@ -61,7 +61,6 @@ static inline void bh_solve_hash_init(
         fprintf(stderr, "Tokyo Cabinet open error: %s\n", tchdberrmsg(ecode));
         exit(-1);
     }
-    return;
 }
 
 
@@ -95,8 +94,6 @@ static inline void bh_solve_hash_free(
     tchdbclose(hash->hash);
     tchdbdel(hash->hash);
     hash->hash = NULL;
-
-    return;
 }
 
 static inline void bh_solve_hash_get(
@@ -107,8 +104,6 @@ static inline void bh_solve_hash_get(
 {
     result->key = key_ptr->key;
     tchdbget3(hash->hash, &(key_ptr->key), sizeof(key_ptr->key), &(result->value), sizeof(result->value));
-
-    return;
 }
 
 #ifdef __cplusplus
