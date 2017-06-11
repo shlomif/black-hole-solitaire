@@ -4,8 +4,6 @@ CURRENT TASKS:
   - Make sure that failed malloc() / realloc() / etc. are handled gracefully.
     @ Added [Sun 2013-05-12]
 COMPLETED TASKS:
-  - first task.
-    @ DONE [Sun 2013-05-12]
   - Make the bits-per-column of up-to-4-cards as "3 bits" instead of "4 bits".
     @ DONE [Sun 2013-05-12]
   - Add the [--iters-display-step N] flag to display a progress trace.

@@ -46,7 +46,6 @@
 #error Unknown state storage.
 #endif
 
-#include "alloc.h"
 #include "rank_reach_prune.h"
 
 #define NUM_SUITS 4
