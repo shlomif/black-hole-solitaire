@@ -641,17 +641,10 @@ extern int DLLEXPORT black_hole_solver_run(
     setup_once(solver);
 
     const_SLOT(num_columns, solver);
-    const typeof(solver->max_iters_limit) max_iters_limit
-        = maxify( solver->max_iters_limit );
-    const typeof(solver->iters_display_step) iters_display_step
-        = solver->iters_display_step;
-
-    const typeof(solver->is_rank_reachability_prune_enabled)
-        is_rank_reachability_prune_enabled
-        = solver->is_rank_reachability_prune_enabled
-        ;
-
-    typeof(solver->iterations_num) iterations_num = solver->iterations_num;
+    const_SLOT(iters_display_step, solver);
+    const_SLOT(is_rank_reachability_prune_enabled, solver);
+    const_AUTO(max_iters_limit, maxify(solver->max_iters_limit));
+    var_AUTO(iterations_num, solver->iterations_num);
 
     long next_iterations_display_point =
     (
