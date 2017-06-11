@@ -663,23 +663,19 @@ extern int DLLEXPORT black_hole_solver_run(
 
     while (solver->queue_len > 0)
     {
-        solver->queue_len--;
+        --solver->queue_len;
         const typeof(solver->queue[solver->queue_len]) queue_item_copy
             = solver->queue[solver->queue_len];
         const typeof(queue_item_copy.s.unpacked) state
             = queue_item_copy.s.unpacked;
         const typeof(state.foundations) foundations = state.foundations;
 
-        if (is_rank_reachability_prune_enabled)
+        if (is_rank_reachability_prune_enabled && (bhs_find_rank_reachability__inline(
+                    foundations,
+                    queue_item_copy.rank_counts.c
+        ) != RANK_REACH__SUCCESS))
         {
-            if (! (bhs_find_rank_reachability__inline(
-                        foundations,
-                        queue_item_copy.rank_counts.c
-            ) == RANK_REACH__SUCCESS)
-            )
-            {
-                continue;
-            }
+            continue;
         }
 
         iterations_num++;
