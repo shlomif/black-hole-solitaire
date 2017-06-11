@@ -39,9 +39,7 @@ extern "C" {
 
 #include "config.h"
 
-#include "inline.h"
 #include <black-hole-solver/bool.h>
-
 #include "state.h"
 
 typedef struct
@@ -49,7 +47,7 @@ typedef struct
     TCHDB * hash;
 } bh_solve_hash_t;
 
-static GCC_INLINE void bh_solve_hash_init(
+static inline void bh_solve_hash_init(
     bh_solve_hash_t * hash
     )
 {
@@ -67,7 +65,7 @@ static GCC_INLINE void bh_solve_hash_init(
 }
 
 
-static GCC_INLINE fcs_bool_t bh_solve_hash_insert(
+static inline fcs_bool_t bh_solve_hash_insert(
     bh_solve_hash_t * hash,
     bhs_state_key_value_pair_t * key
 )
@@ -90,7 +88,7 @@ extern fcs_bool_t bh_solve_hash_insert(
     bhs_state_key_value_pair_t * key
     );
 
-static GCC_INLINE void bh_solve_hash_free(
+static inline void bh_solve_hash_free(
     bh_solve_hash_t * hash
     )
 {
@@ -101,7 +99,7 @@ static GCC_INLINE void bh_solve_hash_free(
     return;
 }
 
-static GCC_INLINE void bh_solve_hash_get(
+static inline void bh_solve_hash_get(
     bh_solve_hash_t * hash,
     bhs_state_key_value_pair_t * key_ptr,
     bhs_state_key_value_pair_t * result

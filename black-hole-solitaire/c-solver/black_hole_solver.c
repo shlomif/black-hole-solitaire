@@ -290,7 +290,7 @@ static int parse_card(
     return BLACK_HOLE_SOLVER__SUCCESS;
 }
 
-static GCC_INLINE fcs_bool_t string_find_prefix(
+static inline fcs_bool_t string_find_prefix(
     const char * * s,
     const char * const prefix
 )
@@ -460,7 +460,7 @@ DLLEXPORT extern int black_hole_solver_set_iters_display_step(
     return BLACK_HOLE_SOLVER__SUCCESS;
 }
 
-static GCC_INLINE void queue_item_populate_packed(
+static inline void queue_item_populate_packed(
     bhs_solver_t * const solver,
     bhs_queue_item_t * const queue_item
 )
@@ -483,7 +483,7 @@ static GCC_INLINE void queue_item_populate_packed(
     }
 }
 
-static GCC_INLINE void queue_item_unpack(
+static inline void queue_item_unpack(
     bhs_solver_t * const solver,
     bhs_solution_state_t * const queue_item
 )
@@ -506,7 +506,7 @@ static GCC_INLINE void queue_item_unpack(
     }
 }
 
-static GCC_INLINE void perform_move(
+static inline void perform_move(
     bhs_solver_t * const solver,
     const bhs_rank_t card,
     const int col_idx,
@@ -555,12 +555,12 @@ static GCC_INLINE void perform_move(
     }
 }
 
-static GCC_INLINE long maxify(long n)
+static inline long maxify(long n)
 {
     return ((n < 0) ? LONG_MAX : n);
 }
 
-static GCC_INLINE bhs_state_key_value_pair_t setup_first_queue_item(
+static inline bhs_state_key_value_pair_t setup_first_queue_item(
     bhs_solver_t * const solver
 )
 {
@@ -598,7 +598,7 @@ static GCC_INLINE bhs_state_key_value_pair_t setup_first_queue_item(
     return new_queue_item->s.packed;
 }
 
-static GCC_INLINE void setup_init_state(
+static inline void setup_init_state(
     bhs_solver_t * const solver
 )
 {
@@ -620,7 +620,7 @@ static GCC_INLINE void setup_init_state(
     return;
 }
 
-static GCC_INLINE void setup_once(
+static inline void setup_once(
     bhs_solver_t * const solver
 )
 {

@@ -34,10 +34,8 @@ extern "C" {
 
 #include <black-hole-solver/bool.h>
 #include <black-hole-solver/fcs_dllexport.h>
-#include "inline.h"
 
 #define NUM_RANKS 13
-
 
 enum RANK_REACH_VERDICT
 {
@@ -50,7 +48,7 @@ DLLEXPORT enum RANK_REACH_VERDICT bhs_find_rank_reachability(
     const unsigned char * const rank_counts
 );
 
-static GCC_INLINE enum RANK_REACH_VERDICT bhs_find_rank_reachability__inline(
+static inline enum RANK_REACH_VERDICT bhs_find_rank_reachability__inline(
     const signed char foundation,
     const unsigned char * const rank_counts
 )

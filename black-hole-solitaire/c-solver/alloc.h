@@ -35,8 +35,6 @@ extern "C"
 
 #include <stddef.h>
 
-#include "inline.h"
-
 typedef struct
 {
     char * * packs;
@@ -53,7 +51,7 @@ extern void bh_solve_compact_allocator_extend(
     bhs_compact_allocator_t * const allocator
         );
 
-static GCC_INLINE void * fcs_compact_alloc_ptr(
+static inline void * fcs_compact_alloc_ptr(
     bhs_compact_allocator_t * const allocator,
     const ssize_t how_much_proto
 )

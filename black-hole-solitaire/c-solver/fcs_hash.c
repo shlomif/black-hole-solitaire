@@ -38,18 +38,13 @@
 #include <assert.h>
 
 #include "fcs_hash.h"
-
 #include "alloc.h"
-
-#include "inline.h"
-
 #include "state.h"
-
 
 typedef  unsigned long  int  ub4;   /* unsigned 4-byte quantities */
 typedef  unsigned       char ub1;
 
-static GCC_INLINE ub4 perl_hash_function(bhs_state_key_t key)
+static inline ub4 perl_hash_function(bhs_state_key_t key)
 {
     register ub4  hash_value_int = 0;
     register ub1 * s_ptr = (ub1 *)(&(key));
@@ -64,7 +59,7 @@ static GCC_INLINE ub4 perl_hash_function(bhs_state_key_t key)
     return hash_value_int;
 }
 
-static GCC_INLINE void bh_solve_hash_rehash(bh_solve_hash_t * hash);
+static inline void bh_solve_hash_rehash(bh_solve_hash_t * hash);
 
 
 
@@ -220,7 +215,7 @@ fcs_bool_t bh_solve_hash_insert(
     hash table, allowing for smaller chains, and faster lookup.
 
   */
-static GCC_INLINE void bh_solve_hash_rehash(
+static inline void bh_solve_hash_rehash(
     bh_solve_hash_t * hash
     )
 {

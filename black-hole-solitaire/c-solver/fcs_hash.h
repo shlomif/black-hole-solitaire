@@ -34,8 +34,6 @@ extern "C" {
 #include "config.h"
 
 #include "alloc.h"
-
-#include "inline.h"
 #include <black-hole-solver/bool.h>
 #include "state.h"
 
@@ -105,9 +103,7 @@ extern fcs_bool_t bh_solve_hash_insert(
     bhs_state_key_value_pair_t * key
     );
 
-
-
-static GCC_INLINE void bh_solve_hash_free(
+static inline void bh_solve_hash_free(
     bh_solve_hash_t * hash
     )
 {
