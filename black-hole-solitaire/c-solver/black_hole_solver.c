@@ -35,6 +35,7 @@
 #include <black-hole-solver/black_hole_solver.h>
 #include "state.h"
 #include "bit_rw.h"
+#include "typeof_wrap.h"
 
 #if (BHS_STATE_STORAGE == BHS_STATE_STORAGE_TOKYO_CAB_HASH)
 #include "tokyo_cab_hash.h"
@@ -469,9 +470,8 @@ static inline void queue_item_populate_packed(
     fc_solve_bit_writer_t bit_w;
     fc_solve_bit_writer_init(&bit_w, queue_item->s.packed.key.data);
 
-    const typeof(solver->num_columns) num_columns = solver->num_columns;
-    const typeof(solver->bits_per_column) bits_per_column
-        = solver->bits_per_column;
+    const_SLOT(num_columns, solver);
+    const_SLOT(bits_per_column, solver);
     for (int col = 0; col < num_columns ; col++)
     {
         fc_solve_bit_writer_write(
@@ -487,8 +487,8 @@ static inline void queue_item_unpack(
     bhs_solution_state_t * const queue_item
 )
 {
-    const int num_columns = solver->num_columns;
-    const int bits_per_column = solver->bits_per_column;
+    const_SLOT(num_columns, solver);
+    const_SLOT(bits_per_column, solver);
 
     queue_item->unpacked.foundations = queue_item->packed.key.foundations;
 
@@ -563,7 +563,7 @@ static inline bhs_state_key_value_pair_t setup_first_queue_item(
     bhs_solver_t * const solver
 )
 {
-    const typeof(solver->num_columns) num_columns = solver->num_columns;
+    const_SLOT(num_columns, solver);
 
     typeof(solver->queue[solver->queue_len]) * const new_queue_item =
         &(solver->queue[solver->queue_len]);
@@ -640,8 +640,7 @@ extern int DLLEXPORT black_hole_solver_run(
 
     setup_once(solver);
 
-    const typeof(solver->num_columns) num_columns = solver->num_columns;
-
+    const_SLOT(num_columns, solver);
     const typeof(solver->max_iters_limit) max_iters_limit
         = maxify( solver->max_iters_limit );
     const typeof(solver->iters_display_step) iters_display_step
@@ -913,7 +912,7 @@ DLLEXPORT extern int black_hole_solver_get_current_solution_board(
         solver->current_state_in_solution_idx
     ];
 
-    const typeof(solver->num_columns) num_columns = solver->num_columns;
+    const_SLOT(num_columns, solver);
     for (int col_idx = 0; col_idx < num_columns; col_idx++)
     {
         s += sprintf(s, "%c", ':');
