@@ -655,11 +655,9 @@ extern int DLLEXPORT black_hole_solver_run(
     while (solver->queue_len > 0)
     {
         --solver->queue_len;
-        const typeof(solver->queue[solver->queue_len]) queue_item_copy
-            = solver->queue[solver->queue_len];
-        const typeof(queue_item_copy.s.unpacked) state
-            = queue_item_copy.s.unpacked;
-        const typeof(state.foundations) foundations = state.foundations;
+        const_AUTO(queue_item_copy, solver->queue[solver->queue_len]);
+        const_AUTO(state, queue_item_copy.s.unpacked);
+        const_AUTO(foundations, state.foundations);
 
         if (is_rank_reachability_prune_enabled && (bhs_find_rank_reachability__inline(
                     foundations,
@@ -675,12 +673,11 @@ extern int DLLEXPORT black_hole_solver_run(
 
         for (int col_idx = 0 ; col_idx < num_columns ; col_idx++)
         {
-            const typeof(state.heights[col_idx]) pos = state.heights[col_idx];
+            const_AUTO(pos, state.heights[col_idx]);
             if ( pos )
             {
                 no_cards = FALSE;
-                const typeof(solver->board_values[col_idx][pos-1]) card =
-                    solver->board_values[col_idx][pos-1];
+                const_AUTO(card, solver->board_values[col_idx][pos-1]);
 
                 if ( (foundations == -1)
                         ||
@@ -793,7 +790,7 @@ static void initialize_states_in_solution(bhs_solver_t * solver)
         /* Reverse the list in place. */
         for (int i = 0 ; i < (num_states >> 1) ; i++)
         {
-            const typeof(states[i]) temp_state = states[i];
+            const_AUTO(temp_state, states[i]);
             states[i] = states[num_states-1-i];
             states[num_states-1-i] = temp_state;
         }
