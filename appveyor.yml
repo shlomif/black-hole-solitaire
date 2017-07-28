@@ -25,5 +25,5 @@ test_script:
     - cd ..\..
     - perl black-hole-solitaire/CI-testing/continuous-integration-testing.pl --gen="MSYS Makefiles"
 cache:
-   - C:\Perl5
+    # - C:\Perl5
 shallow_clone: true
