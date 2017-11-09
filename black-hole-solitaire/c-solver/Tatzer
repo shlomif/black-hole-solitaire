@@ -27,9 +27,6 @@ my %bool_opts_with_false_defaults__values =
 
 my %TRUE_BOOL_OPTS =
 (
-    'build-docs' => 'FCS_BUILD_DOCS',
-    'test-suite' => 'FCS_WITH_TEST_SUITE',
-    'with-ctx-var' => 'FCS_WITH_CONTEXT_VARIABLE',
 );
 my @TRUE_BOOL_KEYS = keys %TRUE_BOOL_OPTS;
 my %true_bool_opts__values = map { $_ => 1 } @TRUE_BOOL_KEYS;
