@@ -13,6 +13,27 @@ use File::Path qw(rmtree);
 use File::Basename qw(dirname);
 use Getopt::Long;
 
+my %BOOL_OPTS_WITH_FALSE_DEFAULTS =
+(
+    'omit-frame' => 'OPTIMIZATION_OMIT_FRAME_POINTER',
+);
+
+my @BOOL_OPTS_WITH_FALSE_DEFAULTS__KEYS = keys %BOOL_OPTS_WITH_FALSE_DEFAULTS;
+
+my %bool_opts_with_false_defaults__values =
+(
+    map { $_ => 0 } @BOOL_OPTS_WITH_FALSE_DEFAULTS__KEYS
+);
+
+my %TRUE_BOOL_OPTS =
+(
+    'build-docs' => 'FCS_BUILD_DOCS',
+    'test-suite' => 'FCS_WITH_TEST_SUITE',
+    'with-ctx-var' => 'FCS_WITH_CONTEXT_VARIABLE',
+);
+my @TRUE_BOOL_KEYS = keys %TRUE_BOOL_OPTS;
+my %true_bool_opts__values = map { $_ => 1 } @TRUE_BOOL_KEYS;
+
 my %INT_OPTS =
 (
     'pack-size' => 'FCS_IA_PACK_SIZE',
@@ -52,8 +73,6 @@ $STR_OPTS{'prefix'}{value} = '/usr';
 my $build_type = "debug";
 my $generate_what;
 my $build_static_lib = 0;
-my $test_suite = 1;
-my $omit_frame;
 my $with_context_var = 1;
 my $max_bench_threads_num = 4;
 my $link_to_static = 0;
@@ -84,10 +103,11 @@ my %themes =
 );
 
 foreach my $rec (
+    {id => "c2", a => "core2",},
+    {id => "ci7", a => "corei7-avx",},
+    {id => "n2", a => "native",},
     {id => "p4", a => "pentium4"},
     {id => "x64", a => "barcelona"},
-    {id => "c2", a => "core2",},
-    {id => "ci7", a => "corei7-avx",}
 )
 {
     my $id = $rec->{id};
@@ -122,7 +142,7 @@ foreach my $rec (
     if (defined(my $HOME = $ENV{HOME}))
     {
         # For use by PySolFC
-        $bb_def->(pysol => ["--prefix=$HOME/apps/fcs-for-pysol",]);
+        $bb_def->(_pysol => ["--prefix=$HOME/apps/fcs-for-pysol",]);
     }
 }
 
@@ -197,13 +217,13 @@ GetOptions(
         return;
     },
     'gen=s' => \$generate_what,
-    'test-suite!' => \$test_suite,
     'tokyo' => sub { return set_both("TOKYO_CAB_HASH"); },
     'static' => \$build_static_lib,
-    'omit-frame!' => \$omit_frame,
     'with-ctx-var!' => \$with_context_var,
     'max-bench-threads-num=i' => \$max_bench_threads_num,
     'static!' => \$link_to_static,
+    (map {; "$_!" => \($bool_opts_with_false_defaults__values{$_}) } @BOOL_OPTS_WITH_FALSE_DEFAULTS__KEYS),
+    (map {; "$_!" => \($true_bool_opts__values{$_}) } @TRUE_BOOL_KEYS),
     (map {; "$_=i" => \($int_opts__values{$_}) } @INT_OPS__KEYS),
     (map {; "$_=s" => \($STR_OPTS{$_}{value}) } @STR_OPTS__KEYS),
 ) or
@@ -236,7 +256,8 @@ my @cmd= ("cmake",
     "-DCMAKE_BUILD_TYPE=$build_type",
     "-DDATADIR=$STR_OPTS{prefix}{value}/share",
     ((!$build_static_lib) ? ("-DBUILD_STATIC_LIBRARY=") : ()),
-    ($omit_frame ? "-DOPTIMIZATION_OMIT_FRAME_POINTER=1" : ()),
+    (map { $bool_opts_with_false_defaults__values{$_} ? ("-D" . $BOOL_OPTS_WITH_FALSE_DEFAULTS{$_} . "=1") : () } @BOOL_OPTS_WITH_FALSE_DEFAULTS__KEYS),
+    (map { '-D' . $TRUE_BOOL_OPTS{$_} . '=' . ($true_bool_opts__values{$_} ? '1': '') } @TRUE_BOOL_KEYS),
     (map { defined($int_opts__values{$_}) ? ("-D" . $INT_OPTS{$_} . "=" . $int_opts__values{$_}) : () } @INT_OPS__KEYS),
     (map { my $k = $_; my $r = $STR_OPTS{$k}; my $v = $r->{value}; defined($v) ? ("-D$r->{param}=$r->{prefix}$v") : () } @STR_OPTS__KEYS),
 );
