@@ -1,3 +1,9 @@
+0.16.0      ( 12 Nov 2017 ):
+============================
+
+* Fix a crash when reading a non-existent board file.
+    - Thanks to Nandakumar Edamana for the report.
+
 0.14.0      ( 24 Feb 2016 ):
 ============================
 

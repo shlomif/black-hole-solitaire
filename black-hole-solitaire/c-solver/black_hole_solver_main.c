@@ -211,6 +211,12 @@ int main(int argc, char * argv[])
     if (filename)
     {
         fh = fopen(filename, "rt");
+        if (! fh)
+        {
+            fprintf(stderr, "Cannot open '%s' for reading!\n", filename);
+            black_hole_solver_free(solver);
+            return -1;
+        }
     }
     else
     {

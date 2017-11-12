@@ -19,7 +19,7 @@ if ($IS_WIN)
 }
 else
 {
-    plan tests => 4;
+    plan tests => 5;
 }
 
 my $bin_dir = catpath( ( splitpath( rel2abs $0 ) )[ 0, 1 ] );
@@ -99,6 +99,15 @@ test_using_valgrind(
         ),
     ],
     qq{valgrind --display-boards --rank-reach-prune all_in_a_row deal #24.}
+);
+
+# TEST
+test_using_valgrind(
+    [
+        '--game', 'black_hole',
+        'non-existent-board----------flakmuttterputter.board',
+    ],
+    qq{valgrind does not crash on non-existent board.}
 );
 
 # TEST

@@ -155,6 +155,7 @@ int DLLEXPORT black_hole_solver_create(
     ret->is_rank_reachability_prune_enabled = FALSE;
     ret->iters_display_step = 0;
     ret->num_columns = 0;
+    ret->queue = NULL;
 
     bh_solve_hash_init(&(ret->positions));
 
