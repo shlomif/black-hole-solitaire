@@ -38,14 +38,6 @@ extern "C" {
 #cmakedefine CARD_DEBUG_PRES
 
 /*
- * Define this macro if the C compiler supports the keyword inline or
- * a similar keyword that was found by Autoconf (and defined as inline).
- * */
-#cmakedefine HAVE_C_INLINE
-
-#cmakedefine FCS_INLINE_KEYWORD ${FCS_INLINE_KEYWORD}
-
-/*
     The sort margin size for the previous states array.
 */
 #define PREV_STATES_SORT_MARGIN 32

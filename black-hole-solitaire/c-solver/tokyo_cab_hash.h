@@ -21,10 +21,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-/*
- * tokyo_cab_hash.h - header file of the Tokyo Cabinet hash.
- *
- */
+// tokyo_cab_hash.h - header file of the Tokyo Cabinet hash.
 #pragma once
 
 #ifdef __cplusplus
@@ -78,10 +75,8 @@ static inline fcs_bool_t bh_solve_hash_insert(
     ));
 }
 
-/*
- * Returns FALSE if the key is new and the key/val pair was inserted.
- * Returns TRUE if the key is not new.
- */
+// Returns FALSE if the key is new and the key/val pair was inserted.
+// Returns TRUE if the key is not new.
 extern fcs_bool_t bh_solve_hash_insert(
     bh_solve_hash_t * hash,
     bhs_state_key_value_pair_t * key

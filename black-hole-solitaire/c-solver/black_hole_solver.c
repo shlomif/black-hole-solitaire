@@ -21,9 +21,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-/*
- * black_hole_solver.c - a solver for Black Hole Solitaire.
- */
+// black_hole_solver.c - a solver for Black Hole Solitaire.
 
 #include <stdlib.h>
 #include <string.h>

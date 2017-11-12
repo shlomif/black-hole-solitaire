@@ -21,9 +21,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-/*
- * bit_rw.h - bit readers and writers. Used by delta_states.c .
- */
+// bit_rw.h - bit readers and writers.
 #pragma once
 
 #include "config.h"

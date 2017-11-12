@@ -21,9 +21,6 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-/*
- * black_hole_solver.h - a solver for Black Hole Solitaire - header of the API.
- */
 #pragma once
 
 #ifdef __cplusplus

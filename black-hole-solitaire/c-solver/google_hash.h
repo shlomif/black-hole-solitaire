@@ -21,10 +21,8 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-/*
- * google_hash.h - header file for Google's dense_hash_map as adapted
- * for Freecell Solver.
- */
+// google_hash.h - header file for Google's dense_hash_map as adapted
+// for Freecell Solver.
 #pragma once
 
 #ifdef __cplusplus

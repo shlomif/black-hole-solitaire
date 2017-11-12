@@ -21,14 +21,9 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-/*
- * bool.h - the purpose of this file is to define the fcs_bool_t type
- * and the related constants of TRUE and FALSE.
- *
- */
-
-#ifndef FC_SOLVE__BOOL_H
-#define FC_SOLVE__BOOL_H
+// bool.h - the purpose of this file is to define the fcs_bool_t type
+// and the related constants of TRUE and FALSE.
+#pragma once
 
 typedef int fcs_bool_t;
 
@@ -38,6 +33,4 @@ typedef int fcs_bool_t;
 
 #ifndef TRUE
 #define TRUE 1
-#endif
-
 #endif

@@ -26,7 +26,6 @@
  * hash uses chaining and re-hashing and was found to be very fast. Not all
  * of the functions of the hash ADT are implemented, but it is useful enough
  * for Freecell Solver.
- *
  */
 
 #include "config.h"

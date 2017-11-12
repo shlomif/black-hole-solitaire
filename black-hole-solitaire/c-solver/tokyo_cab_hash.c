@@ -21,14 +21,6 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-/*
- * fcs_hash.c - an implementation of a simplistic (keys only) hash. This
- * hash uses chaining and re-hashing and was found to be very fast. Not all
- * of the functions of the hash ADT are implemented, but it is useful enough
- * for Freecell Solver.
- *
- */
-
 #define BUILDING_DLL 1
 #include "config.h"
 

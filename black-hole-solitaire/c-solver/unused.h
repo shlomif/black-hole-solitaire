@@ -21,10 +21,8 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-/*
- * unused.h - the purpose of this file is to define the GCC_UNUSED
- * macro to suppress unused parameters warnings / remarks.
- */
+// unused.h - the purpose of this file is to define the GCC_UNUSED
+// macro to suppress unused parameters warnings / remarks.
 #pragma once
 
 #if defined(__GNUC__)

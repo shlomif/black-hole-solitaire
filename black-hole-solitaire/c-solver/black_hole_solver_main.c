@@ -21,10 +21,8 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-/*
- * black_hole_solver_main.c - a solver for Black Hole Solitaire - header
- * of the command line program.
- */
+// black_hole_solver_main.c - a solver for Black Hole Solitaire - header
+// of the command line program.
 
 #include <stdio.h>
 #include <string.h>

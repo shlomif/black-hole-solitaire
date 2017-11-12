@@ -21,14 +21,8 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-/*
- * black_hole_solver.h - a solver for Black Hole Solitaire - header of the API.
- */
-
-#ifndef BLACK_HOLE_SOLVER__H
-#define BLACK_HOLE_SOLVER__H
-
-
+// black_hole_solver.h - a solver for Black Hole Solitaire - header of the API.
+#pragma once
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -118,5 +112,3 @@ DLLEXPORT const char * black_hole_solver_get_lib_version(void);
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* BLACK_HOLE_SOLVER__H */
