@@ -14,7 +14,7 @@ install:
     - cpanm --notest Dist::Zilla Env::Path Games::Solitaire::Verify::Solution IO::All Inline Inline::C Pod::Coverage::TrustPod Pod::Weaver::Section::Support String::ShellQuote Test::CPAN::Changes Test::Differences Test::EOL Test::NoTabs Test::Pod Test::Pod::Coverage Test::TrailingSpace Test::Trap
     - cd black-hole-solitaire
     - hg clone https://bitbucket.org/shlomif/shlomif-cmake-modules c-solver/cmake/sfcador
-    - copy c-solver\cmake\sfcdor\shlomif-cmake-modules\Shlomif_Common.cmake c-solver\cmake\
+    - copy c-solver\cmake\sfcador\shlomif-cmake-modules\Shlomif_Common.cmake c-solver\cmake\
     - cd ..
     - cd black-hole-solitaire\Games-Solitaire-BlackHole-Solver
     - dzil authordeps --missing | cpanm -n
