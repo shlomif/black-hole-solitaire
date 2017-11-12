@@ -4,6 +4,8 @@
 * Fix a crash when reading a non-existent board file.
     - Thanks to Nandakumar Edamana for the report.
 
+* Got the tests to work on MS Windows and other cleanups.
+
 0.14.0      ( 24 Feb 2016 ):
 ============================
 
