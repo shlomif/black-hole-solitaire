@@ -27,8 +27,10 @@ sub _normalize_lf
 {
     trap
     {
-        system('./black-hole-solve',
-            '--game', 'all_in_a_row',
+        system(
+            './black-hole-solve',
+            '--game',
+            'all_in_a_row',
             File::Spec->catfile(
                 $bin_dir, 'data', '24.all_in_a_row.board.txt'
             )
@@ -36,7 +38,7 @@ sub _normalize_lf
     };
 
     # TEST
-    ok (! ($trap->exit), "Running the program successfully for board #24.");
+    ok( !( $trap->exit ), "Running the program successfully for board #24." );
 
     my $expected_output = <<'EOF';
 Solved!
@@ -412,8 +414,8 @@ This scan generated 18056 states.
 EOF
 
     # TEST
-    eq_or_diff (
-        _normalize_lf($trap->stdout()),
+    eq_or_diff(
+        _normalize_lf( $trap->stdout() ),
         _normalize_lf($expected_output),
         "Right output from board 24."
     );
@@ -422,8 +424,10 @@ EOF
 {
     trap
     {
-        system('./black-hole-solve',
-            '--game', 'all_in_a_row',
+        system(
+            './black-hole-solve',
+            '--game',
+            'all_in_a_row',
             '--display-boards',
             File::Spec->catfile(
                 $bin_dir, 'data', '24.all_in_a_row.board.txt'
@@ -432,7 +436,7 @@ EOF
     };
 
     # TEST
-    ok (! ($trap->exit), "Exit code for --display-boards for board #24.");
+    ok( !( $trap->exit ), "Exit code for --display-boards for board #24." );
 
     my $expected_prefix = _normalize_lf(<<'EOF');
 Solved!
@@ -513,12 +517,12 @@ Info: Card moved is QD
 
 EOF
 
-    my $stdout = _normalize_lf($trap->stdout());
+    my $stdout = _normalize_lf( $trap->stdout() );
 
-    my $got_prefix = substr($stdout, 0, length($expected_prefix));
+    my $got_prefix = substr( $stdout, 0, length($expected_prefix) );
 
     # TEST
-    eq_or_diff (
+    eq_or_diff(
         _normalize_lf($got_prefix),
         _normalize_lf($expected_prefix),
         "Right output from board 24 with --display-boards."
@@ -526,13 +530,14 @@ EOF
 
     my $expected_stdout = io->file(
         File::Spec->catfile(
-            $bin_dir, 'data',
-            '24.all_in_a_row.sol-with-display-boards.txt',
+            $bin_dir, 'data', '24.all_in_a_row.sol-with-display-boards.txt',
         )
     )->slurp;
 
     # TEST
-    eq_or_diff (_normalize_lf($stdout), _normalize_lf($expected_stdout),
+    eq_or_diff(
+        _normalize_lf($stdout),
+        _normalize_lf($expected_stdout),
         "Complete Right output from board 24 with --display-boards."
     );
 }

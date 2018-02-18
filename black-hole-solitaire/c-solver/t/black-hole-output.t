@@ -11,10 +11,9 @@ use File::Spec::Functions qw( catpath splitpath rel2abs );
 
 my $bin_dir = catpath( ( splitpath( rel2abs $0 ) )[ 0, 1 ] );
 
-use Test::Trap
-    qw(
+use Test::Trap qw(
     trap $trap :flow:stderr(systemsafe):stdout(systemsafe):warn
-    );
+);
 
 use Socket qw(:crlf);
 
@@ -27,8 +26,10 @@ sub _normalize_lf
 
 trap
 {
-    system('./black-hole-solve',
-        '--game', 'black_hole',
+    system(
+        './black-hole-solve',
+        '--game',
+        'black_hole',
         File::Spec->catfile(
             $bin_dir, "data", "26464608654870335080.bh.board.txt"
         )
@@ -36,7 +37,7 @@ trap
 };
 
 # TEST
-ok (! ($trap->exit), "Running the program successfully.");
+ok( !( $trap->exit ), "Running the program successfully." );
 
 my $expected_output = <<'EOF';
 Solved!
@@ -405,16 +406,16 @@ This scan generated 8672 states.
 EOF
 
 # TEST
-eq_or_diff (_normalize_lf($trap->stdout()), _normalize_lf($expected_output), "Right output.");
+eq_or_diff(
+    _normalize_lf( $trap->stdout() ),
+    _normalize_lf($expected_output),
+    "Right output."
+);
 
 trap
 {
-    system('./black-hole-solve',
-        '--game', 'black_hole',
-        File::Spec->catfile(
-            $bin_dir, "data", "1.bh.board.txt"
-        )
-    );
+    system( './black-hole-solve', '--game', 'black_hole',
+        File::Spec->catfile( $bin_dir, "data", "1.bh.board.txt" ) );
 };
 
 $expected_output = <<'EOF';
@@ -427,15 +428,20 @@ This scan generated 8 states.
 EOF
 
 # TEST
-eq_or_diff (_normalize_lf($trap->stdout()),
-    _normalize_lf($expected_output), "Right output.");
-
+eq_or_diff(
+    _normalize_lf( $trap->stdout() ),
+    _normalize_lf($expected_output),
+    "Right output."
+);
 
 trap
 {
-    system('./black-hole-solve',
-        '--game', 'black_hole',
-        "--max-iters", "10000",
+    system(
+        './black-hole-solve',
+        '--game',
+        'black_hole',
+        "--max-iters",
+        "10000",
         File::Spec->catfile(
             $bin_dir, "data", "26464608654870335080.bh.board.txt"
         )
@@ -443,7 +449,7 @@ trap
 };
 
 # TEST
-ok (! ($trap->exit), "Running --max-iters program successfully.");
+ok( !( $trap->exit ), "Running --max-iters program successfully." );
 
 $expected_output = <<'EOF';
 Solved!
@@ -812,17 +818,16 @@ This scan generated 8672 states.
 EOF
 
 # TEST
-eq_or_diff (_normalize_lf($trap->stdout()), _normalize_lf($expected_output),
-    "Right output.");
+eq_or_diff(
+    _normalize_lf( $trap->stdout() ),
+    _normalize_lf($expected_output),
+    "Right output."
+);
 
 trap
 {
-    system('./black-hole-solve',
-        '--game', 'black_hole',
-        File::Spec->catfile(
-            $bin_dir, "data", "1.bh.board.txt"
-        )
-    );
+    system( './black-hole-solve', '--game', 'black_hole',
+        File::Spec->catfile( $bin_dir, "data", "1.bh.board.txt" ) );
 };
 
 $expected_output = <<'EOF';
@@ -835,29 +840,36 @@ This scan generated 8 states.
 EOF
 
 # TEST
-eq_or_diff (_normalize_lf($trap->stdout()), _normalize_lf($expected_output),
-    "Right output for --max-iters.");
+eq_or_diff(
+    _normalize_lf( $trap->stdout() ),
+    _normalize_lf($expected_output),
+    "Right output for --max-iters."
+);
 
 my $ret_code;
 trap
 {
-    $ret_code = system('./black-hole-solve', '--version');
+    $ret_code = system( './black-hole-solve', '--version' );
 };
 
 # TEST
-is ($ret_code, 0, "Exited successfully.");
+is( $ret_code, 0, "Exited successfully." );
 
 # TEST
-like (_normalize_lf($trap->stdout()),
-    qr/\Ablack-hole-solver version (\d+(?:\.\d+){2})\r?\nLibrary version \1\r?\n\z/,
+like(
+    _normalize_lf( $trap->stdout() ),
+qr/\Ablack-hole-solver version (\d+(?:\.\d+){2})\r?\nLibrary version \1\r?\n\z/,
     "Right otuput for --version."
 );
 
 trap
 {
-    system('./black-hole-solve',
-        '--game', 'black_hole',
-        '--iters-display-step', '1000',
+    system(
+        './black-hole-solve',
+        '--game',
+        'black_hole',
+        '--iters-display-step',
+        '1000',
         File::Spec->catfile(
             $bin_dir, "data", "26464608654870335080.bh.board.txt"
         )
@@ -865,7 +877,7 @@ trap
 };
 
 # TEST
-ok (! ($trap->exit), "iters-display-step: running the program successfully.");
+ok( !( $trap->exit ), "iters-display-step: running the program successfully." );
 
 $expected_output = <<'EOF';
 Iteration: 1000
@@ -1242,37 +1254,45 @@ This scan generated 8672 states.
 EOF
 
 # TEST
-eq_or_diff (_normalize_lf($trap->stdout()), _normalize_lf($expected_output), "Right output for iterations step.");
+eq_or_diff(
+    _normalize_lf( $trap->stdout() ),
+    _normalize_lf($expected_output),
+    "Right output for iterations step."
+);
 
 # TEST:$c=2;
 foreach my $command (
     [
         './black-hole-solve',
-        '--game', 'black_hole',
-        '--iters-display-step', '1100',
+        '--game',
+        'black_hole',
+        '--iters-display-step',
+        '1100',
         File::Spec->catfile(
             $bin_dir, "data", "26464608654870335080.bh.board.txt"
         )
     ],
     [
         './black-hole-solve-resume-api',
-        '--game', 'black_hole',
-        '--iters-display-step', '1100',
+        '--game',
+        'black_hole',
+        '--iters-display-step',
+        '1100',
         File::Spec->catfile(
             $bin_dir, "data", "26464608654870335080.bh.board.txt"
         )
     ],
-)
+    )
 {
-
 
     trap
     {
-        system( @$command);
+        system(@$command);
     };
 
     # TEST*$c
-    ok (! ($trap->exit), "iters-display-step second step: running the program successfully.");
+    ok( !( $trap->exit ),
+        "iters-display-step second step: running the program successfully." );
 
     $expected_output = <<'EOF';
 Iteration: 1100
@@ -1648,7 +1668,8 @@ This scan generated 8672 states.
 EOF
 
     # TEST*$c
-    eq_or_diff (_normalize_lf($trap->stdout()),
+    eq_or_diff(
+        _normalize_lf( $trap->stdout() ),
         _normalize_lf($expected_output),
         "Right output for iterations step on a second step."
     );

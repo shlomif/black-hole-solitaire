@@ -11,7 +11,7 @@ use File::Spec;
 use File::Temp qw( tempdir );
 use File::Spec::Functions qw( catpath splitpath rel2abs );
 
-my $IS_WIN = ($^O eq "MSWin32");
+my $IS_WIN = ( $^O eq "MSWin32" );
 
 if ($IS_WIN)
 {
@@ -28,47 +28,42 @@ use Games::Solitaire::Verify::Solution;
 
 sub test_using_valgrind
 {
-    my $args = shift;
+    my $args  = shift;
     my $blurb = shift;
 
     my $log_fn = "valgrind.log";
 
-    if (ref($args) eq "ARRAY")
+    if ( ref($args) eq "ARRAY" )
     {
         $args = { argv => $args, prog => "black-hole-solve", };
     }
 
     my $cmd_line_args = $args->{argv};
-    my $prog = $args->{prog};
+    my $prog          = $args->{prog};
 
-    system(
-        "valgrind",
-        "--track-origins=yes",
-        "--leak-check=yes",
-        "--log-file=$log_fn",
-        $ENV{'FCS_PATH'} . "/$prog",
-        @$cmd_line_args,
-    );
+    system( "valgrind", "--track-origins=yes", "--leak-check=yes",
+        "--log-file=$log_fn", $ENV{'FCS_PATH'} . "/$prog",
+        @$cmd_line_args, );
 
     open my $read_from_valgrind, "<", $log_fn
         or die "Cannot open valgrind.log for reading";
     my $found_error_summary = 0;
-    my $found_malloc_free = 0;
-    LINES_LOOP:
-    while (my $l = <$read_from_valgrind>)
+    my $found_malloc_free   = 0;
+LINES_LOOP:
+    while ( my $l = <$read_from_valgrind> )
     {
-        if (index($l, q{ERROR SUMMARY: 0 errors from 0 contexts}) >= 0)
+        if ( index( $l, q{ERROR SUMMARY: 0 errors from 0 contexts} ) >= 0 )
         {
             $found_error_summary = 1;
         }
-        elsif (index($l, q{in use at exit: 0 bytes}) >= 0)
+        elsif ( index( $l, q{in use at exit: 0 bytes} ) >= 0 )
         {
             $found_malloc_free = 1;
         }
     }
-    close ($read_from_valgrind);
+    close($read_from_valgrind);
 
-    if (ok (($found_error_summary && $found_malloc_free), $blurb))
+    if ( ok( ( $found_error_summary && $found_malloc_free ), $blurb ) )
     {
         unlink($log_fn);
     }
@@ -82,9 +77,7 @@ sub test_using_valgrind
 test_using_valgrind(
     [
         '--game', 'all_in_a_row',
-        File::Spec->catfile(
-            $bin_dir, 'data', '24.all_in_a_row.board.txt'
-        ),
+        File::Spec->catfile( $bin_dir, 'data', '24.all_in_a_row.board.txt' ),
     ],
     qq{valgrind all_in_a_row deal #24.}
 );
@@ -92,11 +85,8 @@ test_using_valgrind(
 # TEST
 test_using_valgrind(
     [
-        '--game', 'all_in_a_row',
-        '--display-boards', '--rank-reach-prune',
-        File::Spec->catfile(
-            $bin_dir, 'data', '24.all_in_a_row.board.txt'
-        ),
+        '--game', 'all_in_a_row', '--display-boards', '--rank-reach-prune',
+        File::Spec->catfile( $bin_dir, 'data', '24.all_in_a_row.board.txt' ),
     ],
     qq{valgrind --display-boards --rank-reach-prune all_in_a_row deal #24.}
 );
@@ -113,8 +103,10 @@ test_using_valgrind(
 # TEST
 test_using_valgrind(
     [
-        '--game', 'black_hole',
-        '--display-boards', '--rank-reach-prune',
+        '--game',
+        'black_hole',
+        '--display-boards',
+        '--rank-reach-prune',
         File::Spec->catfile(
             $bin_dir, 'data', '26464608654870335080.bh.board.txt',
         ),
@@ -126,10 +118,11 @@ test_using_valgrind(
 test_using_valgrind(
     {
         prog => './black-hole-solve-resume-api',
-        argv =>
-        [
-            '--game', 'black_hole',
-            '--iters-display-step', '1100',
+        argv => [
+            '--game',
+            'black_hole',
+            '--iters-display-step',
+            '1100',
             File::Spec->catfile(
                 $bin_dir, "data", "26464608654870335080.bh.board.txt"
             )
@@ -137,6 +130,7 @@ test_using_valgrind(
     },
     qq{valgrind --iters-display-step resume api},
 );
+
 =head1 COPYRIGHT AND LICENSE
 
 Copyright (c) 2009 Shlomi Fish

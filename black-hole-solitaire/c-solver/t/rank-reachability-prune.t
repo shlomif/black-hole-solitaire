@@ -11,31 +11,25 @@ use Games::Solitaire::BlackHole::RankReachPrune::PP;
 use Games::Solitaire::BlackHole::RankReachPrune::XS;
 
 my $SUCCESS = $Games::Solitaire::BlackHole::RankReachPrune::PP::SUCCESS;
-my $NOT_REACHABLE = $Games::Solitaire::BlackHole::RankReachPrune::PP::NOT_REACHABLE;
+my $NOT_REACHABLE =
+    $Games::Solitaire::BlackHole::RankReachPrune::PP::NOT_REACHABLE;
 
 # TEST:$b=2;
-my @backend_specs =
-(
+my @backend_specs = (
     {
-        id => "perl",
+        id      => "perl",
         backend => sub {
-            my ($foundation, $rank_counts) = @_;
-            return Games::Solitaire::BlackHole::RankReachPrune::PP->
-                prune(
-                    $foundation,
-                    $rank_counts,
-                );
+            my ( $foundation, $rank_counts ) = @_;
+            return Games::Solitaire::BlackHole::RankReachPrune::PP->prune(
+                $foundation, $rank_counts, );
         },
     },
     {
-        id => "c_backend",
+        id      => "c_backend",
         backend => sub {
-            my ($foundation, $rank_counts) = @_;
-            return Games::Solitaire::BlackHole::RankReachPrune::XS->
-                prune(
-                    $foundation,
-                    $rank_counts,
-                );
+            my ( $foundation, $rank_counts ) = @_;
+            return Games::Solitaire::BlackHole::RankReachPrune::XS->prune(
+                $foundation, $rank_counts, );
         },
     }
 );
@@ -44,9 +38,9 @@ sub _verdict_to_s
 {
     my $v = shift;
     return +(
-          ($v eq $SUCCESS) ? 'SUCCESS'
-        : ($v eq $NOT_REACHABLE) ? 'NOT_REACHABLE'
-        : (die "Unknown Verdict '$v'.")
+          ( $v eq $SUCCESS )       ? 'SUCCESS'
+        : ( $v eq $NOT_REACHABLE ) ? 'NOT_REACHABLE'
+        :                            ( die "Unknown Verdict '$v'." )
     );
 }
 
@@ -55,12 +49,10 @@ sub _verdict_to_s
 
     my $test = sub {
         local $Test::Builder::Level = $Test::Builder::Level + 1;
-        my ($foundation, $rank_counts, $verdict, $blurb) = @_;
+        my ( $foundation, $rank_counts, $verdict, $blurb ) = @_;
 
-        is (
-            _verdict_to_s(
-                $backend->{backend}->($foundation, $rank_counts)
-            ),
+        is(
+            _verdict_to_s( $backend->{backend}->( $foundation, $rank_counts ) ),
             $verdict,
             "$backend->{id} - $blurb"
         );
@@ -68,17 +60,15 @@ sub _verdict_to_s
 
     # Test the unreachability for all indexes
     my $test_unreachable_for_all = sub {
-        my ($rank_counts, $blurb) = @_;
+        my ( $rank_counts, $blurb ) = @_;
 
         local $Test::Builder::Level = $Test::Builder::Level + 1;
 
         # TEST:$unr=13;
-        for my $foundation (0 .. (13-1))
+        for my $foundation ( 0 .. ( 13 - 1 ) )
         {
             $test->(
-                $foundation,
-                $rank_counts,
-                'NOT_REACHABLE',
+                $foundation, $rank_counts, 'NOT_REACHABLE',
                 "$blurb with [start == $foundation]",
             );
         }
@@ -91,73 +81,70 @@ sub _verdict_to_s
 
         # TEST:$c++;
         $test->(
-            8, [2,3,2,1,1,2,2,1,0,0,1,2,2],
-            'SUCCESS',
-            "Failure in C backend No. 1",
-        );
-
-        # TEST:$c++;
-        $test->(-1, [(1) x 13], 'SUCCESS', "Always true on foundation of -1.");
-
-        # TEST:$c++;
-        $test->(0, [(1) x 13], 'SUCCESS', "All is all-ranks-reachable.");
-
-        # TEST:$c++;
-        $test->(
-            0, [((1) x 10),((0) x 3)],
-            'SUCCESS',
-            "First 10 ranks",
+            8, [ 2, 3, 2, 1, 1, 2, 2, 1, 0, 0, 1, 2, 2 ],
+            'SUCCESS', "Failure in C backend No. 1",
         );
 
         # TEST:$c++;
         $test->(
-            0, [((1) x 10),0,1,0],
-            'NOT_REACHABLE',
-            "Unreachable island.",
+            -1, [ (1) x 13 ],
+            'SUCCESS', "Always true on foundation of -1."
+        );
+
+        # TEST:$c++;
+        $test->( 0, [ (1) x 13 ], 'SUCCESS', "All is all-ranks-reachable." );
+
+        # TEST:$c++;
+        $test->(
+            0, [ ( (1) x 10 ), ( (0) x 3 ) ],
+            'SUCCESS', "First 10 ranks",
         );
 
         # TEST:$c++;
         $test->(
-            4, [0,0,0,2,1,2,0,0,0,0,0,0,0,],
-            'SUCCESS',
-            "two reachable segment",
+            0, [ ( (1) x 10 ), 0, 1, 0 ],
+            'NOT_REACHABLE', "Unreachable island.",
         );
 
         # TEST:$c++;
         $test->(
-            2, [0,0,0,2,1,0,0,0,0,0,0,0,0,],
-            'SUCCESS',
-            "two reachable segment",
+            4, [ 0, 0, 0, 2, 1, 2, 0, 0, 0, 0, 0, 0, 0, ],
+            'SUCCESS', "two reachable segment",
         );
 
         # TEST:$c++;
         $test->(
-            2, [0,0,0,2,1,0,0,1,0,0,0,0,0,],
-            'NOT_REACHABLE',
-            "One island.",
+            2, [ 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, ],
+            'SUCCESS', "two reachable segment",
+        );
+
+        # TEST:$c++;
+        $test->(
+            2, [ 0, 0, 0, 2, 1, 0, 0, 1, 0, 0, 0, 0, 0, ],
+            'NOT_REACHABLE', "One island.",
         );
 
         # TEST:$c=$c+$unr;
         $test_unreachable_for_all->(
-            [0,0,0,2,1,0,0,1,0,1,0,0,0,],
+            [ 0, 0, 0, 2, 1, 0, 0, 1, 0, 1, 0, 0, 0, ],
             "Two islands.",
         );
 
         # TEST:$c=$c+$unr;
         $test_unreachable_for_all->(
-            [3,0,0,2,1,0,0,1,0,1,0,0,0,],
+            [ 3, 0, 0, 2, 1, 0, 0, 1, 0, 1, 0, 0, 0, ],
             "Three islands",
         );
 
         # TEST:$c=$c+$unr;
         $test_unreachable_for_all->(
-            [3,0,0,2,1,0,0,1,0,1,0,0,0,],
+            [ 3, 0, 0, 2, 1, 0, 0, 1, 0, 1, 0, 0, 0, ],
             "Three islands",
         );
 
         # TEST:$c=$c+$unr;
         $test_unreachable_for_all->(
-            [0,1,1,1,0,0,0,0,2,2,0,0,0,],
+            [ 0, 1, 1, 1, 0, 0, 0, 0, 2, 2, 0, 0, 0, ],
             "Two separated islands.",
         );
 
