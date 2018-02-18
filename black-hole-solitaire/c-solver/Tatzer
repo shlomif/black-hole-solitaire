@@ -12,35 +12,20 @@ use warnings;
 use File::Path qw(rmtree);
 use File::Basename qw(dirname);
 use Getopt::Long;
+use Path::Tiny qw/path/;
 
 my %BOOL_OPTS_WITH_FALSE_DEFAULTS =
 (
     'omit-frame' => 'OPTIMIZATION_OMIT_FRAME_POINTER',
 );
 
-my @BOOL_OPTS_WITH_FALSE_DEFAULTS__KEYS = keys %BOOL_OPTS_WITH_FALSE_DEFAULTS;
-
-my %bool_opts_with_false_defaults__values =
-(
-    map { $_ => 0 } @BOOL_OPTS_WITH_FALSE_DEFAULTS__KEYS
-);
-
 my %TRUE_BOOL_OPTS =
 (
 );
-my @TRUE_BOOL_KEYS = keys %TRUE_BOOL_OPTS;
-my %true_bool_opts__values = map { $_ => 1 } @TRUE_BOOL_KEYS;
 
 my %INT_OPTS =
 (
     'pack-size' => 'FCS_IA_PACK_SIZE',
-);
-
-my @INT_OPS__KEYS = keys %INT_OPTS;
-
-my %int_opts__values =
-(
-    map { $_ => undef() } @INT_OPS__KEYS
 );
 
 my %STR_OPTS =
@@ -56,6 +41,24 @@ my %STR_OPTS =
             ['p|pos' => 'BHS_STATE_STORAGE'],
         )
     ),
+);
+
+my @BOOL_OPTS_WITH_FALSE_DEFAULTS__KEYS = keys %BOOL_OPTS_WITH_FALSE_DEFAULTS;
+
+my %bool_opts_with_false_defaults__values =
+(
+    map { $_ => 0 } @BOOL_OPTS_WITH_FALSE_DEFAULTS__KEYS
+);
+
+my @TRUE_BOOL_KEYS = keys %TRUE_BOOL_OPTS;
+my %true_bool_opts__values = map { $_ => 1 } @TRUE_BOOL_KEYS;
+
+
+my @INT_OPS__KEYS = keys %INT_OPTS;
+
+my %int_opts__values =
+(
+    map { $_ => undef() } @INT_OPS__KEYS
 );
 
 my @STR_OPTS__KEYS = keys %STR_OPTS;
@@ -97,7 +100,52 @@ my %themes =
     bench => [qw(-l tt --omit-frame)],
     fc_bench => [qw(-l bench)],
     testing => [qw(--rwd --dbm=kaztree --test-suite)],
+    pysol_defs => [],
 );
+
+my $SEED_KEY = 'FCS_THEME_RAND';
+my $SEED = $ENV{$SEED_KEY};
+if (defined $SEED)
+{
+    if ($SEED =~ /[^0-9]/)
+    {
+        die "Invalid value for seed!";
+    }
+    my %k;
+    foreach my $flags (values%themes)
+    {
+        for (my $idx = 0; $idx < @$flags ; ++$idx)
+        {
+            my $flag = $flags->[$idx];
+            if ($flag eq '-l')
+            {
+                ++$idx;
+            }
+            else
+            {
+                $k{$flag} = 1;
+            }
+        }
+    }
+    my @k = sort { $a cmp $b } keys %k;
+
+    require Math::Random::MT;
+    my $gen = Math::Random::MT->new($SEED);
+    my @subset;
+    foreach my $key (@k)
+    {
+        if ($gen->rand() < 0.5)
+        {
+            push @subset, $key;
+        }
+    }
+    my $FN = "run-t-$SEED.bash";
+    path($FN)->spew_utf8("$^X $0 @subset\n");
+    delete $ENV{$SEED_KEY};
+    exec("bash", $FN);
+}
+
+my $HOME = $ENV{HOME};
 
 foreach my $rec (
     {id => "c2", a => "core2",},
@@ -110,7 +158,7 @@ foreach my $rec (
     my $id = $rec->{id};
     my $arch = $rec->{a};
 
-    $themes{$id} = ["--arch=$arch"];
+    $themes{$id} = ["--arch=$arch", "--prefix=$HOME/apps/fcs",];
 
     my $def = sub {
         my ($suffix, $theme) = @_;
@@ -136,17 +184,14 @@ foreach my $rec (
     # Testing theme - aims to run the tests quickly
     $bb_def->(t => [qw(-l testing)]);
 
-    if (defined(my $HOME = $ENV{HOME}))
-    {
-        # For use by PySolFC
-        $bb_def->(_pysol => ["--prefix=$HOME/apps/fcs-for-pysol",]);
-    }
+    # For use by PySolFC
+    $bb_def->(_pysol => ['-l', 'pysol_defs', "--prefix=$HOME/apps/fcs-for-pysol",]);
 }
 
 my @new_argv = @ARGV;
 
 CALC_NEW_ARGV:
-for (my $idx = 0; $idx < @new_argv ; $idx++)
+for (my $idx = 0; $idx < @new_argv ; ++$idx)
 {
     if (my ($arg_val) = $new_argv[$idx] =~ m{\A-l(.*)\z}ms)
     {
