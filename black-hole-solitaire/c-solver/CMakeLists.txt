@@ -1,9 +1,6 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
 
-SET (private_mod_path "${CMAKE_SOURCE_DIR}/cmake")
-LIST (APPEND CMAKE_MODULE_PATH "${private_mod_path}")
-INCLUDE(Shlomif_Common)
-
+INCLUDE ("${CMAKE_SOURCE_DIR}/cmake/shlomif_common_bootstrap.cmake")
 SHLOMIF_COMMON_SETUP("${private_mod_path}")
 
 CMAKE_POLICY(SET CMP0054 NEW)
