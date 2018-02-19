@@ -5,7 +5,7 @@ before_install:
     - sudo apt-get install -y cmake cmake-data cpanminus libperl-dev mercurial ninja-build perl valgrind
 install:
     - which python3
-    - sudo cpanm --notest Dist::Zilla Env::Path Games::Solitaire::Verify::Solution IO::All Inline Inline::C Pod::Weaver::Section::Support Test::CPAN::Changes Test::Differences Test::Pod Test::Pod::Coverage Test::TrailingSpace Test::Trap
+    - sudo cpanm --notest Dist::Zilla Env::Path Games::Solitaire::Verify::Solution IO::All Inline Inline::C Perl::Tidy Pod::Weaver::Section::Support Test::Code::TidyAll Test::CPAN::Changes Test::Differences Test::Pod Test::Pod::Coverage Test::TrailingSpace Test::Trap
     - wget http://web-cpan.shlomifish.org/downloads/libtap-1.12.0.tar.bz2
     - tar -xvf libtap-1.12.0.tar.bz2
     - ( mkdir B && cd B && cmake ../libtap-1.12.0 && make && sudo make install )
