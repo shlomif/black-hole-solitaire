@@ -11,7 +11,7 @@ install:
     - SET PERL_LOCAL_LIB_ROOT=C:/Perl5
     - SET PERL_MB_OPT=--install_base C:/Perl5
     - SET PERL_MM_OPT=INSTALL_BASE=C:/Perl5
-    - cpanm --notest Dist::Zilla Env::Path Games::Solitaire::Verify::Solution IO::All Inline Inline::C Perl::Tidy Pod::Coverage::TrustPod Pod::Weaver::Section::Support String::ShellQuote Test::Code::TidyAll Test::CPAN::Changes Test::Differences Test::EOL Test::NoTabs Test::Pod Test::Pod::Coverage Test::TrailingSpace Test::Trap
+    - cpanm --notest Dist::Zilla Env::Path Games::Solitaire::Verify::Solution IO::All Inline Inline::C Perl::Tidy Pod::Coverage::TrustPod Pod::Weaver::Section::Support String::ShellQuote Test::Code::TidyAll Test::CPAN::Changes Test::Differences Test::EOL Test::Kwalitee Test::NoTabs Test::Pod Test::Pod::Coverage Test::TrailingSpace Test::Trap
     - cd black-hole-solitaire
     - hg clone https://bitbucket.org/shlomif/shlomif-cmake-modules c-solver/cmake/sfcador
     - copy c-solver\cmake\sfcador\shlomif-cmake-modules\Shlomif_Common.cmake c-solver\cmake\
