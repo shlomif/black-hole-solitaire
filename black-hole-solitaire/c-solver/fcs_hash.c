@@ -39,23 +39,11 @@
 #include "fcs_hash.h"
 #include "alloc.h"
 #include "state.h"
+#include "wrap_xxhash.h"
 
-typedef  unsigned long  int  ub4;   /* unsigned 4-byte quantities */
-typedef  unsigned       char ub1;
-
-static inline ub4 perl_hash_function(bhs_state_key_t key)
+static inline unsigned long hash_function(const bhs_state_key_t key)
 {
-    register ub4  hash_value_int = 0;
-    register ub1 * s_ptr = (ub1 *)(&(key));
-    register ub1 * s_end = s_ptr+sizeof(key);
-
-    while (s_ptr < s_end)
-    {
-        hash_value_int += (hash_value_int << 5) + *(s_ptr++);
-    }
-    hash_value_int += (hash_value_int>>5);
-
-    return hash_value_int;
+    return DO_XXH(&key, sizeof(key));
 }
 
 static inline void bh_solve_hash_rehash(bh_solve_hash_t * hash);
@@ -97,7 +85,7 @@ void bh_solve_hash_get(
     bh_solve_hash_symlink_t * list;
     bh_solve_hash_symlink_item_t * item;
 
-    bh_solve_hash_value_t hash_value = ((typeof(hash_value))perl_hash_function(key_ptr->key));
+    bh_solve_hash_value_t hash_value = ((typeof(hash_value))hash_function(key_ptr->key));
 
 #define PLACE() (hash_value & (hash->size_bitmask))
     list = (hash->entries + PLACE());
@@ -136,7 +124,7 @@ fcs_bool_t bh_solve_hash_insert(
     enum FCS_INLINED_HASH_DATA_TYPE hash_type;
 #endif
 
-    bh_solve_hash_value_t hash_value = ((typeof(hash_value))perl_hash_function(key->key));
+    bh_solve_hash_value_t hash_value = ((typeof(hash_value))hash_function(key->key));
 
 #ifdef FCS_INLINED_HASH_COMPARISON
     hash_type = hash->hash_type;

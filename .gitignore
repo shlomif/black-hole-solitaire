@@ -16,3 +16,4 @@ black-hole-solitaire/c-solver/black-hole-solver.spec
 black-hole-solitaire/c-solver/build
 black-hole-solitaire/c-solver/cmake/Shlomif_Common.cmake
 black-hole-solitaire/c-solver/tags
+black-hole-solitaire/c-solver/xxHash-wrapper
