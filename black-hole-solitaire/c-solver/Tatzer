@@ -21,6 +21,7 @@ my %BOOL_OPTS_WITH_FALSE_DEFAULTS =
 
 my %TRUE_BOOL_OPTS =
 (
+    'test-suite' => 'FCS_WITH_TEST_SUITE',
 );
 
 my %INT_OPTS =
