@@ -10,6 +10,10 @@ and [“All in a Row”](http://en.wikipedia.org/wiki/All_in_a_Row_%28Solitaire%
 
 ![Running using PySol FC on KDE Plasma 5](<http://i.imgur.com/htp5UZq.jpg>)
 
+### Videos
+
+[Solving Black Hole in PySolFC](https://www.youtube.com/watch?v=t_cuDHj5V2k&feature=youtu.be)
+
 ## Guide to the code
 
 The interesting code in C is under the black-hole-solitaire/c-solver/
