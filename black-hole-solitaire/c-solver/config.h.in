@@ -57,6 +57,8 @@ extern "C" {
 
 #define BHS_STATE_STORAGE ${BHS_STATE_STORAGE}
 
+@SIZEOF_VOID_P_CODE@
+
 #define VERSION "${VERSION}"
 
 #ifdef __cplusplus

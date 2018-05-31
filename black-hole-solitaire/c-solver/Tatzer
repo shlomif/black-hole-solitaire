@@ -100,7 +100,7 @@ my %themes =
     tt => [qw(-r --notest-suite --static)],
     bench => [qw(-l tt --omit-frame)],
     fc_bench => [qw(-l bench)],
-    testing => [qw(--rwd --dbm=kaztree --test-suite)],
+    testing => [qw(--rwd --test-suite)],
     pysol_defs => [],
 );
 
@@ -141,7 +141,7 @@ if (defined $SEED)
         }
     }
     my $FN = "run-t-$SEED.bash";
-    path($FN)->spew_utf8("$^X $0 @subset\n");
+    path($FN)->spew_utf8(join(' ', $^X, $0, @subset) . "\n");
     delete $ENV{$SEED_KEY};
     exec("bash", $FN);
 }
@@ -260,6 +260,13 @@ GetOptions(
         return;
     },
     'gen=s' => \$generate_what,
+    'rwd' => sub {
+        my ($opt, $val) = @_;
+
+        $build_type = "RelWithDebInfo";
+
+        return;
+    },
     'tokyo' => sub { return set_both("TOKYO_CAB_HASH"); },
     'static' => \$build_static_lib,
     'with-ctx-var!' => \$with_context_var,
