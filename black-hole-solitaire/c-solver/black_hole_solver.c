@@ -830,14 +830,14 @@ DLLEXPORT extern int black_hole_solver_get_next_move(
     }
 }
 
-DLLEXPORT extern long black_hole_solver_get_num_states_in_collection(
-    black_hole_solver_instance_t * instance_proto
+DLLEXPORT extern long __attribute__((pure)) black_hole_solver_get_num_states_in_collection(
+    black_hole_solver_instance_t *const instance_proto
 )
 {
     return ((bhs_solver_t *)instance_proto)->num_states_in_collection;
 }
 
-DLLEXPORT extern long black_hole_solver_get_iterations_num(
+DLLEXPORT extern long __attribute__((pure)) black_hole_solver_get_iterations_num(
     black_hole_solver_instance_t * instance_proto
 )
 {
@@ -910,7 +910,7 @@ DLLEXPORT extern int black_hole_solver_get_current_solution_board(
     return BLACK_HOLE_SOLVER__SUCCESS;
 }
 
-DLLEXPORT const char * black_hole_solver_get_lib_version(void)
+DLLEXPORT const __attribute__((const)) char * black_hole_solver_get_lib_version(void)
 {
     return VERSION;
 }
