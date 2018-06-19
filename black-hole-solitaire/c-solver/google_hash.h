@@ -36,14 +36,12 @@ extern "C" {
 
 #if (FCS_STATE_STORAGE == FCS_STATE_STORAGE_GOOGLE_DENSE_HASH)
 
-typedef struct {
-    void * hash;
+typedef struct
+{
+    void *hash;
 } bh_solve_hash_t;
 
-extern void
-bh_solve_hash_init(
-    bh_solve_hash_t * hash
-    );
+extern void bh_solve_hash_init(bh_solve_hash_t *hash);
 
 /*
  * Returns FALSE if the key is new and the key/val pair was inserted.
@@ -51,22 +49,14 @@ bh_solve_hash_init(
  * was set to it.
  */
 extern fcs_bool_t bh_solve_hash_insert(
-    bh_solve_hash_t * hash,
-    bhs_state_key_value_pair_t * key
-    );
+    bh_solve_hash_t *hash, bhs_state_key_value_pair_t *key);
 
-extern void bh_solve_hash_free(
-    bh_solve_hash_t * hash
-    );
+extern void bh_solve_hash_free(bh_solve_hash_t *hash);
 
-extern void bh_solve_hash_get(
-    bh_solve_hash_t * hash,
-    bhs_state_key_value_pair_t * key_ptr,
-    bhs_state_key_value_pair_t * result
-    );
+extern void bh_solve_hash_get(bh_solve_hash_t *hash,
+    bhs_state_key_value_pair_t *key_ptr, bhs_state_key_value_pair_t *result);
 
 #endif
-
 
 #ifdef __cplusplus
 }

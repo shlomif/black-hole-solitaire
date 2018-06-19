@@ -45,20 +45,15 @@ enum GAME_TYPE
 };
 
 static void out_board(
-    black_hole_solver_instance_t *const solver,
-    const fcs_bool_t display_boards
-)
+    black_hole_solver_instance_t *const solver, const fcs_bool_t display_boards)
 {
-    if (! display_boards)
+    if (!display_boards)
     {
         return;
     }
 
-    char * board = NULL;
-    black_hole_solver_get_current_solution_board(
-        solver,
-        &board
-    );
+    char *board = NULL;
+    black_hole_solver_get_current_solution_board(solver, &board);
 
     if (board)
     {
@@ -68,27 +63,28 @@ static void out_board(
     }
 }
 
-static const char * const help_text =
-"black-hole-solve --game {all_in_a_row|black_hole} [more options] [/path/to/board_layout.txt]\n"
-"\n"
-"--help                        displays this help.\n"
-"--max-iters [iter_count]      limit the iterations.\n"
-"--game all_in_a_row           solve All in a Row games.\n"
-"--game black_hole             solve Black Hole games.\n"
-"--displays-boards             display the layout of the board at every step.\n"
-"--rank-reach-prune            enable the Rank Reachability Prune.\n"
-"--iters-display-step [step]   Display a trace every certain step.\n"
-"\n"
-    ;
+static const char *const help_text =
+    "black-hole-solve --game {all_in_a_row|black_hole} [more options] "
+    "[/path/to/board_layout.txt]\n"
+    "\n"
+    "--help                        displays this help.\n"
+    "--max-iters [iter_count]      limit the iterations.\n"
+    "--game all_in_a_row           solve All in a Row games.\n"
+    "--game black_hole             solve Black Hole games.\n"
+    "--displays-boards             display the layout of the board at every "
+    "step.\n"
+    "--rank-reach-prune            enable the Rank Reachability Prune.\n"
+    "--iters-display-step [step]   Display a trace every certain step.\n"
+    "\n";
 
-int main(int argc, char * argv[])
+int main(int argc, char *argv[])
 {
-    black_hole_solver_instance_t * solver;
+    black_hole_solver_instance_t *solver;
     char board[MAX_LEN_BOARD_STRING];
     int error_line_num;
     int ret, solver_ret_code;
-    char * filename = NULL;
-    FILE * fh;
+    char *filename = NULL;
+    FILE *fh;
     int arg_idx;
     long max_iters_limit = -1;
     long iters_display_step = 0;
@@ -102,14 +98,12 @@ int main(int argc, char * argv[])
         if (!strcmp(argv[arg_idx], "--version"))
         {
             printf("black-hole-solver version %s\nLibrary version %s\n",
-                VERSION,
-                VERSION
-            );
+                VERSION, VERSION);
             exit(0);
         }
         else if (!strcmp(argv[arg_idx], "--help"))
         {
-            printf ("%s", help_text);
+            printf("%s", help_text);
             exit(0);
         }
         else if (!strcmp(argv[arg_idx], "--max-iters"))
@@ -130,7 +124,7 @@ int main(int argc, char * argv[])
                 fprintf(stderr, "Error! --game requires an arguments.\n");
                 exit(-1);
             }
-            char * g = argv[arg_idx++];
+            char *g = argv[arg_idx++];
 
             if (!strcmp(g, "black_hole"))
             {
@@ -142,7 +136,9 @@ int main(int argc, char * argv[])
             }
             else
             {
-                fprintf(stderr, "%s\n", "Error! --game should be either \"black_hole\" or \"all_in_a_row\".");
+                fprintf(stderr, "%s\n",
+                    "Error! --game should be either \"black_hole\" or "
+                    "\"all_in_a_row\".");
                 exit(-1);
             }
         }
@@ -161,14 +157,16 @@ int main(int argc, char * argv[])
             arg_idx++;
             if (argc == arg_idx)
             {
-                fprintf(stderr, "Error! --iters-display-step requires an arguments.\n");
+                fprintf(stderr,
+                    "Error! --iters-display-step requires an arguments.\n");
                 exit(-1);
             }
             iters_display_step = atol(argv[arg_idx++]);
 
             if (iters_display_step < 0)
             {
-                fprintf(stderr, "Error! --iters-display-step should be positive or zero.\n");
+                fprintf(stderr, "Error! --iters-display-step should be "
+                                "positive or zero.\n");
                 exit(-1);
             }
         }
@@ -193,9 +191,7 @@ int main(int argc, char * argv[])
     black_hole_solver_set_max_iters_limit(solver, max_iters_limit);
     black_hole_solver_set_iters_display_step(solver, iters_display_step);
     black_hole_solver_enable_rank_reachability_prune(
-        solver,
-        is_rank_reachability_prune_enabled
-    );
+        solver, is_rank_reachability_prune_enabled);
 
     if (argc > arg_idx)
     {
@@ -209,7 +205,7 @@ int main(int argc, char * argv[])
     if (filename)
     {
         fh = fopen(filename, "rt");
-        if (! fh)
+        if (!fh)
         {
             fprintf(stderr, "Cannot open '%s' for reading!\n", filename);
             black_hole_solver_free(solver);
@@ -228,31 +224,18 @@ int main(int argc, char * argv[])
         fclose(fh);
     }
 
-    board[MAX_LEN_BOARD_STRING-1] = '\0';
+    board[MAX_LEN_BOARD_STRING - 1] = '\0';
 
-    if (black_hole_solver_read_board(
-        solver,
-        board,
-        &error_line_num,
-        (
-            (game_type == GAME__BH)
-            ? BHS__BLACK_HOLE__NUM_COLUMNS
-            : BHS__ALL_IN_A_ROW__NUM_COLUMNS
-        ),
-        (
-            (game_type == GAME__BH)
-            ? BHS__BLACK_HOLE__MAX_NUM_CARDS_IN_COL
-            : BHS__ALL_IN_A_ROW__MAX_NUM_CARDS_IN_COL
-        ),
-        (
-            (game_type == GAME__BH)
-            ? BHS__BLACK_HOLE__BITS_PER_COL
-            : BHS__ALL_IN_A_ROW__BITS_PER_COL
-        )
-        )
-    )
+    if (black_hole_solver_read_board(solver, board, &error_line_num,
+            ((game_type == GAME__BH) ? BHS__BLACK_HOLE__NUM_COLUMNS
+                                     : BHS__ALL_IN_A_ROW__NUM_COLUMNS),
+            ((game_type == GAME__BH) ? BHS__BLACK_HOLE__MAX_NUM_CARDS_IN_COL
+                                     : BHS__ALL_IN_A_ROW__MAX_NUM_CARDS_IN_COL),
+            ((game_type == GAME__BH) ? BHS__BLACK_HOLE__BITS_PER_COL
+                                     : BHS__ALL_IN_A_ROW__BITS_PER_COL)))
     {
-        fprintf(stderr, "Error reading the board at line No. %d!\n", error_line_num);
+        fprintf(stderr, "Error reading the board at line No. %d!\n",
+            error_line_num);
         exit(-1);
     }
 
@@ -270,29 +253,21 @@ int main(int argc, char * argv[])
         out_board(solver, display_boards);
 
         while ((next_move_ret_code = black_hole_solver_get_next_move(
-            solver,
-            &col_idx,
-            &card_rank,
-            &card_suit
-            )) == BLACK_HOLE_SOLVER__SUCCESS)
+                    solver, &col_idx, &card_rank, &card_suit)) ==
+               BLACK_HOLE_SOLVER__SUCCESS)
         {
-            printf ("Move a card from stack %d to the foundations\n\n"
-                "Info: Card moved is %c%c\n\n\n====================\n\n",
-                col_idx,
-                (("0A23456789TJQK")[card_rank]), ("HCDS")[card_suit]
-            );
+            printf("Move a card from stack %d to the foundations\n\n"
+                   "Info: Card moved is %c%c\n\n\n====================\n\n",
+                col_idx, (("0A23456789TJQK")[card_rank]), ("HCDS")[card_suit]);
 
             out_board(solver, display_boards);
         }
 
         if (next_move_ret_code != BLACK_HOLE_SOLVER__END)
         {
-            fprintf(
-                stderr,
-                "%s - %d\n",
+            fprintf(stderr, "%s - %d\n",
                 "Get next move routine returned the wrong error code.",
-                next_move_ret_code
-            );
+                next_move_ret_code);
             ret = -1;
         }
     }
@@ -308,11 +283,10 @@ int main(int argc, char * argv[])
     }
 
     printf("\n\n--------------------\n"
-        "Total number of states checked is %ld.\n"
-        "This scan generated %ld states.\n",
+           "Total number of states checked is %ld.\n"
+           "This scan generated %ld states.\n",
         black_hole_solver_get_iterations_num(solver),
-        black_hole_solver_get_num_states_in_collection(solver)
-    );
+        black_hole_solver_get_num_states_in_collection(solver));
 
     black_hole_solver_free(solver);
 

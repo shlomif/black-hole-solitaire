@@ -34,12 +34,7 @@
 #include "rank_reach_prune.h"
 
 DLLEXPORT enum RANK_REACH_VERDICT bhs_find_rank_reachability(
-    const signed char foundation,
-    const unsigned char * const rank_counts
-)
+    const signed char foundation, const unsigned char *const rank_counts)
 {
     return bhs_find_rank_reachability__inline(foundation, rank_counts);
 }
-
-
-

@@ -30,25 +30,23 @@
 
 #include <google/sparse_hash_map>
 
-using google::sparse_hash_map;      // namespace where class lives by default
+using google::sparse_hash_map; // namespace where class lives by default
 
+typedef unsigned long int ub4; /* unsigned 4-byte quantities */
+typedef unsigned char ub1;
 
-typedef  unsigned long  int  ub4;   /* unsigned 4-byte quantities */
-typedef  unsigned       char ub1;
-
-static inline ub4 perl_hash_function(
-    register ub1 *s_ptr,        /* the key */
-    register ub4  length        /* the length of the key */
-    )
+static inline ub4 perl_hash_function(register ub1 *s_ptr, /* the key */
+    register ub4 length /* the length of the key */
+)
 {
-    register ub4  hash_value_int = 0;
-    register ub1 * s_end = s_ptr+length;
+    register ub4 hash_value_int = 0;
+    register ub1 *s_end = s_ptr + length;
 
     while (s_ptr < s_end)
     {
         hash_value_int += (hash_value_int << 5) + *(s_ptr++);
     }
-    hash_value_int += (hash_value_int>>5);
+    hash_value_int += (hash_value_int >> 5);
 
     return hash_value_int;
 }
@@ -57,28 +55,27 @@ static inline ub4 perl_hash_function(
 
 struct state_equality
 {
-  bool operator()(bhs_state_key_t k1, bhs_state_key_t k2) const
-  {
-      return (!memcmp(&k1,&k2,sizeof(k1)));
-  }
+    bool operator()(bhs_state_key_t k1, bhs_state_key_t k2) const
+    {
+        return (!memcmp(&k1, &k2, sizeof(k1)));
+    }
 };
-
 
 struct state_hash
 {
-  int operator()(bhs_state_key_t k1) const
-  {
-      return perl_hash_function((ub1 *)(&k1), sizeof(k1));
-  }
+    int operator()(bhs_state_key_t k1) const
+    {
+        return perl_hash_function((ub1 *)(&k1), sizeof(k1));
+    }
 };
 
-typedef sparse_hash_map<bhs_state_key_t, bhs_state_value_t, state_hash, state_equality> StatesGoogleHash;
+typedef sparse_hash_map<bhs_state_key_t, bhs_state_value_t, state_hash,
+    state_equality>
+    StatesGoogleHash;
 
-extern "C" void bh_solve_hash_init(
-    bh_solve_hash_t * hash
-    )
+extern "C" void bh_solve_hash_init(bh_solve_hash_t *hash)
 {
-    StatesGoogleHash * ret = new StatesGoogleHash;
+    StatesGoogleHash *ret = new StatesGoogleHash;
 
     hash->hash = (void *)ret;
 
@@ -93,25 +90,19 @@ extern "C" void bh_solve_hash_init(
  * was set to it.
  */
 extern "C" fcs_bool_t bh_solve_hash_insert(
-    bh_solve_hash_t * void_hash,
-    bhs_state_key_value_pair_t * key
-)
+    bh_solve_hash_t *void_hash, bhs_state_key_value_pair_t *key)
 {
-    StatesGoogleHash * hash = (StatesGoogleHash *)(void_hash->hash);
+    StatesGoogleHash *hash = (StatesGoogleHash *)(void_hash->hash);
     std::pair<StatesGoogleHash::iterator, bool> result =
-        hash->insert(std::make_pair(key->key, key->value))
-        ;
+        hash->insert(std::make_pair(key->key, key->value));
 
     /* If an insertion took place. */
     return (!(result.second));
 }
 
-
-extern "C" void bh_solve_hash_free(
-    bh_solve_hash_t * void_hash
-    )
+extern "C" void bh_solve_hash_free(bh_solve_hash_t *void_hash)
 {
-    StatesGoogleHash * hash = (StatesGoogleHash *)void_hash->hash;
+    StatesGoogleHash *hash = (StatesGoogleHash *)void_hash->hash;
 
     delete hash;
 
@@ -120,15 +111,11 @@ extern "C" void bh_solve_hash_free(
     return;
 }
 
-extern "C" void bh_solve_hash_get(
-    bh_solve_hash_t * void_hash,
-    bhs_state_key_value_pair_t * key_ptr,
-    bhs_state_key_value_pair_t * result
-    )
+extern "C" void bh_solve_hash_get(bh_solve_hash_t *void_hash,
+    bhs_state_key_value_pair_t *key_ptr, bhs_state_key_value_pair_t *result)
 {
-    StatesGoogleHash * hash = (StatesGoogleHash *)void_hash->hash;
-    StatesGoogleHash::iterator it =
-        hash->find(key_ptr->key);
+    StatesGoogleHash *hash = (StatesGoogleHash *)void_hash->hash;
+    StatesGoogleHash::iterator it = hash->find(key_ptr->key);
 
     result->key = key_ptr->key;
     result->value = ((*(it)).second);

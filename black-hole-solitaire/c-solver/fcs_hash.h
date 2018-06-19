@@ -35,23 +35,23 @@ struct bh_solve_hash_symlink_item_struct
     bh_solve_hash_value_t secondary_hash_value;
 #endif
     // The next item in the list
-    struct bh_solve_hash_symlink_item_struct * next;
+    struct bh_solve_hash_symlink_item_struct *next;
 };
 
 typedef struct bh_solve_hash_symlink_item_struct bh_solve_hash_symlink_item_t;
 
 typedef struct
 {
-    bh_solve_hash_symlink_item_t * first_item;
+    bh_solve_hash_symlink_item_t *first_item;
 } bh_solve_hash_symlink_t;
 
 typedef struct
 {
     /* The vector of the hash table itself */
-    bh_solve_hash_symlink_t * entries;
+    bh_solve_hash_symlink_t *entries;
     /* The list of vacant items as freed by the garbage collector. Use
      * if before allocating more. */
-    bh_solve_hash_symlink_item_t * list_of_vacant_items;
+    bh_solve_hash_symlink_item_t *list_of_vacant_items;
     /* The size of the hash table */
     int size;
 
@@ -66,33 +66,23 @@ typedef struct
 
 } bh_solve_hash_t;
 
-extern void
-bh_solve_hash_init(
-    bh_solve_hash_t * hash
-    );
+extern void bh_solve_hash_init(bh_solve_hash_t *hash);
 
 // Returns FALSE if the key is new and the key/val pair was inserted.
 // Returns TRUE if the key is not new and *existing_key / *existing_val
 // was set to it.
 extern fcs_bool_t bh_solve_hash_insert(
-    bh_solve_hash_t * hash,
-    bhs_state_key_value_pair_t * key
-    );
+    bh_solve_hash_t *hash, bhs_state_key_value_pair_t *key);
 
-static inline void bh_solve_hash_free(
-    bh_solve_hash_t * hash
-    )
+static inline void bh_solve_hash_free(bh_solve_hash_t *hash)
 {
     bh_solve_compact_allocator_finish(&(hash->allocator));
 
     free(hash->entries);
 }
 
-extern void bh_solve_hash_get(
-    bh_solve_hash_t * hash,
-    bhs_state_key_value_pair_t * key_ptr,
-    bhs_state_key_value_pair_t * result
-    );
+extern void bh_solve_hash_get(bh_solve_hash_t *hash,
+    bhs_state_key_value_pair_t *key_ptr, bhs_state_key_value_pair_t *result);
 
 #ifdef __cplusplus
 }

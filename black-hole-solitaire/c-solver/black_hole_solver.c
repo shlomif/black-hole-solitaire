@@ -61,16 +61,16 @@ static int suit_char_to_index(char suit)
 {
     switch (suit)
     {
-        case 'H':
-            return SUIT_H;
-        case 'C':
-            return SUIT_C;
-        case 'D':
-            return SUIT_D;
-        case 'S':
-            return SUIT_S;
-        default:
-            return INVALID_SUIT;
+    case 'H':
+        return SUIT_H;
+    case 'C':
+        return SUIT_C;
+    case 'D':
+        return SUIT_D;
+    case 'S':
+        return SUIT_S;
+    default:
+        return INVALID_SUIT;
     }
 }
 
@@ -112,13 +112,14 @@ typedef struct
     bh_solve_hash_t positions;
 
     bhs_card_string_t initial_foundation_string;
-    bhs_card_string_t initial_board_card_strings[BHS__MAX_NUM_COLUMNS][BHS__MAX_NUM_CARDS_IN_COL];
+    bhs_card_string_t initial_board_card_strings[BHS__MAX_NUM_COLUMNS]
+                                                [BHS__MAX_NUM_CARDS_IN_COL];
     int initial_lens[BHS__MAX_NUM_COLUMNS];
 
     bhs_state_key_value_pair_t init_state;
     bhs_state_key_value_pair_t final_state;
 
-    bhs_solution_state_t * states_in_solution;
+    bhs_solution_state_t *states_in_solution;
     int num_states_in_solution, current_state_in_solution_idx;
 
     long iterations_num, num_states_in_collection, max_iters_limit;
@@ -127,7 +128,7 @@ typedef struct
     int num_columns;
     int bits_per_column;
 
-    bhs_queue_item_t * queue;
+    bhs_queue_item_t *queue;
     int queue_len, queue_max_len;
     int sol_foundations_card_rank, sol_foundations_card_suit;
     fcs_bool_t is_rank_reachability_prune_enabled;
@@ -135,14 +136,13 @@ typedef struct
 } bhs_solver_t;
 
 int DLLEXPORT black_hole_solver_create(
-    black_hole_solver_instance_t * * ret_instance
-)
+    black_hole_solver_instance_t **ret_instance)
 {
-    bhs_solver_t * const ret = (bhs_solver_t *)malloc(sizeof(*ret));
+    bhs_solver_t *const ret = (bhs_solver_t *)malloc(sizeof(*ret));
 
-    if (! ret)
+    if (!ret)
     {
-        *ret_instance =  NULL;
+        *ret_instance = NULL;
         return BLACK_HOLE_SOLVER__OUT_OF_MEMORY;
     }
     ret->require_initialization = TRUE;
@@ -163,17 +163,16 @@ int DLLEXPORT black_hole_solver_create(
 }
 
 DLLEXPORT extern int black_hole_solver_enable_rank_reachability_prune(
-    black_hole_solver_instance_t * const instance_proto,
-    const fcs_bool_t enabled_status
-)
+    black_hole_solver_instance_t *const instance_proto,
+    const fcs_bool_t enabled_status)
 {
-    bhs_solver_t * const solver = (bhs_solver_t *)instance_proto;
+    bhs_solver_t *const solver = (bhs_solver_t *)instance_proto;
     solver->is_rank_reachability_prune_enabled = enabled_status ? TRUE : FALSE;
 
     return BLACK_HOLE_SOLVER__SUCCESS;
 }
 
-#define MAX_RANK (NUM_RANKS-1)
+#define MAX_RANK (NUM_RANKS - 1)
 
 enum BHS_RANKS
 {
@@ -192,12 +191,8 @@ enum BHS_RANKS
     RANK_K,
 };
 
-static int parse_card(
-    const char * * s,
-    bhs_rank_t * const foundation,
-    bhs_card_string_t card,
-    int * const suit_ptr
-)
+static int parse_card(const char **s, bhs_rank_t *const foundation,
+    bhs_card_string_t card, int *const suit_ptr)
 {
     strncpy(card, (*s), BHS_CARD_STRING_LEN);
     card[BHS_CARD_STRING_LEN] = '\0';
@@ -205,62 +200,62 @@ static int parse_card(
     /* Short for value. */
     bhs_rank_t v;
 
-    switch(*(*s))
+    switch (*(*s))
     {
-        case 'A':
-            v = RANK_A;
-            break;
+    case 'A':
+        v = RANK_A;
+        break;
 
-        case '2':
-            v = RANK_2;
-            break;
+    case '2':
+        v = RANK_2;
+        break;
 
-        case '3':
-            v = RANK_3;
-            break;
+    case '3':
+        v = RANK_3;
+        break;
 
-        case '4':
-            v = RANK_4;
-            break;
+    case '4':
+        v = RANK_4;
+        break;
 
-        case '5':
-            v = RANK_5;
-            break;
+    case '5':
+        v = RANK_5;
+        break;
 
-        case '6':
-            v = RANK_6;
-            break;
+    case '6':
+        v = RANK_6;
+        break;
 
-        case '7':
-            v = RANK_7;
-            break;
+    case '7':
+        v = RANK_7;
+        break;
 
-        case '8':
-            v = RANK_8;
-            break;
+    case '8':
+        v = RANK_8;
+        break;
 
-        case '9':
-            v = RANK_9;
-            break;
+    case '9':
+        v = RANK_9;
+        break;
 
-        case 'T':
-            v = RANK_T;
-            break;
+    case 'T':
+        v = RANK_T;
+        break;
 
-        case 'J':
-            v = RANK_J;
-            break;
+    case 'J':
+        v = RANK_J;
+        break;
 
-        case 'Q':
-            v = RANK_Q;
-            break;
+    case 'Q':
+        v = RANK_Q;
+        break;
 
-        case 'K':
-            v = RANK_K;
-            break;
+    case 'K':
+        v = RANK_K;
+        break;
 
-        default:
-            return BLACK_HOLE_SOLVER__UNKNOWN_RANK;
+    default:
+        return BLACK_HOLE_SOLVER__UNKNOWN_RANK;
     }
 
     *foundation = v;
@@ -269,17 +264,17 @@ static int parse_card(
 
     switch (*(*s))
     {
-        case 'H':
-        case 'S':
-        case 'D':
-        case 'C':
-            if (suit_ptr)
-            {
-                *suit_ptr = suit_char_to_index(*(*(s)));
-            }
-            break;
-        default:
-            return BLACK_HOLE_SOLVER__UNKNOWN_SUIT;
+    case 'H':
+    case 'S':
+    case 'D':
+    case 'C':
+        if (suit_ptr)
+        {
+            *suit_ptr = suit_char_to_index(*(*(s)));
+        }
+        break;
+    default:
+        return BLACK_HOLE_SOLVER__UNKNOWN_SUIT;
     }
     (*s)++;
 
@@ -287,9 +282,7 @@ static int parse_card(
 }
 
 static inline fcs_bool_t string_find_prefix(
-    const char * * s,
-    const char * const prefix
-)
+    const char **s, const char *const prefix)
 {
     register size_t len = strlen(prefix);
 
@@ -304,13 +297,10 @@ static inline fcs_bool_t string_find_prefix(
 }
 
 extern int DLLEXPORT black_hole_solver_read_board(
-    black_hole_solver_instance_t * const instance_proto,
-    const char * const board_string,
-    int * const error_line_number,
-    const int num_columns,
-    const int max_num_cards_in_col,
-    const int bits_per_column
-)
+    black_hole_solver_instance_t *const instance_proto,
+    const char *const board_string, int *const error_line_number,
+    const int num_columns, const int max_num_cards_in_col,
+    const int bits_per_column)
 {
     int line_num = 1;
 
@@ -319,12 +309,12 @@ extern int DLLEXPORT black_hole_solver_read_board(
         return BLACK_HOLE_SOLVER__INVALID_INPUT;
     }
 
-    bhs_solver_t * const solver = (bhs_solver_t *)instance_proto;
+    bhs_solver_t *const solver = (bhs_solver_t *)instance_proto;
 
     solver->num_columns = num_columns;
     solver->bits_per_column = bits_per_column;
 
-    const char * s = board_string;
+    const char *s = board_string;
 
     /* Read the foundations. */
 
@@ -334,15 +324,15 @@ extern int DLLEXPORT black_hole_solver_read_board(
         s++;
     }
 
-#define MYRET(code) \
-    { \
-        *error_line_number = line_num; \
-        return code; \
+#define MYRET(code)                                                            \
+    {                                                                          \
+        *error_line_number = line_num;                                         \
+        return code;                                                           \
     }
 
-    if (! string_find_prefix(&s, "Foundations: "))
+    if (!string_find_prefix(&s, "Foundations: "))
     {
-        MYRET (BLACK_HOLE_SOLVER__FOUNDATIONS_NOT_FOUND_AT_START);
+        MYRET(BLACK_HOLE_SOLVER__FOUNDATIONS_NOT_FOUND_AT_START);
     }
 
     while (isspace(*s) && ((*s) != '\n'))
@@ -361,24 +351,21 @@ extern int DLLEXPORT black_hole_solver_read_board(
     }
     else
     {
-        const int ret_code =
-            parse_card(&s,
-                    &(solver->initial_foundation),
-                    solver->initial_foundation_string,
-                    &(solver->sol_foundations_card_suit)
-                    );
+        const int ret_code = parse_card(&s, &(solver->initial_foundation),
+            solver->initial_foundation_string,
+            &(solver->sol_foundations_card_suit));
 
         solver->sol_foundations_card_rank = solver->initial_foundation;
 
         if (ret_code)
         {
-            MYRET (ret_code);
+            MYRET(ret_code);
         }
     }
 
     if (*(s++) != '\n')
     {
-        MYRET (BLACK_HOLE_SOLVER__TRAILING_CHARS);
+        MYRET(BLACK_HOLE_SOLVER__TRAILING_CHARS);
     }
     line_num++;
 
@@ -389,19 +376,16 @@ extern int DLLEXPORT black_hole_solver_read_board(
         {
             if (pos_idx == max_num_cards_in_col)
             {
-                MYRET (BLACK_HOLE_SOLVER__TOO_MANY_CARDS);
+                MYRET(BLACK_HOLE_SOLVER__TOO_MANY_CARDS);
             }
 
             const int ret_code =
-                parse_card(&s,
-                    &(solver->board_values[col_idx][pos_idx]),
-                    solver->initial_board_card_strings[col_idx][pos_idx],
-                    NULL
-                );
+                parse_card(&s, &(solver->board_values[col_idx][pos_idx]),
+                    solver->initial_board_card_strings[col_idx][pos_idx], NULL);
 
             if (ret_code)
             {
-                MYRET (ret_code);
+                MYRET(ret_code);
             }
 
             while ((*s) == ' ')
@@ -416,7 +400,7 @@ extern int DLLEXPORT black_hole_solver_read_board(
 
         if (*s == '\0')
         {
-            MYRET ( BLACK_HOLE_SOLVER__NOT_ENOUGH_COLUMNS );
+            MYRET(BLACK_HOLE_SOLVER__NOT_ENOUGH_COLUMNS);
         }
         else
         {
@@ -430,36 +414,30 @@ extern int DLLEXPORT black_hole_solver_read_board(
 
 #undef MYRET
 
-
 DLLEXPORT extern int black_hole_solver_set_max_iters_limit(
-    black_hole_solver_instance_t * const instance_proto,
-    const long limit
-)
+    black_hole_solver_instance_t *const instance_proto, const long limit)
 {
-    ((bhs_solver_t * const)instance_proto)->max_iters_limit = limit;
+    ((bhs_solver_t *const)instance_proto)->max_iters_limit = limit;
 
     return BLACK_HOLE_SOLVER__SUCCESS;
 }
 
 DLLEXPORT extern int black_hole_solver_set_iters_display_step(
-    black_hole_solver_instance_t * const instance_proto,
-    const long iters_display_step
-)
+    black_hole_solver_instance_t *const instance_proto,
+    const long iters_display_step)
 {
     if (iters_display_step < 0)
     {
         return BLACK_HOLE_SOLVER__INVALID_INPUT;
     }
-    ((bhs_solver_t * const)instance_proto)->iters_display_step
-        = iters_display_step;
+    ((bhs_solver_t *const)instance_proto)->iters_display_step =
+        iters_display_step;
 
     return BLACK_HOLE_SOLVER__SUCCESS;
 }
 
 static inline void queue_item_populate_packed(
-    bhs_solver_t * const solver,
-    bhs_queue_item_t * const queue_item
-)
+    bhs_solver_t *const solver, bhs_queue_item_t *const queue_item)
 {
     queue_item->s.packed.key.foundations = queue_item->s.unpacked.foundations;
 
@@ -468,20 +446,15 @@ static inline void queue_item_populate_packed(
 
     const_SLOT(num_columns, solver);
     const_SLOT(bits_per_column, solver);
-    for (int col = 0; col < num_columns ; col++)
+    for (int col = 0; col < num_columns; col++)
     {
         fc_solve_bit_writer_write(
-            &bit_w,
-            bits_per_column,
-            queue_item->s.unpacked.heights[col]
-        );
+            &bit_w, bits_per_column, queue_item->s.unpacked.heights[col]);
     }
 }
 
 static inline void queue_item_unpack(
-    bhs_solver_t * const solver,
-    bhs_solution_state_t * const queue_item
-)
+    bhs_solver_t *const solver, bhs_solution_state_t *const queue_item)
 {
     const_SLOT(num_columns, solver);
     const_SLOT(bits_per_column, solver);
@@ -491,25 +464,19 @@ static inline void queue_item_unpack(
     fc_solve_bit_reader_t bit_r;
     fc_solve_bit_reader_init(&bit_r, queue_item->packed.key.data);
 
-    for (int col = 0; col < num_columns ; col++)
+    for (int col = 0; col < num_columns; col++)
     {
         queue_item->unpacked.heights[col] =
             (typeof(queue_item->unpacked.heights[col]))fc_solve_bit_reader_read(
-                &bit_r,
-                bits_per_column
-            );
+                &bit_r, bits_per_column);
     }
 }
 
-static inline void perform_move(
-    bhs_solver_t * const solver,
-    const bhs_rank_t card,
-    const int col_idx,
-    const bhs_queue_item_t * const queue_item_copy_ptr
-)
+static inline void perform_move(bhs_solver_t *const solver,
+    const bhs_rank_t card, const int col_idx,
+    const bhs_queue_item_t *const queue_item_copy_ptr)
 {
-    bhs_unpacked_state_t next_state
-        = queue_item_copy_ptr->s.unpacked;
+    bhs_unpacked_state_t next_state = queue_item_copy_ptr->s.unpacked;
 
     next_state.foundations = card;
     next_state.heights[col_idx]--;
@@ -519,22 +486,18 @@ static inline void perform_move(
     next_queue_item.s.unpacked = next_state;
     memset(&(next_queue_item.s.packed), '\0', sizeof(next_queue_item.s.packed));
 
-    next_queue_item.s.packed.value.parent_state = queue_item_copy_ptr->s.packed.key;
-    next_queue_item.s.packed.value.col_idx = (typeof(next_queue_item.s.packed.value.col_idx))col_idx;
+    next_queue_item.s.packed.value.parent_state =
+        queue_item_copy_ptr->s.packed.key;
+    next_queue_item.s.packed.value.col_idx =
+        (typeof(next_queue_item.s.packed.value.col_idx))col_idx;
 
-    queue_item_populate_packed(
-        solver,
-        &(next_queue_item)
-    );
+    queue_item_populate_packed(solver, &(next_queue_item));
 
     next_queue_item.rank_counts = queue_item_copy_ptr->rank_counts;
     next_queue_item.rank_counts.c[(ssize_t)card]--;
 
-    if (! bh_solve_hash_insert(
-            &(solver->positions),
-            &(next_queue_item.s.packed)
-    )
-    )
+    if (!bh_solve_hash_insert(
+            &(solver->positions), &(next_queue_item.s.packed)))
     {
         solver->num_states_in_collection++;
         /* It's a new state - put it in the queue. */
@@ -543,49 +506,44 @@ static inline void perform_move(
         if (solver->queue_len == solver->queue_max_len)
         {
             solver->queue = realloc(
-                solver->queue,
-                sizeof(solver->queue[0]) * (size_t)(solver->queue_max_len += 64)
-            );
+                solver->queue, sizeof(solver->queue[0]) *
+                                   (size_t)(solver->queue_max_len += 64));
         }
     }
 }
 
-static inline long maxify(long n)
-{
-    return ((n < 0) ? LONG_MAX : n);
-}
+static inline long maxify(long n) { return ((n < 0) ? LONG_MAX : n); }
 
 static inline bhs_state_key_value_pair_t setup_first_queue_item(
-    bhs_solver_t * const solver
-)
+    bhs_solver_t *const solver)
 {
     const_SLOT(num_columns, solver);
 
-    typeof(solver->queue[solver->queue_len]) * const new_queue_item =
+    typeof(solver->queue[solver->queue_len]) *const new_queue_item =
         &(solver->queue[solver->queue_len]);
 
     /* Populate the unpacked state. */
-    for (int i = 0 ; i < num_columns ; i++)
+    for (int i = 0; i < num_columns; i++)
     {
-        new_queue_item->s.unpacked.heights[i] = (typeof(new_queue_item->s.unpacked.heights[i]))solver->initial_lens[i];
+        new_queue_item->s.unpacked.heights[i] = (typeof(
+            new_queue_item->s.unpacked.heights[i]))solver->initial_lens[i];
     }
     new_queue_item->s.unpacked.foundations = solver->initial_foundation;
 
     /* Populate the packed item from the unpacked one. */
     memset(&(new_queue_item->s.packed), '\0', sizeof(new_queue_item->s.packed));
 
-    queue_item_populate_packed( solver, new_queue_item );
+    queue_item_populate_packed(solver, new_queue_item);
 
-    memset( &(new_queue_item->rank_counts), '\0',
+    memset(&(new_queue_item->rank_counts), '\0',
         sizeof(new_queue_item->rank_counts));
 
-    for (int col_idx = 0 ; col_idx < num_columns ; col_idx++)
+    for (int col_idx = 0; col_idx < num_columns; col_idx++)
     {
         for (int h = 0; h < new_queue_item->s.unpacked.heights[col_idx]; h++)
         {
-            new_queue_item->rank_counts.c[
-                (ssize_t)solver->board_values[col_idx][h]
-            ]++;
+            new_queue_item->rank_counts
+                .c[(ssize_t)solver->board_values[col_idx][h]]++;
         }
     }
     solver->queue_len++;
@@ -593,28 +551,22 @@ static inline bhs_state_key_value_pair_t setup_first_queue_item(
     return new_queue_item->s.packed;
 }
 
-static inline void setup_init_state(
-    bhs_solver_t * const solver
-)
+static inline void setup_init_state(bhs_solver_t *const solver)
 {
     solver->queue_max_len = 64;
-    solver->queue = malloc(sizeof(solver->queue[0]) * (size_t)solver->queue_max_len);
+    solver->queue =
+        malloc(sizeof(solver->queue[0]) * (size_t)solver->queue_max_len);
     solver->queue_len = 0;
     solver->num_states_in_collection = 0;
 
-    bhs_state_key_value_pair_t * const init_state = &(solver->init_state);
+    bhs_state_key_value_pair_t *const init_state = &(solver->init_state);
     *init_state = setup_first_queue_item(solver);
 
-    bh_solve_hash_insert(
-        &(solver->positions),
-        init_state
-    );
+    bh_solve_hash_insert(&(solver->positions), init_state);
     ++solver->num_states_in_collection;
 }
 
-static inline void setup_once(
-    bhs_solver_t * const solver
-)
+static inline void setup_once(bhs_solver_t *const solver)
 {
     if (solver->require_initialization)
     {
@@ -624,10 +576,9 @@ static inline void setup_once(
 }
 
 extern int DLLEXPORT black_hole_solver_run(
-    black_hole_solver_instance_t * ret_instance
-)
+    black_hole_solver_instance_t *ret_instance)
 {
-    bhs_solver_t * const solver = (bhs_solver_t *)ret_instance;
+    bhs_solver_t *const solver = (bhs_solver_t *)ret_instance;
 
     setup_once(solver);
 
@@ -638,10 +589,10 @@ extern int DLLEXPORT black_hole_solver_run(
     var_AUTO(iterations_num, solver->iterations_num);
 
     long next_iterations_display_point =
-    (
-        (iters_display_step <= 0) ? LONG_MAX :
-        (iterations_num + iters_display_step - (iterations_num % iters_display_step))
-    );
+        ((iters_display_step <= 0)
+                ? LONG_MAX
+                : (iterations_num + iters_display_step -
+                      (iterations_num % iters_display_step)));
 
     while (solver->queue_len > 0)
     {
@@ -650,10 +601,9 @@ extern int DLLEXPORT black_hole_solver_run(
         const_AUTO(state, queue_item_copy.s.unpacked);
         const_AUTO(foundations, state.foundations);
 
-        if (is_rank_reachability_prune_enabled && (bhs_find_rank_reachability__inline(
-                    foundations,
-                    queue_item_copy.rank_counts.c
-        ) != RANK_REACH__SUCCESS))
+        if (is_rank_reachability_prune_enabled &&
+            (bhs_find_rank_reachability__inline(foundations,
+                 queue_item_copy.rank_counts.c) != RANK_REACH__SUCCESS))
         {
             continue;
         }
@@ -662,25 +612,18 @@ extern int DLLEXPORT black_hole_solver_run(
 
         fcs_bool_t no_cards = TRUE;
 
-        for (int col_idx = 0 ; col_idx < num_columns ; col_idx++)
+        for (int col_idx = 0; col_idx < num_columns; col_idx++)
         {
             const_AUTO(pos, state.heights[col_idx]);
-            if ( pos )
+            if (pos)
             {
                 no_cards = FALSE;
-                const_AUTO(card, solver->board_values[col_idx][pos-1]);
+                const_AUTO(card, solver->board_values[col_idx][pos - 1]);
 
-                if ( (foundations == -1)
-                        ||
-                     (abs(card-foundations)%(MAX_RANK-1) == 1)
-                )
+                if ((foundations == -1) ||
+                    (abs(card - foundations) % (MAX_RANK - 1) == 1))
                 {
-                    perform_move(
-                        solver,
-                        card,
-                        col_idx,
-                        &queue_item_copy
-                    );
+                    perform_move(solver, card, col_idx, &queue_item_copy);
                 }
             }
         }
@@ -714,30 +657,29 @@ extern int DLLEXPORT black_hole_solver_run(
 }
 
 extern int DLLEXPORT black_hole_solver_free(
-    black_hole_solver_instance_t * instance_proto
-)
+    black_hole_solver_instance_t *instance_proto)
 {
-    bhs_solver_t * const solver = (bhs_solver_t *)instance_proto;
+    bhs_solver_t *const solver = (bhs_solver_t *)instance_proto;
 
-    bh_solve_hash_free( &(solver->positions) );
+    bh_solve_hash_free(&(solver->positions));
 
     if (solver->states_in_solution)
     {
-        free (solver->states_in_solution);
+        free(solver->states_in_solution);
         solver->states_in_solution = NULL;
     }
 
-    free (solver->queue);
+    free(solver->queue);
     solver->queue = NULL;
 
-    free (solver);
+    free(solver);
 
     return BLACK_HOLE_SOLVER__SUCCESS;
 }
 
 #define NUM_STATES_INCREMENT 16
 
-static void initialize_states_in_solution(bhs_solver_t * solver)
+static void initialize_states_in_solution(bhs_solver_t *solver)
 {
     if (solver->states_in_solution)
     {
@@ -746,46 +688,38 @@ static void initialize_states_in_solution(bhs_solver_t * solver)
     int num_states = 0;
     int max_num_states = NUM_SUITS * NUM_RANKS + 1;
 
-    bhs_solution_state_t * states = malloc(sizeof(states[0]) * (size_t)max_num_states);
+    bhs_solution_state_t *states =
+        malloc(sizeof(states[0]) * (size_t)max_num_states);
 
     states[num_states].packed = (solver->final_state);
     queue_item_unpack(solver, &states[num_states]);
 
-    while (memcmp(
-            &(states[num_states].packed.key),
-            &(solver->init_state.key),
-            sizeof(states[num_states].packed.key)
-    ))
+    while (memcmp(&(states[num_states].packed.key), &(solver->init_state.key),
+        sizeof(states[num_states].packed.key)))
     {
         if (num_states == max_num_states)
         {
-            states =
-                realloc(
-                    states,
-                    sizeof(states[0]) * (size_t)(max_num_states += NUM_STATES_INCREMENT)
-                );
+            states = realloc(
+                states, sizeof(states[0]) *
+                            (size_t)(max_num_states += NUM_STATES_INCREMENT));
         }
 
         /* Look up the next state in the positions associative array. */
-        bh_solve_hash_get(
-            &(solver->positions),
-            (
-                (bhs_state_key_value_pair_t *)
-                &(states[num_states].packed.value.parent_state)
-            ),
-            &(states[num_states+1].packed)
-        );
+        bh_solve_hash_get(&(solver->positions),
+            ((bhs_state_key_value_pair_t *)&(
+                states[num_states].packed.value.parent_state)),
+            &(states[num_states + 1].packed));
         queue_item_unpack(solver, &states[++num_states]);
     }
 
     num_states++;
 
     /* Reverse the list in place. */
-    for (int i = 0 ; i < (num_states >> 1) ; i++)
+    for (int i = 0; i < (num_states >> 1); i++)
     {
         const_AUTO(temp_state, states[i]);
-        states[i] = states[num_states-1-i];
-        states[num_states-1-i] = temp_state;
+        states[i] = states[num_states - 1 - i];
+        states[num_states - 1 - i] = temp_state;
     }
 
     solver->states_in_solution = states;
@@ -794,84 +728,75 @@ static void initialize_states_in_solution(bhs_solver_t * solver)
 }
 
 DLLEXPORT extern int black_hole_solver_get_next_move(
-    black_hole_solver_instance_t * const instance_proto,
-    int * const col_idx_ptr,
-    int * const card_rank_ptr,
-    int * const card_suit_ptr /*  H=0, C=1, D=2, S=3 */
+    black_hole_solver_instance_t *const instance_proto, int *const col_idx_ptr,
+    int *const card_rank_ptr, int *const card_suit_ptr /*  H=0, C=1, D=2, S=3 */
 )
 {
-    bhs_solver_t * const solver = (bhs_solver_t *)instance_proto;
+    bhs_solver_t *const solver = (bhs_solver_t *)instance_proto;
 
     initialize_states_in_solution(solver);
 
-    if (solver->current_state_in_solution_idx == solver->num_states_in_solution-1)
+    if (solver->current_state_in_solution_idx ==
+        solver->num_states_in_solution - 1)
     {
         *col_idx_ptr = *card_rank_ptr = *card_suit_ptr = -1;
         return BLACK_HOLE_SOLVER__END;
     }
 
     {
-        const bhs_solution_state_t next_state = solver->states_in_solution[
-            ++solver->current_state_in_solution_idx
-            ];
+        const bhs_solution_state_t next_state =
+            solver->states_in_solution[++solver->current_state_in_solution_idx];
 
         const int col_idx = next_state.packed.value.col_idx;
         const int height = next_state.unpacked.heights[col_idx];
 
         *col_idx_ptr = col_idx;
-        solver->sol_foundations_card_rank = *card_rank_ptr
-            = solver->board_values[col_idx][height]+1;
-        solver->sol_foundations_card_suit = *card_suit_ptr
-            = suit_char_to_index(
-                solver->initial_board_card_strings[col_idx][height][1]
-            );
+        solver->sol_foundations_card_rank = *card_rank_ptr =
+            solver->board_values[col_idx][height] + 1;
+        solver->sol_foundations_card_suit = *card_suit_ptr = suit_char_to_index(
+            solver->initial_board_card_strings[col_idx][height][1]);
 
         return BLACK_HOLE_SOLVER__SUCCESS;
     }
 }
 
-DLLEXPORT extern long __attribute__((pure)) black_hole_solver_get_num_states_in_collection(
-    black_hole_solver_instance_t *const instance_proto
-)
+DLLEXPORT extern long __attribute__((pure))
+black_hole_solver_get_num_states_in_collection(
+    black_hole_solver_instance_t *const instance_proto)
 {
     return ((bhs_solver_t *)instance_proto)->num_states_in_collection;
 }
 
-DLLEXPORT extern long __attribute__((pure)) black_hole_solver_get_iterations_num(
-    black_hole_solver_instance_t * instance_proto
-)
+DLLEXPORT extern long __attribute__((pure))
+black_hole_solver_get_iterations_num(
+    black_hole_solver_instance_t *instance_proto)
 {
     return ((bhs_solver_t *)instance_proto)->iterations_num;
 }
 
 DLLEXPORT extern int black_hole_solver_get_current_solution_board(
-    black_hole_solver_instance_t * instance_proto,
-    char * * ptr_to_ret
-)
+    black_hole_solver_instance_t *instance_proto, char **ptr_to_ret)
 {
-    bhs_solver_t * const solver = (bhs_solver_t *)instance_proto;
+    bhs_solver_t *const solver = (bhs_solver_t *)instance_proto;
 
     initialize_states_in_solution(solver);
 
     *ptr_to_ret = NULL;
 
-    char * const ret = malloc(
+    char *const ret = malloc(
         /* 3 bytes per card. */
-        (3 * NUM_SUITS * NUM_RANKS)
-            +
+        (3 * NUM_SUITS * NUM_RANKS) +
         /* newline and a leading ":" per column */
-        (2 * BHS__MAX_NUM_COLUMNS)
-            +
+        (2 * BHS__MAX_NUM_COLUMNS) +
         /* For the foundations. */
-        20
-    );
+        20);
 
     if (ret == NULL)
     {
         return BLACK_HOLE_SOLVER__OUT_OF_MEMORY;
     }
 
-    char * s = ret;
+    char *s = ret;
 
     s += sprintf(s, "Foundations: ");
 
@@ -882,15 +807,14 @@ DLLEXPORT extern int black_hole_solver_get_current_solution_board(
     else
     {
         s += sprintf(s, "%c%c",
-            (("0A23456789TJQK")[solver->sol_foundations_card_rank]), ("HCDS")[solver->sol_foundations_card_suit]
-        );
+            (("0A23456789TJQK")[solver->sol_foundations_card_rank]),
+            ("HCDS")[solver->sol_foundations_card_suit]);
     }
 
     s += sprintf(s, "\n");
 
-    bhs_solution_state_t next_state = solver->states_in_solution[
-        solver->current_state_in_solution_idx
-    ];
+    bhs_solution_state_t next_state =
+        solver->states_in_solution[solver->current_state_in_solution_idx];
 
     const_SLOT(num_columns, solver);
     for (int col_idx = 0; col_idx < num_columns; col_idx++)
@@ -898,9 +822,8 @@ DLLEXPORT extern int black_hole_solver_get_current_solution_board(
         s += sprintf(s, "%c", ':');
         for (int h = 0; h < next_state.unpacked.heights[col_idx]; h++)
         {
-            s += sprintf(s, " %s",
-                solver->initial_board_card_strings[col_idx][h]
-            );
+            s += sprintf(
+                s, " %s", solver->initial_board_card_strings[col_idx][h]);
         }
         s += sprintf(s, "\n");
     }
@@ -910,8 +833,8 @@ DLLEXPORT extern int black_hole_solver_get_current_solution_board(
     return BLACK_HOLE_SOLVER__SUCCESS;
 }
 
-DLLEXPORT const __attribute__((const)) char * black_hole_solver_get_lib_version(void)
+DLLEXPORT const __attribute__((const)) char *black_hole_solver_get_lib_version(
+    void)
 {
     return VERSION;
 }
-

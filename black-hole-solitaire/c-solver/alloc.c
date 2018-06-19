@@ -34,55 +34,43 @@
 
 #include "alloc.h"
 
-#define ALLOCED_SIZE (FCS_IA_PACK_SIZE*1024-(256+128))
+#define ALLOCED_SIZE (FCS_IA_PACK_SIZE * 1024 - (256 + 128))
 
-void bh_solve_compact_allocator_init(
-    bhs_compact_allocator_t * const allocator
-    )
+void bh_solve_compact_allocator_init(bhs_compact_allocator_t *const allocator)
 {
-    allocator->packs = (char * *)malloc(sizeof(allocator->packs[0]) * IA_STATE_PACKS_GROW_BY);
+    allocator->packs =
+        (char **)malloc(sizeof(allocator->packs[0]) * IA_STATE_PACKS_GROW_BY);
     allocator->num_packs = 1;
-    allocator->max_ptr =
-        (allocator->ptr =
-        allocator->rollback_ptr =
-        allocator->packs[0] =
-        malloc(ALLOCED_SIZE))
-            + ALLOCED_SIZE;
+    allocator->max_ptr = (allocator->ptr = allocator->rollback_ptr =
+                                 allocator->packs[0] = malloc(ALLOCED_SIZE)) +
+                         ALLOCED_SIZE;
 }
 
-void bh_solve_compact_allocator_extend(
-    bhs_compact_allocator_t * const allocator
-        )
+void bh_solve_compact_allocator_extend(bhs_compact_allocator_t *const allocator)
 {
     /* Allocate a new pack */
-    if (! ((++ ( allocator->num_packs )) & (IA_STATE_PACKS_GROW_BY-1)))
+    if (!((++(allocator->num_packs)) & (IA_STATE_PACKS_GROW_BY - 1)))
     {
-        allocator->packs = (char * *)realloc(
-            allocator->packs,
+        allocator->packs = (char **)realloc(allocator->packs,
             sizeof(allocator->packs[0]) *
-                ((allocator->num_packs) + IA_STATE_PACKS_GROW_BY)
-        );
+                ((allocator->num_packs) + IA_STATE_PACKS_GROW_BY));
     }
 
-    allocator->max_ptr =
-        (allocator->ptr =
-        allocator->rollback_ptr =
-        allocator->packs[allocator->num_packs-1] =
-        malloc(ALLOCED_SIZE))
-            + ALLOCED_SIZE;
+    allocator->max_ptr = (allocator->ptr = allocator->rollback_ptr =
+                                 allocator->packs[allocator->num_packs - 1] =
+                                     malloc(ALLOCED_SIZE)) +
+                         ALLOCED_SIZE;
 }
 
-
-void bh_solve_compact_allocator_finish(bhs_compact_allocator_t * const allocator)
+void bh_solve_compact_allocator_finish(bhs_compact_allocator_t *const allocator)
 {
-    char * * curr_pack = allocator->packs;
-    char * const * const packs_end = curr_pack + allocator->num_packs;
+    char **curr_pack = allocator->packs;
+    char *const *const packs_end = curr_pack + allocator->num_packs;
 
-    for ( ; curr_pack < packs_end ; curr_pack++)
+    for (; curr_pack < packs_end; curr_pack++)
     {
         free(*(curr_pack));
     }
 
     free(allocator->packs);
 }
-

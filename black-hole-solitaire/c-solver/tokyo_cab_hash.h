@@ -41,18 +41,17 @@ extern "C" {
 
 typedef struct
 {
-    TCHDB * hash;
+    TCHDB *hash;
 } bh_solve_hash_t;
 
-static inline void bh_solve_hash_init(
-    bh_solve_hash_t * hash
-    )
+static inline void bh_solve_hash_init(bh_solve_hash_t *hash)
 {
     int ecode;
 
     hash->hash = tchdbnew();
-    tchdbsetcache(hash->hash, 1024*1024);
-    if (!tchdbopen(hash->hash, "bh_solve.hdb", HDBOWRITER|HDBOTRUNC|HDBOCREAT))
+    tchdbsetcache(hash->hash, 1024 * 1024);
+    if (!tchdbopen(
+            hash->hash, "bh_solve.hdb", HDBOWRITER | HDBOTRUNC | HDBOCREAT))
     {
         ecode = tchdbecode(hash->hash);
         fprintf(stderr, "Tokyo Cabinet open error: %s\n", tchdberrmsg(ecode));
@@ -60,45 +59,31 @@ static inline void bh_solve_hash_init(
     }
 }
 
-
 static inline fcs_bool_t bh_solve_hash_insert(
-    bh_solve_hash_t * hash,
-    bhs_state_key_value_pair_t * key
-)
+    bh_solve_hash_t *hash, bhs_state_key_value_pair_t *key)
 {
-    return (!tchdbputkeep(
-        hash->hash,
-        &(key->key),
-        sizeof(key->key),
-        &(key->value),
-        sizeof(key->value)
-    ));
+    return (!tchdbputkeep(hash->hash, &(key->key), sizeof(key->key),
+        &(key->value), sizeof(key->value)));
 }
 
 // Returns FALSE if the key is new and the key/val pair was inserted.
 // Returns TRUE if the key is not new.
 extern fcs_bool_t bh_solve_hash_insert(
-    bh_solve_hash_t * hash,
-    bhs_state_key_value_pair_t * key
-    );
+    bh_solve_hash_t *hash, bhs_state_key_value_pair_t *key);
 
-static inline void bh_solve_hash_free(
-    bh_solve_hash_t * hash
-    )
+static inline void bh_solve_hash_free(bh_solve_hash_t *hash)
 {
     tchdbclose(hash->hash);
     tchdbdel(hash->hash);
     hash->hash = NULL;
 }
 
-static inline void bh_solve_hash_get(
-    bh_solve_hash_t * hash,
-    bhs_state_key_value_pair_t * key_ptr,
-    bhs_state_key_value_pair_t * result
-    )
+static inline void bh_solve_hash_get(bh_solve_hash_t *hash,
+    bhs_state_key_value_pair_t *key_ptr, bhs_state_key_value_pair_t *result)
 {
     result->key = key_ptr->key;
-    tchdbget3(hash->hash, &(key_ptr->key), sizeof(key_ptr->key), &(result->value), sizeof(result->value));
+    tchdbget3(hash->hash, &(key_ptr->key), sizeof(key_ptr->key),
+        &(result->value), sizeof(result->value));
 }
 
 #ifdef __cplusplus

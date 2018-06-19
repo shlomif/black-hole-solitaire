@@ -41,14 +41,10 @@ enum RANK_REACH_VERDICT
 };
 
 DLLEXPORT enum RANK_REACH_VERDICT bhs_find_rank_reachability(
-    const signed char foundation,
-    const unsigned char * const rank_counts
-);
+    const signed char foundation, const unsigned char *const rank_counts);
 
 static inline enum RANK_REACH_VERDICT bhs_find_rank_reachability__inline(
-    const signed char foundation,
-    const unsigned char * const rank_counts
-)
+    const signed char foundation, const unsigned char *const rank_counts)
 {
     if (foundation < 0)
     {
@@ -58,12 +54,12 @@ static inline enum RANK_REACH_VERDICT bhs_find_rank_reachability__inline(
     /* The 20 is a margin */
     signed char physical_queue[NUM_RANKS + 1];
 
-    signed char * queue_ptr = physical_queue;
+    signed char *queue_ptr = physical_queue;
 
     *(queue_ptr++) = foundation;
 
     int full_ranks_goal = 0;
-    for (int i = 0; i < NUM_RANKS ; i++)
+    for (int i = 0; i < NUM_RANKS; i++)
     {
         if (rank_counts[i] > 0)
         {
@@ -80,7 +76,7 @@ static inline enum RANK_REACH_VERDICT bhs_find_rank_reachability__inline(
 
     fcs_bool_t reached[NUM_RANKS];
 
-    for (int i = 0; i < NUM_RANKS ; i++)
+    for (int i = 0; i < NUM_RANKS; i++)
     {
         reached[i] = FALSE;
     }
@@ -92,11 +88,11 @@ static inline enum RANK_REACH_VERDICT bhs_find_rank_reachability__inline(
     {
         const signed char rank = *(--queue_ptr);
 
-        static const int LINKS[2] = {-1,1};
-        for (size_t link_idx = 0; link_idx < (sizeof(LINKS)/sizeof(LINKS[0])) ;
-            link_idx++)
+        static const int LINKS[2] = {-1, 1};
+        for (size_t link_idx = 0; link_idx < (sizeof(LINKS) / sizeof(LINKS[0]));
+             link_idx++)
         {
-            signed char offset_rank = (signed char)(rank+LINKS[link_idx]);
+            signed char offset_rank = (signed char)(rank + LINKS[link_idx]);
 
             if (offset_rank == NUM_RANKS)
             {
@@ -104,12 +100,12 @@ static inline enum RANK_REACH_VERDICT bhs_find_rank_reachability__inline(
             }
             else if (offset_rank == -1)
             {
-                offset_rank = NUM_RANKS-1;
+                offset_rank = NUM_RANKS - 1;
             }
 
             if (rank_counts[offset_rank] > 0)
             {
-                if (! reached[offset_rank])
+                if (!reached[offset_rank])
                 {
                     reached[offset_rank] = TRUE;
                     full_count++;
@@ -119,12 +115,8 @@ static inline enum RANK_REACH_VERDICT bhs_find_rank_reachability__inline(
         }
     }
 
-    return
-    (
-        (full_count == full_ranks_goal)
-            ? RANK_REACH__SUCCESS
-            : RANK_REACH__NOT_REACHABLE
-    );
+    return ((full_count == full_ranks_goal) ? RANK_REACH__SUCCESS
+                                            : RANK_REACH__NOT_REACHABLE);
 }
 
 #ifdef __cplusplus

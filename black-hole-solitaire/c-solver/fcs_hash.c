@@ -46,26 +46,21 @@ static inline unsigned long hash_function(const bhs_state_key_t key)
     return DO_XXH(&key, sizeof(key));
 }
 
-static inline void bh_solve_hash_rehash(bh_solve_hash_t * hash);
+static inline void bh_solve_hash_rehash(bh_solve_hash_t *hash);
 
-
-
-void bh_solve_hash_init(
-    bh_solve_hash_t * hash
-    )
+void bh_solve_hash_init(bh_solve_hash_t *hash)
 {
     const int size = 256;
 
     hash->size = size;
-    hash->size_bitmask = size-1;
+    hash->size_bitmask = size - 1;
     hash->max_num_elems_before_resize = (size << 1);
 
     hash->num_elems = 0;
 
     /* Allocate a table of size entries */
     hash->entries = (bh_solve_hash_symlink_t *)malloc(
-        sizeof(bh_solve_hash_symlink_t) * (size_t)size
-        );
+        sizeof(bh_solve_hash_symlink_t) * (size_t)size);
 
     hash->list_of_vacant_items = NULL;
 
@@ -76,16 +71,14 @@ void bh_solve_hash_init(
     bh_solve_compact_allocator_init(&(hash->allocator));
 }
 
-void bh_solve_hash_get(
-    bh_solve_hash_t * hash,
-    bhs_state_key_value_pair_t * key_ptr,
-    bhs_state_key_value_pair_t * result
-    )
+void bh_solve_hash_get(bh_solve_hash_t *hash,
+    bhs_state_key_value_pair_t *key_ptr, bhs_state_key_value_pair_t *result)
 {
-    bh_solve_hash_symlink_t * list;
-    bh_solve_hash_symlink_item_t * item;
+    bh_solve_hash_symlink_t *list;
+    bh_solve_hash_symlink_item_t *item;
 
-    bh_solve_hash_value_t hash_value = ((typeof(hash_value))hash_function(key_ptr->key));
+    bh_solve_hash_value_t hash_value =
+        ((typeof(hash_value))hash_function(key_ptr->key));
 
 #define PLACE() (hash_value & (hash->size_bitmask))
     list = (hash->entries + PLACE());
@@ -98,9 +91,7 @@ void bh_solve_hash_get(
 
     while (item != NULL)
     {
-        if (
-            !memcmp(&(item->key.key), &(key_ptr->key), sizeof(bhs_state_key_t))
-        )
+        if (!memcmp(&(item->key.key), &(key_ptr->key), sizeof(bhs_state_key_t)))
         {
             result->value = item->key.value;
             return;
@@ -113,18 +104,17 @@ void bh_solve_hash_get(
 }
 
 fcs_bool_t bh_solve_hash_insert(
-    bh_solve_hash_t * hash,
-    bhs_state_key_value_pair_t * key
-    )
+    bh_solve_hash_t *hash, bhs_state_key_value_pair_t *key)
 {
-    bh_solve_hash_symlink_t * list;
-    bh_solve_hash_symlink_item_t * item, * last_item;
-    bh_solve_hash_symlink_item_t * * item_placeholder;
+    bh_solve_hash_symlink_t *list;
+    bh_solve_hash_symlink_item_t *item, *last_item;
+    bh_solve_hash_symlink_item_t **item_placeholder;
 #ifdef FCS_INLINED_HASH_COMPARISON
     enum FCS_INLINED_HASH_DATA_TYPE hash_type;
 #endif
 
-    bh_solve_hash_value_t hash_value = ((typeof(hash_value))hash_function(key->key));
+    bh_solve_hash_value_t hash_value =
+        ((typeof(hash_value))hash_function(key->key));
 
 #ifdef FCS_INLINED_HASH_COMPARISON
     hash_type = hash->hash_type;
@@ -150,9 +140,8 @@ fcs_bool_t bh_solve_hash_insert(
 
         while (item != NULL)
         {
-            if (
-                (!memcmp(&(item->key.key), &(key->key), sizeof(bhs_state_key_t)))
-               )
+            if ((!memcmp(
+                    &(item->key.key), &(key->key), sizeof(bhs_state_key_t))))
             {
                 return TRUE;
             }
@@ -198,14 +187,12 @@ fcs_bool_t bh_solve_hash_insert(
     hash table, allowing for smaller chains, and faster lookup.
 
   */
-static inline void bh_solve_hash_rehash(
-    bh_solve_hash_t * hash
-    )
+static inline void bh_solve_hash_rehash(bh_solve_hash_t *hash)
 {
     int old_size, new_size_bitmask;
-    bh_solve_hash_symlink_item_t * item, * next_item;
+    bh_solve_hash_symlink_item_t *item, *next_item;
     int place;
-    bh_solve_hash_symlink_t * new_entries;
+    bh_solve_hash_symlink_t *new_entries;
 
     old_size = hash->size;
 
@@ -215,11 +202,11 @@ static inline void bh_solve_hash_rehash(
     new_entries = calloc((size_t)new_size, sizeof(bh_solve_hash_symlink_t));
 
     /* Copy the items to the new hash while not allocating them again */
-    for (int i=0 ; i < old_size ; i++)
+    for (int i = 0; i < old_size; i++)
     {
         item = hash->entries[i].first_item;
         /* traverse the chain item by item */
-        while(item != NULL)
+        while (item != NULL)
         {
             /* The place in the new hash table */
             place = item->hash_value & new_size_bitmask;
@@ -254,4 +241,5 @@ static inline void bh_solve_hash_rehash(
 /* ANSI C doesn't allow empty compilation */
 static void bh_solve_hash_c_dummy();
 
-#endif /* (BHS_STATE_STORAGE == BHS_STATE_STORAGE_INTERNAL_HASH) || defined(INDIRECT_STACK_STATES) */
+#endif /* (BHS_STATE_STORAGE == BHS_STATE_STORAGE_INTERNAL_HASH) ||            \
+          defined(INDIRECT_STACK_STATES) */

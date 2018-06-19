@@ -16,15 +16,25 @@
 typedef char bhs_card_string_t[BHS_CARD_STRING_LEN + 1];
 typedef char bhs_rank_t;
 
-#define BHS__MAX_NUM_COLUMNS (max(BHS__ALL_IN_A_ROW__NUM_COLUMNS , BHS__BLACK_HOLE__NUM_COLUMNS))
-#define BHS__MAX_NUM_CARDS_IN_COL (max(BHS__ALL_IN_A_ROW__MAX_NUM_CARDS_IN_COL , BHS__BLACK_HOLE__MAX_NUM_CARDS_IN_COL))
+#define BHS__MAX_NUM_COLUMNS                                                   \
+    (max(BHS__ALL_IN_A_ROW__NUM_COLUMNS, BHS__BLACK_HOLE__NUM_COLUMNS))
+#define BHS__MAX_NUM_CARDS_IN_COL                                              \
+    (max(BHS__ALL_IN_A_ROW__MAX_NUM_CARDS_IN_COL,                              \
+        BHS__BLACK_HOLE__MAX_NUM_CARDS_IN_COL))
 
 #define BHS__NUM_BITS_PER_CHAR 8
 /* We allocate 4-bits for the length of every column */
-#define BHS__ALL_IN_A_ROW__NUM_DATA_CHARS (BHS__ALL_IN_A_ROW__NUM_COLUMNS * BHS__ALL_IN_A_ROW__BITS_PER_COL / BHS__NUM_BITS_PER_CHAR + 1)
-#define BHS__BLACK_HOLE__NUM_DATA_CHARS (BHS__BLACK_HOLE__NUM_COLUMNS * BHS__BLACK_HOLE__BITS_PER_COL / BHS__NUM_BITS_PER_CHAR + 1)
+#define BHS__ALL_IN_A_ROW__NUM_DATA_CHARS                                      \
+    (BHS__ALL_IN_A_ROW__NUM_COLUMNS * BHS__ALL_IN_A_ROW__BITS_PER_COL /        \
+            BHS__NUM_BITS_PER_CHAR +                                           \
+        1)
+#define BHS__BLACK_HOLE__NUM_DATA_CHARS                                        \
+    (BHS__BLACK_HOLE__NUM_COLUMNS * BHS__BLACK_HOLE__BITS_PER_COL /            \
+            BHS__NUM_BITS_PER_CHAR +                                           \
+        1)
 
-#define BHS__NUM_DATA_CHARS (max(BHS__ALL_IN_A_ROW__NUM_DATA_CHARS, BHS__BLACK_HOLE__BITS_PER_COL))
+#define BHS__NUM_DATA_CHARS                                                    \
+    (max(BHS__ALL_IN_A_ROW__NUM_DATA_CHARS, BHS__BLACK_HOLE__BITS_PER_COL))
 
 typedef struct
 {

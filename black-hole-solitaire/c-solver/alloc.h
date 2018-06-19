@@ -29,40 +29,35 @@
 #pragma once
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
 #include <stddef.h>
 
 typedef struct
 {
-    char * * packs;
-    char * max_ptr;
-    char * ptr;
-    char * rollback_ptr;
+    char **packs;
+    char *max_ptr;
+    char *ptr;
+    char *rollback_ptr;
     unsigned long num_packs;
 } bhs_compact_allocator_t;
 
-extern void
-bh_solve_compact_allocator_init(bhs_compact_allocator_t * const allocator);
+extern void bh_solve_compact_allocator_init(
+    bhs_compact_allocator_t *const allocator);
 
 extern void bh_solve_compact_allocator_extend(
-    bhs_compact_allocator_t * const allocator
-        );
+    bhs_compact_allocator_t *const allocator);
 
-static inline void * fcs_compact_alloc_ptr(
-    bhs_compact_allocator_t * const allocator,
-    const ssize_t how_much_proto
-)
+static inline void *fcs_compact_alloc_ptr(
+    bhs_compact_allocator_t *const allocator, const ssize_t how_much_proto)
 {
     /* Round ptr to the next pointer boundary */
     const ssize_t how_much =
         how_much_proto +
-        (ssize_t)
-        (
-         (sizeof(char *)-(((size_t)how_much_proto)&(sizeof(char *)-1)))&(sizeof(char*)-1)
-        );
+        (ssize_t)((sizeof(char *) -
+                      (((size_t)how_much_proto) & (sizeof(char *) - 1))) &
+                  (sizeof(char *) - 1));
 
     if (allocator->max_ptr - allocator->ptr < how_much)
     {
@@ -77,14 +72,13 @@ static inline void * fcs_compact_alloc_ptr(
     return allocator->rollback_ptr;
 }
 
-#define fcs_compact_alloc_release(allocator) \
-{    \
-    (allocator)->ptr = (allocator)->rollback_ptr; \
-}
+#define fcs_compact_alloc_release(allocator)                                   \
+    {                                                                          \
+        (allocator)->ptr = (allocator)->rollback_ptr;                          \
+    }
 
 extern void bh_solve_compact_allocator_finish(
-    bhs_compact_allocator_t * const allocator
-);
+    bhs_compact_allocator_t *const allocator);
 
 #ifdef __cplusplus
 };
