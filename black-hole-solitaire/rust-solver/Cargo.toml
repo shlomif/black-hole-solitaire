@@ -1,0 +1,6 @@
+[package]
+name = "rust-solver"
+version = "0.1.0"
+authors = ["Shlomi Fish <shlomif@shlomifish.org>"]
+
+[dependencies]
