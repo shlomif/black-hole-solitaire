@@ -86,7 +86,7 @@ SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 SET (LIB_BASE "black_hole_solver")
 option (FCS_WITH_TEST_SUITE "Also build and run the test suite." ON)
-SET (BLACK_HOLE_SOLVER_MODULES "alloc.c" "black_hole_solver.c" "rank_reach_prune")
+SET (BLACK_HOLE_SOLVER_MODULES "alloc.c" "black_hole_solver.c" "rank_reach_prune.c")
 
 IF (${BHS_STATE_STORAGE} STREQUAL "BHS_STATE_STORAGE_INTERNAL_HASH")
     LIST(APPEND BLACK_HOLE_SOLVER_MODULES fcs_hash.c)
