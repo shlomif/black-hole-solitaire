@@ -23,81 +23,55 @@
  */
 // black_hole_solver.c - a solver for Black Hole Solitaire.
 
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <limits.h>
-#include <ctype.h>
+use std::collections::HashMap;
 
-#include "config.h"
-#include <black-hole-solver/black_hole_solver.h>
-#include "state.h"
-#include "bit_rw.h"
-#include "typeof_wrap.h"
-
-#if (BHS_STATE_STORAGE == BHS_STATE_STORAGE_TOKYO_CAB_HASH)
-#include "tokyo_cab_hash.h"
-#elif (BHS_STATE_STORAGE == BHS_STATE_STORAGE_INTERNAL_HASH)
-#include "fcs_hash.h"
-#elif (BHS_STATE_STORAGE == BHS_STATE_STORAGE_GOOGLE_SPARSE_HASH)
-#include "google_hash.h"
-#else
-#error Unknown state storage.
-#endif
-
-#include "rank_reach_prune.h"
-
-#define NUM_SUITS 4
+const NUM_SUITS:usize = 4;
 enum BHS_SUITS
 {
     SUIT_H,
     SUIT_C,
     SUIT_D,
     SUIT_S,
-    INVALID_SUIT = -1
-};
-
-static int suit_char_to_index(char suit)
-{
-    switch (suit)
-    {
-    case 'H':
-        return SUIT_H;
-    case 'C':
-        return SUIT_C;
-    case 'D':
-        return SUIT_D;
-    case 'S':
-        return SUIT_S;
-    default:
-        return INVALID_SUIT;
-    }
+    INVALID_SUIT = -1,
 }
 
-typedef struct
+fn suit_char_to_index(suit:char)->BHS_SUITS
 {
-    unsigned char heights[BHS__MAX_NUM_COLUMNS];
-    signed char foundations;
-} bhs_unpacked_state_t;
+    return match suit
+    {
+        'H'=> SUIT_H,
+    'C' =>SUIT_C,
+    'D' =>SUIT_D,
+    'S' =>SUIT_S,
+    _=> INVALID_SUIT,
+    };
+}
 
-typedef struct
+struct  bhs_unpacked_state_t
 {
-    bhs_state_key_value_pair_t packed;
-    bhs_unpacked_state_t unpacked;
-} bhs_solution_state_t;
+    heights:[u8;BHS__MAX_NUM_COLUMNS],
+    foundations:i8,
+}
 
-typedef struct
+struct bhs_solution_state_t
 {
-    unsigned char c[NUM_RANKS];
-} bhs_rank_counts_t;
+    packed: bhs_state_key_value_pair_t,
 
-typedef struct
+    unpacked: bhs_unpacked_state_t,
+}
+
+struct  bhs_rank_counts_t
 {
-    bhs_solution_state_t s;
-    bhs_rank_counts_t rank_counts;
-} bhs_queue_item_t;
+    c:[u8;NUM_RANKS],
+}
 
-typedef struct
+struct  bhs_queue_item_t
+{
+    s:bhs_solution_state_t,
+     rank_counts:bhs_rank_counts_t,
+}
+
+struct bhs_solver_t
 {
     /*
      * TODO : rename from board_values.
@@ -105,75 +79,67 @@ typedef struct
      * This is the ranks of the cards in the columns. It remains constant
      * for the duration of the game.
      * */
-    bhs_rank_t board_values[BHS__MAX_NUM_COLUMNS][BHS__MAX_NUM_CARDS_IN_COL];
+     board_values:[[bhs_rank_t;BHS__MAX_NUM_COLUMNS];BHS__MAX_NUM_CARDS_IN_COL],
 
-    bhs_rank_t initial_foundation;
+    initial_foundation:bhs_rank_t,
 
-    bh_solve_hash_t positions;
+    positions: HashMap<bhs_state_key_t, bhs_state_value_t>,
 
-    bhs_card_string_t initial_foundation_string;
-    bhs_card_string_t initial_board_card_strings[BHS__MAX_NUM_COLUMNS]
-                                                [BHS__MAX_NUM_CARDS_IN_COL];
-    int initial_lens[BHS__MAX_NUM_COLUMNS];
+    initial_foundation_string: bhs_card_string_t,
+   initial_board_card_strings:[[bhs_card_string_t;BHS__MAX_NUM_COLUMNS];BHS__MAX_NUM_CARDS_IN_COL],
+    initial_lens:[usize;BHS__MAX_NUM_COLUMNS],
 
-    bhs_state_key_value_pair_t init_state;
-    bhs_state_key_value_pair_t final_state;
+    init_state: bhs_state_key_value_pair_t,
+    final_state: bhs_state_key_value_pair_t,
 
-    bhs_solution_state_t *states_in_solution;
-    int num_states_in_solution, current_state_in_solution_idx;
+    states_in_solution: [bhs_solution_state_t;64],
+    num_states_in_solution: usize,
+    current_state_in_solution_idx: usize,
 
-    long iterations_num, num_states_in_collection, max_iters_limit;
-    long iters_display_step;
+    iterations_num: usize,
+    num_states_in_collection: usize,
+    max_iters_limit: usize,
+    iters_display_step: usize,
 
-    int num_columns;
-    int bits_per_column;
+    num_columns: usize,
+    bits_per_column: usize,
 
-    bhs_queue_item_t *queue;
-    int queue_len, queue_max_len;
-    int sol_foundations_card_rank, sol_foundations_card_suit;
-    fcs_bool_t is_rank_reachability_prune_enabled;
-    fcs_bool_t require_initialization;
-} bhs_solver_t;
+    queue: [bhs_queue_item_t;53],
+    queue_len: usize,
+    queue_max_len: usize,
+    sol_foundations_card_rank: usize,
+    sol_foundations_card_suit: usize,
+    is_rank_reachability_prune_enabled: bool,
+    require_initialization: bool,
+}
 
-int DLLEXPORT black_hole_solver_create(
-    black_hole_solver_instance_t **ret_instance)
+impl bhs_solver_t {
+    fn black_hole_solver_create()->bhs_solver_t
 {
-    bhs_solver_t *const ret = (bhs_solver_t *)malloc(sizeof(*ret));
+    bhs_solver_t {
+    require_initialization:TRUE,
+    states_in_solution:NULL,
+    iterations_num:0,
+    num_states_in_collection:0,
+    max_iters_limit:-1,
+    is_rank_reachability_prune_enabled:FALSE,
+    iters_display_step:0,
+    num_columns:0,
+    queue:NULL,
+}
+}
 
-    if (!ret)
-    {
-        *ret_instance = NULL;
-        return BLACK_HOLE_SOLVER__OUT_OF_MEMORY;
-    }
-    ret->require_initialization = TRUE;
-    ret->states_in_solution = NULL;
-    ret->iterations_num = 0;
-    ret->num_states_in_collection = 0;
-    ret->max_iters_limit = -1;
-    ret->is_rank_reachability_prune_enabled = FALSE;
-    ret->iters_display_step = 0;
-    ret->num_columns = 0;
-    ret->queue = NULL;
-
-    bh_solve_hash_init(&(ret->positions));
-
-    *ret_instance = (black_hole_solver_instance_t *)ret;
+ fn black_hole_solver_enable_rank_reachability_prune(&self,
+    enabled_status:bool) -> usize
+{
+    self.is_rank_reachability_prune_enabled = enabled_status;
 
     return BLACK_HOLE_SOLVER__SUCCESS;
 }
 
-DLLEXPORT extern int black_hole_solver_enable_rank_reachability_prune(
-    black_hole_solver_instance_t *const instance_proto,
-    const fcs_bool_t enabled_status)
-{
-    bhs_solver_t *const solver = (bhs_solver_t *)instance_proto;
-    solver->is_rank_reachability_prune_enabled = enabled_status ? TRUE : FALSE;
+const MAX_RANK:usize = (NUM_RANKS - 1);
 
-    return BLACK_HOLE_SOLVER__SUCCESS;
 }
-
-#define MAX_RANK (NUM_RANKS - 1)
-
 enum BHS_RANKS
 {
     RANK_A,
@@ -189,9 +155,9 @@ enum BHS_RANKS
     RANK_J,
     RANK_Q,
     RANK_K,
-};
+}
 
-static int parse_card(const char **s, bhs_rank_t *const foundation,
+fn parse_card(s: String, bhs_rank_t *const foundation,
     bhs_card_string_t card, int *const suit_ptr)
 {
     strncpy(card, (*s), BHS_CARD_STRING_LEN);
@@ -281,7 +247,7 @@ static int parse_card(const char **s, bhs_rank_t *const foundation,
     return BLACK_HOLE_SOLVER__SUCCESS;
 }
 
-static inline fcs_bool_t string_find_prefix(
+static inline bool string_find_prefix(
     const char **s, const char *const prefix)
 {
     register size_t len = strlen(prefix);
@@ -296,7 +262,7 @@ static inline fcs_bool_t string_find_prefix(
     return TRUE;
 }
 
-extern int DLLEXPORT black_hole_solver_read_board(
+fn black_hole_solver_read_board(
     black_hole_solver_instance_t *const instance_proto,
     const char *const board_string, int *const error_line_number,
     const int num_columns, const int max_num_cards_in_col,
@@ -324,15 +290,10 @@ extern int DLLEXPORT black_hole_solver_read_board(
         s++;
     }
 
-#define MYRET(code)                                                            \
-    {                                                                          \
-        *error_line_number = line_num;                                         \
-        return code;                                                           \
-    }
-
     if (!string_find_prefix(&s, "Foundations: "))
     {
-        MYRET(BLACK_HOLE_SOLVER__FOUNDATIONS_NOT_FOUND_AT_START);
+        error_line_number = line_num;
+        return BLACK_HOLE_SOLVER__FOUNDATIONS_NOT_FOUND_AT_START;
     }
 
     while (isspace(*s) && ((*s) != '\n'))
@@ -359,13 +320,15 @@ extern int DLLEXPORT black_hole_solver_read_board(
 
         if (ret_code)
         {
-            MYRET(ret_code);
+            error_line_number = line_num;
+            return ret_code;
         }
     }
 
     if (*(s++) != '\n')
     {
-        MYRET(BLACK_HOLE_SOLVER__TRAILING_CHARS);
+        error_line_number = line_num;
+        return BLACK_HOLE_SOLVER__TRAILING_CHARS;
     }
     line_num++;
 
@@ -376,7 +339,8 @@ extern int DLLEXPORT black_hole_solver_read_board(
         {
             if (pos_idx == max_num_cards_in_col)
             {
-                MYRET(BLACK_HOLE_SOLVER__TOO_MANY_CARDS);
+                error_line_number = line_num;
+                return BLACK_HOLE_SOLVER__TOO_MANY_CARDS;
             }
 
             const int ret_code =
@@ -385,7 +349,8 @@ extern int DLLEXPORT black_hole_solver_read_board(
 
             if (ret_code)
             {
-                MYRET(ret_code);
+                error_line_number = line_num;
+                return ret_code;
             }
 
             while ((*s) == ' ')
@@ -400,7 +365,8 @@ extern int DLLEXPORT black_hole_solver_read_board(
 
         if (*s == '\0')
         {
-            MYRET(BLACK_HOLE_SOLVER__NOT_ENOUGH_COLUMNS);
+            error_line_number = line_num;
+            return BLACK_HOLE_SOLVER__NOT_ENOUGH_COLUMNS;
         }
         else
         {
@@ -412,9 +378,7 @@ extern int DLLEXPORT black_hole_solver_read_board(
     return BLACK_HOLE_SOLVER__SUCCESS;
 }
 
-#undef MYRET
-
-DLLEXPORT extern int black_hole_solver_set_max_iters_limit(
+fn black_hole_solver_set_max_iters_limit(
     black_hole_solver_instance_t *const instance_proto, const long limit)
 {
     ((bhs_solver_t *const)instance_proto)->max_iters_limit = limit;
@@ -422,7 +386,7 @@ DLLEXPORT extern int black_hole_solver_set_max_iters_limit(
     return BLACK_HOLE_SOLVER__SUCCESS;
 }
 
-DLLEXPORT extern int black_hole_solver_set_iters_display_step(
+fn black_hole_solver_set_iters_display_step(
     black_hole_solver_instance_t *const instance_proto,
     const long iters_display_step)
 {
@@ -575,7 +539,7 @@ static inline void setup_once(bhs_solver_t *const solver)
     }
 }
 
-extern int DLLEXPORT black_hole_solver_run(
+fn black_hole_solver_run(
     black_hole_solver_instance_t *ret_instance)
 {
     bhs_solver_t *const solver = (bhs_solver_t *)ret_instance;
@@ -610,7 +574,7 @@ extern int DLLEXPORT black_hole_solver_run(
 
         iterations_num++;
 
-        fcs_bool_t no_cards = TRUE;
+        bool no_cards = TRUE;
 
         for (int col_idx = 0; col_idx < num_columns; col_idx++)
         {
@@ -656,7 +620,7 @@ extern int DLLEXPORT black_hole_solver_run(
     return BLACK_HOLE_SOLVER__NOT_SOLVABLE;
 }
 
-extern int DLLEXPORT black_hole_solver_free(
+fn black_hole_solver_free(
     black_hole_solver_instance_t *instance_proto)
 {
     bhs_solver_t *const solver = (bhs_solver_t *)instance_proto;
@@ -677,7 +641,7 @@ extern int DLLEXPORT black_hole_solver_free(
     return BLACK_HOLE_SOLVER__SUCCESS;
 }
 
-#define NUM_STATES_INCREMENT 16
+i32 NUM_STATES_INCREMENT = 16;
 
 static void initialize_states_in_solution(bhs_solver_t *solver)
 {
@@ -727,7 +691,7 @@ static void initialize_states_in_solution(bhs_solver_t *solver)
     solver->current_state_in_solution_idx = 0;
 }
 
-DLLEXPORT extern int black_hole_solver_get_next_move(
+fn black_hole_solver_get_next_move(
     black_hole_solver_instance_t *const instance_proto, int *const col_idx_ptr,
     int *const card_rank_ptr, int *const card_suit_ptr /*  H=0, C=1, D=2, S=3 */
 )
@@ -760,21 +724,21 @@ DLLEXPORT extern int black_hole_solver_get_next_move(
     }
 }
 
-DLLEXPORT extern long __attribute__((pure))
+extern long __attribute__((pure))
 black_hole_solver_get_num_states_in_collection(
     black_hole_solver_instance_t *const instance_proto)
 {
     return ((bhs_solver_t *)instance_proto)->num_states_in_collection;
 }
 
-DLLEXPORT extern long __attribute__((pure))
+extern long __attribute__((pure))
 black_hole_solver_get_iterations_num(
     black_hole_solver_instance_t *instance_proto)
 {
     return ((bhs_solver_t *)instance_proto)->iterations_num;
 }
 
-DLLEXPORT extern int black_hole_solver_get_current_solution_board(
+fn black_hole_solver_get_current_solution_board(
     black_hole_solver_instance_t *instance_proto, char **ptr_to_ret)
 {
     bhs_solver_t *const solver = (bhs_solver_t *)instance_proto;
@@ -831,10 +795,4 @@ DLLEXPORT extern int black_hole_solver_get_current_solution_board(
     *ptr_to_ret = ret;
 
     return BLACK_HOLE_SOLVER__SUCCESS;
-}
-
-DLLEXPORT const __attribute__((const)) char *black_hole_solver_get_lib_version(
-    void)
-{
-    return VERSION;
 }
