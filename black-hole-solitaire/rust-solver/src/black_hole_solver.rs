@@ -157,16 +157,12 @@ enum BHS_RANKS
     RANK_K,
 }
 
-fn parse_card(s: String, bhs_rank_t *const foundation,
-    bhs_card_string_t card, int *const suit_ptr)
+fn parse_card(s: String, card:bhs_card_string_t) -> bhs_rank_t, usize
 {
-    strncpy(card, (*s), BHS_CARD_STRING_LEN);
-    card[BHS_CARD_STRING_LEN] = '\0';
-
     /* Short for value. */
     bhs_rank_t v;
 
-    switch (*(*s))
+    switch (s[0])
     {
     case 'A':
         v = RANK_A;
@@ -234,10 +230,7 @@ fn parse_card(s: String, bhs_rank_t *const foundation,
     case 'S':
     case 'D':
     case 'C':
-        if (suit_ptr)
-        {
-            *suit_ptr = suit_char_to_index(*(*(s)));
-        }
+            suit_ptr = suit_char_to_index(s[1]);
         break;
     default:
         return BLACK_HOLE_SOLVER__UNKNOWN_SUIT;
