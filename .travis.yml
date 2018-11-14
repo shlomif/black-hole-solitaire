@@ -1,5 +1,5 @@
 os: linux
-dist: trusty
+dist: xenial
 before_install:
     - sudo apt-get update -qq
     - sudo apt-get --no-install-recommends install -y cmake cmake-data cpanminus libperl-dev mercurial ninja-build perl valgrind
@@ -13,7 +13,7 @@ install:
     - "( cd black-hole-solitaire/Games-Solitaire-BlackHole-Solver/ && dzil authordeps --missing | grep -vP '[^\\w:]' | xargs -n 5 -P 10 sudo cpanm --quiet --notest )"
     - "( cd black-hole-solitaire/Games-Solitaire-BlackHole-Solver/ && dzil listdeps --author --missing | grep -vP '[^\\w:]' | xargs sudo cpanm --verbose --notest )"
 perl:
-    - "5.22"
+    - "5.26"
 python:
-    - "3.5"
+    - "3.6"
 script: "perl black-hole-solitaire/CI-testing/continuous-integration-testing.pl"
