@@ -157,102 +157,84 @@ enum BHS_RANKS
     RANK_K,
 }
 
-fn parse_card(s: String, card:bhs_card_string_t) -> bhs_rank_t, usize
+enum BHS_PARSE_VERDICT
 {
-    /* Short for value. */
-    bhs_rank_t v;
-
-    switch (s[0])
-    {
-    case 'A':
-        v = RANK_A;
-        break;
-
-    case '2':
-        v = RANK_2;
-        break;
-
-    case '3':
-        v = RANK_3;
-        break;
-
-    case '4':
-        v = RANK_4;
-        break;
-
-    case '5':
-        v = RANK_5;
-        break;
-
-    case '6':
-        v = RANK_6;
-        break;
-
-    case '7':
-        v = RANK_7;
-        break;
-
-    case '8':
-        v = RANK_8;
-        break;
-
-    case '9':
-        v = RANK_9;
-        break;
-
-    case 'T':
-        v = RANK_T;
-        break;
-
-    case 'J':
-        v = RANK_J;
-        break;
-
-    case 'Q':
-        v = RANK_Q;
-        break;
-
-    case 'K':
-        v = RANK_K;
-        break;
-
-    default:
-        return BLACK_HOLE_SOLVER__UNKNOWN_RANK;
-    }
-
-    *foundation = v;
-
-    (*s)++;
-
-    switch (*(*s))
-    {
-    case 'H':
-    case 'S':
-    case 'D':
-    case 'C':
-            suit_ptr = suit_char_to_index(s[1]);
-        break;
-    default:
-        return BLACK_HOLE_SOLVER__UNKNOWN_SUIT;
-    }
-    (*s)++;
-
-    return BLACK_HOLE_SOLVER__SUCCESS;
+    BLACK_HOLE_SOLVER__SUCCESS,
+    BLACK_HOLE_SOLVER__UNKNOWN_SUIT,
+    BLACK_HOLE_SOLVER__UNKNOWN_RANK,
 }
 
-static inline bool string_find_prefix(
-    const char **s, const char *const prefix)
+fn parse_card(s: String, card:bhs_card_string_t) -> (BHS_PARSE_VERDICT, bhs_rank_t, BHS_SUITS)
 {
-    register size_t len = strlen(prefix);
+    /* Short for value. */
+    let mut v: bhs_rank_t;
 
-    if (strncmp(*s, prefix, len) != 0)
+    match (s[0])
     {
-        return FALSE;
+    'A'=>
+        v = RANK_A,
+
+    '2'=>
+        v = RANK_2,
+
+    '3'=>
+        v = RANK_3,
+
+    '4'=>
+        v = RANK_4,
+
+    '5'=>
+        v = RANK_5,
+
+    '6'=>
+        v = RANK_6,
+
+    '7'=>
+        v = RANK_7,
+
+    '8'=>
+        v = RANK_8,
+
+    '9'=>
+        v = RANK_9,
+
+    'T'=>
+        v = RANK_T,
+
+    'J'=>
+        v = RANK_J,
+
+    'Q'=>
+        v = RANK_Q,
+
+    'K'=>
+        v = RANK_K,
+
+    _=>
+        return (BLACK_HOLE_SOLVER__UNKNOWN_RANK, RANK_A, INVALID_SUIT),
+    };
+
+    let mut suit_ptr: BHS_SUITS;
+    match (s[1])
+    {
+    'H'|'S'|'D'|'C'=>
+            suit_ptr = suit_char_to_index(s[1]),
+            _=>
+        return (BLACK_HOLE_SOLVER__UNKNOWN_SUIT, RANK_A, INVALID_SUIT),
     }
 
-    (*s) += len;
+    return (BLACK_HOLE_SOLVER__SUCCESS, v, suit_ptr);
+}
 
-    return TRUE;
+fn string_find_prefix(s: String, start: usize, prefix: String) -> (bool, usize)
+{
+    let len: usize = strlen(prefix);
+
+    if (s[start..start+len] != prefix)
+    {
+        return (FALSE, start);
+    }
+    return (TRUE, start+len);
 }
 
 fn black_hole_solver_read_board(
