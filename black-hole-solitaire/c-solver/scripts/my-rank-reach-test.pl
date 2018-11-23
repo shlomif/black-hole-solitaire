@@ -105,7 +105,7 @@ if ( !@states )
             {
                 my $foundation = _r($1);
 
-                my @ranks = $new_s =~ /($rank_re)/gms;
+                my @ranks       = $new_s =~ /($rank_re)/gms;
                 my @rank_counts = ( (0) x 13 );
                 foreach my $r (@ranks)
                 {
