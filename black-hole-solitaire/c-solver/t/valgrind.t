@@ -10,6 +10,7 @@ use String::ShellQuote;
 use File::Spec;
 use File::Temp qw( tempdir );
 use File::Spec::Functions qw( catpath splitpath rel2abs );
+use Test::RunValgrind ();
 
 my $IS_WIN = ( $^O eq "MSWin32" );
 
@@ -41,36 +42,18 @@ sub test_using_valgrind
     my $cmd_line_args = $args->{argv};
     my $prog          = $args->{prog};
 
-    system( "valgrind", "--track-origins=yes", "--leak-check=yes",
-        "--log-file=$log_fn", $ENV{'FCS_PATH'} . "/$prog",
-        @$cmd_line_args, );
-
-    open my $read_from_valgrind, "<", $log_fn
-        or die "Cannot open valgrind.log for reading";
-    my $found_error_summary = 0;
-    my $found_malloc_free   = 0;
-LINES_LOOP:
-    while ( my $l = <$read_from_valgrind> )
-    {
-        if ( index( $l, q{ERROR SUMMARY: 0 errors from 0 contexts} ) >= 0 )
+    Test::RunValgrind->new(
         {
-            $found_error_summary = 1;
+            supress_stderr => $args->{supress_stderr},
         }
-        elsif ( index( $l, q{in use at exit: 0 bytes} ) >= 0 )
+    )->run(
         {
-            $found_malloc_free = 1;
-        }
-    }
-    close($read_from_valgrind);
-
-    if ( ok( ( $found_error_summary && $found_malloc_free ), $blurb ) )
-    {
-        unlink($log_fn);
-    }
-    else
-    {
-        die "Valgrind failed";
-    }
+            blurb  => $blurb,
+            log_fn => $log_fn,
+            prog   => $ENV{'FCS_PATH'} . "/$prog",
+            argv   => [ @$cmd_line_args, ],
+        },
+    );
 }
 
 # TEST
@@ -93,10 +76,14 @@ test_using_valgrind(
 
 # TEST
 test_using_valgrind(
-    [
-        '--game', 'black_hole',
-        'non-existent-board----------flakmuttterputter.board',
-    ],
+    {
+        argv => [
+            '--game', 'black_hole',
+            'non-existent-board----------flakmuttterputter.board',
+        ],
+        prog           => 'black-hole-solve',
+        supress_stderr => 1,
+    },
     qq{valgrind does not crash on non-existent board.}
 );
 
