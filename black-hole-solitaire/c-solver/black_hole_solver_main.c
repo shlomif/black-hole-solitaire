@@ -25,6 +25,12 @@
 
 #include "main_common.h"
 
+static int solver_run(black_hole_solver_instance_t *const solver,
+    long iters_limit, const long max_iters_limit, const long iters_display_step)
+{
+    return black_hole_solver_run(solver);
+}
+
 int main(int argc, char *argv[])
 {
     black_hole_solver_instance_t *solver;
@@ -188,7 +194,8 @@ int main(int argc, char *argv[])
 
     int ret = 0;
 
-    const int solver_ret_code = black_hole_solver_run(solver);
+    const int solver_ret_code =
+        solver_run(solver, 0, max_iters_limit, iters_display_step);
 
     if (!solver_ret_code)
     {
