@@ -26,8 +26,10 @@
 #include "main_common.h"
 
 static int solver_run(black_hole_solver_instance_t *const solver,
-    long iters_limit, const long max_iters_limit, const long iters_display_step)
+    const long max_iters_limit, const long iters_display_step)
 {
+    long iters_limit = min(iters_display_step, max_iters_limit);
+    black_hole_solver_set_max_iters_limit(solver, iters_limit);
     long iters_num;
     int solver_ret_code;
 
@@ -158,8 +160,6 @@ int main(int argc, char *argv[])
         exit(-1);
     }
 
-    long iters_limit = min(iters_display_step, max_iters_limit);
-    black_hole_solver_set_max_iters_limit(solver, iters_limit);
     black_hole_solver_enable_rank_reachability_prune(
         solver, is_rank_reachability_prune_enabled);
 
@@ -212,7 +212,7 @@ int main(int argc, char *argv[])
     int ret = 0;
 
     const int solver_ret_code =
-        solver_run(solver, iters_limit, max_iters_limit, iters_display_step);
+        solver_run(solver, max_iters_limit, iters_display_step);
 
     if (!solver_ret_code)
     {
