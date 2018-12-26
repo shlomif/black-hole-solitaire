@@ -1261,33 +1261,19 @@ eq_or_diff(
 );
 
 # TEST:$c=2;
-foreach my $command (
-    [
-        './black-hole-solve',
-        '--game',
-        'black_hole',
-        '--iters-display-step',
-        '1100',
-        File::Spec->catfile(
-            $bin_dir, "data", "26464608654870335080.bh.board.txt"
-        )
-    ],
-    [
-        './black-hole-solve-resume-api',
-        '--game',
-        'black_hole',
-        '--iters-display-step',
-        '1100',
-        File::Spec->catfile(
-            $bin_dir, "data", "26464608654870335080.bh.board.txt"
-        )
-    ],
-    )
+foreach my $exe ( './black-hole-solve', './black-hole-solve-resume-api', )
 {
 
     trap
     {
-        system(@$command);
+        system( $exe, '--game',
+            'black_hole',
+            '--iters-display-step',
+            '1100',
+            File::Spec->catfile(
+                $bin_dir, "data", "26464608654870335080.bh.board.txt"
+            ),
+        );
     };
 
     # TEST*$c
