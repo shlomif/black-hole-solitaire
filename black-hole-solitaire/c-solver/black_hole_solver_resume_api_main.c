@@ -25,12 +25,34 @@
 
 #include "main_common.h"
 
+static int solver_run(black_hole_solver_instance_t *const solver,
+    long iters_limit, const long max_iters_limit, const long iters_display_step)
+{
+    long iters_num;
+    int solver_ret_code;
+
+    do
+    {
+        solver_ret_code = black_hole_solver_run(solver);
+        iters_num = black_hole_solver_get_iterations_num(solver);
+        if (iters_limit == iters_num)
+        {
+            printf("Iteration: %ld\n", iters_limit);
+            fflush(stdout);
+        }
+        iters_limit += iters_display_step;
+        iters_limit = min(iters_limit, max_iters_limit);
+        black_hole_solver_set_max_iters_limit(solver, iters_limit);
+    } while ((solver_ret_code == BLACK_HOLE_SOLVER__OUT_OF_ITERS) &&
+             (iters_num < max_iters_limit));
+    return solver_ret_code;
+}
+
 int main(int argc, char *argv[])
 {
     black_hole_solver_instance_t *solver;
     char board[MAX_LEN_BOARD_STRING];
     int error_line_num;
-    int solver_ret_code;
     char *filename = NULL;
     FILE *fh;
     int arg_idx;
@@ -189,22 +211,8 @@ int main(int argc, char *argv[])
 
     int ret = 0;
 
-    long iters_num;
-
-    do
-    {
-        solver_ret_code = black_hole_solver_run(solver);
-        iters_num = black_hole_solver_get_iterations_num(solver);
-        if (iters_limit == iters_num)
-        {
-            printf("Iteration: %ld\n", iters_limit);
-            fflush(stdout);
-        }
-        iters_limit += iters_display_step;
-        iters_limit = min(iters_limit, max_iters_limit);
-        black_hole_solver_set_max_iters_limit(solver, iters_limit);
-    } while ((solver_ret_code == BLACK_HOLE_SOLVER__OUT_OF_ITERS) &&
-             (iters_num < max_iters_limit));
+    const int solver_ret_code =
+        solver_run(solver, iters_limit, max_iters_limit, iters_display_step);
 
     if (!solver_ret_code)
     {

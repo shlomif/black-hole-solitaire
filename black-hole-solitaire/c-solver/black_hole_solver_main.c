@@ -30,7 +30,6 @@ int main(int argc, char *argv[])
     black_hole_solver_instance_t *solver;
     char board[MAX_LEN_BOARD_STRING];
     int error_line_num;
-    int solver_ret_code;
     char *filename = NULL;
     FILE *fh;
     int arg_idx;
@@ -189,7 +188,7 @@ int main(int argc, char *argv[])
 
     int ret = 0;
 
-    solver_ret_code = black_hole_solver_run(solver);
+    const int solver_ret_code = black_hole_solver_run(solver);
 
     if (!solver_ret_code)
     {
