@@ -21,11 +21,9 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-/*
- * black_hole_solver_main.c - a solver for Black Hole Solitaire - header
- * of the command line program.
- */
+// black_hole_solver_resume_api_main.c - solver using the resume API
 
+#include "min_and_max.h"
 #include <limits.h>
 #include <stdio.h>
 #include <string.h>
@@ -33,8 +31,6 @@
 
 #include <black-hole-solver/bool.h>
 #include <black-hole-solver/black_hole_solver.h>
-
-#include "min_and_max.h"
 #include "state.h"
 
 #include "config.h"
@@ -49,15 +45,14 @@ enum GAME_TYPE
 };
 
 static void out_board(
-    black_hole_solver_instance_t *solver, fcs_bool_t display_boards)
+    black_hole_solver_instance_t *const solver, const fcs_bool_t display_boards)
 {
-    char *board = NULL;
-
     if (!display_boards)
     {
         return;
     }
 
+    char *board = NULL;
     black_hole_solver_get_current_solution_board(solver, &board);
 
     if (board)
@@ -66,8 +61,6 @@ static void out_board(
         free(board);
         board = NULL;
     }
-
-    return;
 }
 
 static const char *const help_text =
@@ -89,7 +82,7 @@ int main(int argc, char *argv[])
     black_hole_solver_instance_t *solver;
     char board[MAX_LEN_BOARD_STRING];
     int error_line_num;
-    int ret, solver_ret_code;
+    int solver_ret_code;
     char *filename = NULL;
     FILE *fh;
     int arg_idx;
@@ -212,6 +205,12 @@ int main(int argc, char *argv[])
     if (filename)
     {
         fh = fopen(filename, "rt");
+        if (!fh)
+        {
+            fprintf(stderr, "Cannot open '%s' for reading!\n", filename);
+            black_hole_solver_free(solver);
+            return -1;
+        }
     }
     else
     {
@@ -240,7 +239,7 @@ int main(int argc, char *argv[])
         exit(-1);
     }
 
-    ret = 0;
+    int ret = 0;
 
     long iters_num;
 

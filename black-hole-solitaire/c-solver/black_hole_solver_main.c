@@ -21,15 +21,13 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-// black_hole_solver_main.c - a solver for Black Hole Solitaire - header
-// of the command line program.
+// black_hole_solver_main.c - a solver for Black Hole Solitaire.
 
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
 #include <black-hole-solver/bool.h>
-
 #include <black-hole-solver/black_hole_solver.h>
 #include "state.h"
 
@@ -82,15 +80,15 @@ int main(int argc, char *argv[])
     black_hole_solver_instance_t *solver;
     char board[MAX_LEN_BOARD_STRING];
     int error_line_num;
-    int ret, solver_ret_code;
+    int solver_ret_code;
     char *filename = NULL;
     FILE *fh;
     int arg_idx;
-    long max_iters_limit = -1;
     long iters_display_step = 0;
     enum GAME_TYPE game_type = GAME__UNKNOWN;
     fcs_bool_t display_boards = FALSE;
     fcs_bool_t is_rank_reachability_prune_enabled = FALSE;
+    long max_iters_limit = -1;
 
     arg_idx = 1;
     while (argc > arg_idx)
@@ -111,7 +109,7 @@ int main(int argc, char *argv[])
             arg_idx++;
             if (argc == arg_idx)
             {
-                fprintf(stderr, "Error! --max-iters requires an arguments.\n");
+                fprintf(stderr, "Error! --max-iters requires an argument.\n");
                 exit(-1);
             }
             max_iters_limit = atol(argv[arg_idx++]);
@@ -121,7 +119,7 @@ int main(int argc, char *argv[])
             arg_idx++;
             if (argc == arg_idx)
             {
-                fprintf(stderr, "Error! --game requires an arguments.\n");
+                fprintf(stderr, "Error! --game requires an argument.\n");
                 exit(-1);
             }
             char *g = argv[arg_idx++];
@@ -239,7 +237,7 @@ int main(int argc, char *argv[])
         exit(-1);
     }
 
-    ret = 0;
+    int ret = 0;
 
     solver_ret_code = black_hole_solver_run(solver);
 
