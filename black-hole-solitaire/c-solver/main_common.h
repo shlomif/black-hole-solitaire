@@ -67,17 +67,14 @@ int main(int argc, char *argv[])
 {
     black_hole_solver_instance_t *solver;
     char board[MAX_LEN_BOARD_STRING];
-    int error_line_num;
     char *filename = NULL;
-    FILE *fh;
-    int arg_idx;
     long iters_display_step = 0;
     enum GAME_TYPE game_type = GAME__UNKNOWN;
     fcs_bool_t display_boards = FALSE;
     fcs_bool_t is_rank_reachability_prune_enabled = FALSE;
     long max_iters_limit = LONG_MAX;
 
-    arg_idx = 1;
+    int arg_idx = 1;
     while (argc > arg_idx)
     {
         if (!strcmp(argv[arg_idx], "--version"))
@@ -93,20 +90,18 @@ int main(int argc, char *argv[])
         }
         else if (!strcmp(argv[arg_idx], "--max-iters"))
         {
-            arg_idx++;
-            if (argc == arg_idx)
+            if (argc == ++arg_idx)
             {
-                fprintf(stderr, "Error! --max-iters requires an argument.\n");
+                fputs("Error! --max-iters requires an argument.\n", stderr);
                 exit(-1);
             }
             max_iters_limit = atol(argv[arg_idx++]);
         }
         else if (!strcmp(argv[arg_idx], "--game"))
         {
-            arg_idx++;
-            if (argc == arg_idx)
+            if (argc == ++arg_idx)
             {
-                fprintf(stderr, "Error! --game requires an argument.\n");
+                fputs("Error! --game requires an argument.\n", stderr);
                 exit(-1);
             }
             char *g = argv[arg_idx++];
@@ -129,18 +124,17 @@ int main(int argc, char *argv[])
         }
         else if (!strcmp(argv[arg_idx], "--display-boards"))
         {
-            arg_idx++;
+            ++arg_idx;
             display_boards = TRUE;
         }
         else if (!strcmp(argv[arg_idx], "--rank-reach-prune"))
         {
-            arg_idx++;
+            ++arg_idx;
             is_rank_reachability_prune_enabled = TRUE;
         }
         else if (!strcmp(argv[arg_idx], "--iters-display-step"))
         {
-            arg_idx++;
-            if (argc == arg_idx)
+            if (argc == ++arg_idx)
             {
                 fprintf(stderr,
                     "Error! --iters-display-step requires an arguments.\n");
@@ -163,13 +157,13 @@ int main(int argc, char *argv[])
 
     if (black_hole_solver_create(&solver))
     {
-        fprintf(stderr, "%s\n", "Could not initialise solver (out-of-memory)");
+        fputs("Could not initialise solver (out-of-memory)\n", stderr);
         exit(-1);
     }
 
     if (game_type == GAME__UNKNOWN)
     {
-        fprintf(stderr, "%s\n", "Error! Must specify game type using --game.");
+        fputs("Error! Must specify game type using --game.\n", stderr);
         exit(-1);
     }
 
@@ -185,6 +179,7 @@ int main(int argc, char *argv[])
         arg_idx++;
     }
 
+    FILE *fh = stdin;
     if (filename)
     {
         fh = fopen(filename, "rt");
@@ -195,11 +190,6 @@ int main(int argc, char *argv[])
             return -1;
         }
     }
-    else
-    {
-        fh = stdin;
-    }
-
     fread(board, sizeof(board[0]), MAX_LEN_BOARD_STRING, fh);
 
     if (filename)
@@ -209,6 +199,7 @@ int main(int argc, char *argv[])
 
     board[MAX_LEN_BOARD_STRING - 1] = '\0';
 
+    int error_line_num;
     if (black_hole_solver_read_board(solver, board, &error_line_num,
             ((game_type == GAME__BH) ? BHS__BLACK_HOLE__NUM_COLUMNS
                                      : BHS__ALL_IN_A_ROW__NUM_COLUMNS),
@@ -232,7 +223,7 @@ int main(int argc, char *argv[])
         int col_idx, card_rank, card_suit;
         int next_move_ret_code;
 
-        printf("%s\n", "Solved!");
+        fputs("Solved!\n", stdout);
 
         out_board(solver, display_boards);
 
@@ -257,12 +248,12 @@ int main(int argc, char *argv[])
     }
     else if (solver_ret_code == BLACK_HOLE_SOLVER__OUT_OF_ITERS)
     {
-        printf("%s\n", "Intractable!");
+        fputs("Intractable!\n", stdout);
         ret = -2;
     }
     else
     {
-        printf("%s\n", "Unsolved!");
+        fputs("Unsolved!\n", stdout);
         ret = -1;
     }
 
