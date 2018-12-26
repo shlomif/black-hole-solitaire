@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
     enum GAME_TYPE game_type = GAME__UNKNOWN;
     fcs_bool_t display_boards = FALSE;
     fcs_bool_t is_rank_reachability_prune_enabled = FALSE;
-    long max_iters_limit = -1;
+    long max_iters_limit = LONG_MAX;
 
     arg_idx = 1;
     while (argc > arg_idx)
