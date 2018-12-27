@@ -1,21 +1,17 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
+use 5.014;
 use strict;
 use warnings;
 use autodie;
 
-# use File::Which;
-# use File::Basename;
-use Cwd;
-use File::Spec;
-use File::Copy;
-use File::Path;
-use Getopt::Long;
-use Env::Path;
-use File::Basename qw( basename dirname );
+use Getopt::Long qw/ GetOptions /;
+use Env::Path ();
+use Path::Tiny qw/ path /;
+use File::Basename qw/ basename /;
 
-my $bindir     = dirname(__FILE__);
-my $abs_bindir = File::Spec->rel2abs($bindir);
+my $bindir     = path(__FILE__)->parent;
+my $abs_bindir = $bindir->absolute;
 
 # Whether to use prove instead of runprove.
 my $use_prove = $ENV{FCS_USE_TEST_RUN} ? 0 : 1;
@@ -32,6 +28,8 @@ sub _calc_prove
         ( defined($num_jobs) ? sprintf( "-j%d", $num_jobs ) : () ) ];
 }
 
+my $exit_success;
+
 sub run_tests
 {
     my $tests = shift;
@@ -44,49 +42,65 @@ sub run_tests
 
     # Workaround for Windows spawning-SNAFU.
     my $exit_code = system(@cmd);
-    exit( $exit_code ? (-1) : 0 );
+    exit( $exit_success ? 0 : $exit_code ? (-1) : 0 );
 }
 
-my $tests_glob = "*.{exe,py,t}";
+my $tests_glob = "*.{t.exe,py,t}";
+my $exclude_re_s;
 
+my @execute;
 GetOptions(
-    '--glob=s'   => \$tests_glob,
-    '--prove!'   => \$use_prove,
-    '--jobs|j=n' => \$num_jobs,
-) or die "--glob='tests_glob'";
+    '--exclude-re=s' => \$exclude_re_s,
+    '--execute|e=s'  => \@execute,
+    '--exit0!'       => \$exit_success,
+    '--glob=s'       => \$tests_glob,
+    '--prove!'       => \$use_prove,
+    '--jobs|j=n'     => \$num_jobs,
+) or die "Wrong opts - $!";
+
+sub myglob
+{
+    return glob( shift . "/$tests_glob" );
+}
 
 {
-    my $fcs_path = Cwd::getcwd();
+    my $fcs_path = Path::Tiny->cwd;
     local $ENV{FCS_PATH}     = $fcs_path;
     local $ENV{FCS_SRC_PATH} = $abs_bindir;
 
-    my $testing_preset_rc;
-
     local $ENV{FREECELL_SOLVER_QUIET} = 1;
     Env::Path->PATH->Prepend(
-        File::Spec->catdir( Cwd::getcwd(), "board_gen" ),
-        File::Spec->catdir( $abs_bindir, "t", "scripts" ),
+        Path::Tiny->cwd->child("board_gen"),
+        $abs_bindir->child( "t", "scripts" ),
     );
 
+    my $IS_WIN = ( $^O eq "MSWin32" );
     Env::Path->CPATH->Prepend( $abs_bindir, );
 
     Env::Path->LD_LIBRARY_PATH->Prepend($fcs_path);
+    if ($IS_WIN)
+    {
+        # For the shared objects.
+        Env::Path->PATH->Append($fcs_path);
+    }
 
+    my $foo_lib_dir = $abs_bindir->child( "t", "lib" );
     foreach my $add_lib ( Env::Path->PERL5LIB(), Env::Path->PYTHONPATH() )
     {
-        $add_lib->Append( File::Spec->catdir( $abs_bindir, "t", "lib" ), );
+        $add_lib->Append($foo_lib_dir);
     }
 
     my $get_config_fn = sub {
         my $basename = shift;
 
-        return File::Spec->rel2abs(
-            File::Spec->catdir( $bindir, "t", "config", $basename ),
-        );
+        return $bindir->child( "t", "config", $basename )->absolute;
     };
 
-    local $ENV{HARNESS_ALT_INTRP_FILE} =
-        $get_config_fn->("alternate-interpreters.yml");
+    local $ENV{HARNESS_ALT_INTRP_FILE} = $get_config_fn->(
+        $IS_WIN
+        ? "alternate-interpreters--mswin.yml"
+        : "alternate-interpreters.yml"
+    );
 
     local $ENV{HARNESS_TRIM_FNS} = 'keep:1';
 
@@ -98,18 +112,17 @@ GetOptions(
     );
 
     my $is_ninja = ( -e "build.ninja" );
+    my $MAKE     = $IS_WIN ? 'gmake' : 'make';
 
     if ( !$is_ninja )
     {
-        my $IS_WIN = ( $^O eq "MSWin32" );
-        my $MAKE   = $IS_WIN ? 'gmake' : 'make';
         if ( system( $MAKE, "-s" ) )
         {
             die "$MAKE failed";
         }
     }
 
-    # Put the valgrind test last because it takes a long time.
+    # Put the valgrind tests last, because they take a long time.
     my @tests =
         sort {
         ( ( ( $a =~ /valgrind/ ) <=> ( $b =~ /valgrind/ ) ) *
@@ -117,13 +130,21 @@ GetOptions(
             || ( basename($a) cmp basename($b) )
             || ( $a cmp $b )
         } (
-        glob("t/$tests_glob"),
+        myglob('t'),
+        myglob('.'),
         (
               ( $fcs_path ne $abs_bindir )
-            ? ( glob("$abs_bindir/t/$tests_glob") )
+            ? ( myglob("$abs_bindir/t") )
             : ()
         ),
         );
+
+    if ( defined($exclude_re_s) )
+    {
+        my $re = qr/$exclude_re_s/ms;
+        @tests = grep { basename($_) !~ $re } @tests;
+    }
+    @tests = grep { basename($_) !~ /\A(?:lextab|yacctab)\.py\z/ } @tests;
 
     if ( !$ENV{FCS_TEST_BUILD} )
     {
@@ -135,39 +156,36 @@ GetOptions(
         @tests = grep { !/valgrind/ } @tests;
     }
 
+    print STDERR <<"EOF";
+FCS_PATH = $ENV{FCS_PATH}
+FCS_SRC_PATH = $ENV{FCS_SRC_PATH}
+FCS_TEST_TAGS = <$ENV{FCS_TEST_TAGS}>
+EOF
+
+    if ( $ENV{FCS_TEST_SHELL} )
     {
-        print STDERR "FCS_PATH = $ENV{FCS_PATH}\n";
-        print STDERR "FCS_SRC_PATH = $ENV{FCS_SRC_PATH}\n";
+        system("bash");
+    }
+    elsif (@execute)
+    {
+        system(@execute);
+    }
+    else
+    {
         run_tests( \@tests );
     }
 }
 
+__END__
+
 =head1 COPYRIGHT AND LICENSE
+
+This file is part of Freecell Solver. It is subject to the license terms in
+the COPYING.txt file found in the top-level directory of this distribution
+and at http://fc-solve.shlomifish.org/docs/distro/COPYING.html . No part of
+Freecell Solver, including this file, may be copied, modified, propagated,
+or distributed except according to the terms contained in the COPYING file.
 
 Copyright (c) 2000 Shlomi Fish
 
-Permission is hereby granted, free of charge, to any person
-obtaining a copy of this software and associated documentation
-files (the "Software"), to deal in the Software without
-restriction, including without limitation the rights to use,
-copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the
-Software is furnished to do so, subject to the following
-conditions:
-
-The above copyright notice and this permission notice shall be
-included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-OTHER DEALINGS IN THE SOFTWARE.
-
-
-
 =cut
-
