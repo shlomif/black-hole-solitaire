@@ -4,10 +4,11 @@ use warnings;
 use Test::More tests => 4;
 
 use File::Spec;
+use Path::Tiny qw/ path /;
 
 sub _filename
 {
-    return File::Spec->catfile(File::Spec->curdir(), "t", "data", shift());
+    return File::Spec->catfile( File::Spec->curdir(), "t", "data", shift() );
 }
 
 my $solution1 = <<'EOF';
@@ -67,29 +68,25 @@ EOF
 
 {
     my $sol_fn = _filename("26464608654870335080.bh.sol.txt");
+
     # TEST
-    ok (!system($^X, "-Mblib", "-MGames::Solitaire::BlackHole::Solver::App",
-            "-e", "Games::Solitaire::BlackHole::Solver::App->new()->run()",
+    ok(
+        !system( $^X,
+            "-Mblib",
+            "-MGames::Solitaire::BlackHole::Solver::App",
+            "-e",
+            "Games::Solitaire::BlackHole::Solver::App->new()->run()",
             "--",
-            "-o", $sol_fn,
+            "-o",
+            $sol_fn,
             _filename("26464608654870335080.bh.board.txt")
         )
     );
 
-    my $contents;
-    {
-        local $/;
-        open my $in, "<", $sol_fn,
-            or die "Could not open '$sol_fn' for reading.";
-        $contents = <$in>;
-        close($in);
-    }
-
     # TEST
-    is (
-        $contents,
-        $solution1,
-        "Testing for correct solution.",
+    is(
+        path($sol_fn)->slurp_utf8,
+        $solution1, "Testing for correct solution.",
     );
 
     unlink($sol_fn);
@@ -97,27 +94,22 @@ EOF
 
 {
     my $sol_fn = _filename("26464608654870335080.bh.sol.txt");
+
     # TEST
-    ok (!system($^X, "-Mblib", File::Spec->catfile(File::Spec->curdir(), "bin", "black-hole-solve"),
+    ok(
+        !system( $^X, "-Mblib",
+            File::Spec->catfile(
+                File::Spec->curdir(), "bin", "black-hole-solve"
+            ),
             "-o", $sol_fn,
             _filename("26464608654870335080.bh.board.txt")
         )
     );
 
-    my $contents;
-    {
-        local $/;
-        open my $in, "<", $sol_fn,
-            or die "Could not open '$sol_fn' for reading.";
-        $contents = <$in>;
-        close($in);
-    }
-
     # TEST
-    is (
-        $contents,
-        $solution1,
-        "Testing for correct solution.",
+    is(
+        path($sol_fn)->slurp_utf8,
+        $solution1, "Testing for correct solution.",
     );
 
     unlink($sol_fn);
