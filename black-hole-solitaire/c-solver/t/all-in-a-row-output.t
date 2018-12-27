@@ -6,12 +6,10 @@ use warnings;
 use Test::More tests => 5;
 use Test::Differences;
 
-use File::Spec;
-use File::Spec::Functions qw( catpath splitpath rel2abs );
+use Path::Tiny qw/ path /;
 
-use IO::All;
-
-my $bin_dir = catpath( ( splitpath( rel2abs $0 ) )[ 0, 1 ] );
+my $bin_dir  = path(__FILE__)->parent->absolute;
+my $data_dir = $bin_dir->child('data');
 
 use Test::Trap qw( trap $trap :flow:stderr(systemsafe):stdout(systemsafe):warn);
 
@@ -27,13 +25,8 @@ sub _normalize_lf
 {
     trap
     {
-        system(
-            './black-hole-solve',
-            '--game',
-            'all_in_a_row',
-            File::Spec->catfile(
-                $bin_dir, 'data', '24.all_in_a_row.board.txt'
-            )
+        system( './black-hole-solve', '--game', 'all_in_a_row',
+            $data_dir->child('24.all_in_a_row.board.txt'),
         );
     };
 
@@ -424,14 +417,8 @@ EOF
 {
     trap
     {
-        system(
-            './black-hole-solve',
-            '--game',
-            'all_in_a_row',
-            '--display-boards',
-            File::Spec->catfile(
-                $bin_dir, 'data', '24.all_in_a_row.board.txt'
-            )
+        system( './black-hole-solve', '--game', 'all_in_a_row',
+            '--display-boards', $data_dir->child('24.all_in_a_row.board.txt'),
         );
     };
 
@@ -528,11 +515,9 @@ EOF
         "Right output from board 24 with --display-boards."
     );
 
-    my $expected_stdout = io->file(
-        File::Spec->catfile(
-            $bin_dir, 'data', '24.all_in_a_row.sol-with-display-boards.txt',
-        )
-    )->slurp;
+    my $expected_stdout =
+        $data_dir->child( '24.all_in_a_row.sol-with-display-boards.txt', )
+        ->slurp_utf8;
 
     # TEST
     eq_or_diff(
