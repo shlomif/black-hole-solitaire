@@ -6,16 +6,15 @@ use warnings;
 use Test::More tests => 14;
 use Test::Differences;
 
-use File::Spec;
-use File::Spec::Functions qw( catpath splitpath rel2abs );
-
-my $bin_dir = catpath( ( splitpath( rel2abs $0 ) )[ 0, 1 ] );
-
 use Test::Trap qw(
     trap $trap :flow:stderr(systemsafe):stdout(systemsafe):warn
 );
 
 use Socket qw(:crlf);
+use Path::Tiny qw/ path /;
+
+my $bin_dir  = path(__FILE__)->parent->absolute;
+my $data_dir = $bin_dir->child('data');
 
 sub _normalize_lf
 {
@@ -26,14 +25,8 @@ sub _normalize_lf
 
 trap
 {
-    system(
-        './black-hole-solve',
-        '--game',
-        'black_hole',
-        File::Spec->catfile(
-            $bin_dir, "data", "26464608654870335080.bh.board.txt"
-        )
-    );
+    system( './black-hole-solve', '--game', 'black_hole',
+        $data_dir->child("26464608654870335080.bh.board.txt") );
 };
 
 # TEST
@@ -415,7 +408,7 @@ eq_or_diff(
 trap
 {
     system( './black-hole-solve', '--game', 'black_hole',
-        File::Spec->catfile( $bin_dir, "data", "1.bh.board.txt" ) );
+        $data_dir->child("1.bh.board.txt") );
 };
 
 $expected_output = <<'EOF';
@@ -436,16 +429,8 @@ eq_or_diff(
 
 trap
 {
-    system(
-        './black-hole-solve',
-        '--game',
-        'black_hole',
-        "--max-iters",
-        "10000",
-        File::Spec->catfile(
-            $bin_dir, "data", "26464608654870335080.bh.board.txt"
-        )
-    );
+    system( './black-hole-solve', '--game', 'black_hole', "--max-iters",
+        "10000", $data_dir->child("26464608654870335080.bh.board.txt") );
 };
 
 # TEST
@@ -827,7 +812,7 @@ eq_or_diff(
 trap
 {
     system( './black-hole-solve', '--game', 'black_hole',
-        File::Spec->catfile( $bin_dir, "data", "1.bh.board.txt" ) );
+        $data_dir->child("1.bh.board.txt") );
 };
 
 $expected_output = <<'EOF';
@@ -864,16 +849,9 @@ qr/\Ablack-hole-solver version (\d+(?:\.\d+){2})\r?\nLibrary version \1\r?\n\z/,
 
 trap
 {
-    system(
-        './black-hole-solve',
-        '--game',
-        'black_hole',
-        '--iters-display-step',
-        '1000',
-        File::Spec->catfile(
-            $bin_dir, "data", "26464608654870335080.bh.board.txt"
-        )
-    );
+    system( './black-hole-solve', '--game', 'black_hole',
+        '--iters-display-step', '1000',
+        $data_dir->child("26464608654870335080.bh.board.txt") );
 };
 
 # TEST
@@ -1266,13 +1244,8 @@ foreach my $exe ( './black-hole-solve', './black-hole-solve-resume-api', )
 
     trap
     {
-        system( $exe, '--game',
-            'black_hole',
-            '--iters-display-step',
-            '1100',
-            File::Spec->catfile(
-                $bin_dir, "data", "26464608654870335080.bh.board.txt"
-            ),
+        system( $exe, '--game', 'black_hole', '--iters-display-step', '1100',
+            $data_dir->child("26464608654870335080.bh.board.txt"),
         );
     };
 
