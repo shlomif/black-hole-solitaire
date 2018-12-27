@@ -4,13 +4,11 @@ use strict;
 use warnings;
 
 use Test::More;
-use Carp;
-use Data::Dumper;
-use String::ShellQuote;
-use File::Spec;
-use File::Temp qw( tempdir );
-use File::Spec::Functions qw( catpath splitpath rel2abs );
 use Test::RunValgrind ();
+use Path::Tiny qw/ path /;
+
+my $bin_dir  = path($0)->parent->absolute;
+my $data_dir = $bin_dir->child('data');
 
 my $IS_WIN = ( $^O eq "MSWin32" );
 
@@ -22,10 +20,6 @@ else
 {
     plan tests => 5;
 }
-
-my $bin_dir = catpath( ( splitpath( rel2abs $0 ) )[ 0, 1 ] );
-
-use Games::Solitaire::Verify::Solution;
 
 sub test_using_valgrind
 {
@@ -59,8 +53,7 @@ sub test_using_valgrind
 # TEST
 test_using_valgrind(
     [
-        '--game', 'all_in_a_row',
-        File::Spec->catfile( $bin_dir, 'data', '24.all_in_a_row.board.txt' ),
+        '--game', 'all_in_a_row', $data_dir->child('24.all_in_a_row.board.txt'),
     ],
     qq{valgrind all_in_a_row deal #24.}
 );
@@ -68,8 +61,9 @@ test_using_valgrind(
 # TEST
 test_using_valgrind(
     [
-        '--game', 'all_in_a_row', '--display-boards', '--rank-reach-prune',
-        File::Spec->catfile( $bin_dir, 'data', '24.all_in_a_row.board.txt' ),
+        '--game',           'all_in_a_row',
+        '--display-boards', '--rank-reach-prune',
+        $data_dir->child('24.all_in_a_row.board.txt'),
     ],
     qq{valgrind --display-boards --rank-reach-prune all_in_a_row deal #24.}
 );
@@ -90,13 +84,8 @@ test_using_valgrind(
 # TEST
 test_using_valgrind(
     [
-        '--game',
-        'black_hole',
-        '--display-boards',
-        '--rank-reach-prune',
-        File::Spec->catfile(
-            $bin_dir, 'data', '26464608654870335080.bh.board.txt',
-        ),
+        '--game', 'black_hole', '--display-boards', '--rank-reach-prune',
+        $data_dir->child( '26464608654870335080.bh.board.txt', ),
     ],
     qq{valgrind --display-boards --rank-reach-prune black_hole deal.}
 );
@@ -106,13 +95,8 @@ test_using_valgrind(
     {
         prog => './black-hole-solve-resume-api',
         argv => [
-            '--game',
-            'black_hole',
-            '--iters-display-step',
-            '1100',
-            File::Spec->catfile(
-                $bin_dir, "data", "26464608654870335080.bh.board.txt"
-            )
+            '--game', 'black_hole', '--iters-display-step', '1100',
+            $data_dir->child("26464608654870335080.bh.board.txt")
         ],
     },
     qq{valgrind --iters-display-step resume api},

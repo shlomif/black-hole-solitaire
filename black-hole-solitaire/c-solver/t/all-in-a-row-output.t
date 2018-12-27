@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Test::More tests => 5;
-use Test::Differences;
+use Test::Differences qw/ eq_or_diff /;
 
 use Path::Tiny qw/ path /;
 
