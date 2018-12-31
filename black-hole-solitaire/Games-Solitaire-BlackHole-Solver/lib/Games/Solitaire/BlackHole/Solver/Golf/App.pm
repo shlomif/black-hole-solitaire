@@ -1,4 +1,4 @@
-package Games::Solitaire::BlackHole::Solver::App;
+package Games::Solitaire::BlackHole::Solver::Golf::App;
 
 use strict;
 use warnings;
@@ -10,14 +10,14 @@ use Pod::Usage;
 
 =head1 NAME
 
-Games::Solitaire::BlackHole::Solver::App - a command line application
+Games::Solitaire::BlackHole::Solver::Golf::App - a command line application
 implemented as a class to solve the Black Hole solitaire.
 
 =head1 SYNOPSIS
 
-    use Games::Solitaire::BlackHole::Solver::App;
+    use Games::Solitaire::BlackHole::Solver::Golf::App;
 
-    my $app = Games::Solitaire::BlackHole::Solver::App->new;
+    my $app = Games::Solitaire::BlackHole::Solver::Golf::App->new;
 
     $app->run();
 
@@ -166,6 +166,19 @@ sub run
     my @lines = @{ _calc_lines($filename) };
     chomp(@lines);
 
+    my $talon_line = shift(@lines);
+    my @talon_cards;
+    my @talon_values;
+    my $talon_ptr = 0;
+    if ( my ($cards) = $talon_line =~ m{\ATalon:((?: $card_re){16})\z} )
+    {
+        @talon_cards  = $cards =~ /($card_re)/g;
+        @talon_values = map { _get_rank($_) } @talon_cards;
+    }
+    else
+    {
+        die "Could not match first talon line!";
+    }
     my $found_line = shift(@lines);
 
     my $init_foundation;
@@ -186,10 +199,11 @@ sub run
     my $init_state = "";
 
     vec( $init_state, 0, 8 ) = $init_foundation;
+    vec( $init_state, 1, 8 ) = $talon_ptr;
 
     foreach my $col_idx ( 0 .. $#board_values )
     {
-        vec( $init_state, 4 + $col_idx, 2 ) =
+        vec( $init_state, 4 + $col_idx, 4 ) =
             scalar( @{ $board_values[$col_idx] } );
     }
 
@@ -199,7 +213,7 @@ sub run
 
     my @queue = ($init_state);
 
-    my %is_good_diff = ( map { $_ => 1 } ( 1, $#ranks ) );
+    my %is_good_diff = ( map { $_ => 1 } ( (-1), 1 ) );
 
     my $verdict = 0;
 
@@ -213,8 +227,12 @@ sub run
         while ( ( $prev_state, $col_idx ) = @{ $positions{$state} } )
         {
             push @moves,
-                $board_cards[$col_idx]
-                [ vec( $prev_state, 4 + $col_idx, 2 ) - 1 ];
+                (
+                ( $col_idx == @board_cards )
+                ? "Deal talon " . $talon_cards[ vec( $prev_state, 1, 8 ) ]
+                : $board_cards[$col_idx]
+                    [ vec( $prev_state, 4 + $col_idx, 4 ) - 1 ]
+                );
         }
         continue
         {
@@ -229,11 +247,12 @@ QUEUE_LOOP:
         # The foundation
         my $fnd      = vec( $state, 0, 8 );
         my $no_cards = 1;
+        my $tln      = vec( $state, 1, 8 );
 
         # my @debug_pos;
         foreach my $col_idx ( 0 .. $#board_values )
         {
-            my $pos = vec( $state, 4 + $col_idx, 2 );
+            my $pos = vec( $state, 4 + $col_idx, 4 );
 
             # push @debug_pos, $pos;
             if ($pos)
@@ -241,17 +260,14 @@ QUEUE_LOOP:
                 $no_cards = 0;
 
                 my $card = $board_values[$col_idx][ $pos - 1 ];
-                if (
-                    exists(
-                        $is_good_diff{ ( $card - $fnd ) % scalar(@ranks) }
-                    )
-                    )
+                if ( exists( $is_good_diff{ ( $card - $fnd ) } ) )
                 {
                     my $next_s = $state;
                     vec( $next_s, 0, 8 ) = $card;
-                    vec( $next_s, 4 + $col_idx, 2 )--;
+                    --vec( $next_s, 4 + $col_idx, 4 );
                     if ( !exists( $positions{$next_s} ) )
                     {
+                        # print "$card $fnd $col_idx\n";
                         $positions{$next_s} = [ $state, $col_idx ];
                         push( @queue, $next_s );
                     }
@@ -266,6 +282,17 @@ QUEUE_LOOP:
             $trace_solution->($state);
             $verdict = 1;
             last QUEUE_LOOP;
+        }
+        elsif ( $tln < @talon_values )
+        {
+            my $next_s = $state;
+            vec( $next_s, 0, 8 ) = $talon_values[$tln];
+            ++vec( $next_s, 1, 8 );
+            if ( !exists( $positions{$next_s} ) )
+            {
+                $positions{$next_s} = [ $state, scalar(@board_values) ];
+                push( @queue, $next_s );
+            }
         }
     }
 
