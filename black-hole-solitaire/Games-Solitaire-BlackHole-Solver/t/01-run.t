@@ -3,8 +3,16 @@ use warnings;
 
 use Test::More tests => 4;
 
-use File::Spec;
+use File::Spec ();
 use Path::Tiny qw/ path /;
+use Socket qw/ :crlf /;
+
+sub _normalize_lf
+{
+    my ($s) = @_;
+    $s =~ s#$CRLF#$LF#g;
+    return $s;
+}
 
 sub _filename
 {
@@ -85,8 +93,9 @@ EOF
 
     # TEST
     is(
-        path($sol_fn)->slurp_utf8,
-        $solution1, "Testing for correct solution.",
+        _normalize_lf( path($sol_fn)->slurp_utf8 ),
+        _normalize_lf($solution1),
+        "Testing for correct solution.",
     );
 
     unlink($sol_fn);
@@ -108,8 +117,9 @@ EOF
 
     # TEST
     is(
-        path($sol_fn)->slurp_utf8,
-        $solution1, "Testing for correct solution.",
+        _normalize_lf( path($sol_fn)->slurp_utf8 ),
+        _normalize_lf($solution1),
+        "Testing for correct solution.",
     );
 
     unlink($sol_fn);
