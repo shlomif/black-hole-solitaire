@@ -11,7 +11,7 @@ use Pod::Usage;
 =head1 NAME
 
 Games::Solitaire::BlackHole::Solver::Golf::App - a command line application
-implemented as a class to solve the Black Hole solitaire.
+implemented as a class to solve the “Golf” variant of solitaire.
 
 =head1 SYNOPSIS
 
@@ -23,34 +23,28 @@ implemented as a class to solve the Black Hole solitaire.
 
 And then from the command-line:
 
-    $ black-hole-solve myboard.txt
+    $ golf-solitaire-solve-perl myboard.txt
 
 =head1 DESCRIPTION
 
+This solves deals of
+L<the "Golf" variant of patience and card solitaire|https://en.wikipedia.org/wiki/Golf_(patience)> . It is not related to L<Code golf|https://en.wikipedia.org/wiki/Code_golf>.
 A script that encapsulates this application accepts a filename pointing
 at the file containing the board or C<"-"> for specifying the standard input.
 
-A board looks like this and can be generated for PySol using the
-make_pysol_board.py in the contrib/ .
+A board looks like this and can be generated for PySol FC using L<make_pysol_freecell_board.py|https://github.com/shlomif/fc-solve/blob/master/fc-solve/source/board_gen/make_pysol_freecell_board.py>
 
-    Foundations: AS
-    KD JH JS
-    8H 4C 7D
-    7H TD 4H
-    JD 9S 5S
-    AH 3S 6H
-    9C 9D 8S
-    7S 2H 6S
-    AC JC QH
-    QD 4S TS
-    6C QS QC
-    8D 3D KH
-    5H 5C 8C
-    4D KC TC
-    6D 3C 3H
-    2C KS TH
-    AD 5D 7C
-    9H 2S 2D
+    Talon: TD KC 8H 8S 4S 4H KS 6D 8D 7C JD 9D 2H QD 3D AS
+    Foundations: JH
+    4C 7S 5S KH TC
+    5H 2C 6C 6S TS
+    QC QH 9C 7D AD
+    5D 9S 3C 8C 4D
+    2D 2S 6H AC QS
+    7H KD JC 9H 3H
+    AH JS TH 5C 3S
+
+(PySol FC deal No. 24).
 
 Other flags:
 
@@ -68,13 +62,11 @@ Output to a solution file.
 
 =back
 
-More information about Black Hole Solitaire can be found at:
+More information about Golf Solitaire can be found at:
 
 =over 4
 
-=item * L<http://en.wikipedia.org/wiki/Black_Hole_%28solitaire%29>
-
-=item * L<http://pysolfc.sourceforge.net/doc/rules/blackhole.html>
+=item * L<https://en.wikipedia.org/wiki/Golf_(patience)>
 
 =back
 
@@ -315,7 +307,7 @@ The Black Hole Solitaire Solvers homepage is at
 L<http://www.shlomifish.org/open-source/projects/black-hole-solitaire-solver/>
 and one can find there an implementation of this solver as a C library (under
 the same licence), which is considerably faster and consumes less memory,
-and has had some otehr impovements.
+and has had some otehr improvements.
 
 =head1 AUTHOR
 
@@ -356,4 +348,3 @@ OTHER DEALINGS IN THE SOFTWARE.
 =cut
 
 1;
-
