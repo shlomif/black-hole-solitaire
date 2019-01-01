@@ -156,6 +156,8 @@ sub myglob
         @tests = grep { !/valgrind/ } @tests;
     }
 
+    $ENV{FCS_TEST_TAGS} //= '';
+
     print STDERR <<"EOF";
 FCS_PATH = $ENV{FCS_PATH}
 FCS_SRC_PATH = $ENV{FCS_SRC_PATH}
