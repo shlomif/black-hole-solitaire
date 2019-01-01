@@ -71,14 +71,14 @@ void bh_solve_hash_init(bh_solve_hash_t *hash)
     bh_solve_compact_allocator_init(&(hash->allocator));
 }
 
-void bh_solve_hash_get(bh_solve_hash_t *hash,
-    bhs_state_key_value_pair_t *key_ptr, bhs_state_key_value_pair_t *result)
+void bh_solve_hash_get(
+    bh_solve_hash_t *hash, bhs_state_key_t *key_ptr, bhs_state_value_t *result)
 {
     bh_solve_hash_symlink_t *list;
     bh_solve_hash_symlink_item_t *item;
 
     bh_solve_hash_value_t hash_value =
-        ((typeof(hash_value))hash_function(key_ptr->key));
+        ((typeof(hash_value))hash_function(*key_ptr));
 
 #define PLACE() (hash_value & (hash->size_bitmask))
     list = (hash->entries + PLACE());
@@ -87,13 +87,11 @@ void bh_solve_hash_get(bh_solve_hash_t *hash,
 
     assert(item != NULL);
 
-    result->key = key_ptr->key;
-
     while (item != NULL)
     {
-        if (!memcmp(&(item->key.key), &(key_ptr->key), sizeof(bhs_state_key_t)))
+        if (!memcmp(&(item->key.key), key_ptr, sizeof(bhs_state_key_t)))
         {
-            result->value = item->key.value;
+            *result = item->key.value;
             return;
         }
 

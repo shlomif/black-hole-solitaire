@@ -81,8 +81,8 @@ static inline void bh_solve_hash_free(bh_solve_hash_t *hash)
     free(hash->entries);
 }
 
-extern void bh_solve_hash_get(bh_solve_hash_t *hash,
-    bhs_state_key_value_pair_t *key_ptr, bhs_state_key_value_pair_t *result);
+extern void bh_solve_hash_get(
+    bh_solve_hash_t *hash, bhs_state_key_t *key_ptr, bhs_state_value_t *result);
 
 #ifdef __cplusplus
 }

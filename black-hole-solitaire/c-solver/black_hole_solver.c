@@ -28,6 +28,7 @@
 #include <stdio.h>
 #include <limits.h>
 #include <ctype.h>
+#include <assert.h>
 
 #include "config.h"
 #include <black-hole-solver/black_hole_solver.h>
@@ -355,7 +356,7 @@ extern int DLLEXPORT black_hole_solver_read_board(
             solver->initial_foundation_string,
             &(solver->sol_foundations_card_suit));
 
-        solver->sol_foundations_card_rank = solver->initial_foundation;
+        solver->sol_foundations_card_rank = 1 + solver->initial_foundation;
 
         if (ret_code)
         {
@@ -473,7 +474,7 @@ static inline void queue_item_unpack(
 }
 
 static inline void perform_move(bhs_solver_t *const solver,
-    const bhs_rank_t card, const int col_idx,
+    const bhs_rank_t prev_foundation, const bhs_rank_t card, const int col_idx,
     const bhs_queue_item_t *const queue_item_copy_ptr)
 {
     bhs_unpacked_state_t next_state = queue_item_copy_ptr->s.unpacked;
@@ -486,10 +487,9 @@ static inline void perform_move(bhs_solver_t *const solver,
     next_queue_item.s.unpacked = next_state;
     memset(&(next_queue_item.s.packed), '\0', sizeof(next_queue_item.s.packed));
 
-    next_queue_item.s.packed.value.parent_state =
-        queue_item_copy_ptr->s.packed.key;
     next_queue_item.s.packed.value.col_idx =
         (typeof(next_queue_item.s.packed.value.col_idx))col_idx;
+    next_queue_item.s.packed.value.prev_foundation = prev_foundation;
 
     queue_item_populate_packed(solver, &(next_queue_item));
 
@@ -534,6 +534,7 @@ static inline bhs_state_key_value_pair_t setup_first_queue_item(
     memset(&(new_queue_item->s.packed), '\0', sizeof(new_queue_item->s.packed));
 
     queue_item_populate_packed(solver, new_queue_item);
+    new_queue_item->s.packed.value.col_idx = num_columns;
 
     memset(&(new_queue_item->rank_counts), '\0',
         sizeof(new_queue_item->rank_counts));
@@ -623,7 +624,8 @@ extern int DLLEXPORT black_hole_solver_run(
                 if ((foundations == -1) ||
                     (abs(card - foundations) % (MAX_RANK - 1) == 1))
                 {
-                    perform_move(solver, card, col_idx, &queue_item_copy);
+                    perform_move(
+                        solver, foundations, card, col_idx, &queue_item_copy);
                 }
             }
         }
@@ -685,6 +687,8 @@ static void initialize_states_in_solution(bhs_solver_t *solver)
     {
         return;
     }
+    const_SLOT(num_columns, solver);
+    const_SLOT(bits_per_column, solver);
     int num_states = 0;
     int max_num_states = NUM_SUITS * NUM_RANKS + 1;
 
@@ -706,14 +710,40 @@ static void initialize_states_in_solution(bhs_solver_t *solver)
 
         /* Look up the next state in the positions associative array. */
         bh_solve_hash_get(&(solver->positions),
-            ((bhs_state_key_value_pair_t *)&(
-                states[num_states].packed.value.parent_state)),
-            &(states[num_states + 1].packed));
+            &(states[num_states].packed.key),
+            &(states[num_states + 1].packed.value));
+        // Reverse the move
+        const size_t col_idx = states[num_states + 1].packed.value.col_idx;
+        states[num_states + 1].packed.key = states[num_states].packed.key;
+        if (col_idx == num_columns)
+        {
+            states[num_states + 1].packed.key.foundations =
+                solver->initial_foundation;
+        }
+        else
+        {
+            const_AUTO(moved_card_height,
+                states[num_states].unpacked.heights[col_idx]);
+            var_AUTO(new_moved_card_height, moved_card_height + 1);
+            states[num_states + 1].packed.key.foundations =
+                states[num_states + 1].packed.value.prev_foundation;
+            var_AUTO(offset, bits_per_column * col_idx);
+            unsigned char *data = states[num_states + 1].packed.key.data;
+            for (size_t i = 0; i < bits_per_column;
+                 ++i, ++offset, new_moved_card_height >>= 1)
+            {
+                data[offset >> 3] &= (~(1 << (offset & 0x7)));
+                data[offset >> 3] |=
+                    ((new_moved_card_height & 0x1) << (offset & 0x7));
+            }
+        }
+
         queue_item_unpack(solver, &states[++num_states]);
     }
+    states[num_states].packed.key.foundations =
+        states[num_states].unpacked.foundations = solver->initial_foundation;
 
-    num_states++;
-
+    ++num_states;
     /* Reverse the list in place. */
     for (int i = 0; i < (num_states >> 1); i++)
     {
@@ -745,10 +775,12 @@ DLLEXPORT extern int black_hole_solver_get_next_move(
 
     {
         const bhs_solution_state_t next_state =
-            solver->states_in_solution[++solver->current_state_in_solution_idx];
+            solver->states_in_solution[solver->current_state_in_solution_idx++];
 
         const int col_idx = next_state.packed.value.col_idx;
-        const int height = next_state.unpacked.heights[col_idx];
+        const int height = next_state.unpacked.heights[col_idx] - 1;
+        assert(height >= 0);
+        assert(height < solver->initial_lens[col_idx]);
 
         *col_idx_ptr = col_idx;
         solver->sol_foundations_card_rank = *card_rank_ptr =

@@ -46,10 +46,9 @@ typedef char bhs_col_idx_t;
 
 typedef struct
 {
-    /* The state from which this state was derived. */
-    bhs_state_key_t parent_state;
     /* The index of the column that was changed. */
     bhs_col_idx_t col_idx;
+    bhs_rank_t prev_foundation;
 } bhs_state_value_t;
 
 typedef struct
