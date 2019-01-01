@@ -250,6 +250,7 @@ QUEUE_LOOP:
         my $fnd      = vec( $state, 0, 8 );
         my $no_cards = 1;
         my $tln      = vec( $state, 1, 8 );
+        my @sub_queue;
 
         if ( $place_queens_on_kings || ( $fnd != $RANK_KING ) )
         {
@@ -273,7 +274,7 @@ QUEUE_LOOP:
                         {
                             # print "$card $fnd $col_idx\n";
                             $positions{$next_s} = [ $state, $col_idx ];
-                            push( @queue, $next_s );
+                            push( @sub_queue, $next_s );
                         }
                     }
                 }
@@ -313,6 +314,9 @@ QUEUE_LOOP:
                 push( @queue, $next_s );
             }
         }
+
+        # Give preference to non-talon moves
+        push @queue, @sub_queue;
     }
 
     if ( !$verdict )
