@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 14;
+use Test::More tests => 17;
 use Test::Differences;
 
 use Test::Trap qw(
@@ -1633,4 +1633,157 @@ EOF
         "Right output for iterations step on a second step."
     );
 
+}
+
+{
+    trap
+    {
+        system( './black-hole-solve', '--game', 'black_hole',
+            '--display-boards',
+            $data_dir->child('26464608654870335080.bh.board.txt'),
+        );
+    };
+
+    # TEST
+    ok( !( $trap->exit ),
+        "Exit code for --display-boards for board #26464608654870335080." );
+
+    my $expected_prefix = _normalize_lf(<<'EOF');
+Solved!
+
+[START BOARD]
+Foundations: AS
+: KD JH JS
+: 8H 4C 7D
+: 7H TD 4H
+: JD 9S 5S
+: AH 3S 6H
+: 9C 9D 8S
+: 7S 2H 6S
+: AC JC QH
+: QD 4S TS
+: 6C QS QC
+: 8D 3D KH
+: 5H 5C 8C
+: 4D KC TC
+: 6D 3C 3H
+: 2C KS TH
+: AD 5D 7C
+: 9H 2S 2D
+[END BOARD]
+
+
+Move a card from stack 16 to the foundations
+
+Info: Card moved is 2D
+
+
+====================
+
+
+[START BOARD]
+Foundations: 2D
+: KD JH JS
+: 8H 4C 7D
+: 7H TD 4H
+: JD 9S 5S
+: AH 3S 6H
+: 9C 9D 8S
+: 7S 2H 6S
+: AC JC QH
+: QD 4S TS
+: 6C QS QC
+: 8D 3D KH
+: 5H 5C 8C
+: 4D KC TC
+: 6D 3C 3H
+: 2C KS TH
+: AD 5D 7C
+: 9H 2S
+[END BOARD]
+
+
+Move a card from stack 13 to the foundations
+
+Info: Card moved is 3H
+
+
+====================
+
+
+[START BOARD]
+Foundations: 3H
+: KD JH JS
+: 8H 4C 7D
+: 7H TD 4H
+: JD 9S 5S
+: AH 3S 6H
+: 9C 9D 8S
+: 7S 2H 6S
+: AC JC QH
+: QD 4S TS
+: 6C QS QC
+: 8D 3D KH
+: 5H 5C 8C
+: 4D KC TC
+: 6D 3C
+: 2C KS TH
+: AD 5D 7C
+: 9H 2S
+[END BOARD]
+
+
+Move a card from stack 16 to the foundations
+
+Info: Card moved is 2S
+
+
+====================
+
+
+[START BOARD]
+Foundations: 2S
+: KD JH JS
+: 8H 4C 7D
+: 7H TD 4H
+: JD 9S 5S
+: AH 3S 6H
+: 9C 9D 8S
+: 7S 2H 6S
+: AC JC QH
+: QD 4S TS
+: 6C QS QC
+: 8D 3D KH
+: 5H 5C 8C
+: 4D KC TC
+: 6D 3C
+: 2C KS TH
+: AD 5D 7C
+: 9H
+[END BOARD]
+
+
+Move a card from stack 13 to the foundations
+
+EOF
+
+    my $stdout = _normalize_lf( $trap->stdout() );
+
+    my $got_prefix = substr( $stdout, 0, length($expected_prefix) );
+
+    # TEST
+    eq_or_diff( _normalize_lf($got_prefix), _normalize_lf($expected_prefix),
+        "Foundation in black_hole is AS rather than 0S with --display-boards."
+    );
+
+    my $expected_stdout =
+        $data_dir->child( '26464608654870335080.bh-sol-with-display-boards.txt',
+    )->slurp_utf8;
+
+    # TEST
+    eq_or_diff(
+        _normalize_lf($stdout),
+        _normalize_lf($expected_stdout),
+        "Complete Right output from black_hole solver with --display-boards."
+    );
 }
