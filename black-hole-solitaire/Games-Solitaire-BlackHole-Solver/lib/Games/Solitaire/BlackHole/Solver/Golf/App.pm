@@ -56,6 +56,11 @@ Other flags:
 
 =item * --man
 
+=item * --queens-on-kings and --no-queens-on-kings
+
+Enable and disable the ability to put queens on kings (which is disabled by default).
+This is a common variation on the solitaire rules.
+
 =item * -o/--output solution_file.txt
 
 Output to a solution file.
@@ -90,6 +95,7 @@ sub new
 
 my @ranks = ( "A", 2 .. 9, qw(T J Q K) );
 my %ranks_to_n = ( map { $ranks[$_] => $_ } 0 .. $#ranks );
+my $RANK_KING  = $ranks_to_n{'K'};
 
 my $card_re_str = '[' . join( "", @ranks ) . '][HSCD]';
 my $card_re     = qr{$card_re_str};
@@ -124,11 +130,15 @@ sub run
 
     my ( $help, $man, $version );
 
+    # A boolean
+    my $place_queens_on_kings = '';
+
     GetOptions(
-        "o|output=s" => \$output_fn,
-        'help|h|?'   => \$help,
-        'man'        => \$man,
-        'version'    => \$version,
+        "o|output=s"       => \$output_fn,
+        "queens-on-kings!" => \$place_queens_on_kings,
+        'help|h|?'         => \$help,
+        'man'              => \$man,
+        'version'          => \$version,
     ) or pod2usage(2);
 
     pod2usage(1) if $help;
@@ -241,28 +251,45 @@ QUEUE_LOOP:
         my $no_cards = 1;
         my $tln      = vec( $state, 1, 8 );
 
-        # my @debug_pos;
-        foreach my $col_idx ( 0 .. $#board_values )
+        if ( $place_queens_on_kings || ( $fnd != $RANK_KING ) )
         {
-            my $pos = vec( $state, 4 + $col_idx, 4 );
-
-            # push @debug_pos, $pos;
-            if ($pos)
+            # my @debug_pos;
+            foreach my $col_idx ( 0 .. $#board_values )
             {
-                $no_cards = 0;
+                my $pos = vec( $state, 4 + $col_idx, 4 );
 
-                my $card = $board_values[$col_idx][ $pos - 1 ];
-                if ( exists( $is_good_diff{ ( $card - $fnd ) } ) )
+                # push @debug_pos, $pos;
+                if ($pos)
                 {
-                    my $next_s = $state;
-                    vec( $next_s, 0, 8 ) = $card;
-                    --vec( $next_s, 4 + $col_idx, 4 );
-                    if ( !exists( $positions{$next_s} ) )
+                    $no_cards = 0;
+
+                    my $card = $board_values[$col_idx][ $pos - 1 ];
+                    if ( exists( $is_good_diff{ ( $card - $fnd ) } ) )
                     {
-                        # print "$card $fnd $col_idx\n";
-                        $positions{$next_s} = [ $state, $col_idx ];
-                        push( @queue, $next_s );
+                        my $next_s = $state;
+                        vec( $next_s, 0, 8 ) = $card;
+                        --vec( $next_s, 4 + $col_idx, 4 );
+                        if ( !exists( $positions{$next_s} ) )
+                        {
+                            # print "$card $fnd $col_idx\n";
+                            $positions{$next_s} = [ $state, $col_idx ];
+                            push( @queue, $next_s );
+                        }
                     }
+                }
+            }
+        }
+        else
+        {
+        COL:
+            foreach my $col_idx ( 0 .. $#board_values )
+            {
+                my $pos = vec( $state, 4 + $col_idx, 4 );
+
+                if ($pos)
+                {
+                    $no_cards = 0;
+                    last COL;
                 }
             }
         }
