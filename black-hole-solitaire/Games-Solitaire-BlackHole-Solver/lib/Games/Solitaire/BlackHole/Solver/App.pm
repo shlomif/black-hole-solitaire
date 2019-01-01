@@ -288,7 +288,7 @@ The Black Hole Solitaire Solvers homepage is at
 L<http://www.shlomifish.org/open-source/projects/black-hole-solitaire-solver/>
 and one can find there an implementation of this solver as a C library (under
 the same licence), which is considerably faster and consumes less memory,
-and has had some otehr impovements.
+and has had some other improvements.
 
 =head1 AUTHOR
 
