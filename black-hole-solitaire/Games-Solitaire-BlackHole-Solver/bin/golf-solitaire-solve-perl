@@ -7,9 +7,11 @@ use Games::Solitaire::BlackHole::Solver::Golf::App;
 
 Games::Solitaire::BlackHole::Solver::Golf::App->new->run;
 
+__END__
+
 =head1 NAME
 
-black-hole-solve - a solver for Black Hole Solitaire deals.
+golf-solitaire-solve-perl - a solver for Golf Solitaire deals.
 
 =head1 SYNOPSIS
 
@@ -23,7 +25,7 @@ This is a solver for L<https://en.wikipedia.org/wiki/Golf_(patience)>.
 
 =head1 SEE ALSO
 
-L<Games::Solitaire::BlackHole::Solver::Golf>
+L<Games::Solitaire::BlackHole::Solver::Golf::App>
 
 =head1 COPYRIGHT AND LICENSE
 
