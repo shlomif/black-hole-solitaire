@@ -3,7 +3,7 @@ package Games::Solitaire::BlackHole::Solver::Golf::App;
 use strict;
 use warnings;
 
-use 5.008;
+use 5.014;
 
 use Getopt::Long;
 use Pod::Usage;
@@ -133,9 +133,13 @@ sub run
     # A boolean
     my $place_queens_on_kings = '';
 
+    # A boolean
+    my $wrap_ranks = '';
+
     GetOptions(
         "o|output=s"       => \$output_fn,
         "queens-on-kings!" => \$place_queens_on_kings,
+        "wrap-ranks!"      => \$wrap_ranks,
         'help|h|?'         => \$help,
         'man'              => \$man,
         'version'          => \$version,
@@ -149,6 +153,11 @@ sub run
         print
 "black-hole-solve version $Games::Solitaire::BlackHole::Solver::App::VERSION\n";
         exit(0);
+    }
+
+    if ($wrap_ranks)
+    {
+        $place_queens_on_kings = 1;
     }
 
     my $filename = shift(@ARGV);
@@ -215,7 +224,10 @@ sub run
 
     my @queue = ($init_state);
 
-    my %is_good_diff = ( map { $_ => 1 } ( (-1), 1 ) );
+    my %is_good_diff =
+        ( map { $_ => 1 }
+            ( (-1), 1, ( $wrap_ranks ? ( ( -$RANK_KING ), $RANK_KING ) : () ) )
+        );
 
     my $verdict = 0;
 
