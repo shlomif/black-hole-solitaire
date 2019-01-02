@@ -61,6 +61,11 @@ Other flags:
 Enable and disable the ability to put queens on kings (which is disabled by default).
 This is a common variation on the solitaire rules.
 
+=item * --wrap-ranks and --no-wrap-ranks
+
+Wrap ranks: allow putting aces on kings or kings on aces. If enabled it also sets
+C<--queens-on-kings> .
+
 =item * -o/--output solution_file.txt
 
 Output to a solution file.
