@@ -12,6 +12,7 @@ mkdir -p boards
   do
       fn=boards/golf"$i".board
       echo "== $fn =="
-      run "" || run "--queens-on-kings" || run "--wrap-ranks"
+      # run "" || run "--queens-on-kings" || run "--wrap-ranks"
+      run "--queens-on-kings"
   done
-) | tee -a ~/golfs3.txt
+) | timestamper | tee -a ~/golfs4.txt
