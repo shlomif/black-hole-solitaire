@@ -926,10 +926,11 @@ DLLEXPORT extern int black_hole_solver_get_next_move(
         const int col_idx = next_state.packed.value.col_idx;
         const fcs_bool_t is_talon = (col_idx == solver->num_columns);
         const int height =
-            (is_talon ? (next_state.unpacked.talon_ptr + 1)
+            (is_talon ? (next_state.unpacked.talon_ptr)
                       : (next_state.unpacked.heights[col_idx] - 1));
         assert(height >= 0);
-        assert(is_talon || (height < solver->initial_lens[col_idx]));
+        assert(height <
+               (is_talon ? solver->talon_len : solver->initial_lens[col_idx]));
 
         *col_idx_ptr = col_idx;
         solver->sol_foundations_card_rank = *card_rank_ptr =

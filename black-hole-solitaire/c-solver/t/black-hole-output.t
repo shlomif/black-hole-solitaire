@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 17;
+use Test::More tests => 19;
 use Test::Differences;
 
 use Test::Trap qw(
@@ -1785,5 +1785,31 @@ EOF
         _normalize_lf($stdout),
         _normalize_lf($expected_stdout),
         "Complete Right output from black_hole solver with --display-boards."
+    );
+}
+
+{
+    trap
+    {
+        system( './black-hole-solve', '--game', 'golf',
+            '--display-boards', '--wrap-ranks',
+            $data_dir->child('906.golf.board.txt'),
+        );
+    };
+
+    # TEST
+    ok( !( $trap->exit ),
+        "Exit code for --display-boards for golf board #906." );
+
+    my @cards =
+        qq/6D KC KS AH AC KD 4S 8D 8H JD TC AD QH 4C JS 2C/ =~ /(\S\S)/g;
+    my @strings = map { "Deal talon\n\nInfo: Card moved is $_\n" } @cards;
+
+    my $stdout = _normalize_lf( $trap->stdout() );
+
+    # TEST
+    eq_or_diff(
+        [ $stdout =~ /^(Deal talon\n\nInfo: Card moved is ..\n)/gms ],
+        [@strings], "in order and correct.",
     );
 }
