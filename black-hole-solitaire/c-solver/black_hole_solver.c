@@ -858,14 +858,12 @@ static void initialize_states_in_solution(bhs_solver_t *solver)
             var_AUTO(new_moved_card_height, moved_card_height - 1);
             states[num_states + 1].packed.key.foundations =
                 states[num_states + 1].packed.value.prev_foundation;
-            var_AUTO(offset, 0);
             unsigned char *data = states[num_states + 1].packed.key.data;
             for (size_t i = 0; i < TALON_PTR_BITS;
-                 ++i, ++offset, new_moved_card_height >>= 1)
+                 ++i, new_moved_card_height >>= 1)
             {
-                data[offset >> 3] &= (~(1 << (offset & 0x7)));
-                data[offset >> 3] |=
-                    ((new_moved_card_height & 0x1) << (offset & 0x7));
+                data[i >> 3] &= (~(1 << (i & 0x7)));
+                data[i >> 3] |= ((new_moved_card_height & 0x1) << (i & 0x7));
             }
         }
         else
@@ -927,9 +925,9 @@ DLLEXPORT extern int black_hole_solver_get_next_move(
 
         const int col_idx = next_state.packed.value.col_idx;
         const fcs_bool_t is_talon = (col_idx == solver->num_columns);
-        const int height = ((is_talon ? next_state.unpacked.talon_ptr
-                                      : next_state.unpacked.heights[col_idx]) -
-                            1);
+        const int height =
+            (is_talon ? (next_state.unpacked.talon_ptr + 1)
+                      : (next_state.unpacked.heights[col_idx] - 1));
         assert(height >= 0);
         assert(is_talon || (height < solver->initial_lens[col_idx]));
 
