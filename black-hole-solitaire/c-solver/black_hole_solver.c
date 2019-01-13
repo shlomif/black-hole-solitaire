@@ -387,6 +387,11 @@ extern int DLLEXPORT black_hole_solver_read_board(
         return BLACK_HOLE_SOLVER__INVALID_INPUT;
     }
 
+    if (max_num_cards_in_col > BHS__MAX_NUM_CARDS_IN_COL)
+    {
+        return BLACK_HOLE_SOLVER__INVALID_INPUT;
+    }
+
     bhs_solver_t *const solver = (bhs_solver_t *)instance_proto;
 
     solver->num_columns = num_columns;

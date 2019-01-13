@@ -21,8 +21,9 @@ typedef char bhs_rank_t;
 #define BHS__MAX_NUM_COLUMNS                                                   \
     (max(BHS__ALL_IN_A_ROW__NUM_COLUMNS, BHS__BLACK_HOLE__NUM_COLUMNS))
 #define BHS__MAX_NUM_CARDS_IN_COL                                              \
-    (max(BHS__ALL_IN_A_ROW__MAX_NUM_CARDS_IN_COL,                              \
-        BHS__BLACK_HOLE__MAX_NUM_CARDS_IN_COL))
+    (max(max(BHS__ALL_IN_A_ROW__MAX_NUM_CARDS_IN_COL,                          \
+             BHS__BLACK_HOLE__MAX_NUM_CARDS_IN_COL),                           \
+        BHS__GOLF__MAX_NUM_CARDS_IN_COL))
 
 #define BHS__NUM_BITS_PER_CHAR 8
 /* We allocate 4-bits for the length of every column */
