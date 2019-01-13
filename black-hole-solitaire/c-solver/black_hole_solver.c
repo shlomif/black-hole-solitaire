@@ -330,6 +330,50 @@ static inline fcs_bool_t string_find_prefix(
     return TRUE;
 }
 
+#define MYRET(code)                                                            \
+    {                                                                          \
+        *error_line_number = line_num;                                         \
+        return code;                                                           \
+    }
+
+static int try_parse_talon(bhs_solver_t *const solver, const char **ps)
+{
+    if (string_find_prefix(ps, "Talon: "))
+    {
+        size_t pos_idx = 0;
+        while ((**ps != '\n') && (**ps != '\0'))
+        {
+            if (pos_idx == TALON_MAX_SIZE)
+            {
+                return BLACK_HOLE_SOLVER__TOO_MANY_CARDS;
+            }
+
+            const int ret_code =
+                parse_card(ps, &(solver->talon_values[pos_idx]),
+                    solver->initial_talon_card_strings[pos_idx], NULL);
+
+            if (ret_code)
+            {
+                return ret_code;
+            }
+
+            while ((**ps) == ' ')
+            {
+                ++(*ps);
+            }
+
+            ++pos_idx;
+        }
+        if (**ps == '\n')
+        {
+            ++(*ps);
+        }
+
+        solver->talon_len = pos_idx;
+    }
+    return BLACK_HOLE_SOLVER__SUCCESS;
+}
+
 extern int DLLEXPORT black_hole_solver_read_board(
     black_hole_solver_instance_t *const instance_proto,
     const char *const board_string, int *const error_line_number,
@@ -358,12 +402,14 @@ extern int DLLEXPORT black_hole_solver_read_board(
         s++;
     }
 
-#define MYRET(code)                                                            \
-    {                                                                          \
-        *error_line_number = line_num;                                         \
-        return code;                                                           \
+    solver->talon_len = 0;
+    {
+        const int ret_code = try_parse_talon(solver, &s);
+        if (ret_code)
+        {
+            MYRET(ret_code);
+        }
     }
-
     if (!string_find_prefix(&s, "Foundations: "))
     {
         MYRET(BLACK_HOLE_SOLVER__FOUNDATIONS_NOT_FOUND_AT_START);
@@ -402,36 +448,12 @@ extern int DLLEXPORT black_hole_solver_read_board(
         MYRET(BLACK_HOLE_SOLVER__TRAILING_CHARS);
     }
     ++line_num;
-
-    solver->talon_len = 0;
-    if (string_find_prefix(&s, "Talon: "))
     {
-        size_t pos_idx = 0;
-        while ((*s != '\n') && (*s != '\0'))
+        const int ret_code = try_parse_talon(solver, &s);
+        if (ret_code)
         {
-            if (pos_idx == TALON_MAX_SIZE)
-            {
-                MYRET(BLACK_HOLE_SOLVER__TOO_MANY_CARDS);
-            }
-
-            const int ret_code =
-                parse_card(&s, &(solver->talon_values[pos_idx]),
-                    solver->initial_talon_card_strings[pos_idx], NULL);
-
-            if (ret_code)
-            {
-                MYRET(ret_code);
-            }
-
-            while ((*s) == ' ')
-            {
-                ++s;
-            }
-
-            ++pos_idx;
+            MYRET(ret_code);
         }
-
-        solver->talon_len = pos_idx;
     }
 
     for (int col_idx = 0; col_idx < num_columns; col_idx++, line_num++)
