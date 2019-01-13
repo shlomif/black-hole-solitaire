@@ -5,12 +5,14 @@
 #define BHS__ALL_IN_A_ROW__NUM_COLUMNS 13
 #define BHS__ALL_IN_A_ROW__MAX_NUM_CARDS_IN_COL 4
 #define BHS__ALL_IN_A_ROW__BITS_PER_COL 3
-#define BHS__ALL_IN_A_ROW__COLS_PER_BYTE 2
+
+#define BHS__GOLF__NUM_COLUMNS 7
+#define BHS__GOLF__MAX_NUM_CARDS_IN_COL 5
+#define BHS__GOLF__BITS_PER_COL 3
 
 #define BHS__BLACK_HOLE__NUM_COLUMNS 17
 #define BHS__BLACK_HOLE__MAX_NUM_CARDS_IN_COL 3
 #define BHS__BLACK_HOLE__BITS_PER_COL 2
-#define BHS__BLACK_HOLE__COLS_PER_BYTE 4
 
 #define BHS_CARD_STRING_LEN 2
 typedef char bhs_card_string_t[BHS_CARD_STRING_LEN + 1];
@@ -27,11 +29,11 @@ typedef char bhs_rank_t;
 #define BHS__ALL_IN_A_ROW__NUM_DATA_CHARS                                      \
     (BHS__ALL_IN_A_ROW__NUM_COLUMNS * BHS__ALL_IN_A_ROW__BITS_PER_COL /        \
             BHS__NUM_BITS_PER_CHAR +                                           \
-        1)
+        2)
 #define BHS__BLACK_HOLE__NUM_DATA_CHARS                                        \
     (BHS__BLACK_HOLE__NUM_COLUMNS * BHS__BLACK_HOLE__BITS_PER_COL /            \
             BHS__NUM_BITS_PER_CHAR +                                           \
-        1)
+        2)
 
 #define BHS__NUM_DATA_CHARS                                                    \
     (max(BHS__ALL_IN_A_ROW__NUM_DATA_CHARS, BHS__BLACK_HOLE__BITS_PER_COL))

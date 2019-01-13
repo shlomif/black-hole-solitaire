@@ -3,7 +3,7 @@ package Games::Solitaire::BlackHole::Solver::App;
 use strict;
 use warnings;
 
-use 5.008;
+use 5.014;
 
 use Getopt::Long;
 use Pod::Usage;
@@ -329,4 +329,3 @@ OTHER DEALINGS IN THE SOFTWARE.
 =cut
 
 1;
-

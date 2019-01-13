@@ -29,6 +29,7 @@
 #include <limits.h>
 #include <ctype.h>
 #include <assert.h>
+#include <stdint.h>
 
 #include "config.h"
 #include <black-hole-solver/black_hole_solver.h>
@@ -79,6 +80,7 @@ typedef struct
 {
     unsigned char heights[BHS__MAX_NUM_COLUMNS];
     signed char foundations;
+    uint8_t talon_ptr;
 } bhs_unpacked_state_t;
 
 typedef struct
@@ -98,6 +100,8 @@ typedef struct
     bhs_rank_counts_t rank_counts;
 } bhs_queue_item_t;
 
+#define TALON_MAX_SIZE (NUM_RANKS * 4)
+
 typedef struct
 {
     /*
@@ -109,6 +113,8 @@ typedef struct
     bhs_rank_t board_values[BHS__MAX_NUM_COLUMNS][BHS__MAX_NUM_CARDS_IN_COL];
 
     bhs_rank_t initial_foundation;
+    bhs_rank_t talon_values[TALON_MAX_SIZE];
+    uint_fast16_t talon_len;
 
     bh_solve_hash_t positions;
 
@@ -116,6 +122,7 @@ typedef struct
     bhs_card_string_t initial_board_card_strings[BHS__MAX_NUM_COLUMNS]
                                                 [BHS__MAX_NUM_CARDS_IN_COL];
     int initial_lens[BHS__MAX_NUM_COLUMNS];
+    bhs_card_string_t initial_talon_card_strings[TALON_MAX_SIZE];
 
     bhs_state_key_value_pair_t init_state;
     bhs_state_key_value_pair_t final_state;
@@ -133,7 +140,11 @@ typedef struct
     int queue_len, queue_max_len;
     int sol_foundations_card_rank, sol_foundations_card_suit;
     fcs_bool_t is_rank_reachability_prune_enabled;
+    fcs_bool_t effective_is_rank_reachability_prune_enabled;
     fcs_bool_t require_initialization;
+    fcs_bool_t place_queens_on_kings;
+    fcs_bool_t wrap_ranks;
+    fcs_bool_t effective_place_queens_on_kings;
 } bhs_solver_t;
 
 int DLLEXPORT black_hole_solver_create(
@@ -155,10 +166,32 @@ int DLLEXPORT black_hole_solver_create(
     ret->iters_display_step = 0;
     ret->num_columns = 0;
     ret->queue = NULL;
+    ret->place_queens_on_kings = FALSE;
+    ret->wrap_ranks = TRUE;
 
     bh_solve_hash_init(&(ret->positions));
 
     *ret_instance = (black_hole_solver_instance_t *)ret;
+
+    return BLACK_HOLE_SOLVER__SUCCESS;
+}
+
+DLLEXPORT extern int black_hole_solver_enable_place_queens_on_kings(
+    black_hole_solver_instance_t *const instance_proto,
+    const fcs_bool_t enabled_status)
+{
+    bhs_solver_t *const solver = (bhs_solver_t *)instance_proto;
+    solver->place_queens_on_kings = enabled_status ? TRUE : FALSE;
+
+    return BLACK_HOLE_SOLVER__SUCCESS;
+}
+
+DLLEXPORT extern int black_hole_solver_enable_wrap_ranks(
+    black_hole_solver_instance_t *const instance_proto,
+    const fcs_bool_t enabled_status)
+{
+    bhs_solver_t *const solver = (bhs_solver_t *)instance_proto;
+    solver->wrap_ranks = enabled_status ? TRUE : FALSE;
 
     return BLACK_HOLE_SOLVER__SUCCESS;
 }
@@ -368,7 +401,38 @@ extern int DLLEXPORT black_hole_solver_read_board(
     {
         MYRET(BLACK_HOLE_SOLVER__TRAILING_CHARS);
     }
-    line_num++;
+    ++line_num;
+
+    solver->talon_len = 0;
+    if (string_find_prefix(&s, "Talon: "))
+    {
+        size_t pos_idx = 0;
+        while ((*s != '\n') && (*s != '\0'))
+        {
+            if (pos_idx == TALON_MAX_SIZE)
+            {
+                MYRET(BLACK_HOLE_SOLVER__TOO_MANY_CARDS);
+            }
+
+            const int ret_code =
+                parse_card(&s, &(solver->talon_values[pos_idx]),
+                    solver->initial_talon_card_strings[pos_idx], NULL);
+
+            if (ret_code)
+            {
+                MYRET(ret_code);
+            }
+
+            while ((*s) == ' ')
+            {
+                ++s;
+            }
+
+            ++pos_idx;
+        }
+
+        solver->talon_len = pos_idx;
+    }
 
     for (int col_idx = 0; col_idx < num_columns; col_idx++, line_num++)
     {
@@ -437,6 +501,8 @@ DLLEXPORT extern int black_hole_solver_set_iters_display_step(
     return BLACK_HOLE_SOLVER__SUCCESS;
 }
 
+#define TALON_PTR_BITS 6
+
 static inline void queue_item_populate_packed(
     bhs_solver_t *const solver, bhs_queue_item_t *const queue_item)
 {
@@ -447,6 +513,8 @@ static inline void queue_item_populate_packed(
 
     const_SLOT(num_columns, solver);
     const_SLOT(bits_per_column, solver);
+    fc_solve_bit_writer_write(
+        &bit_w, TALON_PTR_BITS, queue_item->s.unpacked.talon_ptr);
     for (int col = 0; col < num_columns; col++)
     {
         fc_solve_bit_writer_write(
@@ -465,6 +533,8 @@ static inline void queue_item_unpack(
     fc_solve_bit_reader_t bit_r;
     fc_solve_bit_reader_init(&bit_r, queue_item->packed.key.data);
 
+    queue_item->unpacked.talon_ptr =
+        fc_solve_bit_reader_read(&bit_r, TALON_PTR_BITS);
     for (int col = 0; col < num_columns; col++)
     {
         queue_item->unpacked.heights[col] =
@@ -477,10 +547,18 @@ static inline void perform_move(bhs_solver_t *const solver,
     const bhs_rank_t prev_foundation, const bhs_rank_t card, const int col_idx,
     const bhs_queue_item_t *const queue_item_copy_ptr)
 {
+    const_SLOT(num_columns, solver);
     bhs_unpacked_state_t next_state = queue_item_copy_ptr->s.unpacked;
 
     next_state.foundations = card;
-    next_state.heights[col_idx]--;
+    if (col_idx == num_columns)
+    {
+        ++next_state.talon_ptr;
+    }
+    else if (col_idx != num_columns + 1)
+    {
+        --next_state.heights[col_idx];
+    }
 
     bhs_queue_item_t next_queue_item;
 
@@ -529,12 +607,13 @@ static inline bhs_state_key_value_pair_t setup_first_queue_item(
             new_queue_item->s.unpacked.heights[i]))solver->initial_lens[i];
     }
     new_queue_item->s.unpacked.foundations = solver->initial_foundation;
+    new_queue_item->s.unpacked.talon_ptr = 0;
 
     /* Populate the packed item from the unpacked one. */
     memset(&(new_queue_item->s.packed), '\0', sizeof(new_queue_item->s.packed));
 
     queue_item_populate_packed(solver, new_queue_item);
-    new_queue_item->s.packed.value.col_idx = num_columns;
+    new_queue_item->s.packed.value.col_idx = num_columns + 1;
 
     memset(&(new_queue_item->rank_counts), '\0',
         sizeof(new_queue_item->rank_counts));
@@ -559,6 +638,10 @@ static inline void setup_init_state(bhs_solver_t *const solver)
         malloc(sizeof(solver->queue[0]) * (size_t)solver->queue_max_len);
     solver->queue_len = 0;
     solver->num_states_in_collection = 0;
+    solver->effective_place_queens_on_kings =
+        (solver->place_queens_on_kings || solver->wrap_ranks);
+    solver->effective_is_rank_reachability_prune_enabled =
+        solver->talon_len ? FALSE : solver->is_rank_reachability_prune_enabled;
 
     bhs_state_key_value_pair_t *const init_state = &(solver->init_state);
     *init_state = setup_first_queue_item(solver);
@@ -584,8 +667,11 @@ extern int DLLEXPORT black_hole_solver_run(
     setup_once(solver);
 
     const_SLOT(num_columns, solver);
+    const_SLOT(talon_len, solver);
     const_SLOT(iters_display_step, solver);
-    const_SLOT(is_rank_reachability_prune_enabled, solver);
+    const_SLOT(effective_is_rank_reachability_prune_enabled, solver);
+    const_SLOT(effective_place_queens_on_kings, solver);
+    const_SLOT(wrap_ranks, solver);
     const_AUTO(max_iters_limit, maxify(solver->max_iters_limit));
     var_AUTO(iterations_num, solver->iterations_num);
 
@@ -601,8 +687,9 @@ extern int DLLEXPORT black_hole_solver_run(
         const_AUTO(queue_item_copy, solver->queue[solver->queue_len]);
         const_AUTO(state, queue_item_copy.s.unpacked);
         const_AUTO(foundations, state.foundations);
+        const_AUTO(talon_ptr, state.talon_ptr);
 
-        if (is_rank_reachability_prune_enabled &&
+        if (effective_is_rank_reachability_prune_enabled &&
             (bhs_find_rank_reachability__inline(foundations,
                  queue_item_copy.rank_counts.c) != RANK_REACH__SUCCESS))
         {
@@ -612,20 +699,42 @@ extern int DLLEXPORT black_hole_solver_run(
         iterations_num++;
 
         fcs_bool_t no_cards = TRUE;
+        const fcs_bool_t has_talon = talon_ptr < talon_len;
 
-        for (int col_idx = 0; col_idx < num_columns; col_idx++)
+        if (has_talon)
         {
-            const_AUTO(pos, state.heights[col_idx]);
-            if (pos)
+            perform_move(solver, foundations, solver->talon_values[talon_ptr],
+                num_columns, &queue_item_copy);
+        }
+        if (effective_place_queens_on_kings || (foundations != RANK_K))
+        {
+            for (int col_idx = 0; col_idx < num_columns; col_idx++)
             {
-                no_cards = FALSE;
-                const_AUTO(card, solver->board_values[col_idx][pos - 1]);
-
-                if ((foundations == -1) ||
-                    (abs(card - foundations) % (MAX_RANK - 1) == 1))
+                const_AUTO(pos, state.heights[col_idx]);
+                if (pos)
                 {
-                    perform_move(
-                        solver, foundations, card, col_idx, &queue_item_copy);
+                    no_cards = FALSE;
+                    const_AUTO(card, solver->board_values[col_idx][pos - 1]);
+
+                    const_AUTO(diff, abs(card - foundations));
+                    if ((foundations == -1) ||
+                        (diff == 1 || (wrap_ranks && (diff == RANK_K))))
+                    {
+                        perform_move(solver, foundations, card, col_idx,
+                            &queue_item_copy);
+                    }
+                }
+            }
+        }
+        else
+        {
+            for (size_t col_idx = 0; col_idx < num_columns; ++col_idx)
+            {
+                const_AUTO(pos, state.heights[col_idx]);
+                if (pos)
+                {
+                    no_cards = FALSE;
+                    break;
                 }
             }
         }
@@ -715,10 +824,27 @@ static void initialize_states_in_solution(bhs_solver_t *solver)
         // Reverse the move
         const size_t col_idx = states[num_states + 1].packed.value.col_idx;
         states[num_states + 1].packed.key = states[num_states].packed.key;
-        if (col_idx == num_columns)
+        if (col_idx == num_columns + 1)
         {
             states[num_states + 1].packed.key.foundations =
                 solver->initial_foundation;
+        }
+        else if (col_idx == num_columns)
+        {
+            const_AUTO(
+                moved_card_height, states[num_states].unpacked.talon_ptr);
+            var_AUTO(new_moved_card_height, moved_card_height - 1);
+            states[num_states + 1].packed.key.foundations =
+                states[num_states + 1].packed.value.prev_foundation;
+            var_AUTO(offset, 0);
+            unsigned char *data = states[num_states + 1].packed.key.data;
+            for (size_t i = 0; i < TALON_PTR_BITS;
+                 ++i, ++offset, new_moved_card_height >>= 1)
+            {
+                data[offset >> 3] &= (~(1 << (offset & 0x7)));
+                data[offset >> 3] |=
+                    ((new_moved_card_height & 0x1) << (offset & 0x7));
+            }
         }
         else
         {
@@ -727,7 +853,7 @@ static void initialize_states_in_solution(bhs_solver_t *solver)
             var_AUTO(new_moved_card_height, moved_card_height + 1);
             states[num_states + 1].packed.key.foundations =
                 states[num_states + 1].packed.value.prev_foundation;
-            var_AUTO(offset, bits_per_column * col_idx);
+            var_AUTO(offset, TALON_PTR_BITS + bits_per_column * col_idx);
             unsigned char *data = states[num_states + 1].packed.key.data;
             for (size_t i = 0; i < bits_per_column;
                  ++i, ++offset, new_moved_card_height >>= 1)
@@ -778,15 +904,22 @@ DLLEXPORT extern int black_hole_solver_get_next_move(
             solver->states_in_solution[solver->current_state_in_solution_idx++];
 
         const int col_idx = next_state.packed.value.col_idx;
-        const int height = next_state.unpacked.heights[col_idx] - 1;
+        const fcs_bool_t is_talon = (col_idx == solver->num_columns);
+        const int height = ((is_talon ? next_state.unpacked.talon_ptr
+                                      : next_state.unpacked.heights[col_idx]) -
+                            1);
         assert(height >= 0);
-        assert(height < solver->initial_lens[col_idx]);
+        assert(is_talon || (height < solver->initial_lens[col_idx]));
 
         *col_idx_ptr = col_idx;
         solver->sol_foundations_card_rank = *card_rank_ptr =
-            solver->board_values[col_idx][height] + 1;
+            (is_talon ? solver->talon_values
+                      : solver->board_values[col_idx])[height] +
+            1;
         solver->sol_foundations_card_suit = *card_suit_ptr = suit_char_to_index(
-            solver->initial_board_card_strings[col_idx][height][1]);
+            (is_talon
+                    ? solver->initial_talon_card_strings
+                    : solver->initial_board_card_strings[col_idx])[height][1]);
 
         return BLACK_HOLE_SOLVER__SUCCESS;
     }
@@ -819,9 +952,9 @@ DLLEXPORT extern int black_hole_solver_get_current_solution_board(
         /* 3 bytes per card. */
         (3 * NUM_SUITS * NUM_RANKS) +
         /* newline and a leading ":" per column */
-        (2 * BHS__MAX_NUM_COLUMNS) +
-        /* For the foundations. */
-        20);
+        (2 * (BHS__MAX_NUM_COLUMNS + 1)) +
+        /* For the foundations and the talon. */
+        30);
 
     if (ret == NULL)
     {
@@ -848,6 +981,17 @@ DLLEXPORT extern int black_hole_solver_get_current_solution_board(
     bhs_solution_state_t next_state =
         solver->states_in_solution[solver->current_state_in_solution_idx];
 
+    const_SLOT(talon_len, solver);
+    if (talon_len)
+    {
+        s += sprintf(s, "%s", "Talon:");
+        for (uint_fast16_t h = next_state.unpacked.talon_ptr; h < talon_len;
+             ++h)
+        {
+            s += sprintf(s, " %s", solver->initial_talon_card_strings[h]);
+        }
+        s += sprintf(s, "\n");
+    }
     const_SLOT(num_columns, solver);
     for (int col_idx = 0; col_idx < num_columns; col_idx++)
     {

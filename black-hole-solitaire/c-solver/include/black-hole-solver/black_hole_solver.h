@@ -74,6 +74,16 @@ DLLEXPORT extern int black_hole_solver_set_iters_display_step(
     const long display_step
 );
 
+DLLEXPORT extern int black_hole_solver_enable_place_queens_on_kings(
+    black_hole_solver_instance_t * instance_proto,
+    fcs_bool_t enabled_status
+);
+
+DLLEXPORT extern int black_hole_solver_enable_wrap_ranks(
+    black_hole_solver_instance_t * instance_proto,
+    fcs_bool_t enabled_status
+);
+
 DLLEXPORT extern int black_hole_solver_enable_rank_reachability_prune(
     black_hole_solver_instance_t * instance_proto,
     fcs_bool_t enabled_status

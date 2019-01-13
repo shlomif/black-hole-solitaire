@@ -24,7 +24,8 @@ enum GAME_TYPE
 {
     GAME__UNKNOWN = 0,
     GAME__BH,
-    GAME__ALL
+    GAME__ALL,
+    GAME__GOLF
 };
 
 static void out_board(
@@ -72,6 +73,8 @@ int main(int argc, char *argv[])
     enum GAME_TYPE game_type = GAME__UNKNOWN;
     fcs_bool_t display_boards = FALSE;
     fcs_bool_t is_rank_reachability_prune_enabled = FALSE;
+    fcs_bool_t place_queens_on_kings = FALSE;
+    fcs_bool_t wrap_ranks = TRUE;
     long max_iters_limit = LONG_MAX;
 
     int arg_idx = 1;
@@ -110,6 +113,11 @@ int main(int argc, char *argv[])
             {
                 game_type = GAME__BH;
             }
+            else if (!strcmp(g, "golf"))
+            {
+                game_type = GAME__GOLF;
+                wrap_ranks = FALSE;
+            }
             else if (!strcmp(g, "all_in_a_row"))
             {
                 game_type = GAME__ALL;
@@ -121,6 +129,26 @@ int main(int argc, char *argv[])
                     "\"all_in_a_row\".");
                 exit(-1);
             }
+        }
+        else if (!strcmp(argv[arg_idx], "--no-queens-on-kings"))
+        {
+            ++arg_idx;
+            place_queens_on_kings = FALSE;
+        }
+        else if (!strcmp(argv[arg_idx], "--queens-on-kings"))
+        {
+            ++arg_idx;
+            place_queens_on_kings = TRUE;
+        }
+        else if (!strcmp(argv[arg_idx], "--no-wrap-ranks"))
+        {
+            ++arg_idx;
+            wrap_ranks = FALSE;
+        }
+        else if (!strcmp(argv[arg_idx], "--wrap-ranks"))
+        {
+            ++arg_idx;
+            wrap_ranks = TRUE;
         }
         else if (!strcmp(argv[arg_idx], "--display-boards"))
         {
@@ -169,6 +197,9 @@ int main(int argc, char *argv[])
 
     black_hole_solver_enable_rank_reachability_prune(
         solver, is_rank_reachability_prune_enabled);
+    black_hole_solver_enable_wrap_ranks(solver, wrap_ranks);
+    black_hole_solver_enable_place_queens_on_kings(
+        solver, place_queens_on_kings);
 
     if (argc > arg_idx)
     {
@@ -200,13 +231,22 @@ int main(int argc, char *argv[])
     board[MAX_LEN_BOARD_STRING - 1] = '\0';
 
     int error_line_num;
+    const int num_columns =
+        ((game_type == GAME__BH)
+                ? BHS__BLACK_HOLE__NUM_COLUMNS
+                : (game_type == GAME__GOLF) ? BHS__GOLF__NUM_COLUMNS
+                                            : BHS__ALL_IN_A_ROW__NUM_COLUMNS);
     if (black_hole_solver_read_board(solver, board, &error_line_num,
-            ((game_type == GAME__BH) ? BHS__BLACK_HOLE__NUM_COLUMNS
-                                     : BHS__ALL_IN_A_ROW__NUM_COLUMNS),
-            ((game_type == GAME__BH) ? BHS__BLACK_HOLE__MAX_NUM_CARDS_IN_COL
-                                     : BHS__ALL_IN_A_ROW__MAX_NUM_CARDS_IN_COL),
+            num_columns,
+            ((game_type == GAME__BH)
+                    ? BHS__BLACK_HOLE__MAX_NUM_CARDS_IN_COL
+                    : (game_type == GAME__GOLF)
+                          ? BHS__GOLF__MAX_NUM_CARDS_IN_COL
+                          : BHS__ALL_IN_A_ROW__MAX_NUM_CARDS_IN_COL),
             ((game_type == GAME__BH) ? BHS__BLACK_HOLE__BITS_PER_COL
-                                     : BHS__ALL_IN_A_ROW__BITS_PER_COL)))
+                                     : (game_type == GAME__GOLF)
+                                           ? BHS__GOLF__BITS_PER_COL
+                                           : BHS__ALL_IN_A_ROW__BITS_PER_COL)))
     {
         fprintf(stderr, "Error reading the board at line No. %d!\n",
             error_line_num);
@@ -231,9 +271,17 @@ int main(int argc, char *argv[])
                     solver, &col_idx, &card_rank, &card_suit)) ==
                BLACK_HOLE_SOLVER__SUCCESS)
         {
-            printf("Move a card from stack %d to the foundations\n\n"
+            if (col_idx == num_columns)
+            {
+                printf("%s", "Deal talon");
+            }
+            else
+            {
+                printf("Move a card from stack %d to the foundations", col_idx);
+            }
+            printf("\n\n"
                    "Info: Card moved is %c%c\n\n\n====================\n\n",
-                col_idx, (("0A23456789TJQK")[card_rank]), ("HCDS")[card_suit]);
+                (("0A23456789TJQK")[card_rank]), ("HCDS")[card_suit]);
 
             out_board(solver, display_boards);
         }
