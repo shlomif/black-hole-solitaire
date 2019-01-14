@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 19;
+use Test::More tests => 20;
 use Test::Differences;
 
 use Test::Trap qw(
@@ -1811,5 +1811,12 @@ EOF
     eq_or_diff(
         [ $stdout =~ /^(Deal talon\n\nInfo: Card moved is ..\n)/gms ],
         [@strings], "in order and correct.",
+    );
+
+    # TEST
+    eq_or_diff(
+        $stdout,
+        _normalize_lf( $data_dir->child('906.golf.solution.txt')->slurp_utf8 ),
+        "the right golf no. 906 solution",
     );
 }
