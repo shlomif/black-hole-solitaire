@@ -11,7 +11,7 @@ before_install:
     - eval "$(perl -Mlocal::lib=$HOME/perl_modules)"
 install:
     - which python3
-    - cpanm --notest Dist::Zilla Env::Path Games::Solitaire::Verify::Solution IO::All Inline Inline::C Perl::Tidy Pod::Weaver::Section::Support Test::Code::TidyAll Test::CPAN::Changes Test::Differences Test::Kwalitee Test::Pod Test::Pod::Coverage Test::RunValgrind Test::TrailingSpace Test::Trap
+    - cpanm --notest Dir::Manifest Dist::Zilla Env::Path Games::Solitaire::Verify::Solution IO::All Inline Inline::C Perl::Tidy Pod::Weaver::Section::Support Test::Code::TidyAll Test::CPAN::Changes Test::Differences Test::Kwalitee Test::Pod Test::Pod::Coverage Test::RunValgrind Test::TrailingSpace Test::Trap
     - wget http://web-cpan.shlomifish.org/downloads/libtap-1.12.0.tar.bz2
     - tar -xvf libtap-1.12.0.tar.bz2
     - ( mkdir B && cd B && cmake ../libtap-1.12.0 && make && sudo make install )
