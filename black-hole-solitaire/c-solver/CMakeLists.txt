@@ -218,6 +218,17 @@ TARGET_LINK_LIBRARIES(
     "${BHS_EXE}"
     "${LIB_BASE}"
 )
+SET (BHS_EXE "poc")
+
+ADD_EXECUTABLE(
+    "${BHS_EXE}"
+    "buffer_overflow_main.c"
+)
+
+TARGET_LINK_LIBRARIES(
+    "${BHS_EXE}"
+    "${LIB_BASE}"
+)
 
 INSTALL (TARGETS "${BHS_EXE}" DESTINATION "bin")
 
