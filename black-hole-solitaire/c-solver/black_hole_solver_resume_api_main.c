@@ -26,11 +26,11 @@
 #include "main_common.h"
 
 static inline int solver_run(black_hole_solver_instance_t *const solver,
-    const long max_iters_limit, const long iters_display_step)
+    const unsigned long max_iters_limit, const unsigned long iters_display_step)
 {
-    long iters_limit = min(iters_display_step, max_iters_limit);
+    unsigned long iters_limit = min(iters_display_step, max_iters_limit);
     black_hole_solver_set_max_iters_limit(solver, iters_limit);
-    long iters_num;
+    unsigned long iters_num;
     int solver_ret_code;
 
     do
@@ -39,7 +39,7 @@ static inline int solver_run(black_hole_solver_instance_t *const solver,
         iters_num = black_hole_solver_get_iterations_num(solver);
         if (iters_limit == iters_num)
         {
-            printf("Iteration: %ld\n", iters_limit);
+            printf("Iteration: %lu\n", iters_limit);
             fflush(stdout);
         }
         iters_limit += iters_display_step;

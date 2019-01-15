@@ -26,7 +26,7 @@
 #include "main_common.h"
 
 static inline int solver_run(black_hole_solver_instance_t *const solver,
-    const long max_iters_limit, const long iters_display_step)
+    const unsigned long max_iters_limit, const unsigned long iters_display_step)
 {
     black_hole_solver_set_max_iters_limit(solver, max_iters_limit);
     black_hole_solver_set_iters_display_step(solver, iters_display_step);

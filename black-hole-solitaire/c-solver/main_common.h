@@ -1,9 +1,7 @@
-/*
- * main_common.h
- * Copyright (C) 2018 Shlomi Fish <shlomif@cpan.org>
- *
- * Distributed under terms of the Expat license.
- */
+// main_common.h
+// Copyright (C) 2018 Shlomi Fish <shlomif@cpan.org>
+//
+// Distributed under terms of the Expat license.
 #pragma once
 
 #include "min_and_max.h"
@@ -59,20 +57,21 @@ static const char *const help_text =
     "\n";
 
 static inline int solver_run(black_hole_solver_instance_t *const solver,
-    const long max_iters_limit, const long iters_display_step);
+    const unsigned long max_iters_limit,
+    const unsigned long iters_display_step);
 
 int main(int argc, char *argv[])
 {
     black_hole_solver_instance_t *solver;
     char board[MAX_LEN_BOARD_STRING];
     char *filename = NULL;
-    long iters_display_step = 0;
+    unsigned long iters_display_step = 0;
     enum GAME_TYPE game_type = GAME__UNKNOWN;
     bool display_boards = FALSE;
     bool is_rank_reachability_prune_enabled = FALSE;
     bool place_queens_on_kings = FALSE;
     bool wrap_ranks = TRUE;
-    long max_iters_limit = LONG_MAX;
+    unsigned long max_iters_limit = ULONG_MAX;
 
     int arg_idx = 1;
     while (argc > arg_idx)
@@ -166,13 +165,6 @@ int main(int argc, char *argv[])
                 exit(-1);
             }
             iters_display_step = atol(argv[arg_idx++]);
-
-            if (iters_display_step < 0)
-            {
-                fprintf(stderr, "Error! --iters-display-step should be "
-                                "positive or zero.\n");
-                exit(-1);
-            }
         }
         else
         {
@@ -303,8 +295,8 @@ int main(int argc, char *argv[])
     }
 
     printf("\n\n--------------------\n"
-           "Total number of states checked is %ld.\n"
-           "This scan generated %ld states.\n",
+           "Total number of states checked is %lu.\n"
+           "This scan generated %lu states.\n",
         black_hole_solver_get_iterations_num(solver),
         black_hole_solver_get_num_states_in_collection(solver));
 
