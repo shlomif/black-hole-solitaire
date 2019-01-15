@@ -24,13 +24,14 @@
 // bool.h - the purpose of this file is to define the fcs_bool_t type
 // and the related constants of TRUE and FALSE.
 #pragma once
+#include <stdbool.h>
 
-typedef int fcs_bool_t;
+typedef bool fcs_bool_t;
 
 #ifndef FALSE
-#define FALSE 0
+#define FALSE false
 #endif
 
 #ifndef TRUE
-#define TRUE 1
+#define TRUE true
 #endif
