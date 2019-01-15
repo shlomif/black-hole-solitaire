@@ -15,6 +15,7 @@ else
     seed=1
 fi
 export CFLAGS="-Werror"
+unset FCS_TEST_BUILD
 while true
 do
     echo "Checking seed=$seed"
