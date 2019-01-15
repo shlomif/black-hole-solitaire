@@ -21,11 +21,9 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-/*
- * alloc.h - the Freecell Solver compact allocator. Used to allocate
- * columns and other small allocations of a short size. Is able to revert the
- * last allocation.
- */
+// alloc.h - the Freecell Solver compact allocator. Used to allocate
+// columns and other small allocations of a short size. Is able to revert the
+// last allocation.
 #pragma once
 
 #ifdef __cplusplus
@@ -40,7 +38,7 @@ typedef struct
     char *max_ptr;
     char *ptr;
     char *rollback_ptr;
-    unsigned long num_packs;
+    size_t num_packs;
 } bhs_compact_allocator_t;
 
 extern void bh_solve_compact_allocator_init(

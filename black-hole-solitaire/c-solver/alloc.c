@@ -21,11 +21,9 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-/*
- * alloc.c - the Freecell Solver compact allocator. Used to allocate
- * columns and other small allocations of a short size. Is able to revert the
- * last allocation.
- */
+// alloc.c - the Freecell Solver compact allocator. Used to allocate
+// columns and other small allocations of a short size. Is able to revert the
+// last allocation.
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -48,7 +46,7 @@ void bh_solve_compact_allocator_init(bhs_compact_allocator_t *const allocator)
 
 void bh_solve_compact_allocator_extend(bhs_compact_allocator_t *const allocator)
 {
-    /* Allocate a new pack */
+    // Allocate a new pack
     if (!((++(allocator->num_packs)) & (IA_STATE_PACKS_GROW_BY - 1)))
     {
         allocator->packs = (char **)realloc(allocator->packs,

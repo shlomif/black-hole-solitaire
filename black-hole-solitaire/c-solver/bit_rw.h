@@ -24,6 +24,7 @@
 // bit_rw.h - bit readers and writers.
 #pragma once
 
+#include <stddef.h>
 #include "config.h"
 #include "unused.h"
 
@@ -47,9 +48,10 @@ static inline void fc_solve_bit_writer_init(
 }
 
 static inline void fc_solve_bit_writer_write(
-    fc_solve_bit_writer_t *const writer, int len, fc_solve_bit_data_t data)
+    fc_solve_bit_writer_t *const writer, uint_fast32_t len,
+    fc_solve_bit_data_t data)
 {
-    for (; len; len--, (data >>= 1))
+    for (; len; --len, (data >>= 1))
     {
         *(writer->current) |= ((data & 0x1) << (writer->bit_in_char_idx++));
         if (writer->bit_in_char_idx == NUM_BITS_IN_BYTES)
@@ -63,7 +65,7 @@ static inline void fc_solve_bit_writer_write(
 typedef struct
 {
     const fcs_uchar_t *current;
-    int bit_in_char_idx;
+    uint_fast32_t bit_in_char_idx;
     const fcs_uchar_t *start;
 } fc_solve_bit_reader_t;
 
@@ -75,18 +77,18 @@ static inline void fc_solve_bit_reader_init(
 }
 
 static inline fc_solve_bit_data_t fc_solve_bit_reader_read(
-    fc_solve_bit_reader_t *const reader, const int len)
+    fc_solve_bit_reader_t *const reader, const uint_fast32_t len)
 {
     fc_solve_bit_data_t ret = 0;
 
-    for (int idx = 0; idx < len; idx++)
+    for (uint_fast32_t idx = 0; idx < len; ++idx)
     {
         ret |= (((*(reader->current) >> (reader->bit_in_char_idx++)) & 0x1)
                 << idx);
 
         if (reader->bit_in_char_idx == NUM_BITS_IN_BYTES)
         {
-            reader->current++;
+            ++reader->current;
             reader->bit_in_char_idx = 0;
         }
     }
