@@ -36,14 +36,11 @@ static void out_board(
         return;
     }
 
-    char *board = NULL;
-    black_hole_solver_get_current_solution_board(solver, &board);
-
-    if (board)
+    char board[1000];
+    if (black_hole_solver_get_current_solution_board(solver, board) ==
+        BLACK_HOLE_SOLVER__SUCCESS)
     {
         printf("\n[START BOARD]\n%s[END BOARD]\n\n\n", board);
-        free(board);
-        board = NULL;
     }
 }
 

@@ -957,28 +957,13 @@ black_hole_solver_get_iterations_num(
 }
 
 DLLEXPORT extern int black_hole_solver_get_current_solution_board(
-    black_hole_solver_instance_t *instance_proto, char **ptr_to_ret)
+    black_hole_solver_instance_t *instance_proto, char *const output)
 {
     bhs_solver_t *const solver = (bhs_solver_t *)instance_proto;
 
     initialize_states_in_solution(solver);
 
-    *ptr_to_ret = NULL;
-
-    char *const ret = malloc(
-        /* 3 bytes per card. */
-        (3 * NUM_SUITS * NUM_RANKS) +
-        /* newline and a leading ":" per column */
-        (2 * (BHS__MAX_NUM_COLUMNS + 1)) +
-        /* For the foundations and the talon. */
-        30);
-
-    if (ret == NULL)
-    {
-        return BLACK_HOLE_SOLVER__OUT_OF_MEMORY;
-    }
-
-    char *s = ret;
+    char *s = output;
 
     s += sprintf(s, "Foundations: ");
 
@@ -1010,18 +995,16 @@ DLLEXPORT extern int black_hole_solver_get_current_solution_board(
         s += sprintf(s, "\n");
     }
     const_SLOT(num_columns, solver);
-    for (int col_idx = 0; col_idx < num_columns; col_idx++)
+    for (size_t col_idx = 0; col_idx < num_columns; ++col_idx)
     {
         s += sprintf(s, "%c", ':');
-        for (int h = 0; h < next_state.unpacked.heights[col_idx]; h++)
+        for (size_t h = 0; h < next_state.unpacked.heights[col_idx]; ++h)
         {
             s += sprintf(
                 s, " %s", solver->initial_board_card_strings[col_idx][h]);
         }
         s += sprintf(s, "\n");
     }
-
-    *ptr_to_ret = ret;
 
     return BLACK_HOLE_SOLVER__SUCCESS;
 }

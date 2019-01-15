@@ -114,7 +114,7 @@ DLLEXPORT extern long black_hole_solver_get_iterations_num(
 
 DLLEXPORT extern int black_hole_solver_get_current_solution_board(
     black_hole_solver_instance_t * instance_proto,
-    char * * ret_str
+    char * output
 );
 
 DLLEXPORT const char * black_hole_solver_get_lib_version(void);
