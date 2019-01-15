@@ -35,7 +35,7 @@ EOF
     # LDDLFLAGS => "$Config{lddlflags} -L$FindBin::Bin -lfcs_delta_states_test",
     # CCFLAGS => "-L$FindBin::Bin -lfcs_delta_states_test",
     # MYEXTLIB => "$FindBin::Bin/libfcs_delta_states_test.so",
-    CCFLAGS => "$Config{ccflags} -std=gnu99",
+    CCFLAGS => "$Config{ccflags} -std=gnu11",
 );
 
 sub prune
