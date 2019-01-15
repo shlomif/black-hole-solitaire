@@ -233,9 +233,7 @@ int main(int argc, char *argv[])
                           ? BHS__GOLF__MAX_NUM_CARDS_IN_COL
                           : BHS__ALL_IN_A_ROW__MAX_NUM_CARDS_IN_COL),
             ((game_type == GAME__BH) ? BHS__BLACK_HOLE__BITS_PER_COL
-                                     : (game_type == GAME__GOLF)
-                                           ? BHS__GOLF__BITS_PER_COL
-                                           : BHS__ALL_IN_A_ROW__BITS_PER_COL)))
+                                     : BHS__GOLF__BITS_PER_COL)))
     {
         fprintf(stderr, "Error reading the board at line No. %d!\n",
             error_line_num);

@@ -118,7 +118,7 @@ typedef struct
     bhs_card_string_t initial_foundation_string;
     bhs_card_string_t initial_board_card_strings[BHS__MAX_NUM_COLUMNS]
                                                 [BHS__MAX_NUM_CARDS_IN_COL];
-    int initial_lens[BHS__MAX_NUM_COLUMNS];
+    uint_fast16_t initial_lens[BHS__MAX_NUM_COLUMNS];
     bhs_card_string_t initial_talon_card_strings[TALON_MAX_SIZE];
 
     bhs_state_key_value_pair_t init_state;
@@ -200,8 +200,6 @@ DLLEXPORT extern int black_hole_solver_enable_rank_reachability_prune(
 
     return BLACK_HOLE_SOLVER__SUCCESS;
 }
-
-#define MAX_RANK (NUM_RANKS - 1)
 
 enum BHS_RANKS
 {
@@ -455,9 +453,9 @@ extern int DLLEXPORT black_hole_solver_read_board(
         }
     }
 
-    for (int col_idx = 0; col_idx < num_columns; col_idx++, line_num++)
+    for (size_t col_idx = 0; col_idx < num_columns; col_idx++, line_num++)
     {
-        int pos_idx = 0;
+        unsigned int pos_idx = 0;
         while ((*s != '\n') && (*s != '\0'))
         {
             if (pos_idx == max_num_cards_in_col)
@@ -523,7 +521,7 @@ static inline void queue_item_populate_packed(
     const_SLOT(bits_per_column, solver);
     fc_solve_bit_writer_write(
         &bit_w, TALON_PTR_BITS, queue_item->s.unpacked.talon_ptr);
-    for (int col = 0; col < num_columns; col++)
+    for (size_t col = 0; col < num_columns; col++)
     {
         fc_solve_bit_writer_write(
             &bit_w, bits_per_column, queue_item->s.unpacked.heights[col]);
@@ -543,7 +541,7 @@ static inline void queue_item_unpack(
 
     queue_item->unpacked.talon_ptr =
         fc_solve_bit_reader_read(&bit_r, TALON_PTR_BITS);
-    for (int col = 0; col < num_columns; col++)
+    for (size_t col = 0; col < num_columns; col++)
     {
         queue_item->unpacked.heights[col] =
             (typeof(queue_item->unpacked.heights[col]))fc_solve_bit_reader_read(
@@ -552,7 +550,8 @@ static inline void queue_item_unpack(
 }
 
 static inline void perform_move(bhs_solver_t *const solver,
-    const bhs_rank_t prev_foundation, const bhs_rank_t card, const int col_idx,
+    const bhs_rank_t prev_foundation, const bhs_rank_t card,
+    const uint_fast32_t col_idx,
     const bhs_queue_item_t *const queue_item_copy_ptr)
 {
     const_SLOT(num_columns, solver);
@@ -707,7 +706,7 @@ extern int DLLEXPORT black_hole_solver_run(
         }
         if (effective_place_queens_on_kings || (foundations != RANK_K))
         {
-            for (int col_idx = 0; col_idx < num_columns; col_idx++)
+            for (uint_fast32_t col_idx = 0; col_idx < num_columns; col_idx++)
             {
                 const_AUTO(pos, state.heights[col_idx]);
                 if (pos)
@@ -790,8 +789,8 @@ static void initialize_states_in_solution(bhs_solver_t *solver)
     }
     const_SLOT(num_columns, solver);
     const_SLOT(bits_per_column, solver);
-    int num_states = 0;
-    int max_num_states = NUM_SUITS * NUM_RANKS + 1;
+    uint_fast32_t num_states = 0;
+    uint_fast32_t max_num_states = NUM_SUITS * NUM_RANKS + 1;
 
     bhs_solution_state_t *states =
         malloc(sizeof(states[0]) * (size_t)max_num_states);
@@ -894,12 +893,11 @@ DLLEXPORT extern int black_hole_solver_get_next_move(
         const bhs_solution_state_t next_state =
             solver->states_in_solution[solver->current_state_in_solution_idx++];
 
-        const int col_idx = next_state.packed.value.col_idx;
+        const uint_fast32_t col_idx = next_state.packed.value.col_idx;
         const bool is_talon = (col_idx == solver->num_columns);
-        const int height =
+        const uint_fast16_t height =
             (is_talon ? (next_state.unpacked.talon_ptr)
                       : (next_state.unpacked.heights[col_idx] - 1));
-        assert(height >= 0);
         assert(height <
                (is_talon ? solver->talon_len : solver->initial_lens[col_idx]));
 
