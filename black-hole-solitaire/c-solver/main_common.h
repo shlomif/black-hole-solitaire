@@ -28,8 +28,8 @@ enum GAME_TYPE
     GAME__GOLF
 };
 
-static void out_board(
-    black_hole_solver_instance_t *const solver, const fcs_bool_t display_boards)
+static inline void out_board(
+    black_hole_solver_instance_t *const solver, const bool display_boards)
 {
     if (!display_boards)
     {
@@ -68,10 +68,10 @@ int main(int argc, char *argv[])
     char *filename = NULL;
     long iters_display_step = 0;
     enum GAME_TYPE game_type = GAME__UNKNOWN;
-    fcs_bool_t display_boards = FALSE;
-    fcs_bool_t is_rank_reachability_prune_enabled = FALSE;
-    fcs_bool_t place_queens_on_kings = FALSE;
-    fcs_bool_t wrap_ranks = TRUE;
+    bool display_boards = FALSE;
+    bool is_rank_reachability_prune_enabled = FALSE;
+    bool place_queens_on_kings = FALSE;
+    bool wrap_ranks = TRUE;
     long max_iters_limit = LONG_MAX;
 
     int arg_idx = 1;

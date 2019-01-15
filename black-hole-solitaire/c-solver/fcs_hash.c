@@ -101,8 +101,8 @@ void bh_solve_hash_get(
     assert(FALSE);
 }
 
-fcs_bool_t bh_solve_hash_insert(
-    bh_solve_hash_t *hash, bhs_state_key_value_pair_t *key)
+bool bh_solve_hash_insert(
+    bh_solve_hash_t *const hash, bhs_state_key_value_pair_t *const key)
 {
     bh_solve_hash_symlink_t *list;
     bh_solve_hash_symlink_item_t *item, *last_item;

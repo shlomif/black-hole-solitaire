@@ -28,6 +28,7 @@ extern "C" {
 #endif
 
 #include <stddef.h>
+#include <stdint.h>
 
 #include <black-hole-solver/bool.h>
 #include <black-hole-solver/fcs_dllexport.h>
@@ -58,31 +59,23 @@ static inline enum RANK_REACH_VERDICT bhs_find_rank_reachability__inline(
 
     *(queue_ptr++) = foundation;
 
-    int full_ranks_goal = 0;
-    for (int i = 0; i < NUM_RANKS; i++)
+    uint32_t full_ranks_goal = 0;
+    for (size_t i = 0; i < NUM_RANKS; ++i)
     {
         if (rank_counts[i] > 0)
         {
-            full_ranks_goal++;
+            ++full_ranks_goal;
         }
     }
     /* Count the foundation - the starting point - in. */
     if (rank_counts[foundation] == 0)
     {
-        full_ranks_goal++;
+        ++full_ranks_goal;
     }
 
-    int full_count = 0;
-
-    fcs_bool_t reached[NUM_RANKS];
-
-    for (int i = 0; i < NUM_RANKS; i++)
-    {
-        reached[i] = FALSE;
-    }
-
+    uint32_t full_count = 1;
+    bool reached[NUM_RANKS] = {FALSE};
     reached[foundation] = TRUE;
-    full_count++;
 
     while ((full_count < full_ranks_goal) && (queue_ptr > physical_queue))
     {
@@ -108,7 +101,7 @@ static inline enum RANK_REACH_VERDICT bhs_find_rank_reachability__inline(
                 if (!reached[offset_rank])
                 {
                     reached[offset_rank] = TRUE;
-                    full_count++;
+                    ++full_count;
                     *(queue_ptr++) = offset_rank;
                 }
             }

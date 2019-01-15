@@ -59,17 +59,12 @@ static inline void bh_solve_hash_init(bh_solve_hash_t *hash)
     }
 }
 
-static inline fcs_bool_t bh_solve_hash_insert(
+static inline bool bh_solve_hash_insert(
     bh_solve_hash_t *hash, bhs_state_key_value_pair_t *key)
 {
     return (!tchdbputkeep(hash->hash, &(key->key), sizeof(key->key),
         &(key->value), sizeof(key->value)));
 }
-
-// Returns FALSE if the key is new and the key/val pair was inserted.
-// Returns TRUE if the key is not new.
-extern fcs_bool_t bh_solve_hash_insert(
-    bh_solve_hash_t *hash, bhs_state_key_value_pair_t *key);
 
 static inline void bh_solve_hash_free(bh_solve_hash_t *hash)
 {

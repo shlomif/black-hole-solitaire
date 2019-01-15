@@ -89,7 +89,7 @@ extern "C" void bh_solve_hash_init(bh_solve_hash_t *hash)
  * Returns 1 if the key is not new and *existing_key / *existing_val
  * was set to it.
  */
-extern "C" fcs_bool_t bh_solve_hash_insert(
+extern "C" bool bh_solve_hash_insert(
     bh_solve_hash_t *void_hash, bhs_state_key_value_pair_t *key)
 {
     StatesGoogleHash *hash = (StatesGoogleHash *)(void_hash->hash);

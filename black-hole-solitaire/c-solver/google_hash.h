@@ -48,7 +48,7 @@ extern void bh_solve_hash_init(bh_solve_hash_t *hash);
  * Returns TRUE if the key is not new and *existing_key / *existing_val
  * was set to it.
  */
-extern fcs_bool_t bh_solve_hash_insert(
+extern bool bh_solve_hash_insert(
     bh_solve_hash_t *hash, bhs_state_key_value_pair_t *key);
 
 extern void bh_solve_hash_free(bh_solve_hash_t *hash);
