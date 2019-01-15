@@ -72,7 +72,11 @@ sub test_cmd
     test_cmd( [ "tar", "-xvf", $arc_name ], "Unpacking the arc name" );
 
     # TEST
-    ok( scalar( -d $base ), "The directory was created" );
+    if ( !ok( scalar( -d $base ), "The directory was created" ) )
+    {
+        diag( scalar `find .` );
+        die "foo";
+    }
 
     my $orig_cwd = cwd;
 
