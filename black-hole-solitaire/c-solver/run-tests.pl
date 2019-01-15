@@ -24,8 +24,10 @@ sub _is_parallized
 
 sub _calc_prove
 {
-    return [ 'prove',
-        ( defined($num_jobs) ? sprintf( "-j%d", $num_jobs ) : () ) ];
+    return [
+        'prove', '-v',
+        ( defined($num_jobs) ? sprintf( "-j%d", $num_jobs ) : () )
+    ];
 }
 
 my $exit_success;
