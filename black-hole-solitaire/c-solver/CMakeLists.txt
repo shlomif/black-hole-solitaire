@@ -182,18 +182,6 @@ INCLUDE (CheckTypeSize)
 CHECK_TYPE_SIZE("int" INT_SIZE_IN_BYTES)
 CHECK_TYPE_SIZE("void*" SIZEOF_VOID_P BUILTIN_TYPES_ONLY)
 
-SET (BHS_EXE "black-hole-solve-resume-api")
-
-ADD_EXECUTABLE(
-    "${BHS_EXE}"
-    "black_hole_solver_resume_api_main.c"
-)
-
-TARGET_LINK_LIBRARIES(
-    "${BHS_EXE}"
-    "${LIB_BASE}"
-)
-
 SET (BHS_EXE "black-hole-solve")
 
 ADD_EXECUTABLE(

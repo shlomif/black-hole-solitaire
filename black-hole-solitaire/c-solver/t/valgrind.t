@@ -93,7 +93,7 @@ test_using_valgrind(
 # TEST
 test_using_valgrind(
     {
-        prog => './black-hole-solve-resume-api',
+        prog => './black-hole-solve',
         argv => [
             '--game', 'black_hole', '--iters-display-step', '1100',
             $data_dir->child("26464608654870335080.bh.board.txt")

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 20;
+use Test::More tests => 18;
 use Test::Differences;
 
 use Test::Trap qw(
@@ -143,8 +143,8 @@ eq_or_diff(
     "Right output for iterations step."
 );
 
-# TEST:$c=2;
-foreach my $exe ( './black-hole-solve', './black-hole-solve-resume-api', )
+# TEST:$c=1;
+foreach my $exe ( './black-hole-solve', )
 {
 
     trap
