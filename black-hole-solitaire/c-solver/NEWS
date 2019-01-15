@@ -1,3 +1,17 @@
+0.18.0      ( 15 Jan 2019 ):
+============================
+
+* Add support for three variants of
+https://en.wikipedia.org/wiki/Golf_(patience) .
+
+* API revamp - some types and function signatures were changed.
+
+* SECURITY: Fixed a minor buffer overflow problem if one specified
+a large max_num_cards_in_col in black_hole_solver_read_board() and
+passed a large string (not exploitable using the command line exe).
+
+* Added tests; some cleanups and some optimisations .
+
 0.16.0      ( 12 Nov 2017 ):
 ============================
 

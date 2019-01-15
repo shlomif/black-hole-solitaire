@@ -1,9 +1,11 @@
 Black Hole Solitaire Solver
 ===========================
 
-This is a solver for the Solitaire/Patience card games "Black Hole"
-and "All in a Row" - implemented in C as a command line application. For
+This is a solver for the Solitaire/Patience card games "Golf" (3 variants),
+"Black Hole", and "All in a Row" - implemented in C as a command line application. For
 more information about these games, see:
+
+* https://en.wikipedia.org/wiki/Golf_%28patience%29
 
 * http://pysolfc.sourceforge.net/doc/rules/blackhole.html
 
@@ -19,7 +21,7 @@ To install this program, see the INSTALL file.
 Support and Documentation
 -------------------------
 
-After installation, you can find documentation for this module with the
+After installation, you can find documentation for this command with the
 --help command
 
     black-hole-solve --help
@@ -80,7 +82,7 @@ Copyright and Licence
 
 Copyright (C) 2010 Shlomi Fish.
 
-This program is distributed under the MIT (X11) License:
+This program is distributed under the MIT / Expat License:
 L<http://www.opensource.org/licenses/mit-license.php>
 
 Permission is hereby granted, free of charge, to any person
@@ -103,4 +105,3 @@ HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
-

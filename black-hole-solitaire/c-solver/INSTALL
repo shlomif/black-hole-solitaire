@@ -8,7 +8,7 @@ Quick and Dirty Compilation
 ---------------------------
 
 Black Hole Solitaire Solver is using CMake ( http://www.cmake.org/ )
-for its build system. You'll need to install CMake version 2.6.3
+for its build system. You'll need to install CMake version 3.0
 or later from your distribution's repository or from its source
 distribution. *NOTE*: CMake 2.6.2 (that ships with some releases of Ubuntu)
 won't work due to a regression bug so please don't report any errors with
@@ -34,7 +34,7 @@ and "black-hole-solve" which is the executable for you.
 Installing under Win32
 ----------------------
 
-Consult the CMake documentation for generating a Visual C++ , MinGW32
+Consult the CMake documentation for generating a MinGW32 / GCC or clang
 etc. compatible makefile or project.
 
 Testing
