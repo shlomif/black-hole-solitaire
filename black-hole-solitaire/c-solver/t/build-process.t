@@ -75,6 +75,7 @@ sub test_cmd
     if ( !ok( scalar( -d $base ), "The directory was created" ) )
     {
         diag( scalar `find .` );
+        diag( scalar `bash -c "ls -l *tar* ; tar -tvf *.tar.xz ;"` );
         die "foo";
     }
 
