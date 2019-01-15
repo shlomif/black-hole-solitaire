@@ -618,8 +618,8 @@ static inline bhs_state_key_value_pair_t setup_first_queue_item(
     typeof(solver->queue[solver->queue_len]) *const new_queue_item =
         &(solver->queue[solver->queue_len]);
 
-    /* Populate the unpacked state. */
-    for (int i = 0; i < num_columns; i++)
+    // Populate the unpacked state.
+    for (size_t i = 0; i < num_columns; ++i)
     {
         new_queue_item->s.unpacked.heights[i] = (typeof(
             new_queue_item->s.unpacked.heights[i]))solver->initial_lens[i];
@@ -627,7 +627,7 @@ static inline bhs_state_key_value_pair_t setup_first_queue_item(
     new_queue_item->s.unpacked.foundations = solver->initial_foundation;
     new_queue_item->s.unpacked.talon_ptr = 0;
 
-    /* Populate the packed item from the unpacked one. */
+    // Populate the packed item from the unpacked one.
     memset(&(new_queue_item->s.packed), '\0', sizeof(new_queue_item->s.packed));
 
     queue_item_populate_packed(solver, new_queue_item);
@@ -636,12 +636,12 @@ static inline bhs_state_key_value_pair_t setup_first_queue_item(
     memset(&(new_queue_item->rank_counts), '\0',
         sizeof(new_queue_item->rank_counts));
 
-    for (int col_idx = 0; col_idx < num_columns; col_idx++)
+    for (size_t col_idx = 0; col_idx < num_columns; ++col_idx)
     {
-        for (int h = 0; h < new_queue_item->s.unpacked.heights[col_idx]; h++)
+        for (size_t h = 0; h < new_queue_item->s.unpacked.heights[col_idx]; ++h)
         {
-            new_queue_item->rank_counts
-                .c[(ssize_t)solver->board_ranks[col_idx][h]]++;
+            ++(new_queue_item->rank_counts
+                    .c[(ssize_t)solver->board_ranks[col_idx][h]]);
         }
     }
     ++solver->queue_len;
@@ -693,7 +693,7 @@ extern int DLLEXPORT black_hole_solver_run(
     const_SLOT(max_iters_limit, solver);
     var_AUTO(iterations_num, solver->iterations_num);
 
-    long next_iterations_display_point =
+    unsigned long next_iterations_display_point =
         ((iters_display_step <= 0)
                 ? LONG_MAX
                 : (iterations_num + iters_display_step -
@@ -886,8 +886,9 @@ static void initialize_states_in_solution(bhs_solver_t *solver)
         states[num_states].unpacked.foundations = solver->initial_foundation;
 
     ++num_states;
-    /* Reverse the list in place. */
-    for (int i = 0; i < (num_states >> 1); i++)
+    const_AUTO(lim, (num_states >> 1));
+    // Reverse the list in place.
+    for (size_t i = 0; i < lim; ++i)
     {
         const_AUTO(temp_state, states[i]);
         states[i] = states[num_states - 1 - i];
