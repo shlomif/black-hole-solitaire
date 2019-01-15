@@ -122,14 +122,17 @@ sub myglob
         }
     }
 
+    my $BN = 0;
+    my $FN = 1;
+
     # Put the valgrind tests last, because they take a long time.
     my @tests =
         sort {
-        ( ( ( $a =~ /valgrind/ ) <=> ( $b =~ /valgrind/ ) ) *
+        ( ( ( $a->[$FN] =~ /valgrind/ ) <=> ( $b->[$FN] =~ /valgrind/ ) ) *
                 ( _is_parallized() ? -1 : 1 ) )
-            || ( basename($a) cmp basename($b) )
-            || ( $a cmp $b )
-        } (
+            || ( $a->[$BN] cmp $b->[$BN] )
+            || ( $a->[$FN] cmp $b->[$FN] )
+        } map { [ basename($_), $_ ] } (
         myglob('t'),
         (
               ( $fcs_path ne $abs_bindir )
@@ -141,18 +144,18 @@ sub myglob
     if ( defined($exclude_re_s) )
     {
         my $re = qr/$exclude_re_s/ms;
-        @tests = grep { basename($_) !~ $re } @tests;
+        @tests = grep { $_->[$BN] !~ $re } @tests;
     }
-    @tests = grep { basename($_) !~ /\A(?:lextab|yacctab)\.py\z/ } @tests;
+    @tests = grep { $_->[$BN] !~ /\A(?:lextab|yacctab)\.py\z/ } @tests;
 
     if ( !$ENV{FCS_TEST_BUILD} )
     {
-        @tests = grep { basename($_) !~ /build-process/ } @tests;
+        @tests = grep { $_->[$BN] !~ /build-process/ } @tests;
     }
 
     if ( $ENV{FCS_TEST_WITHOUT_VALGRIND} )
     {
-        @tests = grep { !/valgrind/ } @tests;
+        @tests = grep { $_->[$BN] !~ /valgrind/ } @tests;
     }
 
     $ENV{FCS_TEST_TAGS} //= '';
@@ -173,7 +176,7 @@ EOF
     }
     else
     {
-        run_tests( \@tests );
+        run_tests( [ map { $_->[$FN] } @tests ] );
     }
 }
 
