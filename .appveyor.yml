@@ -19,6 +19,7 @@ build: off
 test_script:
     - set CMAKE_MAKE_PROGRAM=C:\strawberry\c\bin\gmake.exe
     - cd ..\..
+    - set FCS_TEST_BUILD=1
     - perl black-hole-solitaire/CI-testing/continuous-integration-testing.pl --gen="MSYS Makefiles"
 # cache:
 #   - C:\Perl5
