@@ -56,7 +56,7 @@ DLLEXPORT extern int black_hole_solver_create(
 );
 
 DLLEXPORT extern int black_hole_solver_read_board(
-    black_hole_solver_instance_t * ret_instance,
+    black_hole_solver_instance_t * instance_proto,
     const char * board_string,
     int * error_line_number,
     unsigned int num_columns,
@@ -103,7 +103,7 @@ DLLEXPORT extern unsigned long black_hole_solver_get_num_states_in_collection(
     black_hole_solver_instance_t * instance_proto
 );
 
-DLLEXPORT extern long black_hole_solver_get_iterations_num(
+DLLEXPORT extern unsigned long black_hole_solver_get_iterations_num(
     black_hole_solver_instance_t * instance_proto
 );
 

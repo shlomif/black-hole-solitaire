@@ -924,7 +924,7 @@ black_hole_solver_get_num_states_in_collection(
     return ((bhs_solver_t *)instance_proto)->num_states_in_collection;
 }
 
-DLLEXPORT extern long __attribute__((pure))
+DLLEXPORT extern unsigned long __attribute__((pure))
 black_hole_solver_get_iterations_num(
     black_hole_solver_instance_t *instance_proto)
 {
