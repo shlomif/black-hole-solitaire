@@ -25,7 +25,8 @@ sub _is_parallized
 sub _calc_prove
 {
     return [
-        'prove', '-v',
+        'prove',
+        ( $ENV{HARNESS_VERBOSE} ? ('-v') : () ),
         ( defined($num_jobs) ? sprintf( "-j%d", $num_jobs ) : () )
     ];
 }
