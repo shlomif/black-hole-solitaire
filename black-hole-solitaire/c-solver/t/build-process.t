@@ -47,8 +47,12 @@ sub test_cmd
 
     chdir($temp_dir);
 
+    my $gen = $ENV{CMAKE_GEN};
+
     # TEST
-    test_cmd( [ "cmake", $src_path ], "cmake succeeded" );
+    test_cmd(
+        [ "cmake", ( ( defined $gen ) ? ( '-G', $gen ) : () ), $src_path ],
+        "cmake succeeded" );
 
     # TEST
     test_cmd( [ "make", "all" ], "make all is successful" );

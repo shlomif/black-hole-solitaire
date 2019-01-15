@@ -27,6 +27,10 @@ GetOptions( 'gen=s' => \$cmake_gen, )
     or die 'Wrong options';
 
 local $ENV{RUN_TESTS_VERBOSE} = 1;
+if ( defined $cmake_gen )
+{
+    $ENV{CMAKE_GEN} = $cmake_gen;
+}
 
 do_system(
     {
