@@ -69,11 +69,6 @@ DLLEXPORT extern int black_hole_solver_set_max_iters_limit(
     unsigned long limit
 );
 
-DLLEXPORT extern int black_hole_solver_set_iters_display_step(
-    black_hole_solver_instance_t * const instance_proto,
-    unsigned long display_step
-);
-
 DLLEXPORT extern int black_hole_solver_enable_place_queens_on_kings(
     black_hole_solver_instance_t * instance_proto,
     bool enabled_status

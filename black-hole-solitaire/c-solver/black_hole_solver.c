@@ -128,7 +128,6 @@ typedef struct
     int num_states_in_solution, current_state_in_solution_idx;
 
     unsigned long iterations_num, num_states_in_collection, max_iters_limit;
-    unsigned long iters_display_step;
 
     uint_fast32_t num_columns;
     uint_fast32_t bits_per_column;
@@ -160,7 +159,6 @@ int DLLEXPORT black_hole_solver_create(
     ret->num_states_in_collection = 0;
     ret->max_iters_limit = ULONG_MAX;
     ret->is_rank_reachability_prune_enabled = FALSE;
-    ret->iters_display_step = 0;
     ret->num_columns = 0;
     ret->queue = NULL;
     ret->place_queens_on_kings = FALSE;
@@ -511,16 +509,6 @@ DLLEXPORT extern int black_hole_solver_set_max_iters_limit(
     return BLACK_HOLE_SOLVER__SUCCESS;
 }
 
-DLLEXPORT extern int black_hole_solver_set_iters_display_step(
-    black_hole_solver_instance_t *const instance_proto,
-    const unsigned long iters_display_step)
-{
-    ((bhs_solver_t *const)instance_proto)->iters_display_step =
-        iters_display_step;
-
-    return BLACK_HOLE_SOLVER__SUCCESS;
-}
-
 #define TALON_PTR_BITS 6
 
 static inline void queue_item_populate_packed(
@@ -686,18 +674,11 @@ extern int DLLEXPORT black_hole_solver_run(
 
     const_SLOT(num_columns, solver);
     const_SLOT(talon_len, solver);
-    const_SLOT(iters_display_step, solver);
     const_SLOT(effective_is_rank_reachability_prune_enabled, solver);
     const_SLOT(effective_place_queens_on_kings, solver);
     const_SLOT(wrap_ranks, solver);
     const_SLOT(max_iters_limit, solver);
     var_AUTO(iterations_num, solver->iterations_num);
-
-    unsigned long next_iterations_display_point =
-        ((iters_display_step <= 0)
-                ? LONG_MAX
-                : (iterations_num + iters_display_step -
-                      (iterations_num % iters_display_step)));
 
     while (solver->queue_len > 0)
     {
@@ -770,13 +751,6 @@ extern int DLLEXPORT black_hole_solver_run(
             solver->iterations_num = iterations_num;
 
             return BLACK_HOLE_SOLVER__OUT_OF_ITERS;
-        }
-
-        if (iterations_num == next_iterations_display_point)
-        {
-            printf("Iteration: %ld\n", iterations_num);
-            fflush(stdout);
-            next_iterations_display_point += iters_display_step;
         }
     }
 

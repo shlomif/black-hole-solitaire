@@ -198,7 +198,7 @@ SET (BHS_EXE "black-hole-solve")
 
 ADD_EXECUTABLE(
     "${BHS_EXE}"
-    "black_hole_solver_main.c"
+    "black_hole_solver_resume_api_main.c"
 )
 
 TARGET_LINK_LIBRARIES(
