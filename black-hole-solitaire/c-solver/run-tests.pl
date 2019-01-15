@@ -131,7 +131,6 @@ sub myglob
             || ( $a cmp $b )
         } (
         myglob('t'),
-        myglob('.'),
         (
               ( $fcs_path ne $abs_bindir )
             ? ( myglob("$abs_bindir/t") )
@@ -148,7 +147,7 @@ sub myglob
 
     if ( !$ENV{FCS_TEST_BUILD} )
     {
-        @tests = grep { !/build-process/ } @tests;
+        @tests = grep { basename($_) !~ /build-process/ } @tests;
     }
 
     if ( $ENV{FCS_TEST_WITHOUT_VALGRIND} )
