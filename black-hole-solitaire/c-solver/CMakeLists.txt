@@ -59,7 +59,7 @@ SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 SET (LIB_BASE "black_hole_solver")
 option (FCS_WITH_TEST_SUITE "Also build and run the test suite." ON)
-SET (BLACK_HOLE_SOLVER_MODULES "alloc.c" "black_hole_solver.c" "rank_reach_prune.c")
+SET (BLACK_HOLE_SOLVER_MODULES "alloc.c" "black_hole_solver.c" "can_move.c" "rank_reach_prune.c")
 
 IF (${BHS_STATE_STORAGE} STREQUAL "BHS_STATE_STORAGE_INTERNAL_HASH")
     LIST(APPEND BLACK_HOLE_SOLVER_MODULES fcs_hash.c)
@@ -112,6 +112,19 @@ ENDIF ()
 INCLUDE_DIRECTORIES(BEFORE "${CMAKE_CURRENT_BINARY_DIR}")
 INCLUDE_DIRECTORIES(BEFORE "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
+SET (is_parent_gen "${CMAKE_CURRENT_SOURCE_DIR}/scripts/gen-c-lookup-files.pl")
+SET (is_parent_args "${is_parent_gen}")
+SET (is_parent_output
+    "${CMAKE_CURRENT_BINARY_DIR}/can_move.c" "${CMAKE_CURRENT_BINARY_DIR}/can_move.h"
+    )
+ADD_CUSTOM_COMMAND(
+    OUTPUT ${is_parent_output}
+    COMMAND "${PERL_EXECUTABLE}"
+    ARGS ${is_parent_args}
+    DEPENDS "${is_parent_gen}"
+)
+# Execute it right away to avoid missing files/includes
+EXECUTE_PROCESS(COMMAND "${PERL_EXECUTABLE}" ${is_parent_args})
 ADD_LIBRARY (
     "${LIB_BASE}"
     SHARED

@@ -34,6 +34,7 @@
 
 #include "config.h"
 #include <black-hole-solver/black_hole_solver.h>
+#include "can_move.h"
 #include "state.h"
 #include "bit_rw.h"
 #include "typeof_wrap.h"
@@ -103,6 +104,7 @@ typedef struct
 
 #define TALON_MAX_SIZE (NUM_RANKS * 4)
 
+typedef const bool can_move__row[13];
 typedef struct
 {
     // This is the ranks of the cards in the columns. It remains constant
@@ -141,6 +143,7 @@ typedef struct
     bool place_queens_on_kings;
     bool wrap_ranks;
     bool effective_place_queens_on_kings;
+    can_move__row *can_move;
 } bhs_solver_t;
 
 int DLLEXPORT black_hole_solver_create(
@@ -647,6 +650,7 @@ static inline void setup_init_state(bhs_solver_t *const solver)
         (solver->place_queens_on_kings || solver->wrap_ranks);
     solver->effective_is_rank_reachability_prune_enabled =
         solver->talon_len ? FALSE : solver->is_rank_reachability_prune_enabled;
+    solver->can_move = &(black_hole_solver__can_move[solver->wrap_ranks][1]);
 
     bhs_state_key_value_pair_t *const init_state = &(solver->init_state);
     *init_state = setup_first_queue_item(solver);
@@ -670,12 +674,12 @@ extern int DLLEXPORT black_hole_solver_run(
     bhs_solver_t *const solver = (bhs_solver_t *)ret_instance;
 
     setup_once(solver);
+    const_SLOT(can_move, solver);
 
     const_SLOT(num_columns, solver);
     const_SLOT(talon_len, solver);
     const_SLOT(effective_is_rank_reachability_prune_enabled, solver);
     const_SLOT(effective_place_queens_on_kings, solver);
-    const_SLOT(wrap_ranks, solver);
     const_SLOT(max_iters_limit, solver);
     var_AUTO(iterations_num, solver->iterations_num);
 
@@ -714,9 +718,7 @@ extern int DLLEXPORT black_hole_solver_run(
                     no_cards = FALSE;
                     const_AUTO(card, solver->board_ranks[col_idx][pos - 1]);
 
-                    const_AUTO(diff, abs(card - foundations));
-                    if ((foundations == -1) ||
-                        (diff == 1 || (wrap_ranks && (diff == RANK_K))))
+                    if (can_move[foundations][(size_t)card])
                     {
                         perform_move(solver, foundations, card, col_idx,
                             &queue_item_copy);
