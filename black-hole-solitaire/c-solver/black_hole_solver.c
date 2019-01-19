@@ -710,6 +710,7 @@ extern int DLLEXPORT black_hole_solver_run(
         }
         if (effective_place_queens_on_kings || (foundations != RANK_K))
         {
+            const bool *const found_can_move = can_move[foundations];
             for (uint_fast32_t col_idx = 0; col_idx < num_columns; col_idx++)
             {
                 const_AUTO(pos, state.heights[col_idx]);
@@ -718,7 +719,7 @@ extern int DLLEXPORT black_hole_solver_run(
                     no_cards = FALSE;
                     const_AUTO(card, solver->board_ranks[col_idx][pos - 1]);
 
-                    if (can_move[foundations][(size_t)card])
+                    if (found_can_move[(size_t)card])
                     {
                         perform_move(solver, foundations, card, col_idx,
                             &queue_item_copy);
