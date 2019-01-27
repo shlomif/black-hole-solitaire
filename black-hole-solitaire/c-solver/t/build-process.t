@@ -15,7 +15,7 @@ if ( !delete( $ENV{'FCS_TEST_BUILD'} ) )
 plan tests => 8;
 
 # Change directory to the Freecell Solver base distribution directory.
-my $src_path = path($0)->parent->parent->absolute;
+my $src_path = path($0)->parent(2)->absolute;
 
 sub test_cmd
 {
