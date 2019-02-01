@@ -34,6 +34,11 @@ if ( defined $cmake_gen )
 
 do_system(
     {
+        cmd => [ "prove", glob("root-tests/t/*.t") ],
+    }
+);
+do_system(
+    {
         cmd => [
 "cd black-hole-solitaire && mkdir B && cd B && $^X ..${SEP}c-solver${SEP}Tatzer "
                 . ( defined($cmake_gen) ? qq#--gen="$cmake_gen"# : "" )
