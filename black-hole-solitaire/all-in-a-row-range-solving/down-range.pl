@@ -5,7 +5,6 @@ use warnings;
 
 use LWP::UserAgent;
 
-
 my $ua = LWP::UserAgent->new;
 $ua->timeout(10_000);
 $ua->env_proxy;
@@ -16,7 +15,7 @@ sub fetch_id
 {
     my $response = $ua->get($url);
 
-    if ($response->is_success())
+    if ( $response->is_success() )
     {
         my $ret = $response->decoded_content();
         chomp($ret);
@@ -28,16 +27,15 @@ sub fetch_id
     }
 }
 
-while ((my $id = fetch_id()) > 0)
+while ( ( my $id = fetch_id() ) > 0 )
 {
     print "$id\n";
     my $fn = "$id.rs";
 
-    if (-e $fn && (! -z $fn))
+    if ( -e $fn && ( !-z $fn ) )
     {
         die "$id.rs already exists.";
     }
-    system(qq{make_pysol_freecell_board.py -F -t "$id" black_hole | }
-        .  qq{black-hole-solve --max-iters 4000000 - > "$fn"}
-    );
+    system(   qq{make_pysol_freecell_board.py -F -t "$id" black_hole | }
+            . qq{black-hole-solve --max-iters 4000000 - > "$fn"} );
 }

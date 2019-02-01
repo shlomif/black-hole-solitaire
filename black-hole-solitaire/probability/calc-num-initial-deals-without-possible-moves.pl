@@ -23,16 +23,16 @@ sub fact
 
 sub npr
 {
-    my ($n, $r) = @_;
+    my ( $n, $r ) = @_;
 
-    return (fact($n) / fact($r));
+    return ( fact($n) / fact($r) );
 }
 
 sub ncr
 {
-    my ($n, $r) = @_;
+    my ( $n, $r ) = @_;
 
-    return npr($n,$r) / fact($n-$r);
+    return npr( $n, $r ) / fact( $n - $r );
 }
 
 my $rank = 13;
@@ -46,14 +46,16 @@ my $num_cards_in_layout = $rank * 4 - 1;
 
 my $num_non_tnk = $num_cards_in_layout - $num_tnk;
 
-my $places_alloc_for_tnk = ncr($num_slots_for_twos_and_kings, $num_tnk);
+my $places_alloc_for_tnk = ncr( $num_slots_for_twos_and_kings, $num_tnk );
 
 # my $tnk_org = fact($num_tnk);
 
 # my $non_tnk_org = fact($num_non_tnk);
 
-my $result = npr($num_slots_for_twos_and_kings, $num_slots_for_twos_and_kings - $num_tnk)
-    * fact($num_cards_in_layout - $num_tnk);
+my $result =
+    npr( $num_slots_for_twos_and_kings,
+    $num_slots_for_twos_and_kings - $num_tnk ) *
+    fact( $num_cards_in_layout - $num_tnk );
 
 my $total = fact(53);
 
@@ -61,4 +63,4 @@ print "Result = ", $result, "\n";
 
 print "Total  = ", $total, "\n";
 
-print "Ratio  = ", $total/$result, "\n";
+print "Ratio  = ", $total / $result, "\n";

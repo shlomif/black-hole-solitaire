@@ -7,7 +7,7 @@ use autodie;
 use IO::All;
 
 # Threshold in seconds.
-my $THRESHOLD = 5;
+my $THRESHOLD  = 5;
 my $SUMMARY_FN = "SUMMARY.txt";
 
 sub sum_fh
@@ -19,7 +19,7 @@ my $time = time() - $THRESHOLD;
 
 my $start_idx;
 
-if (-e $SUMMARY_FN)
+if ( -e $SUMMARY_FN )
 {
     my $last_line = `tail -1 "$SUMMARY_FN"`;
     ($start_idx) = $last_line =~ m/\A(\d+)/;
@@ -39,14 +39,14 @@ sub fn
 
 sub fh
 {
-    return io->file(fn());
+    return io->file( fn() );
 }
 
 my $sum_fh = sum_fh();
 
-while ((-e fn()) && (fh()->mtime() <= $time))
+while ( ( -e fn() ) && ( fh()->mtime() <= $time ) )
 {
-    $sum_fh->append(fh()->all());
+    $sum_fh->append( fh()->all() );
     fh()->unlink();
 }
 continue
