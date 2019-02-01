@@ -49,8 +49,7 @@ else
 }
 
 my @board_cards  = map { [ split /\s+/, $_ ] } @lines;
-my @board_values = map
-{
+my @board_values = map {
     [ map { get_rank($_) } @$_ ]
 } @board_cards;
 
