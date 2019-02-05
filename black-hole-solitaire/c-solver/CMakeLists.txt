@@ -126,7 +126,11 @@ ADD_CUSTOM_COMMAND(
     DEPENDS "${is_parent_gen}"
 )
 # Execute it right away to avoid missing files/includes
-EXECUTE_PROCESS(COMMAND "${PERL_EXECUTABLE}" ${is_parent_args})
+SET(cmd "${PERL_EXECUTABLE}" ${is_parent_args})
+EXECUTE_PROCESS(COMMAND ${cmd} RESULT_VARIABLE ret)
+IF (NOT ("${ret}" STREQUAL "0"))
+    MESSAGE(FATAL_ERROR "${cmd} failed!")
+ENDIF ()
 ADD_LIBRARY (
     "${LIB_BASE}"
     SHARED
