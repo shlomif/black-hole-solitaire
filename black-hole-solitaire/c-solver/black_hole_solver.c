@@ -669,9 +669,9 @@ static inline void setup_once(bhs_solver_t *const solver)
 }
 
 extern int DLLEXPORT black_hole_solver_run(
-    black_hole_solver_instance_t *ret_instance)
+    black_hole_solver_instance_t *instance_proto)
 {
-    bhs_solver_t *const solver = (bhs_solver_t *)ret_instance;
+    bhs_solver_t *const solver = (bhs_solver_t *)instance_proto;
 
     setup_once(solver);
     const_SLOT(can_move, solver);
