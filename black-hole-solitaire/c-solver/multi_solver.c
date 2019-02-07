@@ -169,7 +169,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    while (argc > arg_idx)
+    for (; arg_idx < argc; ++arg_idx)
     {
         filename = argv[arg_idx];
 
@@ -288,7 +288,6 @@ int main(int argc, char *argv[])
 
         black_hole_solver_free(solver);
         fprintf(stdout, "[= END of file %s =]\n", filename);
-        arg_idx++;
     }
 
     return 0;
