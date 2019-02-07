@@ -54,14 +54,10 @@ static const char *const help_text =
     "--iters-display-step [step]   Display a trace every certain step.\n"
     "\n";
 
-static inline int solver_run(black_hole_solver_instance_t *const solver,
-    const unsigned long max_iters_limit,
-    const unsigned long iters_display_step);
+#include "solver_run.h"
 
 int main(int argc, char *argv[])
 {
-    char board[MAX_LEN_BOARD_STRING];
-    char *filename = NULL;
     unsigned long iters_display_step = 0;
     enum GAME_TYPE game_type = GAME__UNKNOWN;
     bool display_boards = FALSE;
@@ -171,7 +167,7 @@ int main(int argc, char *argv[])
 
     for (; arg_idx < argc; ++arg_idx)
     {
-        filename = argv[arg_idx];
+        char *const filename = argv[arg_idx];
 
         FILE *fh = stdin;
         if (filename)
@@ -183,6 +179,7 @@ int main(int argc, char *argv[])
                 return -1;
             }
         }
+        char board[MAX_LEN_BOARD_STRING];
         fread(board, sizeof(board[0]), MAX_LEN_BOARD_STRING, fh);
 
         if (filename)
@@ -291,29 +288,4 @@ int main(int argc, char *argv[])
     }
 
     return 0;
-}
-
-static inline int solver_run(black_hole_solver_instance_t *const solver,
-    const unsigned long max_iters_limit, const unsigned long iters_display_step)
-{
-    unsigned long iters_limit = min(iters_display_step, max_iters_limit);
-    black_hole_solver_set_max_iters_limit(solver, iters_limit);
-    unsigned long iters_num;
-    int solver_ret_code;
-
-    do
-    {
-        solver_ret_code = black_hole_solver_run(solver);
-        iters_num = black_hole_solver_get_iterations_num(solver);
-        if (iters_limit == iters_num)
-        {
-            printf("Iteration: %lu\n", iters_limit);
-            fflush(stdout);
-        }
-        iters_limit += iters_display_step;
-        iters_limit = min(iters_limit, max_iters_limit);
-        black_hole_solver_set_max_iters_limit(solver, iters_limit);
-    } while ((solver_ret_code == BLACK_HOLE_SOLVER__OUT_OF_ITERS) &&
-             (iters_num < max_iters_limit));
-    return solver_ret_code;
 }
