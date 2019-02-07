@@ -52,67 +52,46 @@ typedef struct
 } black_hole_solver_instance_t;
 
 DLLEXPORT extern int black_hole_solver_create(
-    black_hole_solver_instance_t * * ret_instance
-);
+    black_hole_solver_instance_t **ret_instance);
 
 DLLEXPORT extern int black_hole_solver_read_board(
-    black_hole_solver_instance_t * instance_proto,
-    const char * board_string,
-    int * error_line_number,
-    unsigned int num_columns,
-    unsigned int max_num_cards_in_col,
-    unsigned int bits_per_column
-);
+    black_hole_solver_instance_t *instance_proto, const char *board_string,
+    int *error_line_number, unsigned int num_columns,
+    unsigned int max_num_cards_in_col, unsigned int bits_per_column);
 
 DLLEXPORT extern int black_hole_solver_set_max_iters_limit(
-    black_hole_solver_instance_t * instance_proto,
-    unsigned long limit
-);
+    black_hole_solver_instance_t *instance_proto, unsigned long limit);
 
 DLLEXPORT extern int black_hole_solver_enable_place_queens_on_kings(
-    black_hole_solver_instance_t * instance_proto,
-    bool enabled_status
-);
+    black_hole_solver_instance_t *instance_proto, bool enabled_status);
 
 DLLEXPORT extern int black_hole_solver_enable_wrap_ranks(
-    black_hole_solver_instance_t * instance_proto,
-    bool enabled_status
-);
+    black_hole_solver_instance_t *instance_proto, bool enabled_status);
 
 DLLEXPORT extern int black_hole_solver_enable_rank_reachability_prune(
-    black_hole_solver_instance_t * instance_proto,
-    bool enabled_status
-);
+    black_hole_solver_instance_t *instance_proto, bool enabled_status);
 
 DLLEXPORT extern int black_hole_solver_run(
-    black_hole_solver_instance_t * ret_instance
-);
+    black_hole_solver_instance_t *ret_instance);
 
 DLLEXPORT extern int black_hole_solver_free(
-    black_hole_solver_instance_t * instance_proto
-);
+    black_hole_solver_instance_t *instance_proto);
 
 DLLEXPORT extern int black_hole_solver_get_next_move(
-    black_hole_solver_instance_t * instance_proto,
-    int * col_idx_ptr,
-    int * card_rank_ptr,
-    int * card_suit_ptr /* Will return H=0, C=1, D=2, S=3 */
+    black_hole_solver_instance_t *instance_proto, int *col_idx_ptr,
+    int *card_rank_ptr, int *card_suit_ptr /* Will return H=0, C=1, D=2, S=3 */
 );
 
 DLLEXPORT extern unsigned long black_hole_solver_get_num_states_in_collection(
-    black_hole_solver_instance_t * instance_proto
-);
+    black_hole_solver_instance_t *instance_proto);
 
 DLLEXPORT extern unsigned long black_hole_solver_get_iterations_num(
-    black_hole_solver_instance_t * instance_proto
-);
+    black_hole_solver_instance_t *instance_proto);
 
 DLLEXPORT extern int black_hole_solver_get_current_solution_board(
-    black_hole_solver_instance_t * instance_proto,
-    char * output
-);
+    black_hole_solver_instance_t *instance_proto, char *output);
 
-DLLEXPORT const char * black_hole_solver_get_lib_version(void);
+DLLEXPORT const char *black_hole_solver_get_lib_version(void);
 
 #ifdef __cplusplus
 }
