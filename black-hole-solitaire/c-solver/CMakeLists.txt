@@ -215,6 +215,16 @@ TARGET_LINK_LIBRARIES(
 
 INSTALL (TARGETS "${BHS_EXE}" DESTINATION "bin")
 
+ADD_EXECUTABLE(
+    "multi-bhs-solver"
+    "multi_solver.c"
+)
+
+TARGET_LINK_LIBRARIES(
+    "multi-bhs-solver"
+    "${LIB_BASE}"
+)
+
 INSTALL(
     FILES
         "include/black-hole-solver/black_hole_solver.h"
