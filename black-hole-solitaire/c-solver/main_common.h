@@ -94,7 +94,7 @@ int main(int argc, char *argv[])
                 fputs("Error! --max-iters requires an argument.\n", stderr);
                 exit(-1);
             }
-            max_iters_limit = atol(argv[arg_idx++]);
+            max_iters_limit = (unsigned long)atol(argv[arg_idx++]);
         }
         else if (!strcmp(argv[arg_idx], "--game"))
         {
@@ -164,7 +164,7 @@ int main(int argc, char *argv[])
                     "Error! --iters-display-step requires an arguments.\n");
                 exit(-1);
             }
-            iters_display_step = atol(argv[arg_idx++]);
+            iters_display_step = (unsigned long)atol(argv[arg_idx++]);
         }
         else
         {
@@ -220,7 +220,7 @@ int main(int argc, char *argv[])
     board[MAX_LEN_BOARD_STRING - 1] = '\0';
 
     int error_line_num;
-    const int num_columns =
+    const unsigned num_columns =
         ((game_type == GAME__BH)
                 ? BHS__BLACK_HOLE__NUM_COLUMNS
                 : (game_type == GAME__GOLF) ? BHS__GOLF__NUM_COLUMNS
@@ -258,7 +258,7 @@ int main(int argc, char *argv[])
                     solver, &col_idx, &card_rank, &card_suit)) ==
                BLACK_HOLE_SOLVER__SUCCESS)
         {
-            if (col_idx == num_columns)
+            if (col_idx == (int)num_columns)
             {
                 printf("%s", "Deal talon");
             }

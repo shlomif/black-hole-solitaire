@@ -30,13 +30,13 @@
 
 #define NUM_BITS_IN_BYTES 8
 
-typedef int fc_solve_bit_data_t;
+typedef uint_fast32_t fc_solve_bit_data_t;
 typedef unsigned char fcs_uchar_t;
 
 typedef struct
 {
     fcs_uchar_t *current;
-    int bit_in_char_idx;
+    uint_fast32_t bit_in_char_idx;
     fcs_uchar_t *start;
 } fc_solve_bit_writer_t;
 
@@ -83,7 +83,8 @@ static inline fc_solve_bit_data_t fc_solve_bit_reader_read(
 
     for (uint_fast32_t idx = 0; idx < len; ++idx)
     {
-        ret |= (((*(reader->current) >> (reader->bit_in_char_idx++)) & 0x1)
+        ret |= ((fc_solve_bit_data_t)(
+                    (*(reader->current) >> (reader->bit_in_char_idx++)) & 0x1)
                 << idx);
 
         if (reader->bit_in_char_idx == NUM_BITS_IN_BYTES)

@@ -97,7 +97,7 @@ SHLOMIF_ADD_COMMON_C_FLAGS()
 SHLOMIF_FINALIZE_FLAGS()
 
 IF ("$ENV{FCS_CLANG}")
-    ADD_DEFINITIONS("-Weverything -Wno-language-extension-token -Wno-format-nonliteral -Wno-padded -Wno-gnu-statement-expression -Wno-unused-parameter -Wno-vla -Wno-extra-semi -Wno-cast-align -Wno-used-but-marked-unused -Wno-cast-qual -Wno-conversion -Wno-sign-compare -Wno-overlength-strings -Wno-comma -Wno-disabled-macro-expansion")
+    ADD_DEFINITIONS("-Weverything -Wno-language-extension-token -Wno-format-nonliteral -Wno-padded -Wno-gnu-statement-expression -Wno-unused-parameter -Wno-vla -Wno-extra-semi -Wno-used-but-marked-unused  -Wno-comma -Wno-disabled-macro-expansion")
 ENDIF ()
 
 IF ("$ENV{FCS_GCC}")

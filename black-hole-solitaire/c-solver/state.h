@@ -1,5 +1,6 @@
 #pragma once
 
+#include <stdint.h>
 #include "min_and_max.h"
 
 #define BHS__ALL_IN_A_ROW__NUM_COLUMNS 13
@@ -45,7 +46,7 @@ typedef struct
     bhs_rank_t foundations;
 } bhs_state_key_t;
 
-typedef char bhs_col_idx_t;
+typedef uint8_t bhs_col_idx_t;
 
 typedef struct
 {

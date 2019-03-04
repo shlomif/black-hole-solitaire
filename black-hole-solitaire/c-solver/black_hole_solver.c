@@ -127,7 +127,7 @@ typedef struct
     bhs_state_key_value_pair_t final_state;
 
     bhs_solution_state_t *states_in_solution;
-    int num_states_in_solution, current_state_in_solution_idx;
+    uint_fast32_t num_states_in_solution, current_state_in_solution_idx;
 
     unsigned long iterations_num, num_states_in_collection, max_iters_limit;
 
@@ -543,7 +543,7 @@ static inline void queue_item_unpack(
     fc_solve_bit_reader_init(&bit_r, queue_item->packed.key.data);
 
     queue_item->unpacked.talon_ptr =
-        fc_solve_bit_reader_read(&bit_r, TALON_PTR_BITS);
+        (uint8_t)fc_solve_bit_reader_read(&bit_r, TALON_PTR_BITS);
     for (size_t col = 0; col < num_columns; col++)
     {
         queue_item->unpacked.heights[col] =
@@ -621,7 +621,7 @@ static inline bhs_state_key_value_pair_t setup_first_queue_item(
     memset(&(new_queue_item->s.packed), '\0', sizeof(new_queue_item->s.packed));
 
     queue_item_populate_packed(solver, new_queue_item);
-    new_queue_item->s.packed.value.col_idx = num_columns + 1;
+    new_queue_item->s.packed.value.col_idx = (bhs_col_idx_t)num_columns + 1;
 
     memset(&(new_queue_item->rank_counts), '\0',
         sizeof(new_queue_item->rank_counts));
@@ -904,7 +904,7 @@ DLLEXPORT extern int black_hole_solver_get_next_move(
         assert(height <
                (is_talon ? solver->talon_len : solver->initial_lens[col_idx]));
 
-        *col_idx_ptr = col_idx;
+        *col_idx_ptr = (int)col_idx;
         solver->sol_foundations_card_rank = *card_rank_ptr =
             (is_talon ? solver->talon_values
                       : solver->board_ranks[col_idx])[height] +
