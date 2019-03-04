@@ -97,7 +97,7 @@ SHLOMIF_ADD_COMMON_C_FLAGS()
 SHLOMIF_FINALIZE_FLAGS()
 
 IF ("$ENV{FCS_CLANG}")
-    ADD_DEFINITIONS("-Weverything -Wno-language-extension-token -Wno-padded -Wno-gnu-statement-expression -Wno-unused-parameter -Wno-used-but-marked-unused  -Wno-comma -Wno-disabled-macro-expansion")
+    ADD_DEFINITIONS("-Weverything -Wno-language-extension-token -Wno-padded -Wno-gnu-statement-expression -Wno-unused-parameter -Wno-used-but-marked-unused")
 ENDIF ()
 
 IF ("$ENV{FCS_GCC}")
