@@ -22,21 +22,24 @@ extern "C" {
 
 typedef int bh_solve_hash_value_t;
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpadded"
 struct bh_solve_hash_symlink_item_struct
 {
-    // A pointer to the data structure that is to be collected
-    bhs_state_key_value_pair_t key;
+    // The next item in the list
+    struct bh_solve_hash_symlink_item_struct *next;
     /* We also store the hash value corresponding to this key for faster
        comparisons */
     bh_solve_hash_value_t hash_value;
+    // A pointer to the data structure that is to be collected
+    bhs_state_key_value_pair_t key;
 #ifdef FCS_ENABLE_SECONDARY_HASH_VALUE
     // We also store a secondary hash value, which is not used for indexing,
     // but is used to speed up comparison.
     bh_solve_hash_value_t secondary_hash_value;
 #endif
-    // The next item in the list
-    struct bh_solve_hash_symlink_item_struct *next;
 };
+#pragma clang diagnostic pop
 
 typedef struct bh_solve_hash_symlink_item_struct bh_solve_hash_symlink_item_t;
 

@@ -107,36 +107,32 @@ typedef struct
 typedef const bool can_move__row[13];
 typedef struct
 {
+    uint_fast16_t talon_len;
+    bh_solve_hash_t positions;
+    uint_fast16_t initial_lens[BHS__MAX_NUM_COLUMNS];
+    bhs_solution_state_t *states_in_solution;
+    uint_fast32_t num_states_in_solution, current_state_in_solution_idx;
+    unsigned long iterations_num, num_states_in_collection, max_iters_limit;
+    uint_fast32_t num_columns;
+    uint_fast32_t bits_per_column;
+    bhs_queue_item_t *queue;
+    uint_fast32_t queue_len, queue_max_len;
+    int_fast32_t sol_foundations_card_rank, sol_foundations_card_suit;
     // This is the ranks of the cards in the columns. It remains constant
     // for the duration of the game.
     bhs_rank_t board_ranks[BHS__MAX_NUM_COLUMNS][BHS__MAX_NUM_CARDS_IN_COL];
 
     bhs_rank_t initial_foundation;
     bhs_rank_t talon_values[TALON_MAX_SIZE];
-    uint_fast16_t talon_len;
-
-    bh_solve_hash_t positions;
 
     bhs_card_string_t initial_foundation_string;
     bhs_card_string_t initial_board_card_strings[BHS__MAX_NUM_COLUMNS]
                                                 [BHS__MAX_NUM_CARDS_IN_COL];
-    uint_fast16_t initial_lens[BHS__MAX_NUM_COLUMNS];
     bhs_card_string_t initial_talon_card_strings[TALON_MAX_SIZE];
 
     bhs_state_key_value_pair_t init_state;
     bhs_state_key_value_pair_t final_state;
 
-    bhs_solution_state_t *states_in_solution;
-    uint_fast32_t num_states_in_solution, current_state_in_solution_idx;
-
-    unsigned long iterations_num, num_states_in_collection, max_iters_limit;
-
-    uint_fast32_t num_columns;
-    uint_fast32_t bits_per_column;
-
-    bhs_queue_item_t *queue;
-    uint_fast32_t queue_len, queue_max_len;
-    int_fast32_t sol_foundations_card_rank, sol_foundations_card_suit;
     bool is_rank_reachability_prune_enabled;
     bool effective_is_rank_reachability_prune_enabled;
     bool require_initialization;

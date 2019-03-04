@@ -39,7 +39,10 @@
 #include "fcs_hash.h"
 #include "alloc.h"
 #include "state.h"
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpadded"
 #include "wrap_xxhash.h"
+#pragma clang diagnostic pop
 
 static inline unsigned long hash_function(const bhs_state_key_t key)
 {
