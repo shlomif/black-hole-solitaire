@@ -61,17 +61,20 @@ static inline int solver_run(black_hole_solver_instance_t *const solver,
     const unsigned long max_iters_limit,
     const unsigned long iters_display_step);
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpadded"
 typedef struct
 {
     unsigned long iters_display_step;
+    unsigned long max_iters_limit;
     enum GAME_TYPE game_type;
     bool display_boards;
     bool is_rank_reachability_prune_enabled;
     bool place_queens_on_kings;
     bool quiet_output;
     bool wrap_ranks;
-    unsigned long max_iters_limit;
 } bhs_settings;
+#pragma clang diagnostic pop
 
 static inline bhs_settings parse_cmd_line(
     int argc, char *argv[], int *out_arg_idx)
