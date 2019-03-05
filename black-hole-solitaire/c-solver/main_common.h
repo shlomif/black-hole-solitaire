@@ -11,14 +11,15 @@ static inline int solver_run(black_hole_solver_instance_t *const solver,
 
 int main(int argc, char *argv[])
 {
-    unsigned long iters_display_step = 0;
-    enum GAME_TYPE game_type = GAME__UNKNOWN;
-    bool display_boards = FALSE;
-    bool is_rank_reachability_prune_enabled = FALSE;
-    bool place_queens_on_kings = FALSE;
-    bool quiet_output = FALSE;
-    bool wrap_ranks = TRUE;
-    unsigned long max_iters_limit = ULONG_MAX;
+    bhs_settings settings;
+    settings.iters_display_step = 0;
+    settings.game_type = GAME__UNKNOWN;
+    settings.display_boards = FALSE;
+    settings.is_rank_reachability_prune_enabled = FALSE;
+    settings.place_queens_on_kings = FALSE;
+    settings.quiet_output = FALSE;
+    settings.wrap_ranks = TRUE;
+    settings.max_iters_limit = ULONG_MAX;
 
     int arg_idx = 1;
     while (argc > arg_idx)
@@ -41,7 +42,7 @@ int main(int argc, char *argv[])
                 fputs("Error! --max-iters requires an argument.\n", stderr);
                 exit(-1);
             }
-            max_iters_limit = (unsigned long)atol(argv[arg_idx++]);
+            settings.max_iters_limit = (unsigned long)atol(argv[arg_idx++]);
         }
         else if (!strcmp(argv[arg_idx], "--game"))
         {
@@ -54,16 +55,16 @@ int main(int argc, char *argv[])
 
             if (!strcmp(g, "black_hole"))
             {
-                game_type = GAME__BH;
+                settings.game_type = GAME__BH;
             }
             else if (!strcmp(g, "golf"))
             {
-                game_type = GAME__GOLF;
-                wrap_ranks = FALSE;
+                settings.game_type = GAME__GOLF;
+                settings.wrap_ranks = FALSE;
             }
             else if (!strcmp(g, "all_in_a_row"))
             {
-                game_type = GAME__ALL;
+                settings.game_type = GAME__ALL;
             }
             else
             {
@@ -76,37 +77,37 @@ int main(int argc, char *argv[])
         else if (!strcmp(argv[arg_idx], "--no-queens-on-kings"))
         {
             ++arg_idx;
-            place_queens_on_kings = FALSE;
+            settings.place_queens_on_kings = FALSE;
         }
         else if (!strcmp(argv[arg_idx], "--queens-on-kings"))
         {
             ++arg_idx;
-            place_queens_on_kings = TRUE;
+            settings.place_queens_on_kings = TRUE;
         }
         else if (!strcmp(argv[arg_idx], "--no-wrap-ranks"))
         {
             ++arg_idx;
-            wrap_ranks = FALSE;
+            settings.wrap_ranks = FALSE;
         }
         else if (!strcmp(argv[arg_idx], "--quiet"))
         {
             ++arg_idx;
-            quiet_output = TRUE;
+            settings.quiet_output = TRUE;
         }
         else if (!strcmp(argv[arg_idx], "--wrap-ranks"))
         {
             ++arg_idx;
-            wrap_ranks = TRUE;
+            settings.wrap_ranks = TRUE;
         }
         else if (!strcmp(argv[arg_idx], "--display-boards"))
         {
             ++arg_idx;
-            display_boards = TRUE;
+            settings.display_boards = TRUE;
         }
         else if (!strcmp(argv[arg_idx], "--rank-reach-prune"))
         {
             ++arg_idx;
-            is_rank_reachability_prune_enabled = TRUE;
+            settings.is_rank_reachability_prune_enabled = TRUE;
         }
         else if (!strcmp(argv[arg_idx], "--iters-display-step"))
         {
@@ -116,12 +117,17 @@ int main(int argc, char *argv[])
                     "Error! --iters-display-step requires an arguments.\n");
                 exit(-1);
             }
-            iters_display_step = (unsigned long)atol(argv[arg_idx++]);
+            settings.iters_display_step = (unsigned long)atol(argv[arg_idx++]);
         }
         else
         {
             break;
         }
+    }
+    if (settings.game_type == GAME__UNKNOWN)
+    {
+        fputs("Error! Must specify game type using --game.\n", stderr);
+        exit(-1);
     }
 
     char *filename = NULL;
@@ -134,7 +140,5 @@ int main(int argc, char *argv[])
         ++arg_idx;
     }
 
-    return solve_filename(filename, game_type, max_iters_limit,
-        iters_display_step, display_boards, is_rank_reachability_prune_enabled,
-        place_queens_on_kings, quiet_output, wrap_ranks);
+    return solve_filename(filename, settings);
 }

@@ -61,11 +61,20 @@ static inline int solver_run(black_hole_solver_instance_t *const solver,
     const unsigned long max_iters_limit,
     const unsigned long iters_display_step);
 
-static inline int solve_filename(const char *const filename,
-    enum GAME_TYPE game_type, unsigned long max_iters_limit,
-    unsigned long iters_display_step, bool display_boards,
-    bool is_rank_reachability_prune_enabled, bool place_queens_on_kings,
-    bool quiet_output, bool wrap_ranks)
+typedef struct
+{
+    unsigned long iters_display_step;
+    enum GAME_TYPE game_type;
+    bool display_boards;
+    bool is_rank_reachability_prune_enabled;
+    bool place_queens_on_kings;
+    bool quiet_output;
+    bool wrap_ranks;
+    unsigned long max_iters_limit;
+} bhs_settings;
+
+static inline int solve_filename(
+    const char *const filename, const bhs_settings settings)
 {
     int ret = 0;
 
@@ -95,19 +104,14 @@ static inline int solve_filename(const char *const filename,
         exit(-1);
     }
 
-    if (game_type == GAME__UNKNOWN)
-    {
-        fputs("Error! Must specify game type using --game.\n", stderr);
-        exit(-1);
-    }
-
     black_hole_solver_enable_rank_reachability_prune(
-        solver, is_rank_reachability_prune_enabled);
-    black_hole_solver_enable_wrap_ranks(solver, wrap_ranks);
+        solver, settings.is_rank_reachability_prune_enabled);
+    black_hole_solver_enable_wrap_ranks(solver, settings.wrap_ranks);
     black_hole_solver_enable_place_queens_on_kings(
-        solver, place_queens_on_kings);
+        solver, settings.place_queens_on_kings);
 
     int error_line_num;
+    const enum GAME_TYPE game_type = settings.game_type;
     const unsigned num_columns =
         ((game_type == GAME__BH)
                 ? BHS__BLACK_HOLE__NUM_COLUMNS
@@ -128,8 +132,8 @@ static inline int solve_filename(const char *const filename,
         exit(-1);
     }
 
-    const int solver_ret_code =
-        solver_run(solver, max_iters_limit, iters_display_step);
+    const int solver_ret_code = solver_run(
+        solver, settings.max_iters_limit, settings.iters_display_step);
 
     if (!solver_ret_code)
     {
@@ -138,9 +142,9 @@ static inline int solve_filename(const char *const filename,
 
         fputs("Solved!\n", stdout);
 
-        if (!quiet_output)
+        if (!settings.quiet_output)
         {
-            out_board(solver, display_boards);
+            out_board(solver, settings.display_boards);
 
             while ((next_move_ret_code = black_hole_solver_get_next_move(
                         solver, &col_idx, &card_rank, &card_suit)) ==
@@ -160,7 +164,7 @@ static inline int solve_filename(const char *const filename,
                        "%c%c\n\n\n====================\n\n",
                     (("0A23456789TJQK")[card_rank]), ("HCDS")[card_suit]);
 
-                out_board(solver, display_boards);
+                out_board(solver, settings.display_boards);
             }
 
             if (next_move_ret_code != BLACK_HOLE_SOLVER__END)
