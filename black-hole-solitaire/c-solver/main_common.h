@@ -5,10 +5,6 @@
 #pragma once
 #include "solver_common.h"
 
-static inline int solver_run(black_hole_solver_instance_t *const solver,
-    const unsigned long max_iters_limit,
-    const unsigned long iters_display_step);
-
 int main(int argc, char *argv[])
 {
     int arg_idx;
