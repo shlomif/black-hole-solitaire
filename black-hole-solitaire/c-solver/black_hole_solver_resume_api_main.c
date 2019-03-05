@@ -24,4 +24,3 @@
 // black_hole_solver_resume_api_main.c - solver using the resume API
 
 #include "main_common.h"
-#include "solver_run.h"

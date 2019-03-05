@@ -57,9 +57,7 @@ static const char *const help_text =
     "--iters-display-step [step]   Display a trace every certain step.\n"
     "\n";
 
-static inline int solver_run(black_hole_solver_instance_t *const solver,
-    const unsigned long max_iters_limit,
-    const unsigned long iters_display_step);
+#include "solver_run.h"
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wpadded"

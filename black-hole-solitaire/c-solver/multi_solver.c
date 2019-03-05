@@ -3,7 +3,6 @@
 //
 // Distributed under terms of the Expat license.
 #include "solver_common.h"
-#include "solver_run.h"
 
 int main(int argc, char *argv[])
 {
