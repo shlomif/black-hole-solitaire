@@ -19,6 +19,7 @@ int main(int argc, char *argv[])
     bool display_boards = FALSE;
     bool is_rank_reachability_prune_enabled = FALSE;
     bool place_queens_on_kings = FALSE;
+    bool quiet_output = FALSE;
     bool wrap_ranks = TRUE;
     unsigned long max_iters_limit = ULONG_MAX;
 
@@ -89,6 +90,11 @@ int main(int argc, char *argv[])
         {
             ++arg_idx;
             wrap_ranks = FALSE;
+        }
+        else if (!strcmp(argv[arg_idx], "--quiet"))
+        {
+            ++arg_idx;
+            quiet_output = TRUE;
         }
         else if (!strcmp(argv[arg_idx], "--wrap-ranks"))
         {
@@ -201,33 +207,37 @@ int main(int argc, char *argv[])
 
         fputs("Solved!\n", stdout);
 
-        out_board(solver, display_boards);
-
-        while ((next_move_ret_code = black_hole_solver_get_next_move(
-                    solver, &col_idx, &card_rank, &card_suit)) ==
-               BLACK_HOLE_SOLVER__SUCCESS)
+        if (!quiet_output)
         {
-            if (col_idx == (int)num_columns)
-            {
-                printf("%s", "Deal talon");
-            }
-            else
-            {
-                printf("Move a card from stack %d to the foundations", col_idx);
-            }
-            printf("\n\n"
-                   "Info: Card moved is %c%c\n\n\n====================\n\n",
-                (("0A23456789TJQK")[card_rank]), ("HCDS")[card_suit]);
-
             out_board(solver, display_boards);
-        }
 
-        if (next_move_ret_code != BLACK_HOLE_SOLVER__END)
-        {
-            fprintf(stderr, "%s - %d\n",
-                "Get next move routine returned the wrong error code.",
-                next_move_ret_code);
-            ret = -1;
+            while ((next_move_ret_code = black_hole_solver_get_next_move(
+                        solver, &col_idx, &card_rank, &card_suit)) ==
+                   BLACK_HOLE_SOLVER__SUCCESS)
+            {
+                if (col_idx == (int)num_columns)
+                {
+                    printf("%s", "Deal talon");
+                }
+                else
+                {
+                    printf("Move a card from stack %d to the foundations",
+                        col_idx);
+                }
+                printf("\n\n"
+                       "Info: Card moved is %c%c\n\n\n====================\n\n",
+                    (("0A23456789TJQK")[card_rank]), ("HCDS")[card_suit]);
+
+                out_board(solver, display_boards);
+            }
+
+            if (next_move_ret_code != BLACK_HOLE_SOLVER__END)
+            {
+                fprintf(stderr, "%s - %d\n",
+                    "Get next move routine returned the wrong error code.",
+                    next_move_ret_code);
+                ret = -1;
+            }
         }
     }
     else if (solver_ret_code == BLACK_HOLE_SOLVER__OUT_OF_ITERS)
