@@ -61,6 +61,7 @@ SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 SET (LIB_BASE "black_hole_solver")
 option (FCS_WITH_TEST_SUITE "Also build and run the test suite." ON)
+option (FCS_AVOID_TCMALLOC "Avoid linking against Google's tcmalloc")
 SET (BLACK_HOLE_SOLVER_MODULES "black_hole_solver.c" "can_move.c" "meta_alloc.c" "rank_reach_prune.c")
 
 IF (${BHS_STATE_STORAGE} STREQUAL "BHS_STATE_STORAGE_INTERNAL_HASH")
@@ -80,6 +81,23 @@ IF (${BHS_STATE_STORAGE} STREQUAL "BHS_STATE_STORAGE_TOKYO_CAB_HASH")
     ENDIF ()
 
     SET (LIBTOKYO_CAB_LIBS ${TOKYO_CAB_LIBRARIES})
+ENDIF ()
+
+SET(LIBTCMALLOC_LIB_LIST)
+
+# Avoid linking to tcmalloc if the test suite is enabled due to:
+# https://github.com/gperftools/gperftools/issues/758
+IF ((NOT (FCS_AVOID_TCMALLOC)) AND (NOT (FCS_WITH_TEST_SUITE)) AND ( NOT ((CMAKE_BUILD_TYPE STREQUAL "debug") OR (CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo") ) ))
+    # Optionally link against Google's TCMalloc if it's available:
+    # http://goog-perftools.sourceforge.net/
+    # This gives better performance for the threaded programs.
+    FIND_LIBRARY(LIBTCMALLOC_LIB tcmalloc)
+
+    IF(LIBTCMALLOC_LIB STREQUAL "LIBTCMALLOC_LIB-NOTFOUND")
+        # Do nothing.
+    ELSE()
+        SET(LIBTCMALLOC_LIB_LIST ${LIBTCMALLOC_LIB})
+    ENDIF()
 ENDIF ()
 
 include(TestBigEndian)
@@ -220,6 +238,7 @@ ADD_EXECUTABLE(
 TARGET_LINK_LIBRARIES(
     "${BHS_EXE}"
     "${LIB_BASE}"
+    ${LIBTCMALLOC_LIB_LIST}
 )
 
 INSTALL (TARGETS "${BHS_EXE}" DESTINATION "bin")
@@ -232,6 +251,7 @@ ADD_EXECUTABLE(
 TARGET_LINK_LIBRARIES(
     "multi-bhs-solver"
     "${LIB_BASE}"
+    ${LIBTCMALLOC_LIB_LIST}
 )
 
 INSTALL(
