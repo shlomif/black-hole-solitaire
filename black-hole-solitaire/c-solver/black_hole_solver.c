@@ -136,7 +136,6 @@ typedef struct
 
     bool is_rank_reachability_prune_enabled;
     bool effective_is_rank_reachability_prune_enabled;
-    bool require_initialization;
     bool place_queens_on_kings;
     bool wrap_ranks;
     bool effective_place_queens_on_kings;
@@ -153,7 +152,6 @@ int DLLEXPORT black_hole_solver_create(
         *ret_instance = NULL;
         return BLACK_HOLE_SOLVER__OUT_OF_MEMORY;
     }
-    ret->require_initialization = TRUE;
     ret->states_in_solution = NULL;
     ret->iterations_num = 0;
     ret->num_states_in_collection = 0;
@@ -637,7 +635,7 @@ static inline bhs_state_key_value_pair_t setup_first_queue_item(
     return new_queue_item->s.packed;
 }
 
-static inline void setup_init_state(bhs_solver_t *const solver)
+static inline void setup_config(bhs_solver_t *const solver)
 {
     solver->queue_max_len = 64;
     solver->queue =
@@ -646,24 +644,34 @@ static inline void setup_init_state(bhs_solver_t *const solver)
     solver->num_states_in_collection = 0;
     solver->effective_place_queens_on_kings =
         (solver->place_queens_on_kings || solver->wrap_ranks);
-    solver->effective_is_rank_reachability_prune_enabled =
-        solver->talon_len ? FALSE : solver->is_rank_reachability_prune_enabled;
     solver->can_move = &(black_hole_solver__can_move[solver->wrap_ranks][1]);
+}
 
+static inline void setup_init_state(bhs_solver_t *const solver)
+{
     bhs_state_key_value_pair_t *const init_state = &(solver->init_state);
     *init_state = setup_first_queue_item(solver);
 
     bh_solve_hash_insert(&(solver->positions), init_state);
     ++solver->num_states_in_collection;
+    solver->effective_is_rank_reachability_prune_enabled =
+        solver->talon_len ? FALSE : solver->is_rank_reachability_prune_enabled;
 }
 
-static inline void setup_once(bhs_solver_t *const solver)
+extern int DLLEXPORT black_hole_solver_config_setup(
+    black_hole_solver_instance_t *instance_proto)
 {
-    if (solver->require_initialization)
-    {
-        setup_init_state(solver);
-        solver->require_initialization = FALSE;
-    }
+    bhs_solver_t *const solver = (bhs_solver_t *)instance_proto;
+    setup_config(solver);
+    return BLACK_HOLE_SOLVER__SUCCESS;
+}
+
+extern int DLLEXPORT black_hole_solver_setup(
+    black_hole_solver_instance_t *instance_proto)
+{
+    bhs_solver_t *const solver = (bhs_solver_t *)instance_proto;
+    setup_init_state(solver);
+    return BLACK_HOLE_SOLVER__SUCCESS;
 }
 
 extern int DLLEXPORT black_hole_solver_run(
@@ -671,7 +679,6 @@ extern int DLLEXPORT black_hole_solver_run(
 {
     bhs_solver_t *const solver = (bhs_solver_t *)instance_proto;
 
-    setup_once(solver);
     const_SLOT(can_move, solver);
 
     const_SLOT(num_columns, solver);

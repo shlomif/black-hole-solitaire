@@ -71,6 +71,12 @@ DLLEXPORT extern int black_hole_solver_enable_wrap_ranks(
 DLLEXPORT extern int black_hole_solver_enable_rank_reachability_prune(
     black_hole_solver_instance_t *instance, bool enabled_status);
 
+#define BLACK_HOLE_SOLVER__API__REQUIRES_SETUP_CALL 1
+DLLEXPORT extern int black_hole_solver_config_setup(
+    black_hole_solver_instance_t *instance);
+DLLEXPORT extern int black_hole_solver_setup(
+    black_hole_solver_instance_t *instance);
+
 DLLEXPORT extern int black_hole_solver_run(
     black_hole_solver_instance_t *instance);
 

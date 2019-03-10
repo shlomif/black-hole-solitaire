@@ -235,6 +235,7 @@ static inline int solve_filename(
     black_hole_solver_enable_wrap_ranks(solver, settings.wrap_ranks);
     black_hole_solver_enable_place_queens_on_kings(
         solver, settings.place_queens_on_kings);
+    black_hole_solver_config_setup(solver);
 
     int error_line_num;
     const enum GAME_TYPE game_type = settings.game_type;
@@ -257,6 +258,7 @@ static inline int solve_filename(
             error_line_num);
         exit(-1);
     }
+    black_hole_solver_setup(solver);
 
     const int solver_ret_code = solver_run(
         solver, settings.max_iters_limit, settings.iters_display_step);
