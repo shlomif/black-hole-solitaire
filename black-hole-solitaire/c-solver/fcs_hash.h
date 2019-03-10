@@ -16,7 +16,7 @@ extern "C" {
 
 #include "config.h"
 
-#include "alloc.h"
+#include "meta_alloc.h"
 #include <black-hole-solver/bool.h>
 #include "state.h"
 
@@ -65,7 +65,8 @@ typedef struct
 
     int max_num_elems_before_resize;
 
-    bhs_compact_allocator_t allocator;
+    compact_allocator allocator;
+    meta_allocator meta_alloc;
 
 } bh_solve_hash_t;
 
@@ -79,7 +80,8 @@ extern bool bh_solve_hash_insert(
 
 static inline void bh_solve_hash_free(bh_solve_hash_t *hash)
 {
-    bh_solve_compact_allocator_finish(&(hash->allocator));
+    fc_solve_compact_allocator_finish(&(hash->allocator));
+    fc_solve_meta_compact_allocator_finish(&(hash->meta_alloc));
 
     free(hash->entries);
 }

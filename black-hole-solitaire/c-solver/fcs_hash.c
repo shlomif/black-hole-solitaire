@@ -37,7 +37,6 @@
 #include <assert.h>
 
 #include "fcs_hash.h"
-#include "alloc.h"
 #include "state.h"
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wpadded"
@@ -71,7 +70,8 @@ void bh_solve_hash_init(bh_solve_hash_t *hash)
        that the cork of the linked list is right at the start */
     memset(hash->entries, 0, sizeof(bh_solve_hash_symlink_t) * ((size_t)size));
 
-    bh_solve_compact_allocator_init(&(hash->allocator));
+    fc_solve_meta_compact_allocator_init(&(hash->meta_alloc));
+    fc_solve_compact_allocator_init(&(hash->allocator), &(hash->meta_alloc));
 }
 
 void bh_solve_hash_get(
