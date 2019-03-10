@@ -235,12 +235,6 @@ ADD_EXECUTABLE(
     "black_hole_solver_resume_api_main.c"
 )
 
-TARGET_LINK_LIBRARIES(
-    "${BHS_EXE}"
-    "${LIB_BASE}"
-    ${LIBTCMALLOC_LIB_LIST}
-)
-
 INSTALL (TARGETS "${BHS_EXE}" DESTINATION "bin")
 
 ADD_EXECUTABLE(
@@ -248,11 +242,13 @@ ADD_EXECUTABLE(
     "multi_solver.c"
 )
 
-TARGET_LINK_LIBRARIES(
-    "multi-bhs-solver"
-    "${LIB_BASE}"
-    ${LIBTCMALLOC_LIB_LIST}
-)
+FOREACH (exe "${BHS_EXE}" "multi-bhs-solver")
+    TARGET_LINK_LIBRARIES(
+        "${exe}"
+        "${LIB_BASE}"
+        ${LIBTCMALLOC_LIB_LIST}
+    )
+ENDFOREACH()
 
 INSTALL(
     FILES
