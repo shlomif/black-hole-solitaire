@@ -50,7 +50,7 @@ static inline unsigned long hash_function(const bhs_state_key_t key)
 
 static inline void bh_solve_hash_rehash(bh_solve_hash_t *hash);
 
-void bh_solve_hash_init(bh_solve_hash_t *hash)
+void bh_solve_hash_init(bh_solve_hash_t *hash, meta_allocator *const meta_alloc)
 {
     const int size = 256;
 
@@ -70,8 +70,7 @@ void bh_solve_hash_init(bh_solve_hash_t *hash)
        that the cork of the linked list is right at the start */
     memset(hash->entries, 0, sizeof(bh_solve_hash_symlink_t) * ((size_t)size));
 
-    fc_solve_meta_compact_allocator_init(&(hash->meta_alloc));
-    fc_solve_compact_allocator_init(&(hash->allocator), &(hash->meta_alloc));
+    fc_solve_compact_allocator_init(&(hash->allocator), meta_alloc);
 }
 
 void bh_solve_hash_get(

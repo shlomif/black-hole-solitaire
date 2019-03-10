@@ -66,11 +66,10 @@ typedef struct
     int max_num_elems_before_resize;
 
     compact_allocator allocator;
-    meta_allocator meta_alloc;
 
 } bh_solve_hash_t;
 
-extern void bh_solve_hash_init(bh_solve_hash_t *hash);
+extern void bh_solve_hash_init(bh_solve_hash_t *hash, meta_allocator *);
 
 // Returns FALSE if the key is new and the key/val pair was inserted.
 // Returns TRUE if the key is not new and *existing_key / *existing_val
@@ -81,7 +80,6 @@ extern bool bh_solve_hash_insert(
 static inline void bh_solve_hash_free(bh_solve_hash_t *hash)
 {
     fc_solve_compact_allocator_finish(&(hash->allocator));
-    fc_solve_meta_compact_allocator_finish(&(hash->meta_alloc));
 
     free(hash->entries);
 }

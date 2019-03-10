@@ -109,6 +109,7 @@ typedef struct
 {
     uint_fast16_t talon_len;
     bh_solve_hash_t positions;
+    meta_allocator meta_alloc;
     uint_fast16_t initial_lens[BHS__MAX_NUM_COLUMNS];
     bhs_solution_state_t *states_in_solution;
     uint_fast32_t num_states_in_solution, current_state_in_solution_idx;
@@ -163,7 +164,8 @@ int DLLEXPORT black_hole_solver_create(
     ret->place_queens_on_kings = FALSE;
     ret->wrap_ranks = TRUE;
 
-    bh_solve_hash_init(&(ret->positions));
+    fc_solve_meta_compact_allocator_init(&(ret->meta_alloc));
+    bh_solve_hash_init(&(ret->positions), &(ret->meta_alloc));
 
     *ret_instance = (black_hole_solver_instance_t *)ret;
 
@@ -763,6 +765,7 @@ extern int DLLEXPORT black_hole_solver_free(
     bhs_solver_t *const solver = (bhs_solver_t *)instance_proto;
 
     bh_solve_hash_free(&(solver->positions));
+    fc_solve_meta_compact_allocator_finish(&(solver->meta_alloc));
 
     if (solver->states_in_solution)
     {
