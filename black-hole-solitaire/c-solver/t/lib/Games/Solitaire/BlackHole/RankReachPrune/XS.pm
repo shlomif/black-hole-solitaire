@@ -11,19 +11,18 @@ use Inline (
 
 int call_prune(int foundation, AV * rank_counts_av)
 {
-#define NUM_RANKS 13
-    unsigned char rank_counts[NUM_RANKS];
+    bhs_rank_counts rank_counts;
     for (int i = 0; i < NUM_RANKS; i++)
     {
         SV * * item = av_fetch(rank_counts_av, i, FALSE);
         assert(item);
 
-        rank_counts[i] = SvIV(*item);
+        rank_counts.c[i] = SvIV(*item);
     }
 
     return bhs_find_rank_reachability(
         (signed char)foundation,
-        rank_counts
+        &rank_counts
     );
 }
 

@@ -93,13 +93,8 @@ typedef struct
 
 typedef struct
 {
-    uint8_t c[NUM_RANKS];
-} bhs_rank_counts_t;
-
-typedef struct
-{
     bhs_solution_state_t s;
-    bhs_rank_counts_t rank_counts;
+    bhs_rank_counts rank_counts;
 } bhs_queue_item_t;
 
 #define TALON_MAX_SIZE (NUM_RANKS * 4)
@@ -698,7 +693,7 @@ extern int DLLEXPORT black_hole_solver_run(
 
         if (effective_is_rank_reachability_prune_enabled &&
             (bhs_find_rank_reachability__inline(foundations,
-                 queue_item_copy.rank_counts.c) != RANK_REACH__SUCCESS))
+                 &queue_item_copy.rank_counts) != RANK_REACH__SUCCESS))
         {
             continue;
         }

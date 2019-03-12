@@ -41,11 +41,16 @@ enum RANK_REACH_VERDICT
     RANK_REACH__NOT_REACHABLE = 1,
 };
 
+typedef struct
+{
+    uint8_t c[NUM_RANKS];
+} bhs_rank_counts;
+
 DLLEXPORT enum RANK_REACH_VERDICT bhs_find_rank_reachability(
-    const signed char foundation, const unsigned char *const rank_counts);
+    const signed char foundation, const bhs_rank_counts *const rank_counts);
 
 static inline enum RANK_REACH_VERDICT bhs_find_rank_reachability__inline(
-    const signed char foundation, const unsigned char *const rank_counts)
+    const signed char foundation, const bhs_rank_counts *const rank_counts)
 {
     if (foundation < 0)
     {
@@ -62,13 +67,13 @@ static inline enum RANK_REACH_VERDICT bhs_find_rank_reachability__inline(
     uint32_t full_ranks_goal = 0;
     for (size_t i = 0; i < NUM_RANKS; ++i)
     {
-        if (rank_counts[i] > 0)
+        if (rank_counts->c[i] > 0)
         {
             ++full_ranks_goal;
         }
     }
     /* Count the foundation - the starting point - in. */
-    if (rank_counts[foundation] == 0)
+    if (rank_counts->c[foundation] == 0)
     {
         ++full_ranks_goal;
     }
@@ -96,7 +101,7 @@ static inline enum RANK_REACH_VERDICT bhs_find_rank_reachability__inline(
                 offset_rank = NUM_RANKS - 1;
             }
 
-            if (rank_counts[offset_rank] > 0)
+            if (rank_counts->c[offset_rank] > 0)
             {
                 if (!reached[offset_rank])
                 {
