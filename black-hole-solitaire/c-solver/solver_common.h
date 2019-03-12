@@ -7,11 +7,11 @@
 
 #include "min_and_max.h"
 #include <limits.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
-#include <black-hole-solver/bool.h>
 #include <black-hole-solver/black_hole_solver.h>
 #include "state.h"
 
@@ -80,11 +80,11 @@ static inline bhs_settings parse_cmd_line(
     bhs_settings settings;
     settings.iters_display_step = 0;
     settings.game_type = GAME__UNKNOWN;
-    settings.display_boards = FALSE;
-    settings.is_rank_reachability_prune_enabled = FALSE;
-    settings.place_queens_on_kings = FALSE;
-    settings.quiet_output = FALSE;
-    settings.wrap_ranks = TRUE;
+    settings.display_boards = false;
+    settings.is_rank_reachability_prune_enabled = false;
+    settings.place_queens_on_kings = false;
+    settings.quiet_output = false;
+    settings.wrap_ranks = true;
     settings.max_iters_limit = ULONG_MAX;
 
     int arg_idx = 1;
@@ -126,7 +126,7 @@ static inline bhs_settings parse_cmd_line(
             else if (!strcmp(g, "golf"))
             {
                 settings.game_type = GAME__GOLF;
-                settings.wrap_ranks = FALSE;
+                settings.wrap_ranks = false;
             }
             else if (!strcmp(g, "all_in_a_row"))
             {
@@ -143,37 +143,37 @@ static inline bhs_settings parse_cmd_line(
         else if (!strcmp(argv[arg_idx], "--no-queens-on-kings"))
         {
             ++arg_idx;
-            settings.place_queens_on_kings = FALSE;
+            settings.place_queens_on_kings = false;
         }
         else if (!strcmp(argv[arg_idx], "--queens-on-kings"))
         {
             ++arg_idx;
-            settings.place_queens_on_kings = TRUE;
+            settings.place_queens_on_kings = true;
         }
         else if (!strcmp(argv[arg_idx], "--no-wrap-ranks"))
         {
             ++arg_idx;
-            settings.wrap_ranks = FALSE;
+            settings.wrap_ranks = false;
         }
         else if (!strcmp(argv[arg_idx], "--quiet"))
         {
             ++arg_idx;
-            settings.quiet_output = TRUE;
+            settings.quiet_output = true;
         }
         else if (!strcmp(argv[arg_idx], "--wrap-ranks"))
         {
             ++arg_idx;
-            settings.wrap_ranks = TRUE;
+            settings.wrap_ranks = true;
         }
         else if (!strcmp(argv[arg_idx], "--display-boards"))
         {
             ++arg_idx;
-            settings.display_boards = TRUE;
+            settings.display_boards = true;
         }
         else if (!strcmp(argv[arg_idx], "--rank-reach-prune"))
         {
             ++arg_idx;
-            settings.is_rank_reachability_prune_enabled = TRUE;
+            settings.is_rank_reachability_prune_enabled = true;
         }
         else if (!strcmp(argv[arg_idx], "--iters-display-step"))
         {

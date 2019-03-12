@@ -26,8 +26,6 @@
 #pragma once
 #include <stdbool.h>
 
-typedef bool fcs_bool_t;
-
 #ifndef FALSE
 #define FALSE false
 #endif

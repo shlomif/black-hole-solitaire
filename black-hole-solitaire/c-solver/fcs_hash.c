@@ -100,7 +100,7 @@ void bh_solve_hash_get(
         item = item->next;
     }
 
-    assert(FALSE);
+    assert(false);
 }
 
 bool bh_solve_hash_insert(
@@ -143,7 +143,7 @@ bool bh_solve_hash_insert(
             if ((!memcmp(
                     &(item->key.key), &(key->key), sizeof(bhs_state_key_t))))
             {
-                return TRUE;
+                return true;
             }
             /* Cache the item before the current in last_item */
             last_item = item;
@@ -179,7 +179,7 @@ bool bh_solve_hash_insert(
         bh_solve_hash_rehash(hash);
     }
 
-    return FALSE;
+    return false;
 }
 
 /*

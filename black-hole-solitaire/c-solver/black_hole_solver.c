@@ -151,11 +151,11 @@ int DLLEXPORT black_hole_solver_create(
     ret->iterations_num = 0;
     ret->num_states_in_collection = 0;
     ret->max_iters_limit = ULONG_MAX;
-    ret->is_rank_reachability_prune_enabled = FALSE;
+    ret->is_rank_reachability_prune_enabled = false;
     ret->num_columns = 0;
     ret->queue = NULL;
-    ret->place_queens_on_kings = FALSE;
-    ret->wrap_ranks = TRUE;
+    ret->place_queens_on_kings = false;
+    ret->wrap_ranks = true;
 
     fc_solve_meta_compact_allocator_init(&(ret->meta_alloc));
     bh_solve_hash_init(&(ret->positions), &(ret->meta_alloc));
@@ -170,7 +170,7 @@ DLLEXPORT extern int black_hole_solver_enable_place_queens_on_kings(
     const bool enabled_status)
 {
     bhs_solver_t *const solver = (bhs_solver_t *)instance_proto;
-    solver->place_queens_on_kings = enabled_status ? TRUE : FALSE;
+    solver->place_queens_on_kings = enabled_status ? true : false;
 
     return BLACK_HOLE_SOLVER__SUCCESS;
 }
@@ -180,7 +180,7 @@ DLLEXPORT extern int black_hole_solver_enable_wrap_ranks(
     const bool enabled_status)
 {
     bhs_solver_t *const solver = (bhs_solver_t *)instance_proto;
-    solver->wrap_ranks = enabled_status ? TRUE : FALSE;
+    solver->wrap_ranks = enabled_status ? true : false;
 
     return BLACK_HOLE_SOLVER__SUCCESS;
 }
@@ -190,7 +190,7 @@ DLLEXPORT extern int black_hole_solver_enable_rank_reachability_prune(
     const bool enabled_status)
 {
     bhs_solver_t *const solver = (bhs_solver_t *)instance_proto;
-    solver->is_rank_reachability_prune_enabled = enabled_status ? TRUE : FALSE;
+    solver->is_rank_reachability_prune_enabled = enabled_status ? true : false;
 
     return BLACK_HOLE_SOLVER__SUCCESS;
 }
@@ -308,12 +308,12 @@ static inline bool string_find_prefix(const char **s, const char *const prefix)
 
     if (strncmp(*s, prefix, len) != 0)
     {
-        return FALSE;
+        return false;
     }
 
     (*s) += len;
 
-    return TRUE;
+    return true;
 }
 
 #define MYRET(code)                                                            \
@@ -650,7 +650,7 @@ static inline void setup_init_state(bhs_solver_t *const solver)
     bh_solve_hash_insert(&(solver->positions), init_state);
     ++solver->num_states_in_collection;
     solver->effective_is_rank_reachability_prune_enabled =
-        solver->talon_len ? FALSE : solver->is_rank_reachability_prune_enabled;
+        solver->talon_len ? false : solver->is_rank_reachability_prune_enabled;
 }
 
 extern int DLLEXPORT black_hole_solver_config_setup(
@@ -700,7 +700,7 @@ extern int DLLEXPORT black_hole_solver_run(
 
         iterations_num++;
 
-        bool no_cards = TRUE;
+        bool no_cards = true;
         const bool has_talon = talon_ptr < talon_len;
 
         if (has_talon)
@@ -716,7 +716,7 @@ extern int DLLEXPORT black_hole_solver_run(
                 const_AUTO(pos, state.heights[col_idx]);
                 if (pos)
                 {
-                    no_cards = FALSE;
+                    no_cards = false;
                     const_AUTO(card, solver->board_ranks[col_idx][pos - 1]);
 
                     if (found_can_move[(size_t)card])
@@ -734,7 +734,7 @@ extern int DLLEXPORT black_hole_solver_run(
                 const_AUTO(pos, state.heights[col_idx]);
                 if (pos)
                 {
-                    no_cards = FALSE;
+                    no_cards = false;
                     break;
                 }
             }

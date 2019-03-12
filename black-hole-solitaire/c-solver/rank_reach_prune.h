@@ -79,8 +79,8 @@ static inline enum RANK_REACH_VERDICT bhs_find_rank_reachability__inline(
     }
 
     uint32_t full_count = 1;
-    bool reached[NUM_RANKS] = {FALSE};
-    reached[foundation] = TRUE;
+    bool reached[NUM_RANKS] = {false};
+    reached[foundation] = true;
 
     while ((full_count < full_ranks_goal) && (queue_ptr > physical_queue))
     {
@@ -105,7 +105,7 @@ static inline enum RANK_REACH_VERDICT bhs_find_rank_reachability__inline(
             {
                 if (!reached[offset_rank])
                 {
-                    reached[offset_rank] = TRUE;
+                    reached[offset_rank] = true;
                     ++full_count;
                     *(queue_ptr++) = offset_rank;
                 }

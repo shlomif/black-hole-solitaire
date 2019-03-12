@@ -8,7 +8,6 @@ package BHStest;
 
 use BHsolver::InlineWrap (
     C => <<"EOF",
-#include <black-hole-solver/bool.h>
 #include <black-hole-solver/black_hole_solver.h>
 #include "state.h"
 

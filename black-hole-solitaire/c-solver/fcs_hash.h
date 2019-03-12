@@ -14,10 +14,10 @@
 extern "C" {
 #endif
 
+#include <stdbool.h>
 #include "config.h"
 
 #include "meta_alloc.h"
-#include <black-hole-solver/bool.h>
 #include "state.h"
 
 typedef int bh_solve_hash_value_t;
@@ -71,8 +71,8 @@ typedef struct
 
 extern void bh_solve_hash_init(bh_solve_hash_t *hash, meta_allocator *);
 
-// Returns FALSE if the key is new and the key/val pair was inserted.
-// Returns TRUE if the key is not new and *existing_key / *existing_val
+// Returns false if the key is new and the key/val pair was inserted.
+// Returns true if the key is not new and *existing_key / *existing_val
 // was set to it.
 extern bool bh_solve_hash_insert(
     bh_solve_hash_t *hash, bhs_state_key_value_pair_t *key);

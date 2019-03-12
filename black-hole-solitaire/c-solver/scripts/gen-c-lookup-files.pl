@@ -96,7 +96,7 @@ sub emit
 emit(
 qq#const bool black_hole_solver__can_move[2][@{[$MAX_RANK+1]}][@{[$MAX_RANK]}]#,
     'can_move',
-    [ q%<black-hole-solver/bool.h>%, ],
+    [ q%<stdbool.h>%, ],
     [
         map {
             my $table = $_;
@@ -105,7 +105,7 @@ qq#const bool black_hole_solver__can_move[2][@{[$MAX_RANK+1]}][@{[$MAX_RANK]}]#,
                 map {
                     my $row = $_;
                     '{'
-                        . join( ',', map { $_ ? 'TRUE' : 'FALSE' } @$row ) . '}'
+                        . join( ',', map { $_ ? 'true' : 'false' } @$row ) . '}'
                 } @{$table}
                 )
                 . '}'

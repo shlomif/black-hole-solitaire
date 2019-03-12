@@ -27,8 +27,8 @@
 extern "C" {
 #endif
 
+#include <stdbool.h>
 #include <black-hole-solver/fcs_dllexport.h>
-#include <black-hole-solver/bool.h>
 
 enum
 {
