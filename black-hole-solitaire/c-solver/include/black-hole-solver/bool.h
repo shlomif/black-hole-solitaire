@@ -21,15 +21,6 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-// bool.h - the purpose of this file is to define the fcs_bool_t type
-// and the related constants of TRUE and FALSE.
+// bool.h - This file does little and should not be used. Deprecated.
 #pragma once
 #include <stdbool.h>
-
-#ifndef FALSE
-#define FALSE false
-#endif
-
-#ifndef TRUE
-#define TRUE true
-#endif
