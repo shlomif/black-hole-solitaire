@@ -106,7 +106,6 @@ typedef struct
     bh_solve_hash_t positions;
     meta_allocator meta_alloc;
     uint_fast16_t initial_lens[BHS__MAX_NUM_COLUMNS];
-    bhs_solution_state_t *states_in_solution;
     uint_fast32_t num_states_in_solution, current_state_in_solution_idx;
     unsigned long iterations_num, num_states_in_collection, max_iters_limit;
     uint_fast32_t num_columns;
@@ -134,7 +133,10 @@ typedef struct
     bool place_queens_on_kings;
     bool wrap_ranks;
     bool effective_place_queens_on_kings;
+    bool states_in_solution_valid;
     can_move__row *can_move;
+#define max_num_states (NUM_SUITS * NUM_RANKS + 1)
+    bhs_solution_state_t states_in_solution[max_num_states];
 } bhs_solver_t;
 
 int DLLEXPORT black_hole_solver_create(
@@ -147,9 +149,9 @@ int DLLEXPORT black_hole_solver_create(
         *ret_instance = NULL;
         return BLACK_HOLE_SOLVER__OUT_OF_MEMORY;
     }
-    ret->states_in_solution = NULL;
     ret->iterations_num = 0;
     ret->num_states_in_collection = 0;
+    ret->states_in_solution_valid = false;
     ret->max_iters_limit = ULONG_MAX;
     ret->is_rank_reachability_prune_enabled = false;
     ret->num_columns = 0;
@@ -769,12 +771,6 @@ extern int DLLEXPORT black_hole_solver_free(
     bh_solve_hash_free(&(solver->positions));
     fc_solve_meta_compact_allocator_finish(&(solver->meta_alloc));
 
-    if (solver->states_in_solution)
-    {
-        free(solver->states_in_solution);
-        solver->states_in_solution = NULL;
-    }
-
     free(solver->queue);
     solver->queue = NULL;
 
@@ -787,17 +783,15 @@ extern int DLLEXPORT black_hole_solver_free(
 
 static void initialize_states_in_solution(bhs_solver_t *solver)
 {
-    if (solver->states_in_solution)
+    if (solver->states_in_solution_valid)
     {
         return;
     }
     const_SLOT(num_columns, solver);
     const_SLOT(bits_per_column, solver);
     uint_fast32_t num_states = 0;
-    uint_fast32_t max_num_states = NUM_SUITS * NUM_RANKS + 1;
 
-    bhs_solution_state_t *states =
-        malloc(sizeof(states[0]) * (size_t)max_num_states);
+    bhs_solution_state_t *states = solver->states_in_solution;
 
     states[num_states].packed = (solver->final_state);
     queue_item_unpack(solver, &states[num_states]);
@@ -805,13 +799,7 @@ static void initialize_states_in_solution(bhs_solver_t *solver)
     while (memcmp(&(states[num_states].packed.key), &(solver->init_state.key),
         sizeof(states[num_states].packed.key)))
     {
-        if (num_states == max_num_states)
-        {
-            states = realloc(
-                states, sizeof(states[0]) *
-                            (size_t)(max_num_states += NUM_STATES_INCREMENT));
-        }
-
+        assert(num_states < max_num_states);
         /* Look up the next state in the positions associative array. */
         bh_solve_hash_get(&(solver->positions),
             &(states[num_states].packed.key),
@@ -872,9 +860,9 @@ static void initialize_states_in_solution(bhs_solver_t *solver)
         states[num_states - 1 - i] = temp_state;
     }
 
-    solver->states_in_solution = states;
     solver->num_states_in_solution = num_states;
     solver->current_state_in_solution_idx = 0;
+    solver->states_in_solution_valid = true;
 }
 
 DLLEXPORT extern int black_hole_solver_get_next_move(
