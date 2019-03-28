@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include "min_and_max.h"
 #include <limits.h>
 #include <stdbool.h>
 #include <stdio.h>
