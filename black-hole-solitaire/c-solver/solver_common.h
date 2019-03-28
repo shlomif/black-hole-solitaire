@@ -272,6 +272,7 @@ static inline int solve_filename(
 
         if (!settings.quiet_output)
         {
+            black_hole_solver_init_solution_moves(solver);
             out_board(solver, settings.display_boards);
 
             while ((next_move_ret_code = black_hole_solver_get_next_move(

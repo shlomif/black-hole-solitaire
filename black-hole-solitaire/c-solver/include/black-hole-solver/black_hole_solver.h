@@ -83,6 +83,8 @@ DLLEXPORT extern int black_hole_solver_run(
 DLLEXPORT extern int black_hole_solver_free(
     black_hole_solver_instance_t *instance);
 
+DLLEXPORT extern void black_hole_solver_init_solution_moves(
+    black_hole_solver_instance_t *instance);
 DLLEXPORT extern int black_hole_solver_get_next_move(
     black_hole_solver_instance_t *instance, int *col_idx_ptr,
     int *card_rank_ptr, int *card_suit_ptr /* Will return H=0, C=1, D=2, S=3 */

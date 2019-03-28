@@ -133,7 +133,6 @@ typedef struct
     bool place_queens_on_kings;
     bool wrap_ranks;
     bool effective_place_queens_on_kings;
-    bool states_in_solution_valid;
     can_move__row *can_move;
 #define max_num_states (NUM_SUITS * NUM_RANKS + 1)
     bhs_solution_state_t states_in_solution[max_num_states];
@@ -151,7 +150,6 @@ int DLLEXPORT black_hole_solver_create(
     }
     ret->iterations_num = 0;
     ret->num_states_in_collection = 0;
-    ret->states_in_solution_valid = false;
     ret->max_iters_limit = ULONG_MAX;
     ret->is_rank_reachability_prune_enabled = false;
     ret->num_columns = 0;
@@ -781,17 +779,15 @@ extern int DLLEXPORT black_hole_solver_free(
 
 #define NUM_STATES_INCREMENT 16
 
-static void initialize_states_in_solution(bhs_solver_t *solver)
+DLLEXPORT void black_hole_solver_init_solution_moves(
+    black_hole_solver_instance_t *instance_proto)
 {
-    if (solver->states_in_solution_valid)
-    {
-        return;
-    }
+    bhs_solver_t *const solver = (bhs_solver_t *)instance_proto;
     const_SLOT(num_columns, solver);
     const_SLOT(bits_per_column, solver);
     uint_fast32_t num_states = 0;
 
-    bhs_solution_state_t *states = solver->states_in_solution;
+    bhs_solution_state_t *const states = solver->states_in_solution;
 
     states[num_states].packed = (solver->final_state);
     queue_item_unpack(solver, &states[num_states]);
@@ -862,7 +858,6 @@ static void initialize_states_in_solution(bhs_solver_t *solver)
 
     solver->num_states_in_solution = num_states;
     solver->current_state_in_solution_idx = 0;
-    solver->states_in_solution_valid = true;
 }
 
 DLLEXPORT extern int black_hole_solver_get_next_move(
@@ -871,8 +866,6 @@ DLLEXPORT extern int black_hole_solver_get_next_move(
 )
 {
     bhs_solver_t *const solver = (bhs_solver_t *)instance_proto;
-
-    initialize_states_in_solution(solver);
 
     if (solver->current_state_in_solution_idx ==
         solver->num_states_in_solution - 1)
@@ -925,8 +918,6 @@ DLLEXPORT extern int black_hole_solver_get_current_solution_board(
     black_hole_solver_instance_t *instance_proto, char *const output)
 {
     bhs_solver_t *const solver = (bhs_solver_t *)instance_proto;
-
-    initialize_states_in_solution(solver);
 
     char *s = output;
 
