@@ -21,10 +21,8 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-/*
- * google_hash.cpp - module file for Google's sparse_hash_map as adapted
- * for Freecell Solver.
- */
+// google_hash.cpp - module file for Google's sparse_hash_map as adapted
+// for Freecell Solver.
 
 #include "google_hash.h"
 
@@ -50,8 +48,6 @@ static inline ub4 perl_hash_function(register ub1 *s_ptr, /* the key */
 
     return hash_value_int;
 }
-
-#if (FCS_STATE_STORAGE == FCS_STATE_STORAGE_GOOGLE_DENSE_HASH)
 
 struct state_equality
 {
@@ -120,5 +116,3 @@ extern "C" void bh_solve_hash_get(bh_solve_hash_t *void_hash,
     result->key = key_ptr->key;
     result->value = ((*(it)).second);
 }
-
-#endif

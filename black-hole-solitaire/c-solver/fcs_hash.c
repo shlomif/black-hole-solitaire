@@ -30,8 +30,6 @@
 
 #include "config.h"
 
-#if (BHS_STATE_STORAGE == BHS_STATE_STORAGE_INTERNAL_HASH)
-
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
@@ -235,11 +233,3 @@ static inline void bh_solve_hash_rehash(bh_solve_hash_t *hash)
     hash->size_bitmask = new_size_bitmask;
     hash->max_num_elems_before_resize = (new_size << 1);
 }
-
-#else
-
-/* ANSI C doesn't allow empty compilation */
-static void bh_solve_hash_c_dummy();
-
-#endif /* (BHS_STATE_STORAGE == BHS_STATE_STORAGE_INTERNAL_HASH) ||            \
-          defined(INDIRECT_STACK_STATES) */
