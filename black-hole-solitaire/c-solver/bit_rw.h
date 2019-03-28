@@ -26,7 +26,6 @@
 
 #include <stddef.h>
 #include "config.h"
-#include "unused.h"
 
 #define NUM_BITS_IN_BYTES 8
 
