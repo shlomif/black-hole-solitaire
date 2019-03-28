@@ -24,9 +24,6 @@
 #define BUILDING_DLL 1
 #include "config.h"
 
-#include <assert.h>
-#include <stdlib.h>
-
 #if (BHS_STATE_STORAGE == BHS_STATE_STORAGE_TOKYO_CAB_HASH)
 
 #include "tokyo_cab_hash.h"

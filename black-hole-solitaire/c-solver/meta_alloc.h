@@ -16,7 +16,7 @@
 extern "C" {
 #endif
 
-#include <stdio.h>
+#include <stddef.h>
 #include "state.h"
 
 #ifndef FCS_IA_PACK_SIZE

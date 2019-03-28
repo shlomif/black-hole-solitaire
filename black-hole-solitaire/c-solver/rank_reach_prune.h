@@ -29,8 +29,7 @@ extern "C" {
 
 #include <stddef.h>
 #include <stdint.h>
-
-#include <black-hole-solver/bool.h>
+#include <stdbool.h>
 #include <black-hole-solver/fcs_dllexport.h>
 
 #define NUM_RANKS 13

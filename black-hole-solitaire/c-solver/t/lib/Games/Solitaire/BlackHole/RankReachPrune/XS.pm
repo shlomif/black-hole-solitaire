@@ -7,7 +7,6 @@ use warnings;
 
 use Inline (
     C => <<'EOF',
-#include <stdbool.h>
 #include "rank_reach_prune.h"
 
 int call_prune(int foundation, AV * rank_counts_av)

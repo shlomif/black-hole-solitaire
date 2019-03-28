@@ -32,11 +32,8 @@ extern "C" {
 #include <tchdb.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include <stdint.h>
 
 #include "config.h"
-
-#include <black-hole-solver/bool.h>
 #include "state.h"
 
 typedef struct
@@ -44,16 +41,14 @@ typedef struct
     TCHDB *hash;
 } bh_solve_hash_t;
 
-static inline void bh_solve_hash_init(bh_solve_hash_t *hash)
+static inline void bh_solve_hash_init(bh_solve_hash_t *const hash)
 {
-    int ecode;
-
     hash->hash = tchdbnew();
     tchdbsetcache(hash->hash, 1024 * 1024);
     if (!tchdbopen(
             hash->hash, "bh_solve.hdb", HDBOWRITER | HDBOTRUNC | HDBOCREAT))
     {
-        ecode = tchdbecode(hash->hash);
+        const int ecode = tchdbecode(hash->hash);
         fprintf(stderr, "Tokyo Cabinet open error: %s\n", tchdberrmsg(ecode));
         exit(-1);
     }
