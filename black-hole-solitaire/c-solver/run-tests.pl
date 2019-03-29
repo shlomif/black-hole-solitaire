@@ -8,7 +8,6 @@ use autodie;
 use Getopt::Long qw/ GetOptions /;
 use Env::Path ();
 use Path::Tiny qw/ path /;
-use File::Basename qw/ basename /;
 
 my $bindir = path(__FILE__)->parent->absolute;
 
@@ -112,7 +111,7 @@ sub myglob
     # Put the valgrind tests last, because they take a long time.
     my @tests =
         sort { ( $a->[$BN] cmp $b->[$BN] ) || ( $a->[$FN] cmp $b->[$FN] ) }
-        map { [ basename($_), $_ ] } (
+        map { [ path($_)->basename, $_ ] } (
         myglob('t'),
         (
               ( $fcs_path ne $bindir )
