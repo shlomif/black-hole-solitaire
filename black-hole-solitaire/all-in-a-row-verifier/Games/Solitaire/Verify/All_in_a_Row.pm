@@ -54,8 +54,7 @@ sub process_solution
 
     my $get_line = sub {
         my $ret = $next_line_iter->();
-        $line_num++;
-        return ( $ret, $line_num );
+        return ( $ret, ++$line_num );
     };
 
     my $assert_empty_line = sub {
