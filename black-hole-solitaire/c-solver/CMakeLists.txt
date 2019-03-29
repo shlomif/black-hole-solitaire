@@ -1,4 +1,4 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.5)
 
 INCLUDE ("${CMAKE_SOURCE_DIR}/cmake/shlomif_common_bootstrap.cmake")
 SHLOMIF_COMMON_SETUP("${private_mod_path}")
@@ -34,7 +34,6 @@ SET(CPACK_SOURCE_IGNORE_FILES
     "ids-whitelist\\\\.txt"
     "~$"
 )
-
 
 ### This is to set the RPATH correctly, so when installed under a prefix
 ### the executables will find the libraries.
@@ -140,7 +139,7 @@ SET (is_parent_gen "${CMAKE_CURRENT_SOURCE_DIR}/scripts/gen-c-lookup-files.pl")
 SET (is_parent_args "${is_parent_gen}")
 SET (is_parent_output
     "${CMAKE_CURRENT_BINARY_DIR}/can_move.c" "${CMAKE_CURRENT_BINARY_DIR}/can_move.h"
-    )
+)
 ADD_CUSTOM_COMMAND(
     OUTPUT ${is_parent_output}
     COMMAND "${PERL_EXECUTABLE}"
@@ -157,7 +156,7 @@ ADD_LIBRARY (
     "${LIB_BASE}"
     SHARED
     ${BLACK_HOLE_SOLVER_MODULES}
-    )
+)
 
 SET_TARGET_PROPERTIES(
     "${LIB_BASE}" PROPERTIES VERSION 0.1.0 SOVERSION 0
@@ -168,7 +167,7 @@ ADD_LIBRARY (
     "${S_LIB}"
     STATIC
     ${BLACK_HOLE_SOLVER_MODULES}
-    )
+)
 SET_TARGET_PROPERTIES(
     "${S_LIB}"
     PROPERTIES OUTPUT_NAME "${LIB_BASE}"
@@ -185,7 +184,7 @@ ADD_LIBRARY (
     "bhs_rank_reach_prune"
     SHARED
     "rank_reach_prune.c"
-    )
+)
 
 INSTALL (
     TARGETS ${LIBS}
@@ -203,9 +202,7 @@ IF (BUILD_STATIC_LIBRARY)
         STATIC
         ${FREECELL_SOLVER_LIB_MODULES}
     )
-
     LIST (APPEND BLACK_HOLE_SOLVER_LIBS "${STATIC_LIB}")
-
     SET_TARGET_PROPERTIES(
         "${STATIC_LIB}"
         PROPERTIES OUTPUT_NAME "${LIB_BASE}"
@@ -286,16 +283,13 @@ ADD_CUSTOM_COMMAND(
 )
 
 ENABLE_TESTING()
-
 ADD_TEST(
     NAME perl_run_tests
     COMMAND "perl" "${CMAKE_CURRENT_SOURCE_DIR}/run-tests.pl"
 )
-
 ADD_CUSTOM_TARGET(
     "check"
     "perl" "${CMAKE_CURRENT_SOURCE_DIR}/run-tests.pl"
 )
-
 
 ADD_SUBDIRECTORY ("man")
