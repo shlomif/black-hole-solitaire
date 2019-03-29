@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 18;
+use Test::More tests => 20;
 use Test::Differences;
 
 use Test::Trap qw(
@@ -238,5 +238,27 @@ foreach my $exe ( './black-hole-solve', )
         $stdout,
         _normalize_lf( $data_dir->child('906.golf.solution.txt')->slurp_utf8 ),
         "the right golf no. 906 solution",
+    );
+}
+
+{
+    trap
+    {
+        system( './black-hole-solve', '--game', 'golf', '--rank-reach-prune',
+            $data_dir->child('2.golf.board.txt'),
+        );
+    };
+
+    # TEST
+    ok( !( $trap->exit ), "Exit code for for golf board #2." );
+
+    my $stdout = _normalize_lf( $trap->stdout() );
+    $stdout =~ s/--------------------\n\K(?:[^\n]+\n){2}\z//ms;
+
+    # TEST
+    eq_or_diff(
+        $stdout,
+        _normalize_lf( $data_dir->child('2.golf.sol.txt')->slurp_utf8 ),
+        "the right golf no. 2 solution",
     );
 }
