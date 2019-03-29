@@ -2,17 +2,17 @@
 
 =head1 NAME
 
-black-hole-solve - Utility for solving Black Hole Solitaire and All in a Row
-Solitaire games.
+black-hole-solve - Utility for solving Golf Solitaire, Black Hole Solitaire,
+and All in a Row Solitaire games.
 
 =head1 SYNOPSIS
 
-black-hole-solve B<--game> [black_hole|all_in_a_row] /path/to/board.txt
+black-hole-solve B<--game> [golf|black_hole|all_in_a_row] /path/to/board.txt
 
 =head1 DESCRIPTION
 
 B<black-hole-solve> is a command line application that solves a single deal
-of Black Hole Solitaire or All in a Row Solitaire.
+of Golf Solitaire, Black Hole Solitaire, or All in a Row Solitaire.
 
 Also provided is a C library with an API.
 
