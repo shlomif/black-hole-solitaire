@@ -16,11 +16,6 @@ my $bindir = path(__FILE__)->parent->absolute;
 my $use_prove = $ENV{FCS_USE_TEST_RUN} ? 0 : 1;
 my $num_jobs  = $ENV{TEST_JOBS};
 
-sub _is_parallized
-{
-    return ( $use_prove && $num_jobs );
-}
-
 sub _calc_prove
 {
     return [
@@ -116,12 +111,8 @@ sub myglob
 
     # Put the valgrind tests last, because they take a long time.
     my @tests =
-        sort {
-        ( ( ( $a->[$FN] =~ /valgrind/ ) <=> ( $b->[$FN] =~ /valgrind/ ) ) *
-                ( _is_parallized() ? -1 : 1 ) )
-            || ( $a->[$BN] cmp $b->[$BN] )
-            || ( $a->[$FN] cmp $b->[$FN] )
-        } map { [ basename($_), $_ ] } (
+        sort { ( $a->[$BN] cmp $b->[$BN] ) || ( $a->[$FN] cmp $b->[$FN] ) }
+        map { [ basename($_), $_ ] } (
         myglob('t'),
         (
               ( $fcs_path ne $bindir )
