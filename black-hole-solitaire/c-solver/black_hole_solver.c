@@ -556,7 +556,7 @@ static inline void perform_move(bhs_solver_t *const solver,
     {
         ++next_state.talon_ptr;
     }
-    else if (col_idx != num_columns + 1)
+    else
     {
         --next_state.heights[col_idx];
     }
