@@ -625,6 +625,10 @@ static inline bhs_state_key_value_pair_t setup_first_queue_item(
                     .c[(ssize_t)solver->board_ranks[col_idx][h]]);
         }
     }
+    for (size_t h = 0; h < solver->talon_len; ++h)
+    {
+        ++(new_queue_item->rank_counts.c[(ssize_t)solver->talon_values[h]]);
+    }
     ++solver->queue_len;
 
     return new_queue_item->s.packed;
