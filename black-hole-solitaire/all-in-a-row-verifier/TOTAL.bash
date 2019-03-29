@@ -1,4 +1,4 @@
-function solve()
+solve()
 {
     deal_idx="$1"
     shift

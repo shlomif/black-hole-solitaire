@@ -3,13 +3,13 @@ package Games::Solitaire::Verify::All_in_a_Row;
 use strict;
 use warnings;
 
-use Carp;
+use Carp ();
 
-use Games::Solitaire::Verify::Column;
-use Games::Solitaire::Verify::Card;
-use Games::Solitaire::Verify::Freecells;
+use Games::Solitaire::Verify::Card      ();
+use Games::Solitaire::Verify::Column    ();
+use Games::Solitaire::Verify::Freecells ();
 
-use base 'Games::Solitaire::Verify::Base';
+use parent 'Games::Solitaire::Verify::Base';
 
 __PACKAGE__->mk_acc_ref( [qw(_columns _foundation)] );
 
