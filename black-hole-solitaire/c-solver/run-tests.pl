@@ -10,8 +10,7 @@ use Env::Path ();
 use Path::Tiny qw/ path /;
 use File::Basename qw/ basename /;
 
-my $bindir     = path(__FILE__)->parent;
-my $abs_bindir = $bindir->absolute;
+my $bindir = path(__FILE__)->parent->absolute;
 
 # Whether to use prove instead of runprove.
 my $use_prove = $ENV{FCS_USE_TEST_RUN} ? 0 : 1;
@@ -67,18 +66,18 @@ sub myglob
 }
 
 {
-    my $fcs_path = Path::Tiny->cwd;
+    my $fcs_path = Path::Tiny->cwd->absolute;
     local $ENV{FCS_PATH}     = $fcs_path;
-    local $ENV{FCS_SRC_PATH} = $abs_bindir;
+    local $ENV{FCS_SRC_PATH} = $bindir;
 
     local $ENV{FREECELL_SOLVER_QUIET} = 1;
     Env::Path->PATH->Prepend(
         Path::Tiny->cwd->child("board_gen"),
-        $abs_bindir->child( "t", "scripts" ),
+        $bindir->child( "t", "scripts" ),
     );
 
     my $IS_WIN = ( $^O eq "MSWin32" );
-    Env::Path->CPATH->Prepend( $abs_bindir, );
+    Env::Path->CPATH->Prepend( $bindir, );
 
     Env::Path->LD_LIBRARY_PATH->Prepend($fcs_path);
     if ($IS_WIN)
@@ -87,30 +86,17 @@ sub myglob
         Env::Path->PATH->Append($fcs_path);
     }
 
-    my $foo_lib_dir = $abs_bindir->child( "t", "lib" );
+    my $foo_lib_dir = $bindir->child( "t", "lib" );
     foreach my $add_lib ( Env::Path->PERL5LIB(), Env::Path->PYTHONPATH() )
     {
         $add_lib->Append($foo_lib_dir);
     }
 
-    my $get_config_fn = sub {
-        my $basename = shift;
-
-        return $bindir->child( "t", "config", $basename )->absolute;
-    };
-
-    local $ENV{HARNESS_ALT_INTRP_FILE} = $get_config_fn->(
-        $IS_WIN
-        ? "alternate-interpreters--mswin.yml"
-        : "alternate-interpreters.yml"
-    );
-
     local $ENV{HARNESS_TRIM_FNS} = 'keep:1';
 
     local $ENV{HARNESS_PLUGINS} = join(
         ' ', qw(
-            BreakOnFailure ColorSummary ColorFileVerdicts AlternateInterpreters
-            TrimDisplayedFilenames
+            BreakOnFailure ColorSummary ColorFileVerdicts TrimDisplayedFilenames
             )
     );
 
@@ -138,8 +124,8 @@ sub myglob
         } map { [ basename($_), $_ ] } (
         myglob('t'),
         (
-              ( $fcs_path ne $abs_bindir )
-            ? ( myglob("$abs_bindir/t") )
+              ( $fcs_path ne $bindir )
+            ? ( myglob("$bindir/t") )
             : ()
         ),
         );
