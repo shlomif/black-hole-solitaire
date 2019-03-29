@@ -3,14 +3,13 @@
 use strict;
 use warnings;
 
-use IO::All;
-
-use Games::Solitaire::Verify::Card;
+use Path::Tiny qw/ path /;
+use Games::Solitaire::Verify::Card ();
 
 use lib './t/lib';
 
-use Games::Solitaire::BlackHole::RankReachPrune::PP;
-use Games::Solitaire::BlackHole::RankReachPrune::XS;
+use Games::Solitaire::BlackHole::RankReachPrune::PP ();
+use Games::Solitaire::BlackHole::RankReachPrune::XS ();
 
 my $SUCCESS = $Games::Solitaire::BlackHole::RankReachPrune::PP::SUCCESS;
 my $NOT_REACHABLE =
@@ -54,7 +53,7 @@ sub _verdict_to_s
 my $filename = shift(@ARGV);
 
 my @states = (
-    scalar( io->file($filename)->slurp ) =~
+    scalar( path($filename)->slurp_raw ) =~
         /\[START BOARD\]\n(.*?)\n\[END BOARD\]/gms );
 
 if ( !@states )
