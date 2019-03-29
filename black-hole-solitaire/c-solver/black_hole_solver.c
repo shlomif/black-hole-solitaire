@@ -129,7 +129,6 @@ typedef struct
     bhs_state_key_value_pair_t final_state;
 
     bool is_rank_reachability_prune_enabled;
-    bool effective_is_rank_reachability_prune_enabled;
     bool place_queens_on_kings;
     bool wrap_ranks;
     bool effective_place_queens_on_kings;
@@ -653,8 +652,6 @@ static inline void setup_init_state(bhs_solver_t *const solver)
 
     bh_solve_hash_insert(&(solver->positions), init_state);
     ++solver->num_states_in_collection;
-    solver->effective_is_rank_reachability_prune_enabled =
-        solver->talon_len ? false : solver->is_rank_reachability_prune_enabled;
 }
 
 extern int DLLEXPORT black_hole_solver_config_setup(
@@ -682,7 +679,7 @@ extern int DLLEXPORT black_hole_solver_run(
 
     const_SLOT(num_columns, solver);
     const_SLOT(talon_len, solver);
-    const_SLOT(effective_is_rank_reachability_prune_enabled, solver);
+    const_SLOT(is_rank_reachability_prune_enabled, solver);
     const_SLOT(effective_place_queens_on_kings, solver);
     const_SLOT(max_iters_limit, solver);
     var_AUTO(iterations_num, solver->iterations_num);
@@ -695,7 +692,7 @@ extern int DLLEXPORT black_hole_solver_run(
         const_AUTO(foundations, state.foundations);
         const_AUTO(talon_ptr, state.talon_ptr);
 
-        if (effective_is_rank_reachability_prune_enabled &&
+        if (is_rank_reachability_prune_enabled &&
             (bhs_find_rank_reachability__inline(foundations,
                  &queue_item_copy.rank_counts) != RANK_REACH__SUCCESS))
         {
