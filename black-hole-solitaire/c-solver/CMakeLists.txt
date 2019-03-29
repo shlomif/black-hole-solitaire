@@ -227,7 +227,7 @@ SET (BHS_EXE "black-hole-solve")
 
 ADD_EXECUTABLE(
     "${BHS_EXE}"
-    "black_hole_solver_resume_api_main.c"
+    "single_board_main.c"
 )
 
 INSTALL (TARGETS "${BHS_EXE}" DESTINATION "bin")

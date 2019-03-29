@@ -1,8 +1,7 @@
-// main_common.h
+// single_board_main.c
 // Copyright (C) 2018 Shlomi Fish <shlomif@cpan.org>
 //
 // Distributed under terms of the Expat license.
-#pragma once
 #include "solver_common.h"
 
 int main(int argc, char *argv[])
