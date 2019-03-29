@@ -1,32 +1,17 @@
-/* Copyright (c) 2000 Shlomi Fish
- *
- * Permission is hereby granted, free of charge, to any person
- * obtaining a copy of this software and associated documentation
- * files (the "Software"), to deal in the Software without
- * restriction, including without limitation the rights to use,
- * copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following
- * conditions:
- *
- * The above copyright notice and this permission notice shall be
- * included in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
- * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
- * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
- * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
- * OTHER DEALINGS IN THE SOFTWARE.
- */
-/*
- * fcs_hash.c - an implementation of a simplistic (keys only) hash. This
- * hash uses chaining and re-hashing and was found to be very fast. Not all
- * of the functions of the hash ADT are implemented, but it is useful enough
- * for Freecell Solver.
- */
+// This file is part of Black Hole Solitaire Solver. It is subject to the
+// license terms in the COPYING file found in the top-level directory of this
+// distribution and at
+// https://www.shlomifish.org/open-source/projects/black-hole-solitaire-solver/
+// . No part of Black Hole Solitaire Solver, including this file, may be
+// copied, modified, propagated, or distributed except according to the terms
+// contained in the COPYING file.
+//
+// Copyright (c) 2010 Shlomi Fish
+
+// fcs_hash.c - an implementation of a simplistic (keys only) hash. This
+// hash uses chaining and re-hashing and was found to be very fast. Not all
+// of the functions of the hash ADT are implemented, but it is useful enough
+// for Freecell Solver.
 
 #include "config.h"
 
