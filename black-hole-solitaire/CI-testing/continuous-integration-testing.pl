@@ -40,7 +40,7 @@ do_system(
 do_system(
     {
         cmd => [
-"cd black-hole-solitaire && mkdir B && cd B && $^X ..${SEP}c-solver${SEP}Tatzer "
+"cd black-hole-solitaire && mkdir B && cd B && $^X ..${SEP}scripts${SEP}Tatzer "
                 . ( defined($cmake_gen) ? qq#--gen="$cmake_gen"# : "" )
                 . " && $MAKE && $^X ..${SEP}c-solver${SEP}run-tests.pl"
         ]
