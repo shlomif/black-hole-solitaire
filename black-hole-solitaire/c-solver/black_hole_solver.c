@@ -281,7 +281,7 @@ static int parse_card(const char **s, bhs_rank_t *const foundation,
 
     *foundation = v;
 
-    (*s)++;
+    ++(*s);
 
     switch (*(*s))
     {
@@ -297,7 +297,7 @@ static int parse_card(const char **s, bhs_rank_t *const foundation,
     default:
         return BLACK_HOLE_SOLVER__UNKNOWN_SUIT;
     }
-    (*s)++;
+    ++(*s);
 
     return BLACK_HOLE_SOLVER__SUCCESS;
 }
@@ -389,8 +389,8 @@ extern int DLLEXPORT black_hole_solver_read_board(
 
     while ((*s) == '\n')
     {
-        line_num++;
-        s++;
+        ++line_num;
+        ++s;
     }
 
     solver->talon_len = 0;
@@ -408,7 +408,7 @@ extern int DLLEXPORT black_hole_solver_read_board(
 
     while (isspace(*s) && ((*s) != '\n'))
     {
-        s++;
+        ++s;
     }
 
     if ((*s) == '-')
@@ -418,7 +418,7 @@ extern int DLLEXPORT black_hole_solver_read_board(
         solver->initial_foundation = -1;
         solver->sol_foundations_card_rank = -1;
         solver->sol_foundations_card_suit = -1;
-        s++;
+        ++s;
     }
     else
     {
@@ -447,7 +447,7 @@ extern int DLLEXPORT black_hole_solver_read_board(
         }
     }
 
-    for (size_t col_idx = 0; col_idx < num_columns; col_idx++, line_num++)
+    for (size_t col_idx = 0; col_idx < num_columns; ++col_idx, ++line_num)
     {
         unsigned int pos_idx = 0;
         while ((*s != '\n') && (*s != '\0'))
@@ -468,10 +468,10 @@ extern int DLLEXPORT black_hole_solver_read_board(
 
             while ((*s) == ' ')
             {
-                s++;
+                ++s;
             }
 
-            pos_idx++;
+            ++pos_idx;
         }
 
         solver->initial_lens[col_idx] = pos_idx;
@@ -482,7 +482,7 @@ extern int DLLEXPORT black_hole_solver_read_board(
         }
         else
         {
-            s++;
+            ++s;
         }
     }
 
@@ -515,7 +515,7 @@ static inline void queue_item_populate_packed(
     const_SLOT(bits_per_column, solver);
     fc_solve_bit_writer_write(
         &bit_w, TALON_PTR_BITS, queue_item->s.unpacked.talon_ptr);
-    for (size_t col = 0; col < num_columns; col++)
+    for (size_t col = 0; col < num_columns; ++col)
     {
         fc_solve_bit_writer_write(
             &bit_w, bits_per_column, queue_item->s.unpacked.heights[col]);
@@ -535,7 +535,7 @@ static inline void queue_item_unpack(
 
     queue_item->unpacked.talon_ptr =
         (uint8_t)fc_solve_bit_reader_read(&bit_r, TALON_PTR_BITS);
-    for (size_t col = 0; col < num_columns; col++)
+    for (size_t col = 0; col < num_columns; ++col)
     {
         queue_item->unpacked.heights[col] =
             (typeof(queue_item->unpacked.heights[col]))fc_solve_bit_reader_read(
@@ -698,7 +698,7 @@ extern int DLLEXPORT black_hole_solver_run(
             continue;
         }
 
-        iterations_num++;
+        ++iterations_num;
 
         bool no_cards = true;
         const bool has_talon = talon_ptr < talon_len;
@@ -711,7 +711,7 @@ extern int DLLEXPORT black_hole_solver_run(
         if (effective_place_queens_on_kings || (foundations != RANK_K))
         {
             const bool *const found_can_move = can_move[foundations];
-            for (uint_fast32_t col_idx = 0; col_idx < num_columns; col_idx++)
+            for (uint_fast32_t col_idx = 0; col_idx < num_columns; ++col_idx)
             {
                 const_AUTO(pos, state.heights[col_idx]);
                 if (pos)
