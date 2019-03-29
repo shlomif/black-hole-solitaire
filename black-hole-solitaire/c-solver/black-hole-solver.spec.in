@@ -94,7 +94,7 @@ rm -rf %buildroot
 %defattr(-,root,root)
 %{_bindir}/black-hole-solve
 %{_mandir}/*/*
-%doc README NEWS
+%doc README.md NEWS
 
 %files -n libblack_hole_solver0-devel
 %defattr(-,root,root)
