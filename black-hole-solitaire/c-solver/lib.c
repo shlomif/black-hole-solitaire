@@ -85,6 +85,7 @@ typedef struct
 } bhs_queue_item_t;
 
 #define TALON_MAX_SIZE (NUM_RANKS * 4)
+#define QUEUE_MAX_SIZE (1 + (NUM_RANKS + 1) * NUM_RANKS * NUM_SUITS)
 
 typedef const bool can_move__row[13];
 typedef struct
@@ -97,8 +98,7 @@ typedef struct
     unsigned long iterations_num, num_states_in_collection, max_iters_limit;
     uint_fast32_t num_columns;
     uint_fast32_t bits_per_column;
-    bhs_queue_item_t *queue;
-    uint_fast32_t queue_len, queue_max_len;
+    uint_fast32_t queue_len;
     int_fast32_t sol_foundations_card_rank, sol_foundations_card_suit;
     // This is the ranks of the cards in the columns. It remains constant
     // for the duration of the game.
@@ -121,6 +121,7 @@ typedef struct
     bool wrap_ranks;
     bool effective_place_queens_on_kings;
     can_move__row *can_move;
+    bhs_queue_item_t queue[QUEUE_MAX_SIZE];
 #define max_num_states (NUM_SUITS * NUM_RANKS + 1)
     bhs_solution_state_t states_in_solution[max_num_states];
 } bhs_solver_t;
@@ -140,7 +141,6 @@ int DLLEXPORT black_hole_solver_create(
     ret->max_iters_limit = ULONG_MAX;
     ret->is_rank_reachability_prune_enabled = false;
     ret->num_columns = 0;
-    ret->queue = NULL;
     ret->place_queens_on_kings = false;
     ret->wrap_ranks = true;
 
@@ -569,12 +569,7 @@ static inline void perform_move(bhs_solver_t *const solver,
         /* It's a new state - put it in the queue. */
         solver->queue[(solver->queue_len)++] = next_queue_item;
 
-        if (solver->queue_len == solver->queue_max_len)
-        {
-            solver->queue = realloc(
-                solver->queue, sizeof(solver->queue[0]) *
-                                   (size_t)(solver->queue_max_len += 64));
-        }
+        assert(solver->queue_len < QUEUE_MAX_SIZE);
     }
 }
 
@@ -619,9 +614,6 @@ static inline bhs_state_key_value_pair_t setup_first_queue_item(
 
 static inline void setup_config(bhs_solver_t *const solver)
 {
-    solver->queue_max_len = 64;
-    solver->queue =
-        malloc(sizeof(solver->queue[0]) * (size_t)solver->queue_max_len);
     solver->queue_len = 0;
     solver->num_states_in_collection = 0;
     solver->effective_place_queens_on_kings =
@@ -755,9 +747,6 @@ extern int DLLEXPORT black_hole_solver_free(
 
     bh_solve_hash_free(&(solver->positions));
     fc_solve_meta_compact_allocator_finish(&(solver->meta_alloc));
-
-    free(solver->queue);
-    solver->queue = NULL;
 
     free(solver);
 
