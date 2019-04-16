@@ -1,3 +1,15 @@
+0.20.0      ( 17 Apr 2019 ):
+============================
+
+* Add some API calls for BLACK_HOLE_SOLVER__API__REQUIRES_SETUP_CALL .
+Breaking change!
+
+* Add black_hole_solver_recycle() .
+
+* Add the multi-bhs-solve executable - not installed by default.
+
+* Some speed ups, code clean-ups, tests, and refactorings.
+
 0.18.0      ( 15 Jan 2019 ):
 ============================
 

@@ -5,7 +5,7 @@ License: MIT
 Group: Amusement/Games
 Source: https://fc-solve.shlomifish.org/downloads/fc-solve/black-hole-solver-%{version}.tar.xz
 URL: https://www.shlomifish.org/open-source/projects/black-hole-solitaire-solver/
-Requires: libblack_hole_solver0 = %{version}
+Requires: libblack_hole_solver1 = %{version}
 Summary: The Black Hole Solver Executable
 BuildRequires: cmake
 BuildRequires: perl(base)
@@ -35,21 +35,21 @@ Hole” and the one called “All in a Row”. It provides a portable C library,
 a command line application that after being fed with a layout will emit the
 cards to move.
 
-%package -n libblack_hole_solver0
+%package -n libblack_hole_solver1
 Summary: The Black Hole Solitaire Solver dynamic libraries
 Group: Amusement/Games
 
-%description -n libblack_hole_solver0
+%description -n libblack_hole_solver1
 Contains the Blach Hole Solitaire libraries.
 
 This package is mandatory for the Black Hole Solitaire executable too.
 
-%package -n libblack_hole_solver0-devel
+%package -n libblack_hole_solver1-devel
 Summary: The Freecell Solver development tools for solving Freecell games
 Group: Amusement/Games
-Requires: libblack_hole_solver0 = %{version}
+Requires: libblack_hole_solver1 = %{version}
 
-%description -n libblack_hole_solver0-devel
+%description -n libblack_hole_solver1-devel
 Freecell Solver is a library for automatically solving boards of Freecell and
 similar variants of card Solitaire. This package contains the header files and
 static libraries necessary for developing programs using Freecell Solver.
@@ -57,12 +57,12 @@ static libraries necessary for developing programs using Freecell Solver.
 You should install it if you are a game developer who would like to use
 Freecell Solver from within your programs.
 
-%package -n libblack_hole_solver0-static
+%package -n libblack_hole_solver1-static
 Summary: The Freecell Solver static libraries
 Group: Amusement/Games
-Requires: libblack_hole_solver0 = %{version}
+Requires: libblack_hole_solver1 = %{version}
 
-%description -n libblack_hole_solver0-static
+%description -n libblack_hole_solver1-static
 Freecell Solver is a library for automatically solving boards of Freecell and
 similar variants of card Solitaire. This package contains the static libraries.
 
@@ -84,10 +84,10 @@ unset FCS_TEST_BUILD
 rm -rf %buildroot
 %make_install -C build
 
-%files -n libblack_hole_solver0
+%files -n libblack_hole_solver1
 %{_libdir}/libblack_hole_solver.so*
 
-%files -n libblack_hole_solver0-static
+%files -n libblack_hole_solver1-static
 %{_libdir}/libblack_hole_solver.a
 
 %files
@@ -96,7 +96,7 @@ rm -rf %buildroot
 %{_mandir}/*/*
 %doc README.md NEWS
 
-%files -n libblack_hole_solver0-devel
+%files -n libblack_hole_solver1-devel
 %defattr(-,root,root)
 /usr/include/black-hole-solver/*.h
 %{_libdir}/pkgconfig/*.pc
