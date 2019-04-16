@@ -62,6 +62,7 @@ static const char *const help_text =
 #pragma clang diagnostic ignored "-Wpadded"
 typedef struct
 {
+    black_hole_solver_instance_t *solver;
     unsigned long iters_display_step;
     unsigned long max_iters_limit;
     enum GAME_TYPE game_type;
@@ -195,12 +196,28 @@ static inline bhs_settings parse_cmd_line(
         exit(-1);
     }
     *out_arg_idx = arg_idx;
+#define solver (settings_ptr->solver)
+    bhs_settings *settings_ptr = &settings;
+    if (black_hole_solver_create(&solver))
+    {
+        fputs("Could not initialise solver (out-of-memory)\n", stderr);
+        exit(-1);
+    }
+
+    black_hole_solver_enable_rank_reachability_prune(
+        solver, settings.is_rank_reachability_prune_enabled);
+    black_hole_solver_enable_wrap_ranks(solver, settings.wrap_ranks);
+    black_hole_solver_enable_place_queens_on_kings(
+        solver, settings.place_queens_on_kings);
+    black_hole_solver_config_setup(solver);
+
     return settings;
 }
 
 static inline int solve_filename(
-    const char *const filename, const bhs_settings settings)
+    const char *const filename, bhs_settings *const settings_ptr)
 {
+#define settings (*settings_ptr)
     int ret = 0;
 
     FILE *fh = stdin;
@@ -222,19 +239,6 @@ static inline int solve_filename(
     }
 
     board[MAX_LEN_BOARD_STRING - 1] = '\0';
-    black_hole_solver_instance_t *solver;
-    if (black_hole_solver_create(&solver))
-    {
-        fputs("Could not initialise solver (out-of-memory)\n", stderr);
-        exit(-1);
-    }
-
-    black_hole_solver_enable_rank_reachability_prune(
-        solver, settings.is_rank_reachability_prune_enabled);
-    black_hole_solver_enable_wrap_ranks(solver, settings.wrap_ranks);
-    black_hole_solver_enable_place_queens_on_kings(
-        solver, settings.place_queens_on_kings);
-    black_hole_solver_config_setup(solver);
 
     int error_line_num;
     const enum GAME_TYPE game_type = settings.game_type;
@@ -321,6 +325,13 @@ static inline int solve_filename(
         black_hole_solver_get_iterations_num(solver),
         black_hole_solver_get_num_states_in_collection(solver));
 
-    black_hole_solver_free(solver);
+    black_hole_solver_recycle(solver);
     return ret;
 }
+
+static inline void solve_free(bhs_settings *const settings_ptr)
+{
+    black_hole_solver_free(solver);
+}
+#undef solver
+#undef settings
