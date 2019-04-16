@@ -85,7 +85,7 @@ typedef struct
 } bhs_queue_item_t;
 
 #define TALON_MAX_SIZE (NUM_RANKS * 4)
-#define QUEUE_MAX_SIZE (1 + (NUM_RANKS + 1) * NUM_RANKS * NUM_SUITS)
+#define QUEUE_MAX_SIZE (1 + (BHS__MAX_NUM_COLUMNS + 1) * NUM_RANKS * NUM_SUITS)
 
 typedef const bool can_move__row[13];
 typedef struct
