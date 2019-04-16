@@ -67,6 +67,9 @@ DLLEXPORT extern int black_hole_solver_setup(
 DLLEXPORT extern int black_hole_solver_run(
     black_hole_solver_instance_t *instance);
 
+DLLEXPORT extern int black_hole_solver_recycle(
+    black_hole_solver_instance_t *instance);
+
 DLLEXPORT extern int black_hole_solver_free(
     black_hole_solver_instance_t *instance);
 

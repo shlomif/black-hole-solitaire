@@ -84,6 +84,12 @@ static inline void bh_solve_hash_free(bh_solve_hash_t *hash)
     free(hash->entries);
 }
 
+static inline void bh_solve_hash_recycle(bh_solve_hash_t *const hash)
+{
+    fc_solve_compact_allocator_recycle(&(hash->allocator));
+    memset(hash->entries, '\0', sizeof(hash->entries[0]) * hash->size);
+    hash->num_elems = 0;
+}
 extern void bh_solve_hash_get(
     bh_solve_hash_t *hash, bhs_state_key_t *key_ptr, bhs_state_value_t *result);
 

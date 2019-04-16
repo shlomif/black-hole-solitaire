@@ -740,15 +740,15 @@ extern int DLLEXPORT black_hole_solver_run(
     return BLACK_HOLE_SOLVER__NOT_SOLVABLE;
 }
 
-extern int DLLEXPORT black_hole_solver_free(
+extern int DLLEXPORT black_hole_solver_recycle(
     black_hole_solver_instance_t *instance_proto)
 {
     bhs_solver_t *const solver = (bhs_solver_t *)instance_proto;
 
-    bh_solve_hash_free(&(solver->positions));
-    fc_solve_meta_compact_allocator_finish(&(solver->meta_alloc));
-
-    free(solver);
+    bh_solve_hash_recycle(&(solver->positions));
+    solver->iterations_num = 0;
+    solver->queue_len = 0;
+    solver->num_states_in_collection = 0;
 
     return BLACK_HOLE_SOLVER__SUCCESS;
 }
@@ -945,4 +945,17 @@ DLLEXPORT const __attribute__((const)) char *black_hole_solver_get_lib_version(
     void)
 {
     return VERSION;
+}
+
+extern int DLLEXPORT black_hole_solver_free(
+    black_hole_solver_instance_t *instance_proto)
+{
+    bhs_solver_t *const solver = (bhs_solver_t *)instance_proto;
+
+    bh_solve_hash_free(&(solver->positions));
+    fc_solve_meta_compact_allocator_finish(&(solver->meta_alloc));
+
+    free(solver);
+
+    return BLACK_HOLE_SOLVER__SUCCESS;
 }
