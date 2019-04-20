@@ -1,3 +1,17 @@
+addons:
+    apt:
+        packages:
+            - build-essential
+            - cmake
+            - cmake-data
+            - cpanminus
+            - libperl-dev
+            - mercurial
+            - ninja-build
+            - perl
+            - valgrind
+            - xz-utils
+            - zip
 cache:
     ccache: true
     directories:
@@ -5,8 +19,6 @@ cache:
 os: linux
 dist: xenial
 before_install:
-    - sudo apt-get update -qq
-    - sudo apt-get --no-install-recommends install -y build-essential cmake cmake-data cpanminus libperl-dev mercurial ninja-build perl valgrind xz-utils zip
     - cpanm local::lib
     - eval "$(perl -Mlocal::lib=$HOME/perl_modules)"
 install:
