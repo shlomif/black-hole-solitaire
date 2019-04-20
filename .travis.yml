@@ -32,3 +32,4 @@ python:
     - "3.6"
 script:
     - "_verbose() { export HARNESS_VERBOSE=1 ; } ; export FCS_TEST_BUILD=1; perl black-hole-solitaire/CI-testing/continuous-integration-testing.pl"
+sudo: false
