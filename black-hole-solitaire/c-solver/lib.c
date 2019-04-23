@@ -84,10 +84,10 @@ typedef struct
     bhs_rank_counts rank_counts;
 } bhs_queue_item_t;
 
-#define TALON_MAX_SIZE (NUM_RANKS * 4)
+#define TALON_MAX_SIZE (NUM_RANKS * NUM_SUITS)
 #define QUEUE_MAX_SIZE (1 + (BHS__MAX_NUM_COLUMNS + 1) * NUM_RANKS * NUM_SUITS)
 
-typedef const bool can_move__row[13];
+typedef const bool can_move__row[NUM_RANKS];
 typedef struct
 {
     uint_fast16_t talon_len;
@@ -122,8 +122,8 @@ typedef struct
     bool effective_place_queens_on_kings;
     can_move__row *can_move;
     bhs_queue_item_t queue[QUEUE_MAX_SIZE];
-#define max_num_states (NUM_SUITS * NUM_RANKS + 1)
-    bhs_solution_state_t states_in_solution[max_num_states];
+#define MAX_NUM_STATES (NUM_SUITS * NUM_RANKS + 1)
+    bhs_solution_state_t states_in_solution[MAX_NUM_STATES];
 } bhs_solver_t;
 
 int DLLEXPORT black_hole_solver_create(
@@ -771,7 +771,7 @@ DLLEXPORT void black_hole_solver_init_solution_moves(
     while (memcmp(&(states[num_states].packed.key), &(solver->init_state.key),
         sizeof(states[num_states].packed.key)))
     {
-        assert(num_states < max_num_states);
+        assert(num_states < MAX_NUM_STATES);
         /* Look up the next state in the positions associative array. */
         bh_solve_hash_get(&(solver->positions),
             &(states[num_states].packed.key),
