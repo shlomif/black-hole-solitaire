@@ -537,7 +537,7 @@ static inline void queue_item_unpack(
     }
 }
 
-static inline void perform_move(bhs_solver_t *const solver,
+static inline int perform_move(bhs_solver_t *const solver,
     const bhs_rank_t prev_foundation, const bhs_rank_t card,
     const uint_fast32_t col_idx,
     const bhs_queue_item_t *const queue_item_copy_ptr)
@@ -569,8 +569,13 @@ static inline void perform_move(bhs_solver_t *const solver,
     next_queue_item.rank_counts = queue_item_copy_ptr->rank_counts;
     next_queue_item.rank_counts.c[(ssize_t)card]--;
 
-    if (!bh_solve_hash_insert(
-            &(solver->positions), &(next_queue_item.s.packed)))
+    const int ret =
+        bh_solve_hash_insert(&(solver->positions), &(next_queue_item.s.packed));
+    if (unlikely(ret < 0))
+    {
+        return 1;
+    }
+    if (!ret)
     {
         ++solver->num_states_in_collection;
         /* It's a new state - put it in the queue. */
@@ -578,6 +583,7 @@ static inline void perform_move(bhs_solver_t *const solver,
 
         assert(solver->queue_len < QUEUE_MAX_SIZE);
     }
+    return 0;
 }
 
 static inline bhs_state_key_value_pair_t setup_first_queue_item(
@@ -691,8 +697,12 @@ extern int DLLEXPORT black_hole_solver_run(
 
         if (has_talon)
         {
-            perform_move(solver, foundations, solver->talon_values[talon_ptr],
-                num_columns, &queue_item_copy);
+            if (unlikely(perform_move(solver, foundations,
+                    solver->talon_values[talon_ptr], num_columns,
+                    &queue_item_copy)))
+            {
+                return BLACK_HOLE_SOLVER__OUT_OF_MEMORY;
+            }
         }
         if (effective_place_queens_on_kings || (foundations != RANK_K))
         {
@@ -707,8 +717,11 @@ extern int DLLEXPORT black_hole_solver_run(
 
                     if (found_can_move[(size_t)card])
                     {
-                        perform_move(solver, foundations, card, col_idx,
-                            &queue_item_copy);
+                        if (unlikely(perform_move(solver, foundations, card,
+                                col_idx, &queue_item_copy)))
+                        {
+                            return BLACK_HOLE_SOLVER__OUT_OF_MEMORY;
+                        }
                     }
                 }
             }

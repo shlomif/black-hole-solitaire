@@ -31,7 +31,7 @@ static inline unsigned long hash_function(const bhs_state_key_t key)
     return DO_XXH(&key, sizeof(key));
 }
 
-static inline void bh_solve_hash_rehash(bh_solve_hash_t *hash);
+static inline int bh_solve_hash_rehash(bh_solve_hash_t *hash);
 
 int bh_solve_hash_init(bh_solve_hash_t *hash, meta_allocator *const meta_alloc)
 {
@@ -93,7 +93,7 @@ void bh_solve_hash_get(
     assert(false);
 }
 
-bool bh_solve_hash_insert(
+int bh_solve_hash_insert(
     bh_solve_hash_t *const hash, bhs_state_key_value_pair_t *const key)
 {
     bh_solve_hash_symlink_t *list;
@@ -150,7 +150,11 @@ bool bh_solve_hash_insert(
     }
     else
     {
-        item = fcs_compact_alloc_ptr(&(hash->allocator), sizeof(*item));
+        if (unlikely(!(item = fcs_compact_alloc_ptr(
+                           &(hash->allocator), sizeof(*item)))))
+        {
+            return -1;
+        }
     }
 
     *(item_placeholder) = item;
@@ -166,7 +170,10 @@ bool bh_solve_hash_insert(
 
     if ((++hash->num_elems) > hash->max_num_elems_before_resize)
     {
-        bh_solve_hash_rehash(hash);
+        if (unlikely(bh_solve_hash_rehash(hash)))
+        {
+            return -1;
+        }
     }
 
     return false;
@@ -177,7 +184,7 @@ bool bh_solve_hash_insert(
     hash table, allowing for smaller chains, and faster lookup.
 
   */
-static inline void bh_solve_hash_rehash(bh_solve_hash_t *hash)
+static inline int bh_solve_hash_rehash(bh_solve_hash_t *hash)
 {
     int old_size, new_size_bitmask;
     bh_solve_hash_symlink_item_t *item, *next_item;
@@ -189,7 +196,11 @@ static inline void bh_solve_hash_rehash(bh_solve_hash_t *hash)
     const int new_size = old_size << 1;
     new_size_bitmask = new_size - 1;
 
-    new_entries = calloc((size_t)new_size, sizeof(bh_solve_hash_symlink_t));
+    if (unlikely(!(new_entries = calloc(
+                       (size_t)new_size, sizeof(bh_solve_hash_symlink_t)))))
+    {
+        return 1;
+    }
 
     /* Copy the items to the new hash while not allocating them again */
     for (int i = 0; i < old_size; i++)
@@ -224,4 +235,5 @@ static inline void bh_solve_hash_rehash(bh_solve_hash_t *hash)
     hash->size = new_size;
     hash->size_bitmask = new_size_bitmask;
     hash->max_num_elems_before_resize = (new_size << 1);
+    return 0;
 }
