@@ -44,14 +44,9 @@ void bh_solve_hash_init(bh_solve_hash_t *hash, meta_allocator *const meta_alloc)
     hash->num_elems = 0;
 
     /* Allocate a table of size entries */
-    hash->entries = (bh_solve_hash_symlink_t *)malloc(
-        sizeof(bh_solve_hash_symlink_t) * (size_t)size);
+    hash->entries = calloc((size_t)size, sizeof(bh_solve_hash_symlink_t));
 
     hash->list_of_vacant_items = NULL;
-
-    /* Initialize all the cells of the hash table to NULL, which indicate
-       that the cork of the linked list is right at the start */
-    memset(hash->entries, 0, sizeof(bh_solve_hash_symlink_t) * ((size_t)size));
 
     fc_solve_compact_allocator_init(&(hash->allocator), meta_alloc);
 }
