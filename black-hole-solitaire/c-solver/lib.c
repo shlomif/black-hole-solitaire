@@ -634,15 +634,19 @@ static inline void setup_config(bhs_solver_t *const solver)
     solver->can_move = &(black_hole_solver__can_move[solver->wrap_ranks][1]);
 }
 
-static inline void setup_init_state(bhs_solver_t *const solver)
+static inline int setup_init_state(bhs_solver_t *const solver)
 {
     bhs_state_key_value_pair_t *const init_state = &(solver->init_state);
     *init_state = setup_first_queue_item(solver);
 
-    bh_solve_hash_insert(&(solver->positions), init_state);
+    if (unlikely(bh_solve_hash_insert(&(solver->positions), init_state) < 0))
+    {
+        return BLACK_HOLE_SOLVER__OUT_OF_MEMORY;
+    }
     ++solver->num_states_in_collection;
     solver->effective_is_rank_reachability_prune_enabled =
         solver->talon_len ? false : solver->is_rank_reachability_prune_enabled;
+    return BLACK_HOLE_SOLVER__SUCCESS;
 }
 
 extern int DLLEXPORT black_hole_solver_config_setup(
@@ -657,8 +661,7 @@ extern int DLLEXPORT black_hole_solver_setup(
     black_hole_solver_instance_t *instance_proto)
 {
     bhs_solver_t *const solver = (bhs_solver_t *)instance_proto;
-    setup_init_state(solver);
-    return BLACK_HOLE_SOLVER__SUCCESS;
+    return setup_init_state(solver);
 }
 
 extern int DLLEXPORT black_hole_solver_run(
