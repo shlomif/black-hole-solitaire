@@ -22,6 +22,7 @@
 #include "config.h"
 #include <black-hole-solver/black_hole_solver.h>
 #include "can_move.h"
+#include "likely.h"
 #include "state.h"
 #include "bit_rw.h"
 #include "typeof_wrap.h"
@@ -145,7 +146,13 @@ int DLLEXPORT black_hole_solver_create(
     ret->wrap_ranks = true;
 
     fc_solve_meta_compact_allocator_init(&(ret->meta_alloc));
-    bh_solve_hash_init(&(ret->positions), &(ret->meta_alloc));
+    if (unlikely(bh_solve_hash_init(&(ret->positions), &(ret->meta_alloc))))
+    {
+        fc_solve_meta_compact_allocator_finish(&(ret->meta_alloc));
+        free(ret);
+        *ret_instance = NULL;
+        return BLACK_HOLE_SOLVER__OUT_OF_MEMORY;
+    }
 
     *ret_instance = (black_hole_solver_instance_t *)ret;
 

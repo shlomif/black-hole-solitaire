@@ -33,7 +33,7 @@ static inline unsigned long hash_function(const bhs_state_key_t key)
 
 static inline void bh_solve_hash_rehash(bh_solve_hash_t *hash);
 
-void bh_solve_hash_init(bh_solve_hash_t *hash, meta_allocator *const meta_alloc)
+int bh_solve_hash_init(bh_solve_hash_t *hash, meta_allocator *const meta_alloc)
 {
     const int size = 256;
 
@@ -44,11 +44,17 @@ void bh_solve_hash_init(bh_solve_hash_t *hash, meta_allocator *const meta_alloc)
     hash->num_elems = 0;
 
     /* Allocate a table of size entries */
-    hash->entries = calloc((size_t)size, sizeof(bh_solve_hash_symlink_t));
+    if (!(hash->entries =
+                calloc((size_t)size, sizeof(bh_solve_hash_symlink_t))))
+    {
+        return 1;
+    }
 
     hash->list_of_vacant_items = NULL;
 
     fc_solve_compact_allocator_init(&(hash->allocator), meta_alloc);
+
+    return 0;
 }
 
 void bh_solve_hash_get(
