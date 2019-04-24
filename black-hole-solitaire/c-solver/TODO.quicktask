@@ -1,13 +1,14 @@
 # Quicktask v1.2
 
 CURRENT TASKS:
-  - Make sure that failed malloc() / realloc() / etc. are handled gracefully.
-    @ Added [Sun 2013-05-12]
 COMPLETED TASKS:
   - Make the bits-per-column of up-to-4-cards as "3 bits" instead of "4 bits".
     @ DONE [Sun 2013-05-12]
   - Add the [--iters-display-step N] flag to display a progress trace.
     @ Added [Wed 2014-05-21]
     @ DONE [Mon 2014-10-13]
+  - Make sure that failed malloc() / realloc() / etc. are handled gracefully.
+    @ Added [Sun 2013-05-12]
+    @ DONE [Wed 2019-04-24]
 
 # vim:ft=quicktask
