@@ -17,6 +17,7 @@ extern "C" {
 #endif
 
 #include <stddef.h>
+#include "likely.h"
 #include "state.h"
 
 #ifndef FCS_IA_PACK_SIZE
@@ -37,14 +38,14 @@ typedef struct
     meta_allocator *meta;
 } compact_allocator;
 
-extern void fc_solve_compact_allocator_extend(compact_allocator *);
+extern int fc_solve_compact_allocator_extend(compact_allocator *);
 
 /* To be called after the meta_alloc was set. */
-static inline void fc_solve_compact_allocator_init_helper(
+static inline int fc_solve_compact_allocator_init_helper(
     compact_allocator *const allocator)
 {
     allocator->old_list = NULL;
-    fc_solve_compact_allocator_extend(allocator);
+    return fc_solve_compact_allocator_extend(allocator);
 }
 
 static inline void fc_solve_meta_compact_allocator_init(
@@ -55,7 +56,7 @@ static inline void fc_solve_meta_compact_allocator_init(
 
 extern void fc_solve_meta_compact_allocator_finish(meta_allocator *);
 
-extern void fc_solve_compact_allocator_init(
+extern int fc_solve_compact_allocator_init(
     compact_allocator *, meta_allocator *);
 
 static inline void *fcs_compact_alloc_ptr(
@@ -69,7 +70,10 @@ static inline void *fcs_compact_alloc_ptr(
 
     if ((size_t)(allocator->max_ptr - allocator->ptr) < how_much)
     {
-        fc_solve_compact_allocator_extend(allocator);
+        if (unlikely(fc_solve_compact_allocator_extend(allocator)))
+        {
+            return NULL;
+        }
     }
     else
     {

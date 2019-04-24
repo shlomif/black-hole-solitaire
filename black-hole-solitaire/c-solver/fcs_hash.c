@@ -52,7 +52,13 @@ int bh_solve_hash_init(bh_solve_hash_t *hash, meta_allocator *const meta_alloc)
 
     hash->list_of_vacant_items = NULL;
 
-    fc_solve_compact_allocator_init(&(hash->allocator), meta_alloc);
+    if (unlikely(
+            fc_solve_compact_allocator_init(&(hash->allocator), meta_alloc)))
+    {
+        free(hash->entries);
+        hash->entries = NULL;
+        return 1;
+    }
 
     return 0;
 }

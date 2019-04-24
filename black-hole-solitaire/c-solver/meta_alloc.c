@@ -11,17 +11,18 @@
 // meta-allocator concept that is used to collect the pages allocated by
 // the standard allocator after it is destroyed and to recycle them.
 #include <stdlib.h>
+#include "likely.h"
 #include "meta_alloc.h"
 #include "typeof_wrap.h"
 
 #define ALLOCED_SIZE (FCS_IA_PACK_SIZE * 1024 - (256 + 128))
 
-void fc_solve_compact_allocator_init(
+int fc_solve_compact_allocator_init(
     compact_allocator *const allocator, meta_allocator *const meta_alloc)
 {
     allocator->meta = meta_alloc;
 
-    fc_solve_compact_allocator_init_helper(allocator);
+    return fc_solve_compact_allocator_init_helper(allocator);
 }
 
 #define OLD_LIST_NEXT(ptr) (*((char **)(ptr)))
@@ -40,15 +41,20 @@ static inline char *meta_request_new_buffer(meta_allocator *const meta_alloc)
     }
 }
 
-void fc_solve_compact_allocator_extend(compact_allocator *const allocator)
+int fc_solve_compact_allocator_extend(compact_allocator *const allocator)
 {
     char *const new_data = meta_request_new_buffer(allocator->meta);
+    if (unlikely(!new_data))
+    {
+        return 1;
+    }
 
     OLD_LIST_NEXT(new_data) = allocator->old_list;
     allocator->old_list = new_data;
 
     allocator->ptr = allocator->rollback_ptr = OLD_LIST_DATA(new_data);
     allocator->max_ptr = new_data + ALLOCED_SIZE;
+    return 0;
 }
 
 void fc_solve_meta_compact_allocator_finish(meta_allocator *const meta_alloc)
