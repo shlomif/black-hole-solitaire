@@ -8,25 +8,25 @@ URL: https://www.shlomifish.org/open-source/projects/black-hole-solitaire-solver
 Requires: libblack_hole_solver1 = %{version}
 Summary: The Black Hole Solver Executable
 BuildRequires: cmake
-BuildRequires: perl(base)
 BuildRequires: perl(Carp)
 BuildRequires: perl(Cwd)
 BuildRequires: perl(Data::Dumper)
-BuildRequires: perl(Digest::SHA)
 BuildRequires: perl(Env::Path)
 BuildRequires: perl(File::Path)
 BuildRequires: perl(File::Spec)
-BuildRequires: perl(IPC::Open2)
-BuildRequires: perl(lib)
+BuildRequires: perl(Inline)
+BuildRequires: perl(Inline::C)
 BuildRequires: perl(List::MoreUtils)
-BuildRequires: perl(Storable)
-BuildRequires: perl(strict)
-BuildRequires: perl(String::ShellQuote)
+BuildRequires: perl(Path::Tiny)
 BuildRequires: perl(Test::Differences)
 BuildRequires: perl(Test::More)
+BuildRequires: perl(Test::RunValgrind)
+BuildRequires: perl(base)
+BuildRequires: perl(lib)
+BuildRequires: perl(strict)
 BuildRequires: perl(warnings)
-BuildRequires: perl(YAML::XS)
 BuildRequires: perl-devel
+BuildRequires: python3
 BuildRequires: valgrind
 
 %description
