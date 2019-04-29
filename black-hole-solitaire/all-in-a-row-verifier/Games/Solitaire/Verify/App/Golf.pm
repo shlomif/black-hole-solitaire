@@ -4,14 +4,14 @@ use strict;
 use warnings;
 use autodie;
 
-use Games::Solitaire::Verify::All_in_a_Row ();
+use Games::Solitaire::Verify::Golf ();
 use Path::Tiny qw/ path tempdir tempfile cwd /;
 
 sub run
 {
     my ( $self,     $args )        = @_;
     my ( $board_fn, $solution_fn ) = @ARGV;
-    my $verifier = Games::Solitaire::Verify::All_in_a_Row->new(
+    my $verifier = Games::Solitaire::Verify::Golf->new(
         {
             board_string => path($board_fn)->slurp_raw(),
             %$args,

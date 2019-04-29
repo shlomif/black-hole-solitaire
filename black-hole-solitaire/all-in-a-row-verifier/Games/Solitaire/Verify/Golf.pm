@@ -1,4 +1,4 @@
-package Games::Solitaire::Verify::All_in_a_Row;
+package Games::Solitaire::Verify::Golf;
 
 use strict;
 use warnings;
@@ -40,7 +40,11 @@ sub _init
 {
     my ( $self, $args ) = @_;
 
-    $self->_variant( $args->{variant} );
+    my $variant = $self->_variant( $args->{variant} );
+    if ( not exists { golf => 1, all_in_a_row => 1 }->{$variant} )
+    {
+        Carp::confess("Unknown variant '$variant'!");
+    }
     $self->_place_queens_on_kings( $args->{queens_on_kings} // '' );
     $self->_wrap_ranks( $args->{wrap_ranks}                 // '' );
     $self->_foundation(
