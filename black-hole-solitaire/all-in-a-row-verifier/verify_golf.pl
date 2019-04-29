@@ -10,8 +10,10 @@ use IO::All qw/ io /;
 my ( $board_fn, $solution_fn ) = @ARGV;
 my $verifier = Games::Solitaire::Verify::All_in_a_Row->new(
     {
-        board_string => scalar( io->file($board_fn)->slurp() ),
-        variant      => "golf",
+        board_string    => scalar( io->file($board_fn)->slurp() ),
+        variant         => "golf",
+        wrap_ranks      => 0,
+        queens_on_kings => 0,
     }
 );
 

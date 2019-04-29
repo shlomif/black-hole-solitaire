@@ -13,7 +13,18 @@ use Games::Solitaire::Verify::Freecells ();
 
 use parent 'Games::Solitaire::Verify::Base';
 
-__PACKAGE__->mk_acc_ref( [qw(_columns _foundation _talon _variant)] );
+__PACKAGE__->mk_acc_ref(
+    [
+        qw(
+            _columns
+            _foundation
+            _place_queens_on_kings
+            _talon
+            _variant
+            _wrap_ranks
+            )
+    ]
+);
 
 sub _is_golf
 {
@@ -27,6 +38,8 @@ sub _init
     my ( $self, $args ) = @_;
 
     $self->_variant( $args->{variant} );
+    $self->_place_queens_on_kings( $args->{queens_on_kings} // '' );
+    $self->_wrap_ranks( $args->{wrap_ranks}                 // '' );
     my $board_string = $args->{board_string};
 
     my @lines = split( /\n/, $board_string );
@@ -84,6 +97,10 @@ sub _init
             } @lines
         ]
     );
+    if ( $self->_wrap_ranks )
+    {
+        $self->_place_queens_on_kings(1);
+    }
 
     return;
 }
@@ -199,9 +216,25 @@ MOVES:
             if ( defined( $self->_foundation->cell(0) ) )
             {
                 my $found_card = $self->_foundation->cell(0);
+                my $found_rank = $found_card->rank();
+                my $src_rank   = $top_card->rank();
 
-                my $delta = abs( $top_card->rank() - $found_card->rank() );
-                if ( not( $delta == 1 or $delta == ( 13 - 1 ) ) )
+                my $delta = abs( $src_rank - $found_rank );
+                if (
+                    not( $delta == 1 or $delta == ( 13 - 1 ) )
+                    or (
+                            $self->_is_golf
+                        and ( !$self->_wrap_ranks )
+                        and (
+                            (
+                                $self->_place_queens_on_kings
+                                ? ( $found_rank == 13 )
+                                : 0
+                            )
+                            or $delta != 1
+                        )
+                    )
+                    )
                 {
                     die "Cannot put "
                         . $top_card->to_string()
