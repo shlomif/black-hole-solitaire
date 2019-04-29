@@ -26,6 +26,9 @@ __PACKAGE__->mk_acc_ref(
     ]
 );
 
+my $MAX_RANK  = 13;
+my $NUM_SUITS = 4;
+
 sub _is_golf
 {
     my $self = shift;
@@ -40,6 +43,8 @@ sub _init
     $self->_variant( $args->{variant} );
     $self->_place_queens_on_kings( $args->{queens_on_kings} // '' );
     $self->_wrap_ranks( $args->{wrap_ranks}                 // '' );
+    $self->_foundation(
+        Games::Solitaire::Verify::Freecells->new( { count => 1 } ) );
     my $board_string = $args->{board_string};
 
     my @lines = split( /\n/, $board_string );
@@ -62,11 +67,8 @@ sub _init
         $foundation_str = shift(@lines);
         if ( my ($card_s) = $foundation_str =~ m#\AFoundations: (\S{2})\z# )
         {
-            $self->_foundation(
-                Games::Solitaire::Verify::Freecells->new(
-                    { count => 1, string => "Freecells:  $card_s", }
-                )
-            );
+            $self->_set_found(
+                Games::Solitaire::Verify::Card->new( { string => $card_s } ) );
         }
         else
         {
@@ -82,8 +84,6 @@ sub _init
             Carp::confess("Foundations str is '$foundation_str'");
         }
 
-        $self->_foundation(
-            Games::Solitaire::Verify::Freecells->new( { count => 1 } ) );
     }
 
     $self->_columns(
@@ -102,6 +102,13 @@ sub _init
         $self->_place_queens_on_kings(1);
     }
 
+    return;
+}
+
+sub _set_found
+{
+    my ( $self, $card ) = @_;
+    $self->_foundation->assign( 0, $card );
     return;
 }
 
@@ -136,7 +143,7 @@ sub process_solution
 
     # As many moves as the number of cards.
 MOVES:
-    for my $move_idx ( 0 .. ( 13 * 4 - 1 ) )
+    for my $move_idx ( 0 .. ( $MAX_RANK * $NUM_SUITS - 1 ) )
     {
         my ( $move_line, $move_line_idx ) = $get_line->();
 
@@ -161,7 +168,7 @@ MOVES:
 
         if ( !defined $card )
         {
-            if ( ( $col_idx < 0 ) or ( $col_idx >= 13 ) )
+            if ( ( $col_idx < 0 ) or ( $col_idx >= $MAX_RANK ) )
             {
                 die "Invalid column index '$col_idx' at $move_line_idx";
             }
@@ -213,22 +220,22 @@ MOVES:
 "Card moved should be '$top_card_moved_str', but the info says it is '$moved_card_str' at line $info_line_idx";
             }
 
-            if ( defined( $self->_foundation->cell(0) ) )
+            my $found_card = $self->_foundation->cell(0);
+            if ( defined($found_card) )
             {
-                my $found_card = $self->_foundation->cell(0);
                 my $found_rank = $found_card->rank();
                 my $src_rank   = $top_card->rank();
 
                 my $delta = abs( $src_rank - $found_rank );
                 if (
-                    not( $delta == 1 or $delta == ( 13 - 1 ) )
+                    not( $delta == 1 or $delta == ( $MAX_RANK - 1 ) )
                     or (
                             $self->_is_golf
                         and ( !$self->_wrap_ranks )
                         and (
                             (
                                 $self->_place_queens_on_kings
-                                ? ( $found_rank == 13 )
+                                ? ( $found_rank == $MAX_RANK )
                                 : 0
                             )
                             or $delta != 1
@@ -245,8 +252,7 @@ MOVES:
             $card = $col->pop;
         }
 
-        # Now just perform the move.
-        $self->_foundation->assign( 0, $card );
+        $self->_set_found($card);
         if ( $self->_is_golf )
         {
             if ( all { $_->len == 0 } @{ $self->_columns } )
