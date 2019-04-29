@@ -11,6 +11,7 @@ my ( $board_fn, $solution_fn ) = @ARGV;
 my $verifier = Games::Solitaire::Verify::All_in_a_Row->new(
     {
         board_string => scalar( io->file($board_fn)->slurp() ),
+        variant      => "all_in_a_row",
     }
 );
 
