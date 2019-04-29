@@ -1,4 +1,3 @@
-// main_common.h
 // Copyright (C) 2018 Shlomi Fish <shlomif@cpan.org>
 //
 // Distributed under terms of the Expat license.

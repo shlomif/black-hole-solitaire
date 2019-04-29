@@ -13,6 +13,7 @@
 
 #include <black-hole-solver/black_hole_solver.h>
 #include "state.h"
+#include "likely.h"
 
 #include "config.h"
 
@@ -261,7 +262,11 @@ static inline int solve_filename(
             error_line_num);
         exit(-1);
     }
-    black_hole_solver_setup(solver);
+    if (unlikely(black_hole_solver_setup(solver)))
+    {
+        fputs("Could not initialise solver (out-of-memory)\n", stderr);
+        exit(-1);
+    }
 
     const int solver_ret_code = solver_run(
         solver, settings.max_iters_limit, settings.iters_display_step);
@@ -307,6 +312,11 @@ static inline int solve_filename(
                 ret = -1;
             }
         }
+    }
+    else if (solver_ret_code == BLACK_HOLE_SOLVER__OUT_OF_MEMORY)
+    {
+        fputs("Out of memory!\n", stderr);
+        exit(-1);
     }
     else if (solver_ret_code == BLACK_HOLE_SOLVER__OUT_OF_ITERS)
     {
