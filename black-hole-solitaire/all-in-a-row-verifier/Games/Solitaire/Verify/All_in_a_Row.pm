@@ -5,6 +5,7 @@ use warnings;
 use autodie;
 
 use Carp ();
+use List::Util qw/ all /;
 
 use Games::Solitaire::Verify::Card      ();
 use Games::Solitaire::Verify::Column    ();
@@ -50,7 +51,7 @@ sub _init
         {
             $self->_foundation(
                 Games::Solitaire::Verify::Freecells->new(
-                    { count => 1, string => "Freecells: $card_s", }
+                    { count => 1, string => "Freecells:  $card_s", }
                 )
             );
         }
@@ -117,14 +118,14 @@ sub process_solution
     }
 
     # As many moves as the number of cards.
+MOVES:
     for my $move_idx ( 0 .. ( 13 * 4 - 1 ) )
     {
         my ( $move_line, $move_line_idx ) = $get_line->();
 
         my $card;
         if (    $self->_is_golf
-            and $move_line =~
-            m/\AMove a card from the talon to the foundations\z/ )
+            and $move_line =~ m/\ADeal talon\z/ )
         {
             if ( !@{ $self->_talon } )
             {
@@ -213,6 +214,13 @@ sub process_solution
 
         # Now just perform the move.
         $self->_foundation->assign( 0, $card );
+        if ( $self->_is_golf )
+        {
+            if ( all { $_->len == 0 } @{ $self->_columns } )
+            {
+                last MOVES;
+            }
+        }
     }
     return;
 }
