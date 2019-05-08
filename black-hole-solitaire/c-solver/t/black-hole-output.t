@@ -10,19 +10,11 @@ use Test::Trap qw(
     trap $trap :flow:stderr(systemsafe):stdout(systemsafe):warn
 );
 
-use Socket qw(:crlf);
 use Path::Tiny qw/ path /;
 
 my $bin_dir   = path(__FILE__)->parent->absolute;
 my $data_dir  = $bin_dir->child('data');
 my $texts_dir = $data_dir->child('texts');
-
-sub _normalize_lf
-{
-    my ($s) = @_;
-    $s =~ s#$CRLF#$LF#g;
-    return $s;
-}
 
 trap
 {
@@ -34,6 +26,7 @@ trap
 ok( !( $trap->exit ), "Running the program successfully." );
 
 use Dir::Manifest ();
+use Dir::Manifest::Slurp qw/ as_lf /;
 my $mani = Dir::Manifest->new(
     {
         manifest_fn => $texts_dir->child('list.txt'),
@@ -43,7 +36,7 @@ my $mani = Dir::Manifest->new(
 
 # TEST
 eq_or_diff(
-    _normalize_lf( $trap->stdout() ),
+    as_lf( $trap->stdout() ),
     $mani->text( "26464608654870335080.bh.sol.txt", { lf => 1 } ),
     "Right output."
 );
@@ -64,11 +57,8 @@ This scan generated 8 states.
 EOF
 
 # TEST
-eq_or_diff(
-    _normalize_lf( $trap->stdout() ),
-    _normalize_lf($expected_output),
-    "Right output."
-);
+eq_or_diff( as_lf( $trap->stdout() ), as_lf($expected_output),
+    "Right output." );
 
 trap
 {
@@ -81,7 +71,7 @@ ok( !( $trap->exit ), "Running --max-iters program successfully." );
 
 # TEST
 eq_or_diff(
-    _normalize_lf( $trap->stdout() ),
+    as_lf( $trap->stdout() ),
     $mani->text( "26464608654870335080.bh.sol.txt", { lf => 1 } ),
     "Right output."
 );
@@ -103,8 +93,8 @@ EOF
 
 # TEST
 eq_or_diff(
-    _normalize_lf( $trap->stdout() ),
-    _normalize_lf($expected_output),
+    as_lf( $trap->stdout() ),
+    as_lf($expected_output),
     "Right output for --max-iters."
 );
 
@@ -119,7 +109,7 @@ is( $ret_code, 0, "Exited successfully." );
 
 # TEST
 like(
-    _normalize_lf( $trap->stdout() ),
+    as_lf( $trap->stdout() ),
 qr/\Ablack-hole-solver version (\d+(?:\.\d+){2})\r?\nLibrary version \1\r?\n\z/,
     "Right otuput for --version."
 );
@@ -136,7 +126,7 @@ ok( !( $trap->exit ), "iters-display-step: running the program successfully." );
 
 # TEST
 eq_or_diff(
-    _normalize_lf( $trap->stdout() ),
+    as_lf( $trap->stdout() ),
     $mani->text( "26464608654870335080-iters-step.bh.sol.txt", { lf => 1 } ),
     "Right output for iterations step."
 );
@@ -158,7 +148,7 @@ foreach my $exe ( './black-hole-solve', )
 
     # TEST*$c
     eq_or_diff(
-        _normalize_lf( $trap->stdout() ),
+        as_lf( $trap->stdout() ),
         $mani->text(
             "26464608654870335080-iters-step-1100.bh.sol.txt",
             { lf => 1 }
@@ -185,7 +175,7 @@ foreach my $exe ( './black-hole-solve', )
         $mani->text( "26464608654870335080-disp-boards.bh.sol.txt",
         { lf => 1 } );
 
-    my $stdout = _normalize_lf( $trap->stdout() );
+    my $stdout = as_lf( $trap->stdout() );
 
     my $got_prefix = substr( $stdout, 0, length($expected_prefix) );
 
@@ -196,7 +186,7 @@ foreach my $exe ( './black-hole-solve', )
 
     # TEST
     eq_or_diff(
-        _normalize_lf($stdout),
+        as_lf($stdout),
         $mani->text(
             '26464608654870335080.bh-sol-with-display-boards.txt',
             { lf => 1 }
@@ -222,7 +212,7 @@ foreach my $exe ( './black-hole-solve', )
         qq/6D KC KS AH AC KD 4S 8D 8H JD TC AD QH 4C JS 2C/ =~ /(\S\S)/g;
     my @strings = map { "Deal talon\n\nInfo: Card moved is $_\n" } @cards;
 
-    my $stdout = _normalize_lf( $trap->stdout() );
+    my $stdout = as_lf( $trap->stdout() );
 
     # TEST
     eq_or_diff(
@@ -249,7 +239,7 @@ foreach my $exe ( './black-hole-solve', )
     # TEST
     ok( !( $trap->exit ), "Exit code for for golf board #2." );
 
-    my $stdout = _normalize_lf( $trap->stdout() );
+    my $stdout = as_lf( $trap->stdout() );
     $stdout =~ s/--------------------\n\K(?:[^\n]+\n){2}\z//ms;
 
     # TEST

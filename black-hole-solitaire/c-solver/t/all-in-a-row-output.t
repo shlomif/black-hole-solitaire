@@ -13,6 +13,7 @@ my $data_dir  = $bin_dir->child('data');
 my $texts_dir = $data_dir->child('texts');
 
 use Dir::Manifest ();
+use Dir::Manifest::Slurp qw/ as_lf /;
 my $mani = Dir::Manifest->new(
     {
         manifest_fn => $texts_dir->child('list.txt'),
@@ -20,15 +21,6 @@ my $mani = Dir::Manifest->new(
     }
 );
 use Test::Trap qw( trap $trap :flow:stderr(systemsafe):stdout(systemsafe):warn);
-
-use Socket qw(:crlf);
-
-sub _normalize_lf
-{
-    my ($s) = @_;
-    $s =~ s#$CRLF#$LF#g;
-    return $s;
-}
 
 {
     trap
@@ -43,7 +35,7 @@ sub _normalize_lf
 
     # TEST
     eq_or_diff(
-        _normalize_lf( $trap->stdout() ),
+        as_lf( $trap->stdout() ),
         $mani->text( "24.all_in_a_row.sol.txt", { lf => 1 } ),
         "Right output from board 24."
     );
@@ -60,7 +52,7 @@ sub _normalize_lf
     # TEST
     ok( !( $trap->exit ), "Exit code for --display-boards for board #24." );
 
-    my $expected_prefix = _normalize_lf(<<'EOF');
+    my $expected_prefix = as_lf(<<'EOF');
 Solved!
 
 [START BOARD]
@@ -139,22 +131,19 @@ Info: Card moved is QD
 
 EOF
 
-    my $stdout = _normalize_lf( $trap->stdout() );
+    my $stdout = as_lf( $trap->stdout() );
 
     my $got_prefix = substr( $stdout, 0, length($expected_prefix) );
 
     # TEST
-    eq_or_diff(
-        _normalize_lf($got_prefix),
-        _normalize_lf($expected_prefix),
-        "Right output from board 24 with --display-boards."
-    );
+    eq_or_diff( as_lf($got_prefix), as_lf($expected_prefix),
+        "Right output from board 24 with --display-boards." );
 
     my $expected_stdout =
         $mani->text( '24.all_in_a_row.sol-with-display-boards.txt',
         { lf => 1 } );
 
     # TEST
-    eq_or_diff( _normalize_lf($stdout), $expected_stdout,
+    eq_or_diff( as_lf($stdout), $expected_stdout,
         "Complete Right output from board 24 with --display-boards." );
 }
