@@ -82,9 +82,7 @@ ok( !( $trap->exit ), "Running --max-iters program successfully." );
 # TEST
 eq_or_diff(
     _normalize_lf( $trap->stdout() ),
-    $mani->text(
-        "26464608654870335080-with-max-iters.bh.sol.txt", { lf => 1 }
-    ),
+    $mani->text( "26464608654870335080.bh.sol.txt", { lf => 1 } ),
     "Right output."
 );
 
