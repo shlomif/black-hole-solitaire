@@ -23,7 +23,16 @@
 #include "state.h"
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wpadded"
+#ifdef USE_SYSTEM_XXHASH
+#include "xxhash.h"
+#if SIZEOF_VOID_P == 4
+#define DO_XXH(b, l) XXH32((b), (l), 0)
+#else
+#define DO_XXH(b, l) XXH64((b), (l), 0)
+#endif
+#else
 #include "wrap_xxhash.h"
+#endif
 #pragma clang diagnostic pop
 
 static inline unsigned long hash_function(const bhs_state_key_t key)
