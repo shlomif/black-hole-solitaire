@@ -196,14 +196,13 @@ foreach my $exe ( './black-hole-solve', )
         "Foundation in black_hole is AS rather than 0S with --display-boards."
     );
 
-    my $expected_stdout =
-        $data_dir->child( '26464608654870335080.bh-sol-with-display-boards.txt',
-    )->slurp_utf8;
-
     # TEST
     eq_or_diff(
         _normalize_lf($stdout),
-        _normalize_lf($expected_stdout),
+        $mani->text(
+            '26464608654870335080.bh-sol-with-display-boards.txt',
+            { lf => 1 }
+        ),
         "Complete Right output from black_hole solver with --display-boards."
     );
 }
