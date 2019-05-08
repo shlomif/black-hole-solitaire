@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Test::More tests => 20;
-use Test::Differences;
+use Test::Differences qw/ eq_or_diff /;
 
 use Test::Trap qw(
     trap $trap :flow:stderr(systemsafe):stdout(systemsafe):warn
