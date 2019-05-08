@@ -1,3 +1,4 @@
+24.all_in_a_row.sol.txt
 26464608654870335080-disp-boards.bh.sol.txt
 26464608654870335080-iters-step-1100.bh.sol.txt
 26464608654870335080-iters-step.bh.sol.txt
