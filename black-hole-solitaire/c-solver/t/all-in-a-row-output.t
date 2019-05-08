@@ -151,13 +151,10 @@ EOF
     );
 
     my $expected_stdout =
-        $data_dir->child( '24.all_in_a_row.sol-with-display-boards.txt', )
-        ->slurp_utf8;
+        $mani->text( '24.all_in_a_row.sol-with-display-boards.txt',
+        { lf => 1 } );
 
     # TEST
-    eq_or_diff(
-        _normalize_lf($stdout),
-        _normalize_lf($expected_stdout),
-        "Complete Right output from board 24 with --display-boards."
-    );
+    eq_or_diff( _normalize_lf($stdout), $expected_stdout,
+        "Complete Right output from board 24 with --display-boards." );
 }
