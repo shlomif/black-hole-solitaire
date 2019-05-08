@@ -1,3 +1,12 @@
+0.22.0      ( 08 May 2019 ):
+============================
+
+* Try to gracefully abort on memory allocation failure (due to out of RAM/etc.)
+
+* Refactor the test suite.
+
+* Introduce https://metacpan.org/pod/Games::Solitaire::Verify::Golf .
+
 0.20.0      ( 17 Apr 2019 ):
 ============================
 
