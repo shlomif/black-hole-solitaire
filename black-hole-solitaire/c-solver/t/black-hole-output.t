@@ -233,7 +233,7 @@ foreach my $exe ( './black-hole-solve', )
     # TEST
     eq_or_diff(
         $stdout,
-        _normalize_lf( $data_dir->child('906.golf.solution.txt')->slurp_utf8 ),
+        $mani->text( '906.golf.solution.txt', { lf => 1 } ),
         "the right golf no. 906 solution",
     );
 }

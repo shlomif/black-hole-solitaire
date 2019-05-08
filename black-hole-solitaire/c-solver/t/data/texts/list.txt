@@ -5,3 +5,4 @@
 26464608654870335080-iters-step.bh.sol.txt
 26464608654870335080.bh-sol-with-display-boards.txt
 26464608654870335080.bh.sol.txt
+906.golf.solution.txt
