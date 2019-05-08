@@ -255,7 +255,7 @@ foreach my $exe ( './black-hole-solve', )
     # TEST
     eq_or_diff(
         $stdout,
-        _normalize_lf( $data_dir->child('2.golf.sol.txt')->slurp_utf8 ),
+        $mani->text( '2.golf.sol.txt', { lf => 1 } ),
         "the right golf no. 2 solution",
     );
 }
