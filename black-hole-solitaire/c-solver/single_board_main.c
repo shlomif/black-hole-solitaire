@@ -16,7 +16,6 @@ int main(int argc, char *argv[])
         {
             filename = argv[arg_idx];
         }
-        ++arg_idx;
     }
 
     const int ret = solve_filename(filename, &settings);
