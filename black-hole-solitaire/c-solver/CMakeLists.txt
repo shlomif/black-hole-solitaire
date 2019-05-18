@@ -87,6 +87,12 @@ IF (USE_SYSTEM_XXHASH)
     LIST(APPEND DEP_LIBS "xxhash")
 ENDIF ()
 
+SET (rinutils "rinutils")
+IF (NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${rinutils}")
+    EXECUTE_PROCESS(COMMAND "git" "clone" "https://github.com/shlomif/rinutils.git" "${rinutils}"
+        WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+    )
+ENDIF ()
 SET(LIBTCMALLOC_LIB_LIST)
 
 # Avoid linking to tcmalloc if the test suite is enabled due to:
@@ -207,6 +213,7 @@ TARGET_LINK_LIBRARIES("${LIB_BASE}" ${DEP_LIBS})
 
 LIST (APPEND BLACK_HOLE_SOLVER_LIBS "${LIB_BASE}")
 
+INCLUDE_DIRECTORIES(BEFORE "${CMAKE_CURRENT_SOURCE_DIR}/${rinutils}/rinutils/include")
 
 IF (NOT USE_SYSTEM_XXHASH)
     INCLUDE("${private_mod_path}/xxhash_wrapper_bootstrap.cmake")

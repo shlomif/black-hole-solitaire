@@ -17,7 +17,7 @@ extern "C" {
 #endif
 
 #include <stddef.h>
-#include "likely.h"
+#include "rinutils/likely.h"
 #include "state.h"
 
 #ifndef FCS_IA_PACK_SIZE

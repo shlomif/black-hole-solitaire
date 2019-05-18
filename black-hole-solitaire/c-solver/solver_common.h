@@ -13,7 +13,7 @@
 
 #include <black-hole-solver/black_hole_solver.h>
 #include "state.h"
-#include "likely.h"
+#include "rinutils/likely.h"
 
 #include "config.h"
 

@@ -22,10 +22,10 @@
 #include "config.h"
 #include <black-hole-solver/black_hole_solver.h>
 #include "can_move.h"
-#include "likely.h"
+#include "rinutils/likely.h"
 #include "state.h"
 #include "bit_rw.h"
-#include "typeof_wrap.h"
+#include "rinutils/typeof_wrap.h"
 
 #if (BHS_STATE_STORAGE == BHS_STATE_STORAGE_TOKYO_CAB_HASH)
 #include "tokyo_cab_hash.h"

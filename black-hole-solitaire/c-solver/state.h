@@ -1,7 +1,7 @@
 #pragma once
 
 #include <stdint.h>
-#include "min_and_max.h"
+#include "rinutils/min_and_max.h"
 
 #define BHS__ALL_IN_A_ROW__NUM_COLUMNS 13
 #define BHS__ALL_IN_A_ROW__MAX_NUM_CARDS_IN_COL 4

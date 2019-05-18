@@ -11,9 +11,9 @@
 // meta-allocator concept that is used to collect the pages allocated by
 // the standard allocator after it is destroyed and to recycle them.
 #include <stdlib.h>
-#include "likely.h"
+#include "rinutils/likely.h"
 #include "meta_alloc.h"
-#include "typeof_wrap.h"
+#include "rinutils/typeof_wrap.h"
 
 #define ALLOCED_SIZE (FCS_IA_PACK_SIZE * 1024 - (256 + 128))
 
