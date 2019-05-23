@@ -1,10 +1,23 @@
+Black Hole Solver's News File
+=============================
+Shlomi Fish <shlomif@cpan.org>
+:Date: 2019-05-23
+:Revision: $Id$
+
+1.0.0       ( 23 May 2019 ):
+----------------------------
+
+* Convert common headers to https://github.com/shlomif/rinutils/ .
+
+* Convert NEWS to AsciiDoc.
+
 0.24.0      ( 08 May 2019 ):
-============================
+----------------------------
 
 * Add the USE_SYSTEM_XXHASH cmake option.
 
 0.22.0      ( 08 May 2019 ):
-============================
+----------------------------
 
 * Try to gracefully abort on memory allocation failure (due to out of RAM/etc.)
 
@@ -13,9 +26,9 @@
 * Introduce https://metacpan.org/pod/Games::Solitaire::Verify::Golf .
 
 0.20.0      ( 17 Apr 2019 ):
-============================
+----------------------------
 
-* Add some API calls for BLACK_HOLE_SOLVER__API__REQUIRES_SETUP_CALL .
+* Add some API calls for +BLACK_HOLE_SOLVER__API__REQUIRES_SETUP_CALL+ .
 Breaking change!
 
 * Add black_hole_solver_recycle() .
@@ -25,7 +38,7 @@ Breaking change!
 * Some speed ups, code clean-ups, tests, and refactorings.
 
 0.18.0      ( 15 Jan 2019 ):
-============================
+----------------------------
 
 * Add support for three variants of
 https://en.wikipedia.org/wiki/Golf_(patience) .
@@ -39,7 +52,7 @@ passed a large string (not exploitable using the command line exe).
 * Added tests; some cleanups and some optimisations .
 
 0.16.0      ( 12 Nov 2017 ):
-============================
+----------------------------
 
 * Fix a crash when reading a non-existent board file.
     - Thanks to Nandakumar Edamana for the report.
@@ -47,7 +60,7 @@ passed a large string (not exploitable using the command line exe).
 * Got the tests to work on MS Windows and other cleanups.
 
 0.14.0      ( 24 Feb 2016 ):
-============================
+----------------------------
 
 * Move the version control system to Git and GitHub and enabled Travis-CI:
     - https://github.com/shlomif/black-hole-solitaire
@@ -61,14 +74,14 @@ passed a large string (not exploitable using the command line exe).
     - the global --max-iters was ignored.
 
 0.12.0      ( 11 Oct 2014 ):
-============================
+----------------------------
 
 * Made the solver API resumable.
 
 * Code is now -std=gnu99 (GCC/clang) specific due to refactorings and cleanups.
 
 0.10.0      ( 21 May 2014 ):
-============================
+----------------------------
 
 * Add the API function black_hole_solver_set_iters_display_step
 
@@ -77,7 +90,7 @@ passed a large string (not exploitable using the command line exe).
 * Fixed for CMake-3.0.0.
 
 0.8.0       ( 03 Jun 2013 ):
-============================
+----------------------------
 
 * Add the --rank-reach-prune option and
 black_hole_solver_enable_rank_reachability_prune().
@@ -87,24 +100,24 @@ black_hole_solver_enable_rank_reachability_prune().
 * Add the --version flag.
 
 0.6.0       ( 16 May 2013 ):
-============================
+----------------------------
 
 * Add the --display-boards flag.
 
 * Add the --help flag.
 
 0.4.0       ( 12 May 2013 ):
-============================
+----------------------------
 
 * Add support for All in a Row Solitaire in addition to Black Hole
 Solitaire.
 
 0.2.0       ( 22 Sep 2010 ):
-============================
+----------------------------
 
 * Translate to C.
 
 0.0.1       ( 11 Jan 2010 ):
-============================
+----------------------------
 
 * Initial release as a Perl CPAN module.
