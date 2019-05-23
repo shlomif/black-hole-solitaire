@@ -33,6 +33,7 @@ SET (IA_STATE_PACKS_GROW_BY 32 CACHE STRING "Amount to Grow State Packs By")
 SET (base_with_ver "black_hole_solver-[0-9]+\\\\.[0-9]+\\\\.[0-9]+")
 SET(CPACK_SOURCE_GENERATOR "TXZ")
 SET(CPACK_SOURCE_IGNORE_FILES
+    "/\\\\.git/"
     "/\\\\.tidyall\\\\.d/"
     "/tags$"
     "\\\\.swp$"
