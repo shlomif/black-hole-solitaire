@@ -10,7 +10,7 @@ use List::MoreUtils qw(zip part);
 
 my $DATABASE_FILE = "black_hole_solver.sqlite";
 
-my @ranks = ( "A", 2 .. 9, qw(T J Q K) );
+my @ranks      = ( "A", 2 .. 9, qw(T J Q K) );
 my %ranks_to_n = ( map { $ranks[$_] => $_ } 0 .. $#ranks );
 
 my @suits      = (qw(H C D S));
