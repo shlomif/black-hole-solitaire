@@ -8,7 +8,7 @@ option (FCS_WITH_TEST_SUITE "Also build and run the test suite." ON)
 option (FCS_AVOID_TCMALLOC "Avoid linking against Google's tcmalloc")
 option (USE_SYSTEM_XXHASH "Link to the system's xxHash instead of the bundled copy")
 option (BUILD_STATIC_LIBRARY "Build and install the static library")
-option (DISABLE_APPLYING_RPATH "Disable rpath")
+option (DISABLE_APPLYING_RPATH "Disable applying rpath")
 
 INCLUDE(FindPkgConfig)
 
