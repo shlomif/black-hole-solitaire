@@ -121,18 +121,20 @@ typedef struct
 
 #define TALON_PTR_BITS 6
 
-static void write_talon(bhs_state_key_t *key, uint_fast32_t n)
+static inline void write_talon(
+    bhs_state_key_t *key, const fc_solve_bit_data_t n)
 {
     fc_solve_bit_writer_t bit_w;
     fc_solve_bit_writer_init_bare(&bit_w, key->data);
     fc_solve_bit_writer_overwrite(&bit_w, TALON_PTR_BITS, n);
 }
-static uint_fast32_t read_talon(bhs_state_key_t key)
+static inline uint_fast32_t read_talon(const bhs_state_key_t key)
 {
     return key.data[0] & ((1 << TALON_PTR_BITS) - 1);
 }
-static void write_col(bhs_state_key_t *key, uint_fast32_t col_idx,
-    uint_fast32_t bits_per_column, uint_fast32_t n)
+static inline void write_col(bhs_state_key_t *const key,
+    const uint_fast32_t col_idx, const uint_fast32_t bits_per_column,
+    fc_solve_bit_data_t n)
 {
     fc_solve_bit_writer_t w;
     fc_solve_bit_writer_init_bare(&w, key->data);
@@ -140,8 +142,8 @@ static void write_col(bhs_state_key_t *key, uint_fast32_t col_idx,
 
     fc_solve_bit_writer_overwrite(&w, bits_per_column, n);
 }
-static uint_fast32_t read_col(
-    bhs_state_key_t key, uint_fast32_t col_idx, uint_fast32_t bits_per_column)
+static inline fc_solve_bit_data_t read_col(const bhs_state_key_t key,
+    const uint_fast32_t col_idx, const uint_fast32_t bits_per_column)
 {
     fc_solve_bit_reader_t r;
     fc_solve_bit_reader_init(&r, key.data);
