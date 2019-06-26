@@ -660,7 +660,9 @@ extern int DLLEXPORT black_hole_solver_run(
         --solver->queue_len;
         const_AUTO(queue_item_copy, solver->queue[solver->queue_len]);
         const_AUTO(foundations, queue_item_copy.s.packed.key.foundations);
-        const_AUTO(talon_ptr, read_talon(&queue_item_copy.s.packed.key));
+        fc_solve_bit_reader_t r;
+        fc_solve_bit_reader_init(&r, queue_item_copy.s.packed.key.data);
+        const_AUTO(talon_ptr, fc_solve_bit_reader_read(&r, TALON_PTR_BITS));
 
         if (effective_is_rank_reachability_prune_enabled &&
             (bhs_find_rank_reachability__inline(foundations,
@@ -683,9 +685,6 @@ extern int DLLEXPORT black_hole_solver_run(
                 return BLACK_HOLE_SOLVER__OUT_OF_MEMORY;
             }
         }
-        fc_solve_bit_reader_t r;
-        fc_solve_bit_reader_init(&r, queue_item_copy.s.packed.key.data);
-        fc_solve_bit_reader_skip(&r, TALON_PTR_BITS);
         if (effective_place_queens_on_kings || (foundations != RANK_K))
         {
             const bool *const found_can_move = can_move[foundations];
