@@ -83,6 +83,8 @@ typedef struct
 {
     bhs_solution_state_t s;
     bhs_rank_counts rank_counts;
+    void *parent;
+    bool played;
 } bhs_queue_item_t;
 
 #define TALON_MAX_SIZE (NUM_RANKS * NUM_SUITS)
@@ -114,7 +116,7 @@ typedef struct
     bhs_card_string_t initial_talon_card_strings[TALON_MAX_SIZE];
 
     bhs_state_key_value_pair_t init_state;
-    bhs_state_key_value_pair_t final_state;
+    bhs_queue_item_t *final_state;
 
     bool is_rank_reachability_prune_enabled;
     bool effective_is_rank_reachability_prune_enabled;
@@ -146,14 +148,6 @@ int DLLEXPORT black_hole_solver_create(
     ret->wrap_ranks = true;
 
     fc_solve_meta_compact_allocator_init(&(ret->meta_alloc));
-    if (unlikely(bh_solve_hash_init(&(ret->positions), &(ret->meta_alloc))))
-    {
-        fc_solve_meta_compact_allocator_finish(&(ret->meta_alloc));
-        free(ret);
-        *ret_instance = NULL;
-        return BLACK_HOLE_SOLVER__OUT_OF_MEMORY;
-    }
-
     *ret_instance = (black_hole_solver_instance_t *)ret;
 
     return BLACK_HOLE_SOLVER__SUCCESS;
@@ -538,8 +532,8 @@ static inline void queue_item_unpack(
 }
 
 static inline int perform_move(bhs_solver_t *const solver,
-    const bhs_rank_t prev_foundation, const bhs_rank_t card,
-    const uint_fast32_t col_idx,
+    bhs_queue_item_t *queue_item_ptr, const bhs_rank_t prev_foundation,
+    const bhs_rank_t card, const uint_fast32_t col_idx,
     const bhs_queue_item_t *const queue_item_copy_ptr)
 {
     const_SLOT(num_columns, solver);
@@ -568,21 +562,14 @@ static inline int perform_move(bhs_solver_t *const solver,
 
     next_queue_item.rank_counts = queue_item_copy_ptr->rank_counts;
     next_queue_item.rank_counts.c[(ssize_t)card]--;
+    next_queue_item.parent = queue_item_ptr;
+    next_queue_item.played = false;
 
-    const int ret =
-        bh_solve_hash_insert(&(solver->positions), &(next_queue_item.s.packed));
-    if (unlikely(ret < 0))
-    {
-        return 1;
-    }
-    if (!ret)
-    {
-        ++solver->num_states_in_collection;
-        /* It's a new state - put it in the queue. */
-        solver->queue[(solver->queue_len)++] = next_queue_item;
+    /* It's a new state - put it in the queue. */
+    solver->queue[(solver->queue_len)++] = next_queue_item;
+    assert(!solver->queue[0].parent);
 
-        assert(solver->queue_len < QUEUE_MAX_SIZE);
-    }
+    assert(solver->queue_len < QUEUE_MAX_SIZE);
     return 0;
 }
 
@@ -590,9 +577,12 @@ static inline bhs_state_key_value_pair_t setup_first_queue_item(
     bhs_solver_t *const solver)
 {
     const_SLOT(num_columns, solver);
+    assert(solver->queue_len == 0);
 
     typeof(solver->queue[solver->queue_len]) *const new_queue_item =
         &(solver->queue[solver->queue_len]);
+    new_queue_item->parent = NULL;
+    new_queue_item->played = false;
 
     // Populate the unpacked state.
     for (size_t i = 0; i < num_columns; ++i)
@@ -621,6 +611,7 @@ static inline bhs_state_key_value_pair_t setup_first_queue_item(
         }
     }
     ++solver->queue_len;
+    assert(!solver->queue[0].parent);
 
     return new_queue_item->s.packed;
 }
@@ -639,10 +630,6 @@ static inline int setup_init_state(bhs_solver_t *const solver)
     bhs_state_key_value_pair_t *const init_state = &(solver->init_state);
     *init_state = setup_first_queue_item(solver);
 
-    if (unlikely(bh_solve_hash_insert(&(solver->positions), init_state) < 0))
-    {
-        return BLACK_HOLE_SOLVER__OUT_OF_MEMORY;
-    }
     ++solver->num_states_in_collection;
     solver->effective_is_rank_reachability_prune_enabled =
         solver->talon_len ? false : solver->is_rank_reachability_prune_enabled;
@@ -680,8 +667,15 @@ extern int DLLEXPORT black_hole_solver_run(
 
     while (solver->queue_len > 0)
     {
-        --solver->queue_len;
-        const_AUTO(queue_item_copy, solver->queue[solver->queue_len]);
+        assert(!solver->queue[0].parent);
+        const_AUTO(queue_item_ptr, &solver->queue[solver->queue_len - 1]);
+        const_AUTO(queue_item_copy, solver->queue[solver->queue_len - 1]);
+        if (queue_item_ptr->played)
+        {
+            --solver->queue_len;
+            continue;
+        }
+        queue_item_ptr->played = true;
         const_AUTO(state, queue_item_copy.s.unpacked);
         const_AUTO(foundations, state.foundations);
         const_AUTO(talon_ptr, state.talon_ptr);
@@ -690,6 +684,7 @@ extern int DLLEXPORT black_hole_solver_run(
             (bhs_find_rank_reachability__inline(foundations,
                  &queue_item_copy.rank_counts) != RANK_REACH__SUCCESS))
         {
+            --solver->queue_len;
             continue;
         }
 
@@ -700,7 +695,7 @@ extern int DLLEXPORT black_hole_solver_run(
 
         if (has_talon)
         {
-            if (unlikely(perform_move(solver, foundations,
+            if (unlikely(perform_move(solver, queue_item_ptr, foundations,
                     solver->talon_values[talon_ptr], num_columns,
                     &queue_item_copy)))
             {
@@ -720,8 +715,8 @@ extern int DLLEXPORT black_hole_solver_run(
 
                     if (found_can_move[(size_t)card])
                     {
-                        if (unlikely(perform_move(solver, foundations, card,
-                                col_idx, &queue_item_copy)))
+                        if (unlikely(perform_move(solver, queue_item_ptr,
+                                foundations, card, col_idx, &queue_item_copy)))
                         {
                             return BLACK_HOLE_SOLVER__OUT_OF_MEMORY;
                         }
@@ -744,7 +739,7 @@ extern int DLLEXPORT black_hole_solver_run(
 
         if (no_cards)
         {
-            solver->final_state = queue_item_copy.s.packed;
+            solver->final_state = queue_item_ptr;
 
             solver->iterations_num = iterations_num;
 
@@ -768,7 +763,6 @@ extern int DLLEXPORT black_hole_solver_recycle(
 {
     bhs_solver_t *const solver = (bhs_solver_t *)instance_proto;
 
-    bh_solve_hash_recycle(&(solver->positions));
     solver->iterations_num = 0;
     solver->queue_len = 0;
     solver->num_states_in_collection = 0;
@@ -788,17 +782,19 @@ DLLEXPORT void black_hole_solver_init_solution_moves(
 
     bhs_solution_state_t *const states = solver->states_in_solution;
 
-    states[num_states].packed = (solver->final_state);
+    states[num_states].packed = (solver->final_state->s.packed);
+    var_AUTO(parent_ptr, (bhs_queue_item_t *)solver->final_state);
     queue_item_unpack(solver, &states[num_states]);
 
     while (memcmp(&(states[num_states].packed.key), &(solver->init_state.key),
         sizeof(states[num_states].packed.key)))
     {
         assert(num_states < MAX_NUM_STATES);
+        assert(parent_ptr);
+        assert(parent_ptr->played);
         /* Look up the next state in the positions associative array. */
-        bh_solve_hash_get(&(solver->positions),
-            &(states[num_states].packed.key),
-            &(states[num_states + 1].packed.value));
+        states[num_states + 1].packed.value = parent_ptr->s.packed.value;
+        parent_ptr = (bhs_queue_item_t *)parent_ptr->parent;
         // Reverse the move
         const size_t col_idx = states[num_states + 1].packed.value.col_idx;
         states[num_states + 1].packed.key = states[num_states].packed.key;
@@ -975,7 +971,6 @@ extern int DLLEXPORT black_hole_solver_free(
 {
     bhs_solver_t *const solver = (bhs_solver_t *)instance_proto;
 
-    bh_solve_hash_free(&(solver->positions));
     fc_solve_meta_compact_allocator_finish(&(solver->meta_alloc));
 
     free(solver);
