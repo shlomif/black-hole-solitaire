@@ -58,16 +58,19 @@ static inline void fc_solve_bit_writer_overwrite(
     fc_solve_bit_writer_t *const writer, uint_fast32_t len,
     fc_solve_bit_data_t data)
 {
+    fcs_uchar_t c = *(writer->current);
     for (; len; --len, (data >>= 1))
     {
-        *(writer->current) &= (~(1 << (writer->bit_in_char_idx)));
-        *(writer->current) |= ((data & 0x1) << (writer->bit_in_char_idx++));
+        c &= (~(1 << (writer->bit_in_char_idx)));
+        c |= ((data & 0x1) << (writer->bit_in_char_idx++));
         if (writer->bit_in_char_idx == NUM_BITS_IN_BYTES)
         {
-            ++writer->current;
+            *(writer->current) = c;
+            c = *(++writer->current);
             writer->bit_in_char_idx = 0;
         }
     }
+    *(writer->current) = c;
 }
 
 typedef struct
