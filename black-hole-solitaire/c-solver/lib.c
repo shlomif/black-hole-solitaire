@@ -141,11 +141,11 @@ static inline void write_col(bhs_state_key_t *const key,
 
     fc_solve_bit_writer_overwrite(&w, bits_per_column, n);
 }
-static inline fc_solve_bit_data_t read_col(const bhs_state_key_t key,
+static inline fc_solve_bit_data_t read_col(const bhs_state_key_t *key,
     const uint_fast32_t col_idx, const uint_fast32_t bits_per_column)
 {
     fc_solve_bit_reader_t r;
-    fc_solve_bit_reader_init(&r, key.data);
+    fc_solve_bit_reader_init(&r, key->data);
     fc_solve_bit_reader_skip(&r, TALON_PTR_BITS + col_idx * bits_per_column);
 
     return fc_solve_bit_reader_read(&r, bits_per_column);
@@ -538,7 +538,7 @@ static inline int perform_move(bhs_solver_t *const solver,
     else
     {
         write_col(&next_state.key, col_idx, bits_per_column,
-            read_col(next_state.key, col_idx, bits_per_column) - 1);
+            read_col(&next_state.key, col_idx, bits_per_column) - 1);
     }
 #undef next_state
 
@@ -804,7 +804,7 @@ DLLEXPORT void black_hole_solver_init_solution_moves(
         else
         {
             unsigned moved_card_height = read_col(
-                states[num_states].packed.key, col_idx, bits_per_column);
+                &states[num_states].packed.key, col_idx, bits_per_column);
             var_AUTO(new_moved_card_height, moved_card_height + 1);
             states[num_states + 1].packed.key.foundations =
                 states[num_states + 1].packed.value.prev_foundation;
@@ -860,7 +860,7 @@ DLLEXPORT extern int black_hole_solver_get_next_move(
         const uint_fast16_t height =
             (is_talon ? read_talon(next_state.packed.key)
                       : (read_col(
-                             next_state.packed.key, col_idx, bits_per_column) -
+                             &next_state.packed.key, col_idx, bits_per_column) -
                             1));
         assert(height <
                (is_talon ? solver->talon_len : solver->initial_lens[col_idx]));
