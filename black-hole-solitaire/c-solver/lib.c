@@ -124,9 +124,8 @@ typedef struct
 static inline void write_talon(
     bhs_state_key_t *key, const fc_solve_bit_data_t n)
 {
-    fc_solve_bit_writer_t bit_w;
-    fc_solve_bit_writer_init_bare(&bit_w, key->data);
-    fc_solve_bit_writer_overwrite(&bit_w, TALON_PTR_BITS, n);
+    key->data[0] &= ~((1 << TALON_PTR_BITS) - 1);
+    key->data[0] |= n;
 }
 static inline uint_fast32_t read_talon(const bhs_state_key_t key)
 {
