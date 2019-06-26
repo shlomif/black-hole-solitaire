@@ -68,15 +68,7 @@ static int suit_char_to_index(char suit)
 
 typedef struct
 {
-    uint8_t heights[BHS__MAX_NUM_COLUMNS];
-    int8_t foundations;
-    uint8_t talon_ptr;
-} bhs_unpacked_state_t;
-
-typedef struct
-{
     bhs_state_key_value_pair_t packed;
-    bhs_unpacked_state_t unpacked;
 } bhs_solution_state_t;
 
 typedef struct
@@ -127,6 +119,36 @@ typedef struct
     bhs_solution_state_t states_in_solution[MAX_NUM_STATES];
 } bhs_solver_t;
 
+#define TALON_PTR_BITS 6
+
+static void write_talon(bhs_state_key_t *key, uint_fast32_t n)
+{
+    fc_solve_bit_writer_t bit_w;
+    fc_solve_bit_writer_init_bare(&bit_w, key->data);
+    fc_solve_bit_writer_overwrite(&bit_w, TALON_PTR_BITS, n);
+}
+static uint_fast32_t read_talon(bhs_state_key_t key)
+{
+    return key.data[0] & ((1 << TALON_PTR_BITS) - 1);
+}
+static void write_col(bhs_state_key_t *key, uint_fast32_t col_idx,
+    uint_fast32_t bits_per_column, uint_fast32_t n)
+{
+    fc_solve_bit_writer_t w;
+    fc_solve_bit_writer_init_bare(&w, key->data);
+    fc_solve_bit_writer_skip(&w, TALON_PTR_BITS + col_idx * bits_per_column);
+
+    fc_solve_bit_writer_overwrite(&w, bits_per_column, n);
+}
+static uint_fast32_t read_col(
+    bhs_state_key_t key, uint_fast32_t col_idx, uint_fast32_t bits_per_column)
+{
+    fc_solve_bit_reader_t r;
+    fc_solve_bit_reader_init(&r, key.data);
+    fc_solve_bit_reader_skip(&r, TALON_PTR_BITS + col_idx * bits_per_column);
+
+    return fc_solve_bit_reader_read(&r, bits_per_column);
+}
 int DLLEXPORT black_hole_solver_create(
     black_hole_solver_instance_t **ret_instance)
 {
@@ -495,76 +517,32 @@ DLLEXPORT extern int black_hole_solver_set_max_iters_limit(
     return BLACK_HOLE_SOLVER__SUCCESS;
 }
 
-#define TALON_PTR_BITS 6
-
-static inline void queue_item_populate_packed(
-    bhs_solver_t *const solver, bhs_queue_item_t *const queue_item)
-{
-    queue_item->s.packed.key.foundations = queue_item->s.unpacked.foundations;
-
-    fc_solve_bit_writer_t bit_w;
-    fc_solve_bit_writer_init(&bit_w, queue_item->s.packed.key.data);
-
-    const_SLOT(num_columns, solver);
-    const_SLOT(bits_per_column, solver);
-    fc_solve_bit_writer_write(
-        &bit_w, TALON_PTR_BITS, queue_item->s.unpacked.talon_ptr);
-    for (size_t col = 0; col < num_columns; ++col)
-    {
-        fc_solve_bit_writer_write(
-            &bit_w, bits_per_column, queue_item->s.unpacked.heights[col]);
-    }
-}
-
-static inline void queue_item_unpack(
-    bhs_solver_t *const solver, bhs_solution_state_t *const queue_item)
-{
-    const_SLOT(num_columns, solver);
-    const_SLOT(bits_per_column, solver);
-
-    queue_item->unpacked.foundations = queue_item->packed.key.foundations;
-
-    fc_solve_bit_reader_t bit_r;
-    fc_solve_bit_reader_init(&bit_r, queue_item->packed.key.data);
-
-    queue_item->unpacked.talon_ptr =
-        (uint8_t)fc_solve_bit_reader_read(&bit_r, TALON_PTR_BITS);
-    for (size_t col = 0; col < num_columns; ++col)
-    {
-        queue_item->unpacked.heights[col] =
-            (typeof(queue_item->unpacked.heights[col]))fc_solve_bit_reader_read(
-                &bit_r, bits_per_column);
-    }
-}
-
 static inline int perform_move(bhs_solver_t *const solver,
     const bhs_rank_t prev_foundation, const bhs_rank_t card,
     const uint_fast32_t col_idx,
     const bhs_queue_item_t *const queue_item_copy_ptr)
 {
     const_SLOT(num_columns, solver);
-    bhs_unpacked_state_t next_state = queue_item_copy_ptr->s.unpacked;
+    const_SLOT(bits_per_column, solver);
+    bhs_state_key_value_pair_t next_state = queue_item_copy_ptr->s.packed;
 
-    next_state.foundations = card;
+    next_state.key.foundations = card;
     if (col_idx == num_columns)
     {
-        ++next_state.talon_ptr;
+        write_talon(&next_state.key, 1 + read_talon(next_state.key));
     }
     else
     {
-        --next_state.heights[col_idx];
+        write_col(&next_state.key, col_idx, bits_per_column,
+            read_col(next_state.key, col_idx, bits_per_column) - 1);
     }
 
     bhs_queue_item_t next_queue_item;
 
-    next_queue_item.s.unpacked = next_state;
-    memset(&(next_queue_item.s.packed), '\0', sizeof(next_queue_item.s.packed));
-
+    next_queue_item.s.packed = next_state;
     next_queue_item.s.packed.value.col_idx =
         (typeof(next_queue_item.s.packed.value.col_idx))col_idx;
     next_queue_item.s.packed.value.prev_foundation = prev_foundation;
-
-    queue_item_populate_packed(solver, &(next_queue_item));
 
     next_queue_item.rank_counts = queue_item_copy_ptr->rank_counts;
     next_queue_item.rank_counts.c[(ssize_t)card]--;
@@ -594,30 +572,26 @@ static inline bhs_state_key_value_pair_t setup_first_queue_item(
     typeof(solver->queue[solver->queue_len]) *const new_queue_item =
         &(solver->queue[solver->queue_len]);
 
-    // Populate the unpacked state.
-    for (size_t i = 0; i < num_columns; ++i)
-    {
-        new_queue_item->s.unpacked.heights[i] = (typeof(
-            new_queue_item->s.unpacked.heights[i]))solver->initial_lens[i];
-    }
-    new_queue_item->s.unpacked.foundations = solver->initial_foundation;
-    new_queue_item->s.unpacked.talon_ptr = 0;
-
     // Populate the packed item from the unpacked one.
     memset(&(new_queue_item->s.packed), '\0', sizeof(new_queue_item->s.packed));
-
-    queue_item_populate_packed(solver, new_queue_item);
+    new_queue_item->s.packed.key.foundations = solver->initial_foundation;
     new_queue_item->s.packed.value.col_idx = (bhs_col_idx_t)num_columns + 1;
-
     memset(&(new_queue_item->rank_counts), '\0',
         sizeof(new_queue_item->rank_counts));
 
-    for (size_t col_idx = 0; col_idx < num_columns; ++col_idx)
+    fc_solve_bit_writer_t bit_w;
+    fc_solve_bit_writer_init(&bit_w, new_queue_item->s.packed.key.data);
+
+    const_SLOT(bits_per_column, solver);
+    fc_solve_bit_writer_write(&bit_w, TALON_PTR_BITS, 0);
+    for (size_t col = 0; col < num_columns; ++col)
     {
-        for (size_t h = 0; h < new_queue_item->s.unpacked.heights[col_idx]; ++h)
+        const_AUTO(hh, solver->initial_lens[col]);
+        fc_solve_bit_writer_write(&bit_w, bits_per_column, hh);
+        for (size_t h = 0; h < hh; ++h)
         {
             ++(new_queue_item->rank_counts
-                    .c[(ssize_t)solver->board_ranks[col_idx][h]]);
+                    .c[(ssize_t)solver->board_ranks[col][h]]);
         }
     }
     ++solver->queue_len;
@@ -672,6 +646,7 @@ extern int DLLEXPORT black_hole_solver_run(
     const_SLOT(can_move, solver);
 
     const_SLOT(num_columns, solver);
+    const_SLOT(bits_per_column, solver);
     const_SLOT(talon_len, solver);
     const_SLOT(effective_is_rank_reachability_prune_enabled, solver);
     const_SLOT(effective_place_queens_on_kings, solver);
@@ -682,9 +657,9 @@ extern int DLLEXPORT black_hole_solver_run(
     {
         --solver->queue_len;
         const_AUTO(queue_item_copy, solver->queue[solver->queue_len]);
-        const_AUTO(state, queue_item_copy.s.unpacked);
-        const_AUTO(foundations, state.foundations);
-        const_AUTO(talon_ptr, state.talon_ptr);
+        const_AUTO(state, queue_item_copy.s.packed.key);
+        const_AUTO(foundations, queue_item_copy.s.packed.key.foundations);
+        const_AUTO(talon_ptr, read_talon(state));
 
         if (effective_is_rank_reachability_prune_enabled &&
             (bhs_find_rank_reachability__inline(foundations,
@@ -712,7 +687,7 @@ extern int DLLEXPORT black_hole_solver_run(
             const bool *const found_can_move = can_move[foundations];
             for (uint_fast32_t col_idx = 0; col_idx < num_columns; ++col_idx)
             {
-                const_AUTO(pos, state.heights[col_idx]);
+                const_AUTO(pos, read_col(state, col_idx, bits_per_column));
                 if (pos)
                 {
                     no_cards = false;
@@ -733,7 +708,7 @@ extern int DLLEXPORT black_hole_solver_run(
         {
             for (size_t col_idx = 0; col_idx < num_columns; ++col_idx)
             {
-                const_AUTO(pos, state.heights[col_idx]);
+                const_AUTO(pos, read_col(state, col_idx, bits_per_column));
                 if (pos)
                 {
                     no_cards = false;
@@ -789,7 +764,6 @@ DLLEXPORT void black_hole_solver_init_solution_moves(
     bhs_solution_state_t *const states = solver->states_in_solution;
 
     states[num_states].packed = (solver->final_state);
-    queue_item_unpack(solver, &states[num_states]);
 
     while (memcmp(&(states[num_states].packed.key), &(solver->init_state.key),
         sizeof(states[num_states].packed.key)))
@@ -810,7 +784,7 @@ DLLEXPORT void black_hole_solver_init_solution_moves(
         else if (col_idx == num_columns)
         {
             const_AUTO(
-                moved_card_height, states[num_states].unpacked.talon_ptr);
+                moved_card_height, read_talon(states[num_states].packed.key));
             var_AUTO(new_moved_card_height, moved_card_height - 1);
             states[num_states + 1].packed.key.foundations =
                 states[num_states + 1].packed.value.prev_foundation;
@@ -824,8 +798,8 @@ DLLEXPORT void black_hole_solver_init_solution_moves(
         }
         else
         {
-            const_AUTO(moved_card_height,
-                states[num_states].unpacked.heights[col_idx]);
+            unsigned moved_card_height = read_col(
+                states[num_states].packed.key, col_idx, bits_per_column);
             var_AUTO(new_moved_card_height, moved_card_height + 1);
             states[num_states + 1].packed.key.foundations =
                 states[num_states + 1].packed.value.prev_foundation;
@@ -839,11 +813,9 @@ DLLEXPORT void black_hole_solver_init_solution_moves(
                     ((new_moved_card_height & 0x1) << (offset & 0x7));
             }
         }
-
-        queue_item_unpack(solver, &states[++num_states]);
+        ++num_states;
     }
-    states[num_states].packed.key.foundations =
-        states[num_states].unpacked.foundations = solver->initial_foundation;
+    states[num_states].packed.key.foundations = solver->initial_foundation;
 
     ++num_states;
     const_AUTO(lim, (num_states >> 1));
@@ -879,9 +851,12 @@ DLLEXPORT extern int black_hole_solver_get_next_move(
 
         const uint_fast32_t col_idx = next_state.packed.value.col_idx;
         const bool is_talon = (col_idx == solver->num_columns);
+        const_SLOT(bits_per_column, solver);
         const uint_fast16_t height =
-            (is_talon ? (next_state.unpacked.talon_ptr)
-                      : (next_state.unpacked.heights[col_idx] - 1));
+            (is_talon ? read_talon(next_state.packed.key)
+                      : (read_col(
+                             next_state.packed.key, col_idx, bits_per_column) -
+                            1));
         assert(height <
                (is_talon ? solver->talon_len : solver->initial_lens[col_idx]));
 
@@ -942,7 +917,7 @@ DLLEXPORT extern int black_hole_solver_get_current_solution_board(
     if (talon_len)
     {
         s += sprintf(s, "%s", "Talon:");
-        for (uint_fast16_t h = next_state.unpacked.talon_ptr; h < talon_len;
+        for (uint_fast16_t h = read_talon(next_state.packed.key); h < talon_len;
              ++h)
         {
             s += sprintf(s, " %s", solver->initial_talon_card_strings[h]);
@@ -950,10 +925,13 @@ DLLEXPORT extern int black_hole_solver_get_current_solution_board(
         s += sprintf(s, "\n");
     }
     const_SLOT(num_columns, solver);
+    const_SLOT(bits_per_column, solver);
     for (size_t col_idx = 0; col_idx < num_columns; ++col_idx)
     {
         s += sprintf(s, "%c", ':');
-        for (size_t h = 0; h < next_state.unpacked.heights[col_idx]; ++h)
+        const size_t hh =
+            read_col(next_state.packed.key, col_idx, bits_per_column);
+        for (size_t h = 0; h < hh; ++h)
         {
             s += sprintf(
                 s, " %s", solver->initial_board_card_strings[col_idx][h]);

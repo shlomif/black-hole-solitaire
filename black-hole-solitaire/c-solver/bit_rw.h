@@ -26,6 +26,12 @@ typedef struct
     fcs_uchar_t *start;
 } fc_solve_bit_writer_t;
 
+static inline void fc_solve_bit_writer_init_bare(
+    fc_solve_bit_writer_t *const writer, fcs_uchar_t *const start)
+{
+    writer->start = writer->current = start;
+    writer->bit_in_char_idx = 0;
+}
 static inline void fc_solve_bit_writer_init(
     fc_solve_bit_writer_t *const writer, fcs_uchar_t *const start)
 {
@@ -48,6 +54,22 @@ static inline void fc_solve_bit_writer_write(
     }
 }
 
+static inline void fc_solve_bit_writer_overwrite(
+    fc_solve_bit_writer_t *const writer, uint_fast32_t len,
+    fc_solve_bit_data_t data)
+{
+    for (; len; --len, (data >>= 1))
+    {
+        *(writer->current) &= (~(1 << (writer->bit_in_char_idx)));
+        *(writer->current) |= ((data & 0x1) << (writer->bit_in_char_idx++));
+        if (writer->bit_in_char_idx == NUM_BITS_IN_BYTES)
+        {
+            ++writer->current;
+            writer->bit_in_char_idx = 0;
+        }
+    }
+}
+
 typedef struct
 {
     const fcs_uchar_t *current;
@@ -60,6 +82,21 @@ static inline void fc_solve_bit_reader_init(
 {
     reader->start = reader->current = start;
     reader->bit_in_char_idx = 0;
+}
+
+static inline void fc_solve_bit_reader_skip(
+    fc_solve_bit_reader_t *const reader, uint_fast32_t len)
+{
+    if (len <= 7 - reader->bit_in_char_idx)
+    {
+        reader->bit_in_char_idx += len;
+        return;
+    }
+    len -= 8 - reader->bit_in_char_idx;
+    reader->bit_in_char_idx = 0;
+    ++reader->current;
+    reader->current += (len >> 3);
+    reader->bit_in_char_idx += (len & 7);
 }
 
 static inline fc_solve_bit_data_t fc_solve_bit_reader_read(
@@ -81,4 +118,18 @@ static inline fc_solve_bit_data_t fc_solve_bit_reader_read(
     }
 
     return ret;
+}
+static inline void fc_solve_bit_writer_skip(
+    fc_solve_bit_writer_t *const writer, uint_fast32_t len)
+{
+    if (len <= 7 - writer->bit_in_char_idx)
+    {
+        writer->bit_in_char_idx += len;
+        return;
+    }
+    len -= 8 - writer->bit_in_char_idx;
+    writer->bit_in_char_idx = 0;
+    ++writer->current;
+    writer->current += (len >> 3);
+    writer->bit_in_char_idx += (len & 7);
 }
