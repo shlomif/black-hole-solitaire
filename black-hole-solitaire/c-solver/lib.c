@@ -122,14 +122,14 @@ typedef struct
 #define TALON_PTR_BITS 6
 
 static inline void write_talon(
-    bhs_state_key_t *key, const fc_solve_bit_data_t n)
+    bhs_state_key_t *const key, const fc_solve_bit_data_t n)
 {
     key->data[0] &= ~((1 << TALON_PTR_BITS) - 1);
     key->data[0] |= n;
 }
-static inline uint_fast32_t read_talon(const bhs_state_key_t key)
+static inline uint_fast32_t read_talon(const bhs_state_key_t *const key)
 {
-    return key.data[0] & ((1 << TALON_PTR_BITS) - 1);
+    return key->data[0] & ((1 << TALON_PTR_BITS) - 1);
 }
 static inline void write_col(bhs_state_key_t *const key,
     const uint_fast32_t col_idx, const uint_fast32_t bits_per_column,
@@ -533,7 +533,7 @@ static inline int perform_move(bhs_solver_t *const solver,
     next_state.key.foundations = card;
     if (col_idx == num_columns)
     {
-        write_talon(&next_state.key, 1 + read_talon(next_state.key));
+        write_talon(&next_state.key, 1 + read_talon(&next_state.key));
     }
     else
     {
@@ -661,7 +661,7 @@ extern int DLLEXPORT black_hole_solver_run(
         const_AUTO(queue_item_copy, solver->queue[solver->queue_len]);
         const_AUTO(state, queue_item_copy.s.packed.key);
         const_AUTO(foundations, queue_item_copy.s.packed.key.foundations);
-        const_AUTO(talon_ptr, read_talon(state));
+        const_AUTO(talon_ptr, read_talon(&state));
 
         if (effective_is_rank_reachability_prune_enabled &&
             (bhs_find_rank_reachability__inline(foundations,
@@ -789,7 +789,7 @@ DLLEXPORT void black_hole_solver_init_solution_moves(
         else if (col_idx == num_columns)
         {
             const_AUTO(
-                moved_card_height, read_talon(states[num_states].packed.key));
+                moved_card_height, read_talon(&states[num_states].packed.key));
             var_AUTO(new_moved_card_height, moved_card_height - 1);
             states[num_states + 1].packed.key.foundations =
                 states[num_states + 1].packed.value.prev_foundation;
@@ -858,7 +858,7 @@ DLLEXPORT extern int black_hole_solver_get_next_move(
         const bool is_talon = (col_idx == solver->num_columns);
         const_SLOT(bits_per_column, solver);
         const uint_fast16_t height =
-            (is_talon ? read_talon(next_state.packed.key)
+            (is_talon ? read_talon(&next_state.packed.key)
                       : (read_col(
                              &next_state.packed.key, col_idx, bits_per_column) -
                             1));
