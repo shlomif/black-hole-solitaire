@@ -415,12 +415,12 @@ extern int DLLEXPORT black_hole_solver_read_board(
         const int ret_code = try_parse_talon(solver, &s);
         if (ret_code)
         {
-            MYRET(ret_code);
+            MYRET(ret_code)
         }
     }
     if (!string_find_prefix(&s, "Foundations: "))
     {
-        MYRET(BLACK_HOLE_SOLVER__FOUNDATIONS_NOT_FOUND_AT_START);
+        MYRET(BLACK_HOLE_SOLVER__FOUNDATIONS_NOT_FOUND_AT_START)
     }
 
     while (isspace(*s) && ((*s) != '\n'))
@@ -447,20 +447,20 @@ extern int DLLEXPORT black_hole_solver_read_board(
 
         if (ret_code)
         {
-            MYRET(ret_code);
+            MYRET(ret_code)
         }
     }
 
     if (*(s++) != '\n')
     {
-        MYRET(BLACK_HOLE_SOLVER__TRAILING_CHARS);
+        MYRET(BLACK_HOLE_SOLVER__TRAILING_CHARS)
     }
     ++line_num;
     {
         const int ret_code = try_parse_talon(solver, &s);
         if (ret_code)
         {
-            MYRET(ret_code);
+            MYRET(ret_code)
         }
     }
 
@@ -471,7 +471,7 @@ extern int DLLEXPORT black_hole_solver_read_board(
         {
             if (pos_idx == max_num_cards_in_col)
             {
-                MYRET(BLACK_HOLE_SOLVER__TOO_MANY_CARDS);
+                MYRET(BLACK_HOLE_SOLVER__TOO_MANY_CARDS)
             }
 
             const int ret_code =
@@ -480,7 +480,7 @@ extern int DLLEXPORT black_hole_solver_read_board(
 
             if (ret_code)
             {
-                MYRET(ret_code);
+                MYRET(ret_code)
             }
 
             while ((*s) == ' ')
@@ -495,7 +495,7 @@ extern int DLLEXPORT black_hole_solver_read_board(
 
         if (*s == '\0')
         {
-            MYRET(BLACK_HOLE_SOLVER__NOT_ENOUGH_COLUMNS);
+            MYRET(BLACK_HOLE_SOLVER__NOT_ENOUGH_COLUMNS)
         }
         else
         {
@@ -687,7 +687,7 @@ extern int DLLEXPORT black_hole_solver_run(
         }
         if (effective_place_queens_on_kings || (foundations != RANK_K))
         {
-            const bool *const found_can_move = can_move[foundations];
+            const bool *const found_can_move = can_move[(ssize_t)foundations];
             for (uint_fast32_t col_idx = 0; col_idx < num_columns; ++col_idx)
             {
                 const_AUTO(pos, fc_solve_bit_reader_read(&r, bits_per_column));
@@ -754,8 +754,6 @@ extern int DLLEXPORT black_hole_solver_recycle(
     return BLACK_HOLE_SOLVER__SUCCESS;
 }
 
-#define NUM_STATES_INCREMENT 16
-
 DLLEXPORT void black_hole_solver_init_solution_moves(
     black_hole_solver_instance_t *instance_proto)
 {
@@ -801,8 +799,9 @@ DLLEXPORT void black_hole_solver_init_solution_moves(
         }
         else
         {
-            unsigned moved_card_height = read_col(
-                &states[num_states].packed.key, col_idx, bits_per_column);
+            const_AUTO(
+                moved_card_height, read_col(&states[num_states].packed.key,
+                                       col_idx, bits_per_column));
             var_AUTO(new_moved_card_height, moved_card_height + 1);
             states[num_states + 1].packed.key.foundations =
                 states[num_states + 1].packed.value.prev_foundation;
@@ -919,13 +918,14 @@ DLLEXPORT extern int black_hole_solver_get_current_solution_board(
     const_SLOT(talon_len, solver);
     fc_solve_bit_reader_t r;
     fc_solve_bit_reader_init(&r, next_state.packed.key.data);
-    uint_fast16_t h = fc_solve_bit_reader_read(&r, TALON_PTR_BITS);
+    var_AUTO(talon_ptr, fc_solve_bit_reader_read(&r, TALON_PTR_BITS));
     if (talon_len)
     {
         s += sprintf(s, "%s", "Talon:");
-        for (; h < talon_len; ++h)
+        for (; talon_ptr < talon_len; ++talon_ptr)
         {
-            s += sprintf(s, " %s", solver->initial_talon_card_strings[h]);
+            s += sprintf(
+                s, " %s", solver->initial_talon_card_strings[talon_ptr]);
         }
         s += sprintf(s, "\n");
     }
