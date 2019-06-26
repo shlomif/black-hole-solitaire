@@ -526,8 +526,11 @@ static inline int perform_move(bhs_solver_t *const solver,
 {
     const_SLOT(num_columns, solver);
     const_SLOT(bits_per_column, solver);
-    bhs_state_key_value_pair_t next_state = queue_item_copy_ptr->s.packed;
 
+    bhs_queue_item_t next_queue_item;
+
+#define next_state next_queue_item.s.packed
+    next_state = queue_item_copy_ptr->s.packed;
     next_state.key.foundations = card;
     if (col_idx == num_columns)
     {
@@ -538,10 +541,8 @@ static inline int perform_move(bhs_solver_t *const solver,
         write_col(&next_state.key, col_idx, bits_per_column,
             read_col(next_state.key, col_idx, bits_per_column) - 1);
     }
+#undef next_state
 
-    bhs_queue_item_t next_queue_item;
-
-    next_queue_item.s.packed = next_state;
     next_queue_item.s.packed.value.col_idx =
         (typeof(next_queue_item.s.packed.value.col_idx))col_idx;
     next_queue_item.s.packed.value.prev_foundation = prev_foundation;
