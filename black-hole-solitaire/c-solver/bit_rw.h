@@ -58,7 +58,8 @@ static inline void fc_solve_bit_writer_overwrite(
     fc_solve_bit_writer_t *const writer, uint_fast32_t len,
     fc_solve_bit_data_t data)
 {
-    fcs_uchar_t c = *(writer->current);
+    fcs_uchar_t *current = writer->current;
+    fcs_uchar_t c = *(current);
     uint_fast32_t bit_in_char_idx = writer->bit_in_char_idx;
     for (; len; --len, (data >>= 1))
     {
@@ -66,12 +67,12 @@ static inline void fc_solve_bit_writer_overwrite(
         c |= ((data & 0x1) << (bit_in_char_idx));
         if (++bit_in_char_idx == NUM_BITS_IN_BYTES)
         {
-            *(writer->current) = c;
-            c = *(++writer->current);
+            *(current) = c;
+            c = *(++current);
             bit_in_char_idx = 0;
         }
     }
-    *(writer->current) = c;
+    *(writer->current = current) = c;
     writer->bit_in_char_idx = bit_in_char_idx;
 }
 
