@@ -684,12 +684,15 @@ extern int DLLEXPORT black_hole_solver_run(
                 return BLACK_HOLE_SOLVER__OUT_OF_MEMORY;
             }
         }
+        fc_solve_bit_reader_t r;
+        fc_solve_bit_reader_init(&r, state.data);
+        fc_solve_bit_reader_skip(&r, TALON_PTR_BITS);
         if (effective_place_queens_on_kings || (foundations != RANK_K))
         {
             const bool *const found_can_move = can_move[foundations];
             for (uint_fast32_t col_idx = 0; col_idx < num_columns; ++col_idx)
             {
-                const_AUTO(pos, read_col(state, col_idx, bits_per_column));
+                const_AUTO(pos, fc_solve_bit_reader_read(&r, bits_per_column));
                 if (pos)
                 {
                     no_cards = false;
@@ -710,7 +713,7 @@ extern int DLLEXPORT black_hole_solver_run(
         {
             for (size_t col_idx = 0; col_idx < num_columns; ++col_idx)
             {
-                const_AUTO(pos, read_col(state, col_idx, bits_per_column));
+                const_AUTO(pos, fc_solve_bit_reader_read(&r, bits_per_column));
                 if (pos)
                 {
                     no_cards = false;
