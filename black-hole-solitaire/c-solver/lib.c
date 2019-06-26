@@ -919,11 +919,13 @@ DLLEXPORT extern int black_hole_solver_get_current_solution_board(
         solver->states_in_solution[solver->current_state_in_solution_idx];
 
     const_SLOT(talon_len, solver);
+    fc_solve_bit_reader_t r;
+    fc_solve_bit_reader_init(&r, next_state.packed.key.data);
+    uint_fast16_t h = fc_solve_bit_reader_read(&r, TALON_PTR_BITS);
     if (talon_len)
     {
         s += sprintf(s, "%s", "Talon:");
-        for (uint_fast16_t h = read_talon(next_state.packed.key); h < talon_len;
-             ++h)
+        for (; h < talon_len; ++h)
         {
             s += sprintf(s, " %s", solver->initial_talon_card_strings[h]);
         }
@@ -934,8 +936,7 @@ DLLEXPORT extern int black_hole_solver_get_current_solution_board(
     for (size_t col_idx = 0; col_idx < num_columns; ++col_idx)
     {
         s += sprintf(s, "%c", ':');
-        const size_t hh =
-            read_col(next_state.packed.key, col_idx, bits_per_column);
+        const size_t hh = fc_solve_bit_reader_read(&r, bits_per_column);
         for (size_t h = 0; h < hh; ++h)
         {
             s += sprintf(
