@@ -63,7 +63,7 @@ static const char *const help_text =
 #pragma clang diagnostic ignored "-Wpadded"
 typedef struct
 {
-    black_hole_solver_instance_t *solver;
+    black_hole_solver_instance_t *the_solver;
     unsigned long iters_display_step;
     unsigned long max_iters_limit;
     enum GAME_TYPE game_type;
@@ -197,7 +197,7 @@ static inline bhs_settings parse_cmd_line(
         exit(-1);
     }
     *out_arg_idx = arg_idx;
-#define solver (settings_ptr->solver)
+#define solver (settings_ptr->the_solver)
     bhs_settings *settings_ptr = &settings;
     if (black_hole_solver_create(&solver))
     {
