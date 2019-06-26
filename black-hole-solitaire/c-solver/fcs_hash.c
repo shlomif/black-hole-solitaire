@@ -142,8 +142,7 @@ int bh_solve_hash_insert(
 
         while (item != NULL)
         {
-            if ((!memcmp(
-                    &(item->key.key), &(key->key), sizeof(bhs_state_key_t))))
+            if ((!memcmp(&(item->key), &(key->key), sizeof(bhs_state_key_t))))
             {
                 return 1;
             }
@@ -178,7 +177,7 @@ int bh_solve_hash_insert(
     /* Put the new element at the end of the list */
     /* Do an in-order insertion. */
     *item = (bh_solve_hash_symlink_item_t){
-        .key = (*key), .hash_value = hash_value, .next = NULL};
+        .key = (key->key), .hash_value = hash_value, .next = NULL};
 #ifdef FCS_ENABLE_SECONDARY_HASH_VALUE
     item->secondary_hash_value = secondary_hash_value;
 #endif

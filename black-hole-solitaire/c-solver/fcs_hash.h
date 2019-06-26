@@ -51,7 +51,7 @@ struct bh_solve_hash_symlink_item_struct
        comparisons */
     bh_solve_hash_value_t hash_value;
     // A pointer to the data structure that is to be collected
-    bhs_state_key_value_pair_t key;
+    bhs_state_key_t key;
 #ifdef FCS_ENABLE_SECONDARY_HASH_VALUE
     // We also store a secondary hash value, which is not used for indexing,
     // but is used to speed up comparison.
@@ -110,34 +110,6 @@ static inline void bh_solve_hash_recycle(bh_solve_hash_t *const hash)
     fc_solve_compact_allocator_recycle(&(hash->allocator));
     memset(hash->entries, '\0', sizeof(hash->entries[0]) * hash->size);
     hash->num_elems = 0;
-}
-static inline void bh_solve_hash_get(
-    bh_solve_hash_t *hash, bhs_state_key_t *key_ptr, bhs_state_value_t *result)
-{
-    bh_solve_hash_symlink_t *list;
-    bh_solve_hash_symlink_item_t *item;
-
-    const_AUTO(hash_value, bh_solve__hash_function(*key_ptr));
-
-#define PLACE() (hash_value & (hash->size_bitmask))
-    list = (hash->entries + PLACE());
-
-    item = list->first_item;
-
-    assert(item != NULL);
-
-    while (item != NULL)
-    {
-        if (!memcmp(&(item->key.key), key_ptr, sizeof(bhs_state_key_t)))
-        {
-            *result = item->key.value;
-            return;
-        }
-
-        item = item->next;
-    }
-
-    assert(false);
 }
 
 #ifdef __cplusplus
