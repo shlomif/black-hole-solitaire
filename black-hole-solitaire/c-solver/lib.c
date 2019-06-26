@@ -27,16 +27,6 @@
 #include "bit_rw.h"
 #include "rinutils/typeof_wrap.h"
 
-#if (BHS_STATE_STORAGE == BHS_STATE_STORAGE_TOKYO_CAB_HASH)
-#include "tokyo_cab_hash.h"
-#elif (BHS_STATE_STORAGE == BHS_STATE_STORAGE_INTERNAL_HASH)
-#include "fcs_hash.h"
-#elif (BHS_STATE_STORAGE == BHS_STATE_STORAGE_GOOGLE_SPARSE_HASH)
-#include "google_hash.h"
-#else
-#error Unknown state storage.
-#endif
-
 #include "rank_reach_prune.h"
 
 #define NUM_SUITS 4
@@ -94,8 +84,6 @@ typedef const bool can_move__row[NUM_RANKS];
 typedef struct
 {
     uint_fast16_t talon_len;
-    bh_solve_hash_t positions;
-    meta_allocator meta_alloc;
     uint_fast16_t initial_lens[BHS__MAX_NUM_COLUMNS];
     uint_fast32_t num_states_in_solution, current_state_in_solution_idx;
     unsigned long iterations_num, num_states_in_collection, max_iters_limit;
@@ -147,7 +135,6 @@ int DLLEXPORT black_hole_solver_create(
     ret->place_queens_on_kings = false;
     ret->wrap_ranks = true;
 
-    fc_solve_meta_compact_allocator_init(&(ret->meta_alloc));
     *ret_instance = (black_hole_solver_instance_t *)ret;
 
     return BLACK_HOLE_SOLVER__SUCCESS;
@@ -792,7 +779,7 @@ DLLEXPORT void black_hole_solver_init_solution_moves(
         assert(num_states < MAX_NUM_STATES);
         assert(parent_ptr);
         assert(parent_ptr->played);
-        /* Look up the next state in the positions associative array. */
+        /* Look up the next state in the solutions' chain */
         states[num_states + 1].packed.value = parent_ptr->s.packed.value;
         parent_ptr = (bhs_queue_item_t *)parent_ptr->parent;
         // Reverse the move
@@ -970,8 +957,6 @@ extern int DLLEXPORT black_hole_solver_free(
     black_hole_solver_instance_t *instance_proto)
 {
     bhs_solver_t *const solver = (bhs_solver_t *)instance_proto;
-
-    fc_solve_meta_compact_allocator_finish(&(solver->meta_alloc));
 
     free(solver);
 
