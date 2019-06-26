@@ -659,9 +659,8 @@ extern int DLLEXPORT black_hole_solver_run(
     {
         --solver->queue_len;
         const_AUTO(queue_item_copy, solver->queue[solver->queue_len]);
-        const_AUTO(state, queue_item_copy.s.packed.key);
         const_AUTO(foundations, queue_item_copy.s.packed.key.foundations);
-        const_AUTO(talon_ptr, read_talon(&state));
+        const_AUTO(talon_ptr, read_talon(&queue_item_copy.s.packed.key));
 
         if (effective_is_rank_reachability_prune_enabled &&
             (bhs_find_rank_reachability__inline(foundations,
@@ -685,7 +684,7 @@ extern int DLLEXPORT black_hole_solver_run(
             }
         }
         fc_solve_bit_reader_t r;
-        fc_solve_bit_reader_init(&r, state.data);
+        fc_solve_bit_reader_init(&r, queue_item_copy.s.packed.key.data);
         fc_solve_bit_reader_skip(&r, TALON_PTR_BITS);
         if (effective_place_queens_on_kings || (foundations != RANK_K))
         {
