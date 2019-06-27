@@ -56,7 +56,6 @@ my $generate_what;
 my $build_static_lib      = 0;
 my $with_context_var      = 1;
 my $max_bench_threads_num = 4;
-my $link_to_static        = 0;
 
 sub set_both
 {
@@ -76,7 +75,7 @@ sub set_hash
 set_hash();
 
 my %themes = (
-    tt         => [qw(-r --notest-suite --static)],
+    tt         => [qw(-r --notest-suite --nostatic)],
     bench      => [qw(-l tt --omit-frame)],
     fc_bench   => [qw(-l bench)],
     testing    => [qw(--rwd --test-suite)],
@@ -254,10 +253,9 @@ GetOptions(
         return;
     },
     'tokyo'                   => sub { return set_both("TOKYO_CAB_HASH"); },
-    'static'                  => \$build_static_lib,
+    'static!'                 => \$build_static_lib,
     'with-ctx-var!'           => \$with_context_var,
     'max-bench-threads-num=i' => \$max_bench_threads_num,
-    'static!'                 => \$link_to_static,
     (
         map { ; "$_!" => \( $bool_opts_with_false_defaults__values{$_} ) }
             @BOOL_OPTS_WITH_FALSE_DEFAULTS__KEYS
@@ -298,7 +296,10 @@ my @cmd = (
     ( defined($generate_what) ? ( "-G", $generate_what ) : () ),
     "-DCMAKE_BUILD_TYPE=$build_type",
     "-DDATADIR=$STR_OPTS{prefix}{value}/share",
-    ( ( !$build_static_lib ) ? ("-DBUILD_STATIC_LIBRARY=") : () ),
+    (
+          ( !$build_static_lib ) ? ("-DBUILD_STATIC_LIBRARY=")
+        : ( "-DBUILD_STATIC_LIBRARY=1", "-DLINK_TO_STATIC=1", )
+    ),
     (
         map {
             $bool_opts_with_false_defaults__values{$_}

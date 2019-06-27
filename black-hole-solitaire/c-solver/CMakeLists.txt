@@ -8,6 +8,7 @@ option (FCS_WITH_TEST_SUITE "Also build and run the test suite." ON)
 option (FCS_AVOID_TCMALLOC "Avoid linking against Google's tcmalloc")
 option (USE_SYSTEM_XXHASH "Link to the system's xxHash instead of the bundled copy")
 option (BUILD_STATIC_LIBRARY "Build and install the static library")
+option (LINK_TO_STATIC "Link the executables to the static library")
 option (DISABLE_APPLYING_RPATH "Disable applying rpath")
 
 INCLUDE(FindPkgConfig)
@@ -178,6 +179,7 @@ SET_TARGET_PROPERTIES(
 )
 
 SET (LIBS "${LIB_BASE}")
+SET (LINKLIB "${LIB_BASE}")
 
 IF (BUILD_STATIC_LIBRARY)
     SET (S_LIB "${LIB_BASE}-static")
@@ -191,6 +193,9 @@ IF (BUILD_STATIC_LIBRARY)
         PROPERTIES OUTPUT_NAME "${LIB_BASE}"
     )
     LIST(APPEND LIBS "${S_LIB}")
+    IF (LINK_TO_STATIC)
+        SET (LINKLIB "${S_LIB}")
+    ENDIF ()
 ENDIF ()
 
 SET_TARGET_PROPERTIES(
@@ -243,7 +248,7 @@ ADD_EXECUTABLE(
 FOREACH (exe "${BHS_EXE}" "multi-bhs-solver")
     TARGET_LINK_LIBRARIES(
         "${exe}"
-        "${LIB_BASE}"
+        "${LINKLIB}"
         ${LIBTCMALLOC_LIB_LIST}
     )
 ENDFOREACH()
