@@ -110,18 +110,19 @@ static inline fc_solve_bit_data_t fc_solve_bit_reader_read(
 {
     fc_solve_bit_data_t ret = 0;
 
+    fcs_uchar_t c = *(reader->current);
+    uint_fast32_t bit_in_char_idx = reader->bit_in_char_idx;
     for (uint_fast32_t idx = 0; idx < len; ++idx)
     {
-        ret |= ((fc_solve_bit_data_t)(
-                    (*(reader->current) >> (reader->bit_in_char_idx++)) & 0x1)
-                << idx);
+        ret |= ((fc_solve_bit_data_t)((c >> (bit_in_char_idx)) & 0x1) << idx);
 
-        if (reader->bit_in_char_idx == NUM_BITS_IN_BYTES)
+        if (++bit_in_char_idx == NUM_BITS_IN_BYTES)
         {
-            ++reader->current;
-            reader->bit_in_char_idx = 0;
+            c = *(++reader->current);
+            bit_in_char_idx = 0;
         }
     }
+    reader->bit_in_char_idx = bit_in_char_idx;
 
     return ret;
 }
