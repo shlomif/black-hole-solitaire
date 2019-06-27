@@ -143,7 +143,7 @@ int bh_solve_hash_insert(
             if ((!memcmp(
                     &(item->key.key), &(key->key), sizeof(bhs_state_key_t))))
             {
-                return true;
+                return 1;
             }
             /* Cache the item before the current in last_item */
             last_item = item;
@@ -190,7 +190,7 @@ int bh_solve_hash_insert(
         }
     }
 
-    return false;
+    return 0;
 }
 
 /*
