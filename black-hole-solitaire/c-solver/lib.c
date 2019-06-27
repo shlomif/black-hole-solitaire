@@ -746,7 +746,9 @@ extern int DLLEXPORT black_hole_solver_recycle(
 {
     bhs_solver_t *const solver = (bhs_solver_t *)instance_proto;
 
+#ifndef BHS_BREAK_ME
     bh_solve_hash_recycle(&(solver->positions));
+#endif
     solver->iterations_num = 0;
     solver->queue_len = 0;
     solver->num_states_in_collection = 0;

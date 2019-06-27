@@ -11,10 +11,11 @@ int main(int argc, char *argv[])
     for (; arg_idx < argc; ++arg_idx)
     {
         char *const filename = argv[arg_idx];
-        fprintf(stdout, "[= Starting file %s =]\n", filename);
+        fprintf(settings.out_fh, "[= Starting file %s =]\n", filename);
         solve_filename(filename, &settings);
-        fprintf(stdout, "[= END of file %s =]\n", filename);
+        fprintf(settings.out_fh, "[= END of file %s =]\n", filename);
     }
+    fflush(settings.out_fh);
     solve_free(&settings);
 
     return 0;

@@ -27,7 +27,7 @@ enum GAME_TYPE
     GAME__GOLF
 };
 
-static inline void out_board(
+static inline void out_board(FILE *out_fh,
     black_hole_solver_instance_t *const solver, const bool display_boards)
 {
     if (!display_boards)
@@ -39,7 +39,7 @@ static inline void out_board(
     if (black_hole_solver_get_current_solution_board(solver, board) ==
         BLACK_HOLE_SOLVER__SUCCESS)
     {
-        printf("\n[START BOARD]\n%s[END BOARD]\n\n\n", board);
+        fprintf(out_fh, "\n[START BOARD]\n%s[END BOARD]\n\n\n", board);
     }
 }
 
@@ -64,6 +64,7 @@ static const char *const help_text =
 typedef struct
 {
     black_hole_solver_instance_t *the_solver;
+    FILE *out_fh;
     unsigned long iters_display_step;
     unsigned long max_iters_limit;
     enum GAME_TYPE game_type;
@@ -79,6 +80,7 @@ static inline bhs_settings parse_cmd_line(
     int argc, char *argv[], int *out_arg_idx)
 {
     bhs_settings settings;
+    settings.out_fh = stdout;
     settings.iters_display_step = 0;
     settings.game_type = GAME__UNKNOWN;
     settings.display_boards = false;
@@ -101,6 +103,15 @@ static inline bhs_settings parse_cmd_line(
         {
             printf("%s", help_text);
             exit(0);
+        }
+        else if (!strcmp(argv[arg_idx], "--output"))
+        {
+            if (argc == ++arg_idx)
+            {
+                fputs("Error! --output requires an argument.\n", stderr);
+                exit(-1);
+            }
+            settings.out_fh = fopen(argv[arg_idx++], "wt");
         }
         else if (!strcmp(argv[arg_idx], "--max-iters"))
         {
@@ -270,18 +281,19 @@ static inline int solve_filename(
 
     const int solver_ret_code = solver_run(
         solver, settings.max_iters_limit, settings.iters_display_step);
+    FILE *const out_fh = settings_ptr->out_fh;
 
     if (!solver_ret_code)
     {
         int col_idx, card_rank, card_suit;
         int next_move_ret_code;
 
-        fputs("Solved!\n", stdout);
+        fputs("Solved!\n", out_fh);
 
         if (!settings.quiet_output)
         {
             black_hole_solver_init_solution_moves(solver);
-            out_board(solver, settings.display_boards);
+            out_board(out_fh, solver, settings.display_boards);
 
             while ((next_move_ret_code = black_hole_solver_get_next_move(
                         solver, &col_idx, &card_rank, &card_suit)) ==
@@ -289,19 +301,21 @@ static inline int solve_filename(
             {
                 if (col_idx == (int)num_columns)
                 {
-                    printf("%s", "Deal talon");
+                    fprintf(out_fh, "%s", "Deal talon");
                 }
                 else
                 {
-                    printf("Move a card from stack %d to the foundations",
+                    fprintf(out_fh,
+                        "Move a card from stack %d to the foundations",
                         col_idx);
                 }
-                printf("\n\n"
-                       "Info: Card moved is "
-                       "%c%c\n\n\n====================\n\n",
+                fprintf(out_fh,
+                    "\n\n"
+                    "Info: Card moved is "
+                    "%c%c\n\n\n====================\n\n",
                     (("0A23456789TJQK")[card_rank]), ("HCDS")[card_suit]);
 
-                out_board(solver, settings.display_boards);
+                out_board(out_fh, solver, settings.display_boards);
             }
 
             if (next_move_ret_code != BLACK_HOLE_SOLVER__END)
@@ -320,18 +334,19 @@ static inline int solve_filename(
     }
     else if (solver_ret_code == BLACK_HOLE_SOLVER__OUT_OF_ITERS)
     {
-        fputs("Intractable!\n", stdout);
+        fputs("Intractable!\n", out_fh);
         ret = -2;
     }
     else
     {
-        fputs("Unsolved!\n", stdout);
+        fputs("Unsolved!\n", out_fh);
         ret = -1;
     }
 
-    printf("\n\n--------------------\n"
-           "Total number of states checked is %lu.\n"
-           "This scan generated %lu states.\n",
+    fprintf(out_fh,
+        "\n\n--------------------\n"
+        "Total number of states checked is %lu.\n"
+        "This scan generated %lu states.\n",
         black_hole_solver_get_iterations_num(solver),
         black_hole_solver_get_num_states_in_collection(solver));
 

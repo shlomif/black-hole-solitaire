@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 20;
+use Test::More tests => 22;
 use Test::Differences qw/ eq_or_diff /;
 
 use Test::Trap qw(
@@ -247,5 +247,37 @@ foreach my $exe ( './black-hole-solve', )
         $stdout,
         $mani->text( '2.golf.sol.txt', { lf => 1 } ),
         "the right golf no. 2 solution",
+    );
+}
+
+{
+    my $out_fn = "golf1to20out.txt";
+    trap
+    {
+        system(
+            './multi-bhs-solver',
+            '--output',
+            $out_fn,
+            '--game',
+            'golf',
+            '--display-boards',
+            '--wrap-ranks',
+            ( map { $mani->get_obj("golf$_.board")->fh } 1 .. 20 )
+        );
+    };
+
+    # TEST
+    ok( !( $trap->exit ),
+        "Exit code for --display-boards for golf board #906." );
+
+    my $stdout = as_lf( path($out_fn)->slurp_raw );
+    $stdout =~
+        s#^(\[= (?:Starting|END of) file )(\S+)#$1 . path($2)->basename#egms;
+
+    # TEST
+    is(
+        $stdout,
+        $mani->text( "golf-1to20.sol.txt", { lf => 1 } ),
+        "recycling works",
     );
 }
