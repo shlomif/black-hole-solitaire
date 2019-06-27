@@ -24,22 +24,7 @@
 #include "state.h"
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wpadded"
-#ifdef USE_SYSTEM_XXHASH
-#include "xxhash.h"
-#if SIZEOF_VOID_P == 4
-#define DO_XXH(b, l) XXH32((b), (l), 0)
-#else
-#define DO_XXH(b, l) XXH64((b), (l), 0)
-#endif
-#else
-#include "wrap_xxhash.h"
-#endif
 #pragma clang diagnostic pop
-
-static inline unsigned long hash_function(const bhs_state_key_t key)
-{
-    return DO_XXH(&key, sizeof(key));
-}
 
 // This function "rehashes" a hash. I.e: it increases the size of its
 // hash table, allowing for smaller chains, and faster lookup.
@@ -66,7 +51,8 @@ static inline bool bh_solve_hash_rehash(bh_solve_hash_t *hash)
         while (item != NULL)
         {
             /* The place in the new hash table */
-            const_AUTO(place, item->hash_value & new_size_bitmask);
+            const_AUTO(place,
+                *(bh_solve_hash_value_t *)&(item->key) & new_size_bitmask);
 
             /* Store the next item in the linked list in a safe place,
                so we can retrieve it after the assignment */
@@ -131,8 +117,7 @@ void bh_solve_hash_get(
     bh_solve_hash_symlink_t *list;
     bh_solve_hash_symlink_item_t *item;
 
-    bh_solve_hash_value_t hash_value =
-        ((typeof(hash_value))hash_function(*key_ptr));
+    bh_solve_hash_value_t hash_value = *((typeof(hash_value) *)(key_ptr));
 
 #define PLACE() (hash_value & (hash->size_bitmask))
     list = (hash->entries + PLACE());
@@ -163,9 +148,7 @@ int bh_solve_hash_insert(
 #ifdef FCS_INLINED_HASH_COMPARISON
     enum FCS_INLINED_HASH_DATA_TYPE hash_type;
 #endif
-
-    bh_solve_hash_value_t hash_value =
-        ((typeof(hash_value))hash_function(key->key));
+    bh_solve_hash_value_t hash_value = *((typeof(hash_value) *)(key));
 
 #ifdef FCS_INLINED_HASH_COMPARISON
     hash_type = hash->hash_type;
@@ -226,8 +209,7 @@ int bh_solve_hash_insert(
 
     /* Put the new element at the end of the list */
     /* Do an in-order insertion. */
-    *item = (bh_solve_hash_symlink_item_t){
-        .key = (*key), .hash_value = hash_value, .next = NULL};
+    *item = (bh_solve_hash_symlink_item_t){.key = (*key), .next = NULL};
 #ifdef FCS_ENABLE_SECONDARY_HASH_VALUE
     item->secondary_hash_value = secondary_hash_value;
 #endif

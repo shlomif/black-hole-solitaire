@@ -20,7 +20,7 @@ extern "C" {
 #include "meta_alloc.h"
 #include "state.h"
 
-typedef int bh_solve_hash_value_t;
+typedef unsigned bh_solve_hash_value_t;
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wpadded"
@@ -28,9 +28,6 @@ struct bh_solve_hash_symlink_item_struct
 {
     // The next item in the list
     struct bh_solve_hash_symlink_item_struct *next;
-    /* We also store the hash value corresponding to this key for faster
-       comparisons */
-    bh_solve_hash_value_t hash_value;
     // A pointer to the data structure that is to be collected
     bhs_state_key_value_pair_t key;
 #ifdef FCS_ENABLE_SECONDARY_HASH_VALUE
