@@ -356,6 +356,10 @@ static inline int solve_filename(
 
 static inline void solve_free(bhs_settings *const settings_ptr)
 {
+    if (settings_ptr->out_fh != stdout)
+    {
+        fclose(settings_ptr->out_fh);
+    }
     black_hole_solver_free(solver);
 }
 #undef solver
