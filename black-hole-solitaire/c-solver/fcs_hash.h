@@ -52,9 +52,11 @@ typedef struct
 {
     /* The vector of the hash table itself */
     bh_solve_hash_symlink_t *entries;
+#ifdef BHS_WITH_HASH_VACANT_ITEMS
     /* The list of vacant items as freed by the garbage collector. Use
      * if before allocating more. */
     bh_solve_hash_symlink_item_t *list_of_vacant_items;
+#endif
     /* The size of the hash table */
     int size;
 

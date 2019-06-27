@@ -58,8 +58,9 @@ int bh_solve_hash_init(bh_solve_hash_t *hash, meta_allocator *const meta_alloc)
     {
         return 1;
     }
-
+#ifdef BHS_WITH_HASH_VACANT_ITEMS
     hash->list_of_vacant_items = NULL;
+#endif
 
     if (unlikely(
             fc_solve_compact_allocator_init(&(hash->allocator), meta_alloc)))
@@ -153,18 +154,22 @@ int bh_solve_hash_insert(
         item_placeholder = &(last_item->next);
     }
 
+#ifdef BHS_WITH_HASH_VACANT_ITEMS
     if (hash->list_of_vacant_items)
     {
         hash->list_of_vacant_items = (item = hash->list_of_vacant_items)->next;
     }
     else
     {
+#endif
         if (unlikely(!(item = fcs_compact_alloc_ptr(
                            &(hash->allocator), sizeof(*item)))))
         {
             return -1;
         }
+#ifdef BHS_WITH_HASH_VACANT_ITEMS
     }
+#endif
 
     *(item_placeholder) = item;
 
