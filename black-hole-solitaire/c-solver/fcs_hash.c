@@ -19,6 +19,7 @@
 #include <string.h>
 #include <assert.h>
 
+#include "rinutils/typeof_wrap.h"
 #include "fcs_hash.h"
 #include "state.h"
 #pragma clang diagnostic push
@@ -40,7 +41,58 @@ static inline unsigned long hash_function(const bhs_state_key_t key)
     return DO_XXH(&key, sizeof(key));
 }
 
-static inline int bh_solve_hash_rehash(bh_solve_hash_t *hash);
+// This function "rehashes" a hash. I.e: it increases the size of its
+// hash table, allowing for smaller chains, and faster lookup.
+static inline int bh_solve_hash_rehash(bh_solve_hash_t *hash)
+{
+    bh_solve_hash_symlink_t *new_entries;
+
+    const_AUTO(old_size, hash->size);
+
+    const int new_size = old_size << 1;
+    const_AUTO(new_size_bitmask, new_size - 1);
+
+    if (unlikely(!(new_entries = calloc(
+                       (size_t)new_size, sizeof(bh_solve_hash_symlink_t)))))
+    {
+        return 1;
+    }
+
+    /* Copy the items to the new hash while not allocating them again */
+    for (int i = 0; i < old_size; i++)
+    {
+        var_AUTO(item, hash->entries[i].first_item);
+        /* traverse the chain item by item */
+        while (item != NULL)
+        {
+            /* The place in the new hash table */
+            const_AUTO(place, item->hash_value & new_size_bitmask);
+
+            /* Store the next item in the linked list in a safe place,
+               so we can retrieve it after the assignment */
+            const_AUTO(next_item, item->next);
+            /* It is placed in front of the first element in the chain,
+               so it should link to it */
+            item->next = new_entries[place].first_item;
+
+            /* Make it the first item in its chain */
+            new_entries[place].first_item = item;
+
+            /* Move to the next item this one. */
+            item = next_item;
+        }
+    };
+
+    /* Free the entries of the old hash */
+    free(hash->entries);
+
+    /* Copy the new hash to the old one */
+    hash->entries = new_entries;
+    hash->size = new_size;
+    hash->size_bitmask = new_size_bitmask;
+    hash->max_num_elems_before_resize = (new_size << 1);
+    return 0;
+}
 
 int bh_solve_hash_init(bh_solve_hash_t *hash, meta_allocator *const meta_alloc)
 {
@@ -106,7 +158,6 @@ void bh_solve_hash_get(
 int bh_solve_hash_insert(
     bh_solve_hash_t *const hash, bhs_state_key_value_pair_t *const key)
 {
-    bh_solve_hash_symlink_t *list;
     bh_solve_hash_symlink_item_t *item, *last_item;
     bh_solve_hash_symlink_item_t **item_placeholder;
 #ifdef FCS_INLINED_HASH_COMPARISON
@@ -122,7 +173,7 @@ int bh_solve_hash_insert(
     /* Get the index of the appropriate chain in the hash table */
 #define PLACE() (hash_value & (hash->size_bitmask))
 
-    list = (hash->entries + PLACE());
+    bh_solve_hash_symlink_t *list = (hash->entries + PLACE());
 
 #undef PLACE
 
@@ -190,64 +241,5 @@ int bh_solve_hash_insert(
         }
     }
 
-    return 0;
-}
-
-/*
-    This function "rehashes" a hash. I.e: it increases the size of its
-    hash table, allowing for smaller chains, and faster lookup.
-
-  */
-static inline int bh_solve_hash_rehash(bh_solve_hash_t *hash)
-{
-    int old_size, new_size_bitmask;
-    bh_solve_hash_symlink_item_t *item, *next_item;
-    int place;
-    bh_solve_hash_symlink_t *new_entries;
-
-    old_size = hash->size;
-
-    const int new_size = old_size << 1;
-    new_size_bitmask = new_size - 1;
-
-    if (unlikely(!(new_entries = calloc(
-                       (size_t)new_size, sizeof(bh_solve_hash_symlink_t)))))
-    {
-        return 1;
-    }
-
-    /* Copy the items to the new hash while not allocating them again */
-    for (int i = 0; i < old_size; i++)
-    {
-        item = hash->entries[i].first_item;
-        /* traverse the chain item by item */
-        while (item != NULL)
-        {
-            /* The place in the new hash table */
-            place = item->hash_value & new_size_bitmask;
-
-            /* Store the next item in the linked list in a safe place,
-               so we can retrieve it after the assignment */
-            next_item = item->next;
-            /* It is placed in front of the first element in the chain,
-               so it should link to it */
-            item->next = new_entries[place].first_item;
-
-            /* Make it the first item in its chain */
-            new_entries[place].first_item = item;
-
-            /* Move to the next item this one. */
-            item = next_item;
-        }
-    };
-
-    /* Free the entries of the old hash */
-    free(hash->entries);
-
-    /* Copy the new hash to the old one */
-    hash->entries = new_entries;
-    hash->size = new_size;
-    hash->size_bitmask = new_size_bitmask;
-    hash->max_num_elems_before_resize = (new_size << 1);
     return 0;
 }
