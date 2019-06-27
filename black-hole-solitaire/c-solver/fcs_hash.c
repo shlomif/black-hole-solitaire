@@ -43,7 +43,7 @@ static inline unsigned long hash_function(const bhs_state_key_t key)
 
 // This function "rehashes" a hash. I.e: it increases the size of its
 // hash table, allowing for smaller chains, and faster lookup.
-static inline int bh_solve_hash_rehash(bh_solve_hash_t *hash)
+static inline bool bh_solve_hash_rehash(bh_solve_hash_t *hash)
 {
     bh_solve_hash_symlink_t *new_entries;
 
@@ -55,7 +55,7 @@ static inline int bh_solve_hash_rehash(bh_solve_hash_t *hash)
     if (unlikely(!(new_entries = calloc(
                        (size_t)new_size, sizeof(bh_solve_hash_symlink_t)))))
     {
-        return 1;
+        return true;
     }
 
     /* Copy the items to the new hash while not allocating them again */
@@ -91,7 +91,7 @@ static inline int bh_solve_hash_rehash(bh_solve_hash_t *hash)
     hash->size = new_size;
     hash->size_bitmask = new_size_bitmask;
     hash->max_num_elems_before_resize = (new_size << 1);
-    return 0;
+    return false;
 }
 
 int bh_solve_hash_init(bh_solve_hash_t *hash, meta_allocator *const meta_alloc)
