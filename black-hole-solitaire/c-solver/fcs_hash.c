@@ -22,24 +22,6 @@
 #include "rinutils/typeof_wrap.h"
 #include "fcs_hash.h"
 #include "state.h"
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wpadded"
-#ifdef USE_SYSTEM_XXHASH
-#include "xxhash.h"
-#if SIZEOF_VOID_P == 4
-#define DO_XXH(b, l) XXH32((b), (l), 0)
-#else
-#define DO_XXH(b, l) XXH64((b), (l), 0)
-#endif
-#else
-#include "wrap_xxhash.h"
-#endif
-#pragma clang diagnostic pop
-
-static inline bh_solve_hash_value_t hash_function(const bhs_state_key_t key)
-{
-    return DO_XXH(&key, sizeof(key));
-}
 
 // This function "rehashes" a hash. I.e: it increases the size of its
 // hash table, allowing for smaller chains, and faster lookup.
@@ -125,35 +107,6 @@ int bh_solve_hash_init(bh_solve_hash_t *hash, meta_allocator *const meta_alloc)
     return 0;
 }
 
-void bh_solve_hash_get(
-    bh_solve_hash_t *hash, bhs_state_key_t *key_ptr, bhs_state_value_t *result)
-{
-    bh_solve_hash_symlink_t *list;
-    bh_solve_hash_symlink_item_t *item;
-
-    const_AUTO(hash_value, hash_function(*key_ptr));
-
-#define PLACE() (hash_value & (hash->size_bitmask))
-    list = (hash->entries + PLACE());
-
-    item = list->first_item;
-
-    assert(item != NULL);
-
-    while (item != NULL)
-    {
-        if (!memcmp(&(item->key.key), key_ptr, sizeof(bhs_state_key_t)))
-        {
-            *result = item->key.value;
-            return;
-        }
-
-        item = item->next;
-    }
-
-    assert(false);
-}
-
 int bh_solve_hash_insert(
     bh_solve_hash_t *const hash, bhs_state_key_value_pair_t *const key)
 {
@@ -163,7 +116,7 @@ int bh_solve_hash_insert(
     enum FCS_INLINED_HASH_DATA_TYPE hash_type;
 #endif
 
-    const_AUTO(hash_value, hash_function(key->key));
+    const_AUTO(hash_value, bh_solve__hash_function(key->key));
 
 #ifdef FCS_INLINED_HASH_COMPARISON
     hash_type = hash->hash_type;
