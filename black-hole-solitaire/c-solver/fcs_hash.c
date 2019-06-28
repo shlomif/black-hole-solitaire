@@ -36,7 +36,7 @@
 #endif
 #pragma clang diagnostic pop
 
-static inline unsigned long hash_function(const bhs_state_key_t key)
+static inline bh_solve_hash_value_t hash_function(const bhs_state_key_t key)
 {
     return DO_XXH(&key, sizeof(key));
 }
@@ -49,7 +49,7 @@ static inline bool bh_solve_hash_rehash(bh_solve_hash_t *hash)
 
     const_AUTO(old_size, hash->size);
 
-    const int new_size = old_size << 1;
+    const_AUTO(new_size, old_size << 1);
     const_AUTO(new_size_bitmask, new_size - 1);
 
     if (unlikely(!(new_entries = calloc(
@@ -59,7 +59,7 @@ static inline bool bh_solve_hash_rehash(bh_solve_hash_t *hash)
     }
 
     /* Copy the items to the new hash while not allocating them again */
-    for (int i = 0; i < old_size; i++)
+    for (bh_solve_hash_value_t i = 0; i < old_size; i++)
     {
         var_AUTO(item, hash->entries[i].first_item);
         /* traverse the chain item by item */
@@ -96,7 +96,7 @@ static inline bool bh_solve_hash_rehash(bh_solve_hash_t *hash)
 
 int bh_solve_hash_init(bh_solve_hash_t *hash, meta_allocator *const meta_alloc)
 {
-    const int size = 256;
+    const bh_solve_hash_value_t size = 256;
 
     hash->size = size;
     hash->size_bitmask = size - 1;
@@ -131,8 +131,7 @@ void bh_solve_hash_get(
     bh_solve_hash_symlink_t *list;
     bh_solve_hash_symlink_item_t *item;
 
-    bh_solve_hash_value_t hash_value =
-        ((typeof(hash_value))hash_function(*key_ptr));
+    const_AUTO(hash_value, hash_function(*key_ptr));
 
 #define PLACE() (hash_value & (hash->size_bitmask))
     list = (hash->entries + PLACE());
@@ -164,8 +163,7 @@ int bh_solve_hash_insert(
     enum FCS_INLINED_HASH_DATA_TYPE hash_type;
 #endif
 
-    bh_solve_hash_value_t hash_value =
-        ((typeof(hash_value))hash_function(key->key));
+    const_AUTO(hash_value, hash_function(key->key));
 
 #ifdef FCS_INLINED_HASH_COMPARISON
     hash_type = hash->hash_type;

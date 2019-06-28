@@ -20,7 +20,7 @@ extern "C" {
 #include "meta_alloc.h"
 #include "state.h"
 
-typedef int bh_solve_hash_value_t;
+typedef unsigned bh_solve_hash_value_t;
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wpadded"
@@ -58,14 +58,14 @@ typedef struct
     bh_solve_hash_symlink_item_t *list_of_vacant_items;
 #endif
     /* The size of the hash table */
-    int size;
+    bh_solve_hash_value_t size;
 
     /* A bit mask that extract the lowest bits out of the hash value */
-    int size_bitmask;
+    bh_solve_hash_value_t size_bitmask;
     /* The number of elements stored inside the hash */
-    int num_elems;
+    bh_solve_hash_value_t num_elems;
 
-    int max_num_elems_before_resize;
+    bh_solve_hash_value_t max_num_elems_before_resize;
 
     compact_allocator allocator;
 
