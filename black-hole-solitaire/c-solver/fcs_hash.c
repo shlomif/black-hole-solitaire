@@ -108,7 +108,7 @@ int bh_solve_hash_init(bh_solve_hash_t *hash, meta_allocator *const meta_alloc)
 }
 
 int bh_solve_hash_insert(
-    bh_solve_hash_t *const hash, bhs_state_key_value_pair_t *const key)
+    bh_solve_hash_t *const hash, bhs_state_key_t *const key)
 {
     bh_solve_hash_symlink_item_t *item, *last_item;
     bh_solve_hash_symlink_item_t **item_placeholder;
@@ -116,7 +116,7 @@ int bh_solve_hash_insert(
     enum FCS_INLINED_HASH_DATA_TYPE hash_type;
 #endif
 
-    const_AUTO(hash_value, bh_solve__hash_function(key->key));
+    const_AUTO(hash_value, bh_solve__hash_function(*key));
 
 #ifdef FCS_INLINED_HASH_COMPARISON
     hash_type = hash->hash_type;
@@ -142,7 +142,7 @@ int bh_solve_hash_insert(
 
         while (item != NULL)
         {
-            if ((!memcmp(&(item->key), &(key->key), sizeof(bhs_state_key_t))))
+            if ((!memcmp(&(item->key), key, sizeof(bhs_state_key_t))))
             {
                 return 1;
             }
@@ -177,7 +177,7 @@ int bh_solve_hash_insert(
     /* Put the new element at the end of the list */
     /* Do an in-order insertion. */
     *item = (bh_solve_hash_symlink_item_t){
-        .key = (key->key), .hash_value = hash_value, .next = NULL};
+        .key = (*key), .hash_value = hash_value, .next = NULL};
 #ifdef FCS_ENABLE_SECONDARY_HASH_VALUE
     item->secondary_hash_value = secondary_hash_value;
 #endif

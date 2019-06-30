@@ -553,8 +553,8 @@ static inline int perform_move(bhs_solver_t *const solver,
     next_queue_item.parent = queue_item_ptr;
     next_queue_item.played = false;
 
-    const int ret =
-        bh_solve_hash_insert(&(solver->positions), &(next_queue_item.s.packed));
+    const int ret = bh_solve_hash_insert(
+        &(solver->positions), &(next_queue_item.s.packed.key));
     if (unlikely(ret < 0))
     {
         return 1;
@@ -624,7 +624,8 @@ static inline int setup_init_state(bhs_solver_t *const solver)
     bhs_state_key_value_pair_t *const init_state = &(solver->init_state);
     *init_state = setup_first_queue_item(solver);
 
-    if (unlikely(bh_solve_hash_insert(&(solver->positions), init_state) < 0))
+    if (unlikely(
+            bh_solve_hash_insert(&(solver->positions), &init_state->key) < 0))
     {
         return BLACK_HOLE_SOLVER__OUT_OF_MEMORY;
     }

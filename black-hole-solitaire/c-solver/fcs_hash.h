@@ -95,8 +95,7 @@ extern int bh_solve_hash_init(bh_solve_hash_t *hash, meta_allocator *);
 // Returns false if the key is new and the key/val pair was inserted.
 // Returns true if the key is not new and *existing_key / *existing_val
 // was set to it.
-extern int bh_solve_hash_insert(
-    bh_solve_hash_t *hash, bhs_state_key_value_pair_t *key);
+extern int bh_solve_hash_insert(bh_solve_hash_t *hash, bhs_state_key_t *key);
 
 static inline void bh_solve_hash_free(bh_solve_hash_t *hash)
 {
