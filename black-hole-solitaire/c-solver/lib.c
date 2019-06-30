@@ -521,8 +521,8 @@ DLLEXPORT extern int black_hole_solver_set_max_iters_limit(
 }
 
 static inline int perform_move(bhs_solver_t *const solver,
-    bhs_queue_item_t *queue_item_ptr, const bhs_rank_t prev_foundation,
-    const bhs_rank_t card, const uint_fast32_t col_idx,
+    bhs_queue_item_t *queue_item_ptr, const bhs_rank_t card,
+    const uint_fast32_t col_idx,
     const bhs_queue_item_t *const queue_item_copy_ptr)
 {
     const_SLOT(num_columns, solver);
@@ -546,7 +546,6 @@ static inline int perform_move(bhs_solver_t *const solver,
 
     next_queue_item.s.packed.value.col_idx =
         (typeof(next_queue_item.s.packed.value.col_idx))col_idx;
-    next_queue_item.s.packed.value.prev_foundation = prev_foundation;
 
     next_queue_item.rank_counts = queue_item_copy_ptr->rank_counts;
     next_queue_item.rank_counts.c[(ssize_t)card]--;
@@ -694,7 +693,7 @@ extern int DLLEXPORT black_hole_solver_run(
 
         if (has_talon)
         {
-            if (unlikely(perform_move(solver, queue_item_ptr, foundations,
+            if (unlikely(perform_move(solver, queue_item_ptr,
                     solver->talon_values[talon_ptr], num_columns,
                     &queue_item_copy)))
             {
@@ -714,8 +713,8 @@ extern int DLLEXPORT black_hole_solver_run(
 
                     if (found_can_move[(size_t)card])
                     {
-                        if (unlikely(perform_move(solver, queue_item_ptr,
-                                foundations, card, col_idx, &queue_item_copy)))
+                        if (unlikely(perform_move(solver, queue_item_ptr, card,
+                                col_idx, &queue_item_copy)))
                         {
                             return BLACK_HOLE_SOLVER__OUT_OF_MEMORY;
                         }

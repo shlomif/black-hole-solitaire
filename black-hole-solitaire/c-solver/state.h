@@ -52,7 +52,6 @@ typedef struct
 {
     /* The index of the column that was changed. */
     bhs_col_idx_t col_idx;
-    bhs_rank_t prev_foundation;
 } bhs_state_value_t;
 
 typedef struct
