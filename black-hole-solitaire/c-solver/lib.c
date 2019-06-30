@@ -802,37 +802,38 @@ DLLEXPORT void black_hole_solver_init_solution_moves(
             states[num_states + 1].packed.key.foundations =
                 solver->initial_foundation;
         }
-        else if (col_idx == num_columns)
-        {
-            const_AUTO(
-                moved_card_height, read_talon(&states[num_states].packed.key));
-            var_AUTO(new_moved_card_height, moved_card_height - 1);
-            states[num_states + 1].packed.key.foundations =
-                states[num_states + 1].packed.value.prev_foundation;
-            unsigned char *data = states[num_states + 1].packed.key.data;
-            for (size_t i = 0; i < TALON_PTR_BITS;
-                 ++i, new_moved_card_height >>= 1)
-            {
-                data[i >> 3] &= (~(1 << (i & 0x7)));
-                data[i >> 3] |= ((new_moved_card_height & 0x1) << (i & 0x7));
-            }
-        }
         else
         {
-            const_AUTO(
-                moved_card_height, read_col(&states[num_states].packed.key,
-                                       col_idx, bits_per_column));
-            var_AUTO(new_moved_card_height, moved_card_height + 1);
             states[num_states + 1].packed.key.foundations =
                 states[num_states + 1].packed.value.prev_foundation;
-            var_AUTO(offset, TALON_PTR_BITS + bits_per_column * col_idx);
             unsigned char *data = states[num_states + 1].packed.key.data;
-            for (size_t i = 0; i < bits_per_column;
-                 ++i, ++offset, new_moved_card_height >>= 1)
+            if (col_idx == num_columns)
             {
-                data[offset >> 3] &= (~(1 << (offset & 0x7)));
-                data[offset >> 3] |=
-                    ((new_moved_card_height & 0x1) << (offset & 0x7));
+                const_AUTO(moved_card_height,
+                    read_talon(&states[num_states].packed.key));
+                var_AUTO(new_moved_card_height, moved_card_height - 1);
+                for (size_t i = 0; i < TALON_PTR_BITS;
+                     ++i, new_moved_card_height >>= 1)
+                {
+                    data[i >> 3] &= (~(1 << (i & 0x7)));
+                    data[i >> 3] |=
+                        ((new_moved_card_height & 0x1) << (i & 0x7));
+                }
+            }
+            else
+            {
+                const_AUTO(
+                    moved_card_height, read_col(&states[num_states].packed.key,
+                                           col_idx, bits_per_column));
+                var_AUTO(new_moved_card_height, moved_card_height + 1);
+                var_AUTO(offset, TALON_PTR_BITS + bits_per_column * col_idx);
+                for (size_t i = 0; i < bits_per_column;
+                     ++i, ++offset, new_moved_card_height >>= 1)
+                {
+                    data[offset >> 3] &= (~(1 << (offset & 0x7)));
+                    data[offset >> 3] |=
+                        ((new_moved_card_height & 0x1) << (offset & 0x7));
+                }
             }
         }
         ++num_states;
