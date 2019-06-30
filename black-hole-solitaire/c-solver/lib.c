@@ -785,8 +785,8 @@ DLLEXPORT void black_hole_solver_init_solution_moves(
     states[num_states].packed = (solver->final_state->s.packed);
     var_AUTO(parent_ptr, solver->final_state);
 
-    while (memcmp(&(states[num_states].packed.key), &(solver->init_state),
-        sizeof(states[num_states].packed.key)))
+    while (memcmp(&(states[num_states].packed.key.data),
+        &(solver->init_state.data), sizeof(states[num_states].packed.key.data)))
     {
         assert(num_states < MAX_NUM_STATES);
         assert(parent_ptr);
@@ -797,15 +797,8 @@ DLLEXPORT void black_hole_solver_init_solution_moves(
         // Reverse the move
         const size_t col_idx = states[num_states + 1].packed.value.col_idx;
         states[num_states + 1].packed.key = states[num_states].packed.key;
-        if (col_idx == num_columns + 1)
+        if (col_idx != num_columns + 1)
         {
-            states[num_states + 1].packed.key.foundations =
-                solver->initial_foundation;
-        }
-        else
-        {
-            states[num_states + 1].packed.key.foundations =
-                states[num_states + 1].packed.value.prev_foundation;
             unsigned char *data = states[num_states + 1].packed.key.data;
             if (col_idx == num_columns)
             {
