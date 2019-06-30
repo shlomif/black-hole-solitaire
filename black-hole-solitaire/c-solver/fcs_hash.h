@@ -39,7 +39,7 @@ typedef unsigned bh_solve_hash_value_t;
 static inline bh_solve_hash_value_t bh_solve__hash_function(
     const bhs_state_key_t key)
 {
-    return DO_XXH(&key, sizeof(key));
+    return (bh_solve_hash_value_t)DO_XXH(&key, sizeof(key));
 }
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wpadded"
