@@ -63,9 +63,9 @@ my @suits = qw/H C D S/;
 path('suit_char_to_index.h')->spew_utf8(
     "#pragma once\n",
     "enum BHS_SUITS {",
-    join( ",", ( map { "SUIT_$_" } @suits ), "INVALID_SUIT" ),
+    join( ",", ( map { "SUIT_$_" } @suits ), "INVALID_SUIT = -1" ),
     "};",
-    "static int suit_char_to_index[256]={",
+    "static enum BHS_SUITS suit_char_to_index[256]={",
     join(
         ",",
         map {
