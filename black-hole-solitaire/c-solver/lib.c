@@ -107,7 +107,7 @@ typedef struct
                                                 [BHS__MAX_NUM_CARDS_IN_COL];
     bhs_card_string_t initial_talon_card_strings[TALON_MAX_SIZE];
 
-    bhs_state_key_value_pair_t init_state;
+    bhs_state_key_t init_state;
     bhs_queue_item_t *final_state;
 
     bool is_rank_reachability_prune_enabled;
@@ -571,8 +571,7 @@ static inline int perform_move(bhs_solver_t *const solver,
     return 0;
 }
 
-static inline bhs_state_key_value_pair_t setup_first_queue_item(
-    bhs_solver_t *const solver)
+static inline bhs_state_key_t setup_first_queue_item(bhs_solver_t *const solver)
 {
     const_SLOT(num_columns, solver);
     assert(solver->queue_len == 0);
@@ -607,7 +606,7 @@ static inline bhs_state_key_value_pair_t setup_first_queue_item(
     ++solver->queue_len;
     assert(!solver->queue[0].parent);
 
-    return new_queue_item->s.packed;
+    return new_queue_item->s.packed.key;
 }
 
 static inline void setup_config(bhs_solver_t *const solver)
@@ -621,11 +620,10 @@ static inline void setup_config(bhs_solver_t *const solver)
 
 static inline int setup_init_state(bhs_solver_t *const solver)
 {
-    bhs_state_key_value_pair_t *const init_state = &(solver->init_state);
+    bhs_state_key_t *const init_state = &(solver->init_state);
     *init_state = setup_first_queue_item(solver);
 
-    if (unlikely(
-            bh_solve_hash_insert(&(solver->positions), &init_state->key) < 0))
+    if (unlikely(bh_solve_hash_insert(&(solver->positions), init_state) < 0))
     {
         return BLACK_HOLE_SOLVER__OUT_OF_MEMORY;
     }
@@ -787,7 +785,7 @@ DLLEXPORT void black_hole_solver_init_solution_moves(
     states[num_states].packed = (solver->final_state->s.packed);
     var_AUTO(parent_ptr, solver->final_state);
 
-    while (memcmp(&(states[num_states].packed.key), &(solver->init_state.key),
+    while (memcmp(&(states[num_states].packed.key), &(solver->init_state),
         sizeof(states[num_states].packed.key)))
     {
         assert(num_states < MAX_NUM_STATES);
