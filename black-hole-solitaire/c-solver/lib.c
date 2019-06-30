@@ -87,7 +87,7 @@ typedef struct
     bh_solve_hash_t positions;
     meta_allocator meta_alloc;
     uint_fast16_t initial_lens[BHS__MAX_NUM_COLUMNS];
-    uint_fast32_t num_states_in_solution, current_state_in_solution_idx;
+    uint_fast32_t current_state_in_solution_idx;
     unsigned long iterations_num, num_states_in_collection, max_iters_limit;
     uint_fast32_t num_columns;
     uint_fast32_t bits_per_column;
@@ -820,19 +820,7 @@ DLLEXPORT void black_hole_solver_init_solution_moves(
         ++num_states;
     }
     states[num_states].packed.key.foundations = solver->initial_foundation;
-
-    ++num_states;
-    const_AUTO(lim, (num_states >> 1));
-    // Reverse the list in place.
-    for (size_t i = 0; i < lim; ++i)
-    {
-        const_AUTO(temp_state, states[i]);
-        states[i] = states[num_states - 1 - i];
-        states[num_states - 1 - i] = temp_state;
-    }
-
-    solver->num_states_in_solution = num_states;
-    solver->current_state_in_solution_idx = 0;
+    solver->current_state_in_solution_idx = num_states;
 }
 
 DLLEXPORT extern int black_hole_solver_get_next_move(
@@ -842,8 +830,7 @@ DLLEXPORT extern int black_hole_solver_get_next_move(
 {
     bhs_solver_t *const solver = (bhs_solver_t *)instance_proto;
 
-    if (solver->current_state_in_solution_idx ==
-        solver->num_states_in_solution - 1)
+    if (solver->current_state_in_solution_idx == 0)
     {
         *col_idx_ptr = *card_rank_ptr = *card_suit_ptr = -1;
         return BLACK_HOLE_SOLVER__END;
@@ -851,7 +838,7 @@ DLLEXPORT extern int black_hole_solver_get_next_move(
 
     {
         const bhs_solution_state_t next_state =
-            solver->states_in_solution[solver->current_state_in_solution_idx++];
+            solver->states_in_solution[solver->current_state_in_solution_idx--];
 
         const uint_fast32_t col_idx = next_state.packed.value.col_idx;
         const bool is_talon = (col_idx == solver->num_columns);
