@@ -793,41 +793,7 @@ DLLEXPORT void black_hole_solver_init_solution_moves(
         /* Look up the next state in the solutions' chain */
         states[num_states + 1].packed.value = parent_ptr->s.packed.value;
         parent_ptr = (bhs_queue_item_t *)parent_ptr->parent;
-        // Reverse the move
-        const size_t col_idx = states[num_states + 1].packed.value.col_idx;
-        states[num_states + 1].packed.key = states[num_states].packed.key;
-        if (col_idx != num_columns + 1)
-        {
-            unsigned char *data = states[num_states + 1].packed.key.data;
-            if (col_idx == num_columns)
-            {
-                const_AUTO(moved_card_height,
-                    read_talon(&states[num_states].packed.key));
-                var_AUTO(new_moved_card_height, moved_card_height - 1);
-                for (size_t i = 0; i < TALON_PTR_BITS;
-                     ++i, new_moved_card_height >>= 1)
-                {
-                    data[i >> 3] &= (~(1 << (i & 0x7)));
-                    data[i >> 3] |=
-                        ((new_moved_card_height & 0x1) << (i & 0x7));
-                }
-            }
-            else
-            {
-                const_AUTO(
-                    moved_card_height, read_col(&states[num_states].packed.key,
-                                           col_idx, bits_per_column));
-                var_AUTO(new_moved_card_height, moved_card_height + 1);
-                var_AUTO(offset, TALON_PTR_BITS + bits_per_column * col_idx);
-                for (size_t i = 0; i < bits_per_column;
-                     ++i, ++offset, new_moved_card_height >>= 1)
-                {
-                    data[offset >> 3] &= (~(1 << (offset & 0x7)));
-                    data[offset >> 3] |=
-                        ((new_moved_card_height & 0x1) << (offset & 0x7));
-                }
-            }
-        }
+        states[num_states + 1].packed.key = parent_ptr->s.packed.key;
         ++num_states;
     }
 
