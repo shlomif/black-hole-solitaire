@@ -838,7 +838,6 @@ DLLEXPORT void black_hole_solver_init_solution_moves(
         }
         ++num_states;
     }
-    states[num_states].packed.key.foundations = solver->initial_foundation;
 
     ++num_states;
     const_AUTO(lim, (num_states >> 1));
