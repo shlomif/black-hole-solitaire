@@ -40,31 +40,7 @@
 #include "rank_reach_prune.h"
 
 #define NUM_SUITS 4
-enum BHS_SUITS
-{
-    SUIT_H,
-    SUIT_C,
-    SUIT_D,
-    SUIT_S,
-    INVALID_SUIT = -1
-};
-
-static int suit_char_to_index(char suit)
-{
-    switch (suit)
-    {
-    case 'H':
-        return SUIT_H;
-    case 'C':
-        return SUIT_C;
-    case 'D':
-        return SUIT_D;
-    case 'S':
-        return SUIT_S;
-    default:
-        return INVALID_SUIT;
-    }
-}
+#include "suit_char_to_index.h"
 
 typedef struct
 {
@@ -308,7 +284,7 @@ static int parse_card(const char **s, bhs_rank_t *const foundation,
     case 'C':
         if (suit_ptr)
         {
-            *suit_ptr = suit_char_to_index(*(*(s)));
+            *suit_ptr = suit_char_to_index[*(*(s))];
         }
         break;
     default:
@@ -856,10 +832,10 @@ DLLEXPORT extern int black_hole_solver_get_next_move(
             (is_talon ? solver->talon_values
                       : solver->board_ranks[col_idx])[height] +
             1;
-        solver->sol_foundations_card_suit = *card_suit_ptr = suit_char_to_index(
-            (is_talon
-                    ? solver->initial_talon_card_strings
-                    : solver->initial_board_card_strings[col_idx])[height][1]);
+        solver
+            ->sol_foundations_card_suit = *card_suit_ptr = suit_char_to_index[(
+            is_talon ? solver->initial_talon_card_strings
+                     : solver->initial_board_card_strings[col_idx])[height][1]];
 
         return BLACK_HOLE_SOLVER__SUCCESS;
     }

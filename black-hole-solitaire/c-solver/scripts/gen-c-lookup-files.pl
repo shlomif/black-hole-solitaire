@@ -4,6 +4,7 @@ use 5.014;
 use strict;
 use warnings;
 use autodie;
+use List::Util qw/ any /;
 use Path::Tiny qw/ path /;
 
 my $FALSE = 0;
@@ -57,6 +58,23 @@ foreach my $wrap_ranks ( 0, 1 )
         }
     }
 }
+
+my @suits = qw/H C D S/;
+path('suit_char_to_index.h')->spew_utf8(
+    "#pragma once\n",
+    "enum BHS_SUITS {",
+    join( ",", ( map { "SUIT_$_" } @suits ), "INVALID_SUIT" ),
+    "};",
+    "static int suit_char_to_index[256]={",
+    join(
+        ",",
+        map {
+            my $c = chr($_);
+            ( any { $c eq $_ } @suits ) ? "SUIT_$c" : "INVALID_SUIT"
+        } 0 .. 255
+    ),
+    "};"
+);
 
 path('board_gen_lookup1.h')->spew_utf8(
     "#pragma once\n",
