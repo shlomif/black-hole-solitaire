@@ -4,6 +4,15 @@ Shlomi Fish <shlomif@cpan.org>
 :Date: 2019-05-23
 :Revision: $Id$
 
+1.2.0       ( 30 Jun 2019 ):
+----------------------------
+
+* Add the +--output+ flag to output to a file.
+
+* Add some tests.
+
+* Several optimisations and cleanups.
+
 1.0.0       ( 23 May 2019 ):
 ----------------------------
 
