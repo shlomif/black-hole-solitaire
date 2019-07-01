@@ -4,6 +4,11 @@ Shlomi Fish <shlomif@cpan.org>
 :Date: 2019-05-23
 :Revision: $Id$
 
+1.2.1       ( 01 Jul 2019 ):
+----------------------------
+
+* Fix for platforms with unsigned chars (e.g: ARM Linux).
+
 1.2.0       ( 30 Jun 2019 ):
 ----------------------------
 

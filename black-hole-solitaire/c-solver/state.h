@@ -17,7 +17,7 @@
 
 #define BHS_CARD_STRING_LEN 2
 typedef char bhs_card_string_t[BHS_CARD_STRING_LEN + 1];
-typedef char bhs_rank_t;
+typedef int8_t bhs_rank_t;
 
 #define BHS__MAX_NUM_COLUMNS                                                   \
     (max(BHS__ALL_IN_A_ROW__NUM_COLUMNS, BHS__BLACK_HOLE__NUM_COLUMNS))
