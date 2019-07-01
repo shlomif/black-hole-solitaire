@@ -795,8 +795,8 @@ DLLEXPORT void black_hole_solver_init_solution_moves(
             for (size_t i = 0; i < TALON_PTR_BITS;
                  ++i, new_moved_card_height >>= 1)
             {
-                data[i >> 3] &= (~(1 << (i & 0x7)));
-                data[i >> 3] |= ((new_moved_card_height & 0x1) << (i & 0x7));
+                data[0] &= (~(1 << (i)));
+                data[0] |= ((new_moved_card_height & 0x1) << (i));
             }
         }
         else
