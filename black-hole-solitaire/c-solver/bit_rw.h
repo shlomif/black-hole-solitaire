@@ -25,14 +25,14 @@ typedef struct
     rin_uchar *start;
 } rin_bit_writer;
 
-static inline void rin_bit_writer_init_bare(
+static inline void rin_bit_writer_init(
     rin_bit_writer *const writer, rin_uchar *const start)
 {
     writer->start = writer->current = start;
     writer->bit_in_char_idx = 0;
 }
 
-static inline void rin_bit_writer_init(
+static inline void rin_bit_writer_init_and_clear(
     rin_bit_writer *const writer, rin_uchar *const start)
 {
     *(writer->start = writer->current = start) = 0;

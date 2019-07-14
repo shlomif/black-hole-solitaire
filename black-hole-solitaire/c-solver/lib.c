@@ -135,7 +135,7 @@ static inline void write_col(bhs_state_key_t *const key,
     rin_bit_data n)
 {
     rin_bit_writer w;
-    rin_bit_writer_init_bare(&w, key->data);
+    rin_bit_writer_init(&w, key->data);
     rin_bit_writer_skip(&w, TALON_PTR_BITS + col_idx * bits_per_column);
 
     rin_bit_writer_overwrite(&w, bits_per_column, n);
@@ -581,7 +581,7 @@ static inline bhs_state_key_value_pair_t setup_first_queue_item(
         sizeof(new_queue_item->rank_counts));
 
     rin_bit_writer bit_w;
-    rin_bit_writer_init(&bit_w, new_queue_item->s.packed.key.data);
+    rin_bit_writer_init_and_clear(&bit_w, new_queue_item->s.packed.key.data);
 
     const_SLOT(bits_per_column, solver);
     rin_bit_writer_write(&bit_w, TALON_PTR_BITS, 0);
