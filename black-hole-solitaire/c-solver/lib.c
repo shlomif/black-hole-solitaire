@@ -24,8 +24,8 @@
 #include "can_move.h"
 #include "rinutils/likely.h"
 #include "state.h"
-#include "bit_rw.h"
 #include "rinutils/typeof_wrap.h"
+#include "rinutils/bit_rw.h"
 
 #if (BHS_STATE_STORAGE == BHS_STATE_STORAGE_TOKYO_CAB_HASH)
 #include "tokyo_cab_hash.h"
