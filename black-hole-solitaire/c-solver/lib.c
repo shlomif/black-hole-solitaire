@@ -121,8 +121,7 @@ typedef struct
 
 #define TALON_PTR_BITS 6
 
-static inline void write_talon(
-    bhs_state_key_t *const key, const fc_solve_bit_data_t n)
+static inline void write_talon(bhs_state_key_t *const key, const rin_bit_data n)
 {
     key->data[0] &= ~((1 << TALON_PTR_BITS) - 1);
     key->data[0] |= n;
@@ -133,22 +132,22 @@ static inline uint_fast32_t read_talon(const bhs_state_key_t *const key)
 }
 static inline void write_col(bhs_state_key_t *const key,
     const uint_fast32_t col_idx, const uint_fast32_t bits_per_column,
-    fc_solve_bit_data_t n)
+    rin_bit_data n)
 {
-    fc_solve_bit_writer_t w;
-    fc_solve_bit_writer_init_bare(&w, key->data);
-    fc_solve_bit_writer_skip(&w, TALON_PTR_BITS + col_idx * bits_per_column);
+    rin_bit_writer w;
+    rin_bit_writer_init_bare(&w, key->data);
+    rin_bit_writer_skip(&w, TALON_PTR_BITS + col_idx * bits_per_column);
 
-    fc_solve_bit_writer_overwrite(&w, bits_per_column, n);
+    rin_bit_writer_overwrite(&w, bits_per_column, n);
 }
-static inline fc_solve_bit_data_t read_col(const bhs_state_key_t *key,
+static inline rin_bit_data read_col(const bhs_state_key_t *key,
     const uint_fast32_t col_idx, const uint_fast32_t bits_per_column)
 {
-    fc_solve_bit_reader_t r;
-    fc_solve_bit_reader_init(&r, key->data);
-    fc_solve_bit_reader_skip(&r, TALON_PTR_BITS + col_idx * bits_per_column);
+    rin_bit_reader r;
+    rin_bit_reader_init(&r, key->data);
+    rin_bit_reader_skip(&r, TALON_PTR_BITS + col_idx * bits_per_column);
 
-    return fc_solve_bit_reader_read(&r, bits_per_column);
+    return rin_bit_reader_read(&r, bits_per_column);
 }
 int DLLEXPORT black_hole_solver_create(
     black_hole_solver_instance_t **ret_instance)
@@ -581,15 +580,15 @@ static inline bhs_state_key_value_pair_t setup_first_queue_item(
     memset(&(new_queue_item->rank_counts), '\0',
         sizeof(new_queue_item->rank_counts));
 
-    fc_solve_bit_writer_t bit_w;
-    fc_solve_bit_writer_init(&bit_w, new_queue_item->s.packed.key.data);
+    rin_bit_writer bit_w;
+    rin_bit_writer_init(&bit_w, new_queue_item->s.packed.key.data);
 
     const_SLOT(bits_per_column, solver);
-    fc_solve_bit_writer_write(&bit_w, TALON_PTR_BITS, 0);
+    rin_bit_writer_write(&bit_w, TALON_PTR_BITS, 0);
     for (size_t col = 0; col < num_columns; ++col)
     {
         const_AUTO(hh, solver->initial_lens[col]);
-        fc_solve_bit_writer_write(&bit_w, bits_per_column, hh);
+        rin_bit_writer_write(&bit_w, bits_per_column, hh);
         for (size_t h = 0; h < hh; ++h)
         {
             ++(new_queue_item->rank_counts
@@ -660,9 +659,9 @@ extern int DLLEXPORT black_hole_solver_run(
         --solver->queue_len;
         const_AUTO(queue_item_copy, solver->queue[solver->queue_len]);
         const_AUTO(foundations, queue_item_copy.s.packed.key.foundations);
-        fc_solve_bit_reader_t r;
-        fc_solve_bit_reader_init(&r, queue_item_copy.s.packed.key.data);
-        const_AUTO(talon_ptr, fc_solve_bit_reader_read(&r, TALON_PTR_BITS));
+        rin_bit_reader r;
+        rin_bit_reader_init(&r, queue_item_copy.s.packed.key.data);
+        const_AUTO(talon_ptr, rin_bit_reader_read(&r, TALON_PTR_BITS));
 
         if (effective_is_rank_reachability_prune_enabled &&
             (bhs_find_rank_reachability__inline(foundations,
@@ -690,7 +689,7 @@ extern int DLLEXPORT black_hole_solver_run(
             const bool *const found_can_move = can_move[(ssize_t)foundations];
             for (uint_fast32_t col_idx = 0; col_idx < num_columns; ++col_idx)
             {
-                const_AUTO(pos, fc_solve_bit_reader_read(&r, bits_per_column));
+                const_AUTO(pos, rin_bit_reader_read(&r, bits_per_column));
                 if (pos)
                 {
                     no_cards = false;
@@ -711,7 +710,7 @@ extern int DLLEXPORT black_hole_solver_run(
         {
             for (size_t col_idx = 0; col_idx < num_columns; ++col_idx)
             {
-                const_AUTO(pos, fc_solve_bit_reader_read(&r, bits_per_column));
+                const_AUTO(pos, rin_bit_reader_read(&r, bits_per_column));
                 if (pos)
                 {
                     no_cards = false;
@@ -905,9 +904,9 @@ DLLEXPORT extern int black_hole_solver_get_current_solution_board(
         solver->states_in_solution[solver->current_state_in_solution_idx];
 
     const_SLOT(talon_len, solver);
-    fc_solve_bit_reader_t r;
-    fc_solve_bit_reader_init(&r, next_state.packed.key.data);
-    var_AUTO(talon_ptr, fc_solve_bit_reader_read(&r, TALON_PTR_BITS));
+    rin_bit_reader r;
+    rin_bit_reader_init(&r, next_state.packed.key.data);
+    var_AUTO(talon_ptr, rin_bit_reader_read(&r, TALON_PTR_BITS));
     if (talon_len)
     {
         s += sprintf(s, "%s", "Talon:");
@@ -923,7 +922,7 @@ DLLEXPORT extern int black_hole_solver_get_current_solution_board(
     for (size_t col_idx = 0; col_idx < num_columns; ++col_idx)
     {
         s += sprintf(s, "%c", ':');
-        const size_t hh = fc_solve_bit_reader_read(&r, bits_per_column);
+        const size_t hh = rin_bit_reader_read(&r, bits_per_column);
         for (size_t h = 0; h < hh; ++h)
         {
             s += sprintf(
