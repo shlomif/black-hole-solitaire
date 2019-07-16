@@ -44,7 +44,7 @@ sub test_using_valgrind
         {
             blurb  => $blurb,
             log_fn => $log_fn,
-            prog   => $ENV{'FCS_PATH'} . "/$prog",
+            prog   => $ENV{'FCS_BIN_PATH'} . "/$prog",
             argv   => [ @$cmd_line_args, ],
         },
     );

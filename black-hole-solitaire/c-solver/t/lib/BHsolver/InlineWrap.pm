@@ -32,10 +32,10 @@ sub import
         name => $pkg,
         NAME => $pkg,
         INC =>
-"-I$ENV{FCS_PATH}/include -I$ENV{FCS_SRC_PATH}/rinutils/rinutils/include -I$ENV{FCS_SRC_PATH}/include -I$ENV{FCS_PATH} -I$ENV{FCS_SRC_PATH}",
+"-I$ENV{FCS_BIN_PATH}/include -I$ENV{FCS_SRC_PATH}/rinutils/rinutils/include -I$ENV{FCS_SRC_PATH}/include -I$ENV{FCS_BIN_PATH} -I$ENV{FCS_SRC_PATH}",
         CCFLAGS           => $ccflags,
         CLEAN_AFTER_BUILD => 0,
-        LIBS              => "-L$ENV{FCS_PATH} $libs",
+        LIBS              => "-L$ENV{FCS_BIN_PATH} $libs",
         @workaround_for_a_heisenbug,
         %args,
     );
