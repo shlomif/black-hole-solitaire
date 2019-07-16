@@ -4,6 +4,15 @@ Shlomi Fish <shlomif@cpan.org>
 :Date: 2019-05-23
 :Revision: $Id$
 
+1.4.0       ( 16 Jul 2019 ):
+----------------------------
+
+* Fix a build warning on latest cmake.
+
+* Moved bit_rw to rinutils.
+
+* Rename tests-time env vars to make them clearer.
+
 1.2.1       ( 01 Jul 2019 ):
 ----------------------------
 
