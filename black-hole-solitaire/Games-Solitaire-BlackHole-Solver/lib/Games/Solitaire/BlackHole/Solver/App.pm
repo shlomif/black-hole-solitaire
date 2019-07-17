@@ -147,10 +147,10 @@ sub run
         die "Could not match first foundation line!";
     }
 
-    my @board_cards  = map { [ split /\s+/, $_ ] } @lines;
+    $self->_board_cards( [ map { [ split /\s+/, $_ ] } @lines ] );
     my @board_values = map {
         [ map { $self->_get_rank($_) } @$_ ]
-    } @board_cards;
+    } @{ $self->_board_cards };
 
     my $init_state = "";
 
@@ -158,39 +158,19 @@ sub run
 
     foreach my $col_idx ( 0 .. $#board_values )
     {
-        vec( $init_state, 4 + $col_idx, 2 ) =
+        vec( $init_state, 4 + $col_idx, 4 ) =
             scalar( @{ $board_values[$col_idx] } );
     }
 
-    # The values of %positions is an array reference with the 0th key being the
+    # The values of $positions is an array reference with the 0th key being the
     # previous state, and the 1th key being the column of the move.
-    my %positions = ( $init_state => [] );
+    my $positions = $self->_positions( +{ $init_state => [], } );
 
     my @queue = ($init_state);
 
     my %is_good_diff = ( map { $_ => 1 } map { $_, -$_ } ( 1, $RANK_KING ) );
 
     my $verdict = 0;
-
-    my $trace_solution = sub {
-        my $final_state = shift;
-
-        my $state = $final_state;
-        my ( $prev_state, $col_idx );
-
-        my @moves;
-        while ( ( $prev_state, $col_idx ) = @{ $positions{$state} } )
-        {
-            push @moves,
-                $board_cards[$col_idx]
-                [ vec( $prev_state, 4 + $col_idx, 2 ) - 1 ];
-        }
-        continue
-        {
-            $state = $prev_state;
-        }
-        print {$output_handle} map { "$_\n" } reverse(@moves);
-    };
 
 QUEUE_LOOP:
     while ( my $state = pop(@queue) )
@@ -202,7 +182,7 @@ QUEUE_LOOP:
         # my @debug_pos;
         foreach my $col_idx ( 0 .. $#board_values )
         {
-            my $pos = vec( $state, 4 + $col_idx, 2 );
+            my $pos = vec( $state, 4 + $col_idx, 4 );
 
             # push @debug_pos, $pos;
             if ($pos)
@@ -214,10 +194,10 @@ QUEUE_LOOP:
                 {
                     my $next_s = $state;
                     vec( $next_s, 0, 8 ) = $card;
-                    vec( $next_s, 4 + $col_idx, 2 )--;
-                    if ( !exists( $positions{$next_s} ) )
+                    --vec( $next_s, 4 + $col_idx, 4 );
+                    if ( !exists( $positions->{$next_s} ) )
                     {
-                        $positions{$next_s} = [ $state, $col_idx ];
+                        $positions->{$next_s} = [ $state, $col_idx ];
                         push( @queue, $next_s );
                     }
                 }
@@ -228,7 +208,7 @@ QUEUE_LOOP:
         if ($no_cards)
         {
             print {$output_handle} "Solved!\n";
-            $trace_solution->($state);
+            $self->_trace_solution( $state, $output_handle );
             $verdict = 1;
             last QUEUE_LOOP;
         }

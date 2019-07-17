@@ -124,7 +124,7 @@ sub run
     if ($version)
     {
         print
-"black-hole-solve version $Games::Solitaire::BlackHole::Solver::App::VERSION\n";
+"golf-solitaire-solve version $Games::Solitaire::BlackHole::Solver::Golf::App::VERSION\n";
         exit(0);
     }
 
@@ -151,13 +151,12 @@ sub run
     chomp(@lines);
 
     my $talon_line = shift(@lines);
-    my @talon_cards;
     my @talon_values;
     my $talon_ptr = 0;
     if ( my ($cards) = $talon_line =~ m{\ATalon:((?: $card_re){16})\z} )
     {
-        @talon_cards  = $cards =~ /($card_re)/g;
-        @talon_values = map { $self->_get_rank($_) } @talon_cards;
+        @talon_values = map { $self->_get_rank($_) }
+            @{ $self->_talon_cards( [ $cards =~ /($card_re)/g ] ) };
     }
     else
     {
@@ -175,10 +174,10 @@ sub run
         die "Could not match first foundation line!";
     }
 
-    my @board_cards  = map { [ split /\s+/, $_ ] } @lines;
+    $self->_board_cards( [ map { [ split /\s+/, $_ ] } @lines ] );
     my @board_values = map {
         [ map { $self->_get_rank($_) } @$_ ]
-    } @board_cards;
+    } @{ $self->_board_cards };
 
     my $init_state = "";
 
@@ -191,9 +190,9 @@ sub run
             scalar( @{ $board_values[$col_idx] } );
     }
 
-    # The values of %positions is an array reference with the 0th key being the
+    # The values of $positions is an array reference with the 0th key being the
     # previous state, and the 1th key being the column of the move.
-    my %positions = ( $init_state => [] );
+    my $positions = $self->_positions( +{ $init_state => [], } );
 
     my @queue = ($init_state);
 
@@ -203,30 +202,6 @@ sub run
         );
 
     my $verdict = 0;
-
-    my $trace_solution = sub {
-        my $final_state = shift;
-
-        my $state = $final_state;
-        my ( $prev_state, $col_idx );
-
-        my @moves;
-        while ( ( $prev_state, $col_idx ) = @{ $positions{$state} } )
-        {
-            push @moves,
-                (
-                ( $col_idx == @board_cards )
-                ? "Deal talon " . $talon_cards[ vec( $prev_state, 1, 8 ) ]
-                : $board_cards[$col_idx]
-                    [ vec( $prev_state, 4 + $col_idx, 4 ) - 1 ]
-                );
-        }
-        continue
-        {
-            $state = $prev_state;
-        }
-        print {$output_handle} map { "$_\n" } reverse(@moves);
-    };
 
 QUEUE_LOOP:
     while ( my $state = pop(@queue) )
@@ -255,10 +230,10 @@ QUEUE_LOOP:
                         my $next_s = $state;
                         vec( $next_s, 0, 8 ) = $card;
                         --vec( $next_s, 4 + $col_idx, 4 );
-                        if ( !exists( $positions{$next_s} ) )
+                        if ( !exists( $positions->{$next_s} ) )
                         {
                             # print "$card $fnd $col_idx\n";
-                            $positions{$next_s} = [ $state, $col_idx ];
+                            $positions->{$next_s} = [ $state, $col_idx ];
                             push( @sub_queue, $next_s );
                         }
                     }
@@ -284,7 +259,7 @@ QUEUE_LOOP:
         if ($no_cards)
         {
             print {$output_handle} "Solved!\n";
-            $trace_solution->($state);
+            $self->_trace_solution( $state, $output_handle );
             $verdict = 1;
             last QUEUE_LOOP;
         }
@@ -293,9 +268,9 @@ QUEUE_LOOP:
             my $next_s = $state;
             vec( $next_s, 0, 8 ) = $talon_values[$tln];
             ++vec( $next_s, 1, 8 );
-            if ( !exists( $positions{$next_s} ) )
+            if ( !exists( $positions->{$next_s} ) )
             {
-                $positions{$next_s} = [ $state, scalar(@board_values) ];
+                $positions->{$next_s} = [ $state, scalar(@board_values) ];
                 push( @queue, $next_s );
             }
         }
