@@ -94,6 +94,14 @@ Runs the application.
 
 =cut
 
+package Games::Solitaire::BlackHole::Solver::App::Task;
+
+use Moo;
+
+has [ '_queue', '_gen', '_remaining_iters', '_seed', ] => ( is => 'rw' );
+
+package Games::Solitaire::BlackHole::Solver::App;
+
 sub _shuffle
 {
     my ( $gen, $arr ) = @_;
@@ -119,10 +127,10 @@ sub run
 
     my ( $help, $man, $version );
 
-    my $seed;
+    my @seeds;
 
     GetOptions(
-        "seed=i"     => \$seed,
+        "seed=i\@"   => \@seeds,
         "o|output=s" => \$output_fn,
         'help|h|?'   => \$help,
         'man'        => \$man,
@@ -138,7 +146,6 @@ sub run
 "black-hole-solve version $Games::Solitaire::BlackHole::Solver::App::VERSION\n";
         exit(0);
     }
-    my $gen = Math::Random::MT->new( $seed // 1 );
 
     my $filename = shift(@ARGV);
 
@@ -158,16 +165,24 @@ sub run
 
     $self->_parse_board( \@lines );
     my $init_queue   = $self->_set_up_initial_position(0);
-    my @queue        = @$init_queue;
     my $positions    = $self->_positions;
     my $board_values = $self->_board_values;
 
+    my $iseed = shift @seeds;
+    my $task  = Games::Solitaire::BlackHole::Solver::App::Task->new(
+        {
+            _queue           => [@$init_queue],
+            _seed            => $iseed,
+            _gen             => Math::Random::MT->new( $iseed || 1 ),
+            _remaining_iters => ( 1 << 31 ),
+        }
+    );
     my %is_good_diff = ( map { $_ => 1 } map { $_, -$_ } ( 1, $RANK_KING ) );
 
     my $verdict = 0;
 
 QUEUE_LOOP:
-    while ( my $state = pop(@queue) )
+    while ( my $state = pop( @{ $task->_queue } ) )
     {
         my $rec = $positions->{$state};
         next QUEUE_LOOP if not $rec->[2];
@@ -223,8 +238,8 @@ QUEUE_LOOP:
         }
         if (@_pending)
         {
-            _shuffle( $gen, \@_pending ) if defined $seed;
-            push @queue, map { $_->[0] } @_pending;
+            _shuffle( $task->_gen, \@_pending ) if $task->_seed;
+            push @{ $task->_queue }, map { $_->[0] } @_pending;
             $rec->[3] += ( scalar grep { !$_->[1] } @_pending );
         }
         else
