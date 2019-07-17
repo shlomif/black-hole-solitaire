@@ -169,6 +169,9 @@ sub run
 QUEUE_LOOP:
     while ( my $state = pop(@queue) )
     {
+        my $rec = $positions->{$state};
+        next QUEUE_LOOP if not $rec->[2];
+
         # The foundation
         my $fnd      = vec( $state, 0, 8 );
         my $no_cards = 1;
@@ -191,10 +194,20 @@ QUEUE_LOOP:
                     my $next_s = $state;
                     vec( $next_s, 0, 8 ) = $card;
                     --vec( $next_s, 4 + $col_idx, 4 );
-                    if ( !exists( $positions->{$next_s} ) )
+                    my $exists = exists( $positions->{$next_s} );
+                    my $to_add = 0;
+                    if ( !$exists )
                     {
-                        $positions->{$next_s} = [ $state, $col_idx ];
-                        push( @_pending, $next_s );
+                        $positions->{$next_s} = [ $state, $col_idx, 1, 0 ];
+                        $to_add = 1;
+                    }
+                    elsif ( $positions->{$next_s}->[2] )
+                    {
+                        $to_add = 1;
+                    }
+                    if ($to_add)
+                    {
+                        push( @_pending, [ $next_s, $exists ] );
                     }
                 }
             }
@@ -211,7 +224,20 @@ QUEUE_LOOP:
         if (@_pending)
         {
             _shuffle( $gen, \@_pending ) if defined $seed;
-            push @queue, @_pending;
+            push @queue, map { $_->[0] } @_pending;
+            $rec->[3] += ( scalar grep { !$_->[1] } @_pending );
+        }
+        else
+        {
+            my $parent     = $state;
+            my $parent_rec = $rec;
+
+            while ( --$parent_rec->[3] <= 0 )
+            {
+                $parent_rec->[2] = 0;
+                $parent          = $parent_rec->[0];
+                $parent_rec      = $positions->{$parent};
+            }
         }
     }
 

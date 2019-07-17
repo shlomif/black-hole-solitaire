@@ -58,8 +58,10 @@ sub _trace_solution
     my ( $prev_state, $col_idx );
 
     my @moves;
+LOOP:
     while ( ( $prev_state, $col_idx ) = @{ $self->_positions->{$state} } )
     {
+        last LOOP if not defined $prev_state;
         push @moves,
             (
             ( $col_idx == @{ $self->_board_cards } )
@@ -140,7 +142,7 @@ sub _set_up_initial_position
 
     # The values of $positions is an array reference with the 0th key being the
     # previous state, and the 1th key being the column of the move.
-    $self->_positions( +{ $init_state => [], } );
+    $self->_positions( +{ $init_state => [ undef, undef, 1, 0, ], } );
 
     return [$init_state];
 }
