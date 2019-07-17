@@ -136,6 +136,7 @@ sub run
         'man'        => \$man,
         'version'    => \$version,
     ) or pod2usage(2);
+    push @seeds, 0 if not @seeds;
 
     pod2usage(1) if $help;
     pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
@@ -168,18 +169,38 @@ sub run
     my $positions    = $self->_positions;
     my $board_values = $self->_board_values;
 
-    my $iseed = shift @seeds;
-    my $task  = Games::Solitaire::BlackHole::Solver::App::Task->new(
-        {
-            _queue           => [@$init_queue],
-            _seed            => $iseed,
-            _gen             => Math::Random::MT->new( $iseed || 1 ),
-            _remaining_iters => ( 1 << 31 ),
-        }
-    );
+    my @tasks;
+    foreach my $iseed (@seeds)
+    {
+        push @tasks,
+            Games::Solitaire::BlackHole::Solver::App::Task->new(
+            {
+                _queue           => [@$init_queue],
+                _seed            => $iseed,
+                _gen             => Math::Random::MT->new( $iseed || 1 ),
+                _remaining_iters => 100,
+            }
+            );
+    }
     my %is_good_diff = ( map { $_ => 1 } map { $_, -$_ } ( 1, $RANK_KING ) );
 
-    my $verdict = 0;
+    my $task_idx = 0;
+    my $verdict  = 0;
+
+    my $next_task;
+    $next_task = sub {
+        return if !@tasks;
+        if ( !@{ $tasks[$task_idx]->_queue } )
+        {
+            splice @tasks, $task_idx, 1;
+            return $next_task->();
+        }
+        my $ret = $tasks[ $task_idx++ ];
+        $task_idx %= @tasks;
+        $ret->_remaining_iters(100);
+        return $ret;
+    };
+    my $task = $next_task->();
 
 QUEUE_LOOP:
     while ( my $state = pop( @{ $task->_queue } ) )
@@ -247,11 +268,20 @@ QUEUE_LOOP:
             my $parent     = $state;
             my $parent_rec = $rec;
 
+        PARENT:
             while ( --$parent_rec->[3] <= 0 )
             {
                 $parent_rec->[2] = 0;
-                $parent          = $parent_rec->[0];
-                $parent_rec      = $positions->{$parent};
+                $parent = $parent_rec->[0];
+                last PARENT if not defined $parent;
+                $parent_rec = $positions->{$parent};
+            }
+        }
+        if ( not --$task->{_remaining_iters} )
+        {
+            if ( not $task = $next_task->() )
+            {
+                last QUEUE_LOOP;
             }
         }
     }
