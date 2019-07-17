@@ -1,17 +1,12 @@
 package Games::Solitaire::BlackHole::Solver::App::Base;
 
-use strict;
-use warnings;
+use Moo;
 
-our @ISA         = qw(Exporter);
+extends('Exporter');
+
+has [ '_board_cards', '_talon_cards', '_positions' ] => ( is => 'rw' );
 our %EXPORT_TAGS = ( 'all' => [qw($card_re)] );
 our @EXPORT_OK   = ( @{ $EXPORT_TAGS{'all'} } );
-
-sub new
-{
-    my $class = shift;
-    return bless {}, $class;
-}
 
 my @ranks      = ( "A", 2 .. 9, qw(T J Q K) );
 my %ranks_to_n = ( map { $ranks[$_] => $_ } 0 .. $#ranks );
@@ -48,42 +43,6 @@ sub _calc_lines
         close($in);
         return \@lines;
     }
-}
-
-sub _board_cards
-{
-    my $self = shift;
-
-    if (@_)
-    {
-        $self->{_board_cards} = shift;
-    }
-
-    return $self->{_board_cards};
-}
-
-sub _talon_cards
-{
-    my $self = shift;
-
-    if (@_)
-    {
-        $self->{_talon_cards} = shift;
-    }
-
-    return $self->{_talon_cards};
-}
-
-sub _positions
-{
-    my $self = shift;
-
-    if (@_)
-    {
-        $self->{_positions} = shift;
-    }
-
-    return $self->{_positions};
 }
 
 sub _trace_solution
