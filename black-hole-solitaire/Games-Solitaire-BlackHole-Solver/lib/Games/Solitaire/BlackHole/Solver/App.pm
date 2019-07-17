@@ -5,6 +5,7 @@ use warnings;
 
 use 5.014;
 
+use Math::Random::MT ();
 use Getopt::Long;
 use Pod::Usage;
 
@@ -93,6 +94,23 @@ Runs the application.
 
 =cut
 
+sub _shuffle
+{
+    my ( $gen, $arr ) = @_;
+
+    my $i = $#$arr;
+    while ( $i > 0 )
+    {
+        my $j = int( $gen->rand( $i + 1 ) );
+        if ( $i != $j )
+        {
+            @$arr[ $i, $j ] = @$arr[ $j, $i ];
+        }
+        --$i;
+    }
+    return;
+}
+
 sub run
 {
     my $self      = shift;
@@ -101,7 +119,10 @@ sub run
 
     my ( $help, $man, $version );
 
+    my $seed;
+
     GetOptions(
+        "seed=i"     => \$seed,
         "o|output=s" => \$output_fn,
         'help|h|?'   => \$help,
         'man'        => \$man,
@@ -117,6 +138,7 @@ sub run
 "black-hole-solve version $Games::Solitaire::BlackHole::Solver::App::VERSION\n";
         exit(0);
     }
+    my $gen = Math::Random::MT->new( $seed // 1 );
 
     my $filename = shift(@ARGV);
 
@@ -151,6 +173,8 @@ QUEUE_LOOP:
         my $fnd      = vec( $state, 0, 8 );
         my $no_cards = 1;
 
+        my @_pending;
+
         # my @debug_pos;
         foreach my $col_idx ( 0 .. $#$board_values )
         {
@@ -170,7 +194,7 @@ QUEUE_LOOP:
                     if ( !exists( $positions->{$next_s} ) )
                     {
                         $positions->{$next_s} = [ $state, $col_idx ];
-                        push( @queue, $next_s );
+                        push( @_pending, $next_s );
                     }
                 }
             }
@@ -183,6 +207,11 @@ QUEUE_LOOP:
             $self->_trace_solution( $state, $output_handle );
             $verdict = 1;
             last QUEUE_LOOP;
+        }
+        if (@_pending)
+        {
+            _shuffle( $gen, \@_pending ) if defined $seed;
+            push @queue, @_pending;
         }
     }
 
