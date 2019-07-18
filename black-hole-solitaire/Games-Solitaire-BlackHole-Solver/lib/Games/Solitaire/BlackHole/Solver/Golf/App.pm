@@ -197,9 +197,8 @@ sub run
     my @queue = ($init_state);
 
     my %is_good_diff =
-        ( map { $_ => 1 }
-            ( (-1), 1, ( $wrap_ranks ? ( ( -$RANK_KING ), $RANK_KING ) : () ) )
-        );
+        ( map { $_ => 1 } map { $_, -$_ }
+            ( 1, ( $wrap_ranks ? ($RANK_KING) : () ) ) );
 
     my $verdict = 0;
 
