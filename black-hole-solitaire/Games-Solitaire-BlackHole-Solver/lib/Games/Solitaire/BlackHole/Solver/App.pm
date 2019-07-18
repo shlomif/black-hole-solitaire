@@ -133,7 +133,6 @@ sub run
     }
 
     my @lines = @{ $self->_calc_lines($filename) };
-    chomp(@lines);
 
     my $found_line = shift(@lines);
 

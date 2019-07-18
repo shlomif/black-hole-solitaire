@@ -30,19 +30,21 @@ sub _calc_lines
     my $self     = shift;
     my $filename = shift;
 
+    my @lines;
     if ( $filename eq "-" )
     {
-        return [<STDIN>];
+        @lines = <STDIN>;
     }
     else
     {
         open my $in, "<", $filename
             or die
             "Could not open $filename for inputting the board lines - $!";
-        my @lines = <$in>;
+        @lines = <$in>;
         close($in);
-        return \@lines;
     }
+    chomp @lines;
+    return \@lines;
 }
 
 sub _trace_solution

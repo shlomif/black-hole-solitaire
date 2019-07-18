@@ -148,7 +148,6 @@ sub run
     }
 
     my @lines = @{ $self->_calc_lines($filename) };
-    chomp(@lines);
 
     my $talon_line = shift(@lines);
     my @talon_values;
