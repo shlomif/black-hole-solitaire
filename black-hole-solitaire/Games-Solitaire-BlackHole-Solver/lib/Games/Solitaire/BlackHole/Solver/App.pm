@@ -134,31 +134,17 @@ sub run
 
     my @lines = @{ $self->_calc_lines($filename) };
 
-    my $found_line = shift(@lines);
-
-    my $init_foundation;
-    if ( my ($card) = $found_line =~ m{\AFoundations: ($card_re)\z} )
-    {
-        $init_foundation = $self->_get_rank($card);
-    }
-    else
-    {
-        die "Could not match first foundation line!";
-    }
-
-    $self->_board_cards( [ map { [ split /\s+/, $_ ] } @lines ] );
-    my @board_values = map {
-        [ map { $self->_get_rank($_) } @$_ ]
-    } @{ $self->_board_cards };
+    $self->_parse_board( \@lines );
 
     my $init_state = "";
 
-    vec( $init_state, 0, 8 ) = $init_foundation;
+    vec( $init_state, 0, 8 ) = $self->_init_foundation;
 
-    foreach my $col_idx ( 0 .. $#board_values )
+    my $board_values = $self->_board_values;
+    foreach my $col_idx ( 0 .. $#$board_values )
     {
         vec( $init_state, 4 + $col_idx, 4 ) =
-            scalar( @{ $board_values[$col_idx] } );
+            scalar( @{ $board_values->[$col_idx] } );
     }
 
     # The values of $positions is an array reference with the 0th key being the
@@ -179,7 +165,7 @@ QUEUE_LOOP:
         my $no_cards = 1;
 
         # my @debug_pos;
-        foreach my $col_idx ( 0 .. $#board_values )
+        foreach my $col_idx ( 0 .. $#$board_values )
         {
             my $pos = vec( $state, 4 + $col_idx, 4 );
 
@@ -188,7 +174,7 @@ QUEUE_LOOP:
             {
                 $no_cards = 0;
 
-                my $card = $board_values[$col_idx][ $pos - 1 ];
+                my $card = $board_values->[$col_idx][ $pos - 1 ];
                 if ( exists( $is_good_diff{ $card - $fnd } ) )
                 {
                     my $next_s = $state;

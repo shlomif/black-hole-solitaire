@@ -4,7 +4,10 @@ use Moo;
 
 extends('Exporter');
 
-has [ '_board_cards', '_talon_cards', '_positions' ] => ( is => 'rw' );
+has [
+    '_board_cards', '_board_values', '_init_foundation', '_talon_cards',
+    '_positions'
+] => ( is => 'rw' );
 our %EXPORT_TAGS = ( 'all' => [qw($card_re)] );
 our @EXPORT_OK   = ( @{ $EXPORT_TAGS{'all'} } );
 
@@ -91,6 +94,33 @@ sub _my_exit
     return;
 }
 
+sub _parse_board
+{
+    my ( $self, $lines ) = @_;
+
+    my $found_line = shift(@$lines);
+
+    my $init_foundation;
+    if ( my ($card) = $found_line =~ m{\AFoundations: ($card_re)\z} )
+    {
+        $init_foundation = $self->_get_rank($card);
+    }
+    else
+    {
+        die "Could not match first foundation line!";
+    }
+    $self->_init_foundation($init_foundation);
+
+    $self->_board_cards( [ map { [ split /\s+/, $_ ] } @$lines ] );
+    $self->_board_values(
+        [
+            map {
+                [ map { $self->_get_rank($_) } @$_ ]
+            } @{ $self->_board_cards }
+        ]
+    );
+    return;
+}
 1;
 
 __END__
