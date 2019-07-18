@@ -214,17 +214,7 @@ QUEUE_LOOP:
         }
     }
 
-    if ( !$verdict )
-    {
-        print {$output_handle} "Unsolved!\n";
-    }
-
-    if ( defined($output_fn) )
-    {
-        close($output_handle);
-    }
-
-    exit( !$verdict );
+    return $self->_my_exit( $verdict, $output_handle, $output_fn );
 }
 
 =head1 SEE ALSO

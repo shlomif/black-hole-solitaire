@@ -69,6 +69,26 @@ sub _trace_solution
     }
     print {$output_handle} map { "$_\n" } reverse(@moves);
 }
+
+sub _my_exit
+{
+    my ( $self, $verdict, $output_handle, $output_fn ) = @_;
+
+    if ( !$verdict )
+    {
+        print {$output_handle} "Unsolved!\n";
+    }
+
+    if ( defined($output_fn) )
+    {
+        close($output_handle);
+    }
+
+    exit( !$verdict );
+
+    return;
+}
+
 1;
 
 __END__
