@@ -128,11 +128,6 @@ sub run
         exit(0);
     }
 
-    if ($wrap_ranks)
-    {
-        $place_queens_on_kings = 1;
-    }
-
     my $filename = shift(@ARGV);
 
     my $output_handle;
@@ -163,23 +158,14 @@ sub run
     }
 
     $self->_parse_board( \@lines );
-    my $init_state = "";
-
-    vec( $init_state, 0, 8 ) = $self->_init_foundation;
-    vec( $init_state, 1, 8 ) = $talon_ptr;
-
+    my $init_queue   = $self->_set_up_initial_position($talon_ptr);
+    my @queue        = @$init_queue;
+    my $positions    = $self->_positions;
     my $board_values = $self->_board_values;
-    foreach my $col_idx ( 0 .. $#$board_values )
+    if ($wrap_ranks)
     {
-        vec( $init_state, 4 + $col_idx, 4 ) =
-            scalar( @{ $board_values->[$col_idx] } );
+        $place_queens_on_kings = 1;
     }
-
-    # The values of $positions is an array reference with the 0th key being the
-    # previous state, and the 1th key being the column of the move.
-    my $positions = $self->_positions( +{ $init_state => [], } );
-
-    my @queue = ($init_state);
 
     my %is_good_diff =
         ( map { $_ => 1 } map { $_, -$_ }

@@ -135,23 +135,10 @@ sub run
     my @lines = @{ $self->_calc_lines($filename) };
 
     $self->_parse_board( \@lines );
-
-    my $init_state = "";
-
-    vec( $init_state, 0, 8 ) = $self->_init_foundation;
-
+    my $init_queue   = $self->_set_up_initial_position(0);
+    my @queue        = @$init_queue;
+    my $positions    = $self->_positions;
     my $board_values = $self->_board_values;
-    foreach my $col_idx ( 0 .. $#$board_values )
-    {
-        vec( $init_state, 4 + $col_idx, 4 ) =
-            scalar( @{ $board_values->[$col_idx] } );
-    }
-
-    # The values of $positions is an array reference with the 0th key being the
-    # previous state, and the 1th key being the column of the move.
-    my $positions = $self->_positions( +{ $init_state => [], } );
-
-    my @queue = ($init_state);
 
     my %is_good_diff = ( map { $_ => 1 } map { $_, -$_ } ( 1, $RANK_KING ) );
 

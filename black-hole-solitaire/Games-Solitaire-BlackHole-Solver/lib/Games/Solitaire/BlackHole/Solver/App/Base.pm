@@ -121,6 +121,30 @@ sub _parse_board
     );
     return;
 }
+
+sub _set_up_initial_position
+{
+    my ( $self, $talon_ptr ) = @_;
+
+    my $init_state = "";
+
+    vec( $init_state, 0, 8 ) = $self->_init_foundation;
+    vec( $init_state, 1, 8 ) = $talon_ptr;
+
+    my $board_values = $self->_board_values;
+    foreach my $col_idx ( 0 .. $#$board_values )
+    {
+        vec( $init_state, 4 + $col_idx, 4 ) =
+            scalar( @{ $board_values->[$col_idx] } );
+    }
+
+    # The values of $positions is an array reference with the 0th key being the
+    # previous state, and the 1th key being the column of the move.
+    $self->_positions( +{ $init_state => [], } );
+
+    return [$init_state];
+}
+
 1;
 
 __END__
