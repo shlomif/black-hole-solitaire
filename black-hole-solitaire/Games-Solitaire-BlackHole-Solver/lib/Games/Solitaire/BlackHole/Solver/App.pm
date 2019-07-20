@@ -269,8 +269,9 @@ QUEUE_LOOP:
             my $parent_rec = $rec;
 
         PARENT:
-            while ( --$parent_rec->[3] <= 0 )
+            while ( ( !$parent_rec->[3] ) or --$parent_rec->[3] <= 0 )
             {
+                die if $parent_rec->[3] < 0;
                 $parent_rec->[2] = 0;
                 $parent = $parent_rec->[0];
                 last PARENT if not defined $parent;
