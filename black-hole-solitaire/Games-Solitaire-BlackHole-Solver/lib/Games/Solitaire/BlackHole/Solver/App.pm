@@ -166,12 +166,10 @@ QUEUE_LOOP:
 
         my @_pending;
 
-        # my @debug_pos;
         foreach my $col_idx ( 0 .. $#$board_values )
         {
             my $pos = vec( $state, 4 + $col_idx, 4 );
 
-            # push @debug_pos, $pos;
             if ($pos)
             {
                 $no_cards = 0;
@@ -201,7 +199,6 @@ QUEUE_LOOP:
             }
         }
 
-        # print "Checking ", join(",", @debug_pos), "\n";
         if ($no_cards)
         {
             $self->_trace_solution( $state, );
