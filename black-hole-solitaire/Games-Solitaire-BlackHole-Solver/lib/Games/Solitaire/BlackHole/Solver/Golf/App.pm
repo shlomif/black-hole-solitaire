@@ -126,7 +126,7 @@ sub run
 
     $self->_parse_board;
     $self->_set_up_initial_position($talon_ptr);
-    my @queue        = @{ $self->_init_queue };
+    $self->_set_up_tasks;
     my $positions    = $self->_positions;
     my $board_values = $self->_board_values;
     if ($wrap_ranks)
@@ -140,14 +140,21 @@ sub run
 
     my $verdict = 0;
 
+    my $task = $self->_next_task;
+
 QUEUE_LOOP:
-    while ( my $state = pop(@queue) )
+    while ( my $state = pop( @{ $task->_queue } ) )
     {
+        my $rec = $positions->{$state};
+        next QUEUE_LOOP if not $rec->[2];
+
         # The foundation
         my $fnd      = vec( $state, 0, 8 );
         my $no_cards = 1;
         my $tln      = vec( $state, 1, 8 );
         my @sub_queue;
+
+        my @_pending;
 
         if ( $place_queens_on_kings || ( $fnd != $RANK_KING ) )
         {
@@ -160,16 +167,25 @@ QUEUE_LOOP:
                     $no_cards = 0;
 
                     my $card = $board_values->[$col_idx][ $pos - 1 ];
-                    if ( exists( $is_good_diff{ ( $card - $fnd ) } ) )
+                    if ( exists( $is_good_diff{ $card - $fnd } ) )
                     {
                         my $next_s = $state;
                         vec( $next_s, 0, 8 ) = $card;
                         --vec( $next_s, 4 + $col_idx, 4 );
-                        if ( !exists( $positions->{$next_s} ) )
+                        my $exists = exists( $positions->{$next_s} );
+                        my $to_add = 0;
+                        if ( !$exists )
                         {
-                            # print "$card $fnd $col_idx\n";
-                            $positions->{$next_s} = [ $state, $col_idx ];
-                            push( @sub_queue, $next_s );
+                            $positions->{$next_s} = [ $state, $col_idx, 1, 0 ];
+                            $to_add = 1;
+                        }
+                        elsif ( $positions->{$next_s}->[2] )
+                        {
+                            $to_add = 1;
+                        }
+                        if ($to_add)
+                        {
+                            push( @sub_queue, [ $next_s, $exists ] );
                         }
                     }
                 }
@@ -203,13 +219,41 @@ QUEUE_LOOP:
             ++vec( $next_s, 1, 8 );
             if ( !exists( $positions->{$next_s} ) )
             {
-                $positions->{$next_s} = [ $state, scalar(@$board_values) ];
-                push( @queue, $next_s );
+                $positions->{$next_s} =
+                    [ $state, scalar(@$board_values), 1, 0 ];
+                push( @_pending, [ $next_s, 0 ] );
             }
         }
 
         # Give preference to non-talon moves
-        push @queue, @sub_queue;
+        push @_pending, @sub_queue;
+        if (@_pending)
+        {
+            $self->_shuffle( $task->_gen, \@_pending ) if $task->_seed;
+            push @{ $task->_queue }, map { $_->[0] } @_pending;
+            $rec->[3] += ( scalar grep { !$_->[1] } @_pending );
+        }
+        else
+        {
+            my $parent     = $state;
+            my $parent_rec = $rec;
+
+        PARENT:
+            while ( ( !$parent_rec->[3] ) or ( ! --$parent_rec->[3] ) )
+            {
+                $parent_rec->[2] = 0;
+                $parent = $parent_rec->[0];
+                last PARENT if not defined $parent;
+                $parent_rec = $positions->{$parent};
+            }
+        }
+        if ( not --$task->{_remaining_iters} )
+        {
+            if ( not $task = $self->_next_task )
+            {
+                last QUEUE_LOOP;
+            }
+        }
     }
 
     return $self->_my_exit( $verdict, );

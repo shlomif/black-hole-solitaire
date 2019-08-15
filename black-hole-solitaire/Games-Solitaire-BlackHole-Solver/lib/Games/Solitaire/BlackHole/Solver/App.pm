@@ -125,34 +125,37 @@ QUEUE_LOOP:
 
         my @_pending;
 
-        foreach my $col_idx ( 0 .. $#$board_values )
+        if (1)
         {
-            my $pos = vec( $state, 4 + $col_idx, 4 );
-
-            if ($pos)
+            foreach my $col_idx ( 0 .. $#$board_values )
             {
-                $no_cards = 0;
+                my $pos = vec( $state, 4 + $col_idx, 4 );
 
-                my $card = $board_values->[$col_idx][ $pos - 1 ];
-                if ( exists( $is_good_diff{ $card - $fnd } ) )
+                if ($pos)
                 {
-                    my $next_s = $state;
-                    vec( $next_s, 0, 8 ) = $card;
-                    --vec( $next_s, 4 + $col_idx, 4 );
-                    my $exists = exists( $positions->{$next_s} );
-                    my $to_add = 0;
-                    if ( !$exists )
+                    $no_cards = 0;
+
+                    my $card = $board_values->[$col_idx][ $pos - 1 ];
+                    if ( exists( $is_good_diff{ $card - $fnd } ) )
                     {
-                        $positions->{$next_s} = [ $state, $col_idx, 1, 0 ];
-                        $to_add = 1;
-                    }
-                    elsif ( $positions->{$next_s}->[2] )
-                    {
-                        $to_add = 1;
-                    }
-                    if ($to_add)
-                    {
-                        push( @_pending, [ $next_s, $exists ] );
+                        my $next_s = $state;
+                        vec( $next_s, 0, 8 ) = $card;
+                        --vec( $next_s, 4 + $col_idx, 4 );
+                        my $exists = exists( $positions->{$next_s} );
+                        my $to_add = 0;
+                        if ( !$exists )
+                        {
+                            $positions->{$next_s} = [ $state, $col_idx, 1, 0 ];
+                            $to_add = 1;
+                        }
+                        elsif ( $positions->{$next_s}->[2] )
+                        {
+                            $to_add = 1;
+                        }
+                        if ($to_add)
+                        {
+                            push( @_pending, [ $next_s, $exists ] );
+                        }
                     }
                 }
             }
