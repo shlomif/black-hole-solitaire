@@ -111,11 +111,7 @@ sub run
         }
     );
 
-    my $filename = shift(@ARGV);
-
-    my @lines = @{ $self->_calc_lines($filename) };
-
-    my $talon_line = shift(@lines);
+    my $talon_line = shift( @{ $self->_board_lines } );
     my @talon_values;
     my $talon_ptr = 0;
     if ( my ($cards) = $talon_line =~ m{\ATalon:((?: $card_re){16})\z} )
@@ -128,7 +124,7 @@ sub run
         die "Could not match first talon line!";
     }
 
-    $self->_parse_board( \@lines );
+    $self->_parse_board;
     my $init_queue   = $self->_set_up_initial_position($talon_ptr);
     my @queue        = @$init_queue;
     my $positions    = $self->_positions;

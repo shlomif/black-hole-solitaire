@@ -7,8 +7,9 @@ use Pod::Usage;
 extends('Exporter');
 
 has [
-    '_board_cards', '_board_values', '_init_foundation', '_talon_cards',
-    '_positions',   '_quiet',        '_output_handle',   '_output_fn',
+    '_board_cards', '_board_lines', '_board_values', '_init_foundation',
+    '_talon_cards', '_positions',   '_quiet',        '_output_handle',
+    '_output_fn',
 ] => ( is => 'rw' );
 our %EXPORT_TAGS = ( 'all' => [qw($card_re)] );
 our @EXPORT_OK   = ( @{ $EXPORT_TAGS{'all'} } );
@@ -49,7 +50,8 @@ sub _calc_lines
         close($in);
     }
     chomp @lines;
-    return \@lines;
+    $self->_board_lines( \@lines );
+    return;
 }
 
 sub _trace_solution
@@ -107,7 +109,8 @@ sub _my_exit
 
 sub _parse_board
 {
-    my ( $self, $lines ) = @_;
+    my ($self) = @_;
+    my $lines = $self->_board_lines;
 
     my $found_line = shift(@$lines);
 
@@ -214,6 +217,8 @@ sub _process_cmd_line
     }
     $self->_output_fn($output_fn);
     $self->_output_handle($output_handle);
+    $self->_calc_lines( shift(@ARGV) );
+
     return;
 }
 

@@ -116,11 +116,7 @@ sub run
     );
     push @seeds, 0 if not @seeds;
 
-    my $filename = shift(@ARGV);
-
-    my @lines = @{ $self->_calc_lines($filename) };
-
-    $self->_parse_board( \@lines );
+    $self->_parse_board;
     my $init_queue   = $self->_set_up_initial_position(0);
     my $positions    = $self->_positions;
     my $board_values = $self->_board_values;
