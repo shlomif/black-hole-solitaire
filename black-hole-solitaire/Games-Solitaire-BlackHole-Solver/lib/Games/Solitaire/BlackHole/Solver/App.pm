@@ -167,33 +167,9 @@ QUEUE_LOOP:
             $verdict = 1;
             last QUEUE_LOOP;
         }
-        if (@_pending)
-        {
-            $self->_shuffle( $task->_gen, \@_pending ) if $task->_seed;
-            push @{ $task->_queue }, map { $_->[0] } @_pending;
-            $rec->[3] += ( scalar grep { !$_->[1] } @_pending );
-        }
-        else
-        {
-            my $parent     = $state;
-            my $parent_rec = $rec;
-
-        PARENT:
-            while ( ( !$parent_rec->[3] ) or ( ! --$parent_rec->[3] ) )
-            {
-                $parent_rec->[2] = 0;
-                $parent = $parent_rec->[0];
-                last PARENT if not defined $parent;
-                $parent_rec = $positions->{$parent};
-            }
-        }
-        if ( not --$task->{_remaining_iters} )
-        {
-            if ( not $task = $self->_next_task )
-            {
-                last QUEUE_LOOP;
-            }
-        }
+        last QUEUE_LOOP
+            if not $task =
+            $self->_process_pending_items( $task, \@_pending, $state, $rec );
     }
 
     return $self->_my_exit( $verdict, );

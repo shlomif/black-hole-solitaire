@@ -271,6 +271,38 @@ sub _next_task
     return $ret;
 }
 
+sub _process_pending_items
+{
+    my ( $self, $task, $_pending, $state, $rec ) = @_;
+
+    if (@$_pending)
+    {
+        $self->_shuffle( $task->_gen, $_pending ) if $task->_seed;
+        push @{ $task->_queue }, map { $_->[0] } @$_pending;
+        $rec->[3] += ( scalar grep { !$_->[1] } @$_pending );
+    }
+    else
+    {
+        my $parent     = $state;
+        my $parent_rec = $rec;
+        my $positions  = $self->_positions;
+
+    PARENT:
+        while ( ( !$parent_rec->[3] ) or ( ! --$parent_rec->[3] ) )
+        {
+            $parent_rec->[2] = 0;
+            $parent = $parent_rec->[0];
+            last PARENT if not defined $parent;
+            $parent_rec = $positions->{$parent};
+        }
+    }
+    if ( not --$task->{_remaining_iters} )
+    {
+        return $self->_next_task;
+    }
+    return $task;
+}
+
 package Games::Solitaire::BlackHole::Solver::App::Base::Task;
 
 use Moo;
