@@ -102,23 +102,6 @@ has [ '_queue', '_gen', '_remaining_iters', '_seed', ] => ( is => 'rw' );
 
 package Games::Solitaire::BlackHole::Solver::App;
 
-sub _shuffle
-{
-    my ( $gen, $arr ) = @_;
-
-    my $i = $#$arr;
-    while ( $i > 0 )
-    {
-        my $j = int( $gen->rand( $i + 1 ) );
-        if ( $i != $j )
-        {
-            @$arr[ $i, $j ] = @$arr[ $j, $i ];
-        }
-        --$i;
-    }
-    return;
-}
-
 sub run
 {
     my $self      = shift;
@@ -262,7 +245,7 @@ QUEUE_LOOP:
         }
         if (@_pending)
         {
-            _shuffle( $task->_gen, \@_pending ) if $task->_seed;
+            $self->_shuffle( $task->_gen, \@_pending ) if $task->_seed;
             push @{ $task->_queue }, map { $_->[0] } @_pending;
             $rec->[3] += ( scalar grep { !$_->[1] } @_pending );
         }

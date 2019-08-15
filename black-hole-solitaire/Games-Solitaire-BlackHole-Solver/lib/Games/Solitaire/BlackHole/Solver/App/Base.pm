@@ -151,6 +151,22 @@ sub _set_up_initial_position
     return [$init_state];
 }
 
+sub _shuffle
+{
+    my ( $self, $gen, $arr ) = @_;
+
+    my $i = $#$arr;
+    while ( $i > 0 )
+    {
+        my $j = int( $gen->rand( $i + 1 ) );
+        if ( $i != $j )
+        {
+            @$arr[ $i, $j ] = @$arr[ $j, $i ];
+        }
+        --$i;
+    }
+    return;
+}
 1;
 
 __END__
