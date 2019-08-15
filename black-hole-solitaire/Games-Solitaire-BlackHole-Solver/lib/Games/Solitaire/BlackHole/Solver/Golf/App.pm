@@ -108,9 +108,11 @@ sub run
 
     # A boolean
     my $wrap_ranks = '';
+    my $quiet      = '';
 
     GetOptions(
         "o|output=s"       => \$output_fn,
+        "quiet!"           => \$quiet,
         "queens-on-kings!" => \$place_queens_on_kings,
         "wrap-ranks!"      => \$wrap_ranks,
         'help|h|?'         => \$help,
@@ -128,6 +130,7 @@ sub run
         exit(0);
     }
 
+    $self->_quiet($quiet);
     my $filename = shift(@ARGV);
 
     my $output_handle;

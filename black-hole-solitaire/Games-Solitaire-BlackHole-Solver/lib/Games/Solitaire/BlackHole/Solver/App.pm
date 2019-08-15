@@ -124,6 +124,7 @@ sub run
     my $self      = shift;
     my $RANK_KING = $self->_RANK_KING;
     my $output_fn;
+    my $quiet = '';
 
     my ( $help, $man, $version );
 
@@ -132,6 +133,7 @@ sub run
     GetOptions(
         "seed=i\@"   => \@seeds,
         "o|output=s" => \$output_fn,
+        "quiet!"     => \$quiet,
         'help|h|?'   => \$help,
         'man'        => \$man,
         'version'    => \$version,
@@ -148,6 +150,7 @@ sub run
         exit(0);
     }
 
+    $self->_quiet($quiet);
     my $filename = shift(@ARGV);
 
     my $output_handle;
@@ -269,9 +272,8 @@ QUEUE_LOOP:
             my $parent_rec = $rec;
 
         PARENT:
-            while ( ( !$parent_rec->[3] ) or --$parent_rec->[3] <= 0 )
+            while ( ( !$parent_rec->[3] ) or ( ! --$parent_rec->[3] ) )
             {
-                die if $parent_rec->[3] < 0;
                 $parent_rec->[2] = 0;
                 $parent = $parent_rec->[0];
                 last PARENT if not defined $parent;

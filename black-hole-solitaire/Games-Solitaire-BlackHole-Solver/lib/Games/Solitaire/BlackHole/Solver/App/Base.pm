@@ -6,7 +6,7 @@ extends('Exporter');
 
 has [
     '_board_cards', '_board_values', '_init_foundation', '_talon_cards',
-    '_positions'
+    '_positions',   '_quiet',
 ] => ( is => 'rw' );
 our %EXPORT_TAGS = ( 'all' => [qw($card_re)] );
 our @EXPORT_OK   = ( @{ $EXPORT_TAGS{'all'} } );
@@ -54,6 +54,8 @@ sub _trace_solution
 {
     my ( $self, $final_state, $output_handle ) = @_;
 
+    return if $self->_quiet;
+
     my $state = $final_state;
     my ( $prev_state, $col_idx );
 
@@ -75,6 +77,8 @@ LOOP:
         $state = $prev_state;
     }
     print {$output_handle} map { "$_\n" } reverse(@moves);
+
+    return;
 }
 
 sub _my_exit
