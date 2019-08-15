@@ -5,8 +5,6 @@ use warnings;
 
 use 5.014;
 
-use Math::Random::MT ();
-
 use parent 'Games::Solitaire::BlackHole::Solver::App::Base';
 use Games::Solitaire::BlackHole::Solver::App::Base qw/ $card_re /;
 
@@ -92,67 +90,28 @@ Runs the application.
 
 =cut
 
-package Games::Solitaire::BlackHole::Solver::App::Task;
-
-use Moo;
-
-has [ '_queue', '_gen', '_remaining_iters', '_seed', ] => ( is => 'rw' );
-
-package Games::Solitaire::BlackHole::Solver::App;
-
 sub run
 {
     my $self      = shift;
     my $RANK_KING = $self->_RANK_KING;
 
-    my @seeds;
-
     $self->_process_cmd_line(
         {
-            extra_flags => {
-                "seed=i\@" => \@seeds,
-            }
+            extra_flags => {}
         }
     );
-    push @seeds, 0 if not @seeds;
 
     $self->_parse_board;
-    my $init_queue   = $self->_set_up_initial_position(0);
+    $self->_set_up_initial_position(0);
+    $self->_set_up_tasks;
     my $positions    = $self->_positions;
     my $board_values = $self->_board_values;
 
-    my @tasks;
-    foreach my $iseed (@seeds)
-    {
-        push @tasks,
-            Games::Solitaire::BlackHole::Solver::App::Task->new(
-            {
-                _queue           => [@$init_queue],
-                _seed            => $iseed,
-                _gen             => Math::Random::MT->new( $iseed || 1 ),
-                _remaining_iters => 100,
-            }
-            );
-    }
     my %is_good_diff = ( map { $_ => 1 } map { $_, -$_ } ( 1, $RANK_KING ) );
 
-    my $task_idx = 0;
-    my $verdict  = 0;
+    my $verdict = 0;
 
-    my $next_task;
-    $next_task = sub {
-        return if !@tasks;
-        if ( !@{ $tasks[$task_idx]->_queue } )
-        {
-            splice @tasks, $task_idx, 1;
-            return $next_task->();
-        }
-        my $ret = $tasks[ $task_idx++ ];
-        $task_idx %= @tasks;
-        $ret->_remaining_iters(100);
-        return $ret;
-    };
-    my $task = $next_task->();
+    my $task = $self->_next_task;
 
 QUEUE_LOOP:
     while ( my $state = pop( @{ $task->_queue } ) )
@@ -227,7 +186,7 @@ QUEUE_LOOP:
         }
         if ( not --$task->{_remaining_iters} )
         {
-            if ( not $task = $next_task->() )
+            if ( not $task = $self->_next_task )
             {
                 last QUEUE_LOOP;
             }

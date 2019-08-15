@@ -125,8 +125,8 @@ sub run
     }
 
     $self->_parse_board;
-    my $init_queue   = $self->_set_up_initial_position($talon_ptr);
-    my @queue        = @$init_queue;
+    $self->_set_up_initial_position($talon_ptr);
+    my @queue        = @{ $self->_init_queue };
     my $positions    = $self->_positions;
     my $board_values = $self->_board_values;
     if ($wrap_ranks)

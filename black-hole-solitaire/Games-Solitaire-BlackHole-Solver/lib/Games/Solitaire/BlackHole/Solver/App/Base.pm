@@ -3,13 +3,18 @@ package Games::Solitaire::BlackHole::Solver::App::Base;
 use Moo;
 use Getopt::Long;
 use Pod::Usage;
+use Math::Random::MT ();
 
 extends('Exporter');
 
 has [
-    '_board_cards', '_board_lines', '_board_values', '_init_foundation',
-    '_talon_cards', '_positions',   '_quiet',        '_output_handle',
-    '_output_fn',
+    '_board_cards',   '_board_lines',
+    '_board_values',  '_init_foundation',
+    '_init_queue',    '_talon_cards',
+    '_positions',     '_quiet',
+    '_output_handle', '_output_fn',
+    '_seeds',         '_tasks',
+    '_task_idx',
 ] => ( is => 'rw' );
 our %EXPORT_TAGS = ( 'all' => [qw($card_re)] );
 our @EXPORT_OK   = ( @{ $EXPORT_TAGS{'all'} } );
@@ -156,7 +161,9 @@ sub _set_up_initial_position
     # previous state, and the 1th key being the column of the move.
     $self->_positions( +{ $init_state => [ undef, undef, 1, 0, ], } );
 
-    return [$init_state];
+    $self->_init_queue( [$init_state] );
+
+    return;
 }
 
 sub _shuffle
@@ -183,15 +190,19 @@ sub _process_cmd_line
     my $quiet = '';
     my $output_fn;
     my ( $help, $man, $version );
+    my @seeds;
 
     GetOptions(
         "o|output=s" => \$output_fn,
         "quiet!"     => \$quiet,
+        "seed=i\@"   => \@seeds,
         'help|h|?'   => \$help,
         'man'        => \$man,
         'version'    => \$version,
         %{ $args->{extra_flags} },
     ) or pod2usage(2);
+    push @seeds, 0 if not @seeds;
+    $self->_seeds( \@seeds );
 
     pod2usage(1) if $help;
     pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
@@ -221,6 +232,50 @@ sub _process_cmd_line
 
     return;
 }
+
+sub _set_up_tasks
+{
+    my ($self) = @_;
+
+    my @tasks;
+    foreach my $iseed ( @{ $self->_seeds } )
+    {
+        push @tasks,
+            Games::Solitaire::BlackHole::Solver::App::Base::Task->new(
+            {
+                _queue           => [ @{ $self->_init_queue } ],
+                _seed            => $iseed,
+                _gen             => Math::Random::MT->new( $iseed || 1 ),
+                _remaining_iters => 100,
+            }
+            );
+    }
+    $self->_task_idx(0);
+    $self->_tasks( \@tasks );
+    return;
+}
+
+sub _next_task
+{
+    my ($self) = @_;
+    my $tasks = $self->_tasks;
+    return if !@$tasks;
+    if ( !@{ $tasks->[ $self->_task_idx ]->_queue } )
+    {
+        splice @$tasks, $self->_task_idx, 1;
+        return $self->_next_task;
+    }
+    my $ret = $tasks->[ $self->_task_idx ];
+    $self->_task_idx( ( $self->_task_idx + 1 ) % @$tasks );
+    $ret->_remaining_iters(100);
+    return $ret;
+}
+
+package Games::Solitaire::BlackHole::Solver::App::Base::Task;
+
+use Moo;
+
+has [ '_queue', '_gen', '_remaining_iters', '_seed', ] => ( is => 'rw' );
 
 1;
 
