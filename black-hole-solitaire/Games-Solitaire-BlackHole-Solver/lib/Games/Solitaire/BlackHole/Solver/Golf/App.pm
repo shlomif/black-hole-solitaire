@@ -134,9 +134,12 @@ sub run
         $place_queens_on_kings = 1;
     }
 
-    my %is_good_diff =
-        ( map { $_ => 1 } map { $_, -$_ }
-            ( 1, ( $wrap_ranks ? ($RANK_KING) : () ) ) );
+    $self->_is_good_diff(
+        +{
+            map { $_ => 1 } map { $_, -$_ }
+                ( 1, ( $wrap_ranks ? ($RANK_KING) : () ) )
+        }
+    );
 
     my $verdict = 0;
 
@@ -158,38 +161,8 @@ QUEUE_LOOP:
 
         if ( $place_queens_on_kings || ( $fnd != $RANK_KING ) )
         {
-            foreach my $col_idx ( 0 .. $#$board_values )
-            {
-                my $pos = vec( $state, 4 + $col_idx, 4 );
-
-                if ($pos)
-                {
-                    $no_cards = 0;
-
-                    my $card = $board_values->[$col_idx][ $pos - 1 ];
-                    if ( exists( $is_good_diff{ $card - $fnd } ) )
-                    {
-                        my $next_s = $state;
-                        vec( $next_s, 0, 8 ) = $card;
-                        --vec( $next_s, 4 + $col_idx, 4 );
-                        my $exists = exists( $positions->{$next_s} );
-                        my $to_add = 0;
-                        if ( !$exists )
-                        {
-                            $positions->{$next_s} = [ $state, $col_idx, 1, 0 ];
-                            $to_add = 1;
-                        }
-                        elsif ( $positions->{$next_s}->[2] )
-                        {
-                            $to_add = 1;
-                        }
-                        if ($to_add)
-                        {
-                            push( @sub_queue, [ $next_s, $exists ] );
-                        }
-                    }
-                }
-            }
+            $self->_find_moves( \@sub_queue, $board_values, $state,
+                \$no_cards );
         }
         else
         {

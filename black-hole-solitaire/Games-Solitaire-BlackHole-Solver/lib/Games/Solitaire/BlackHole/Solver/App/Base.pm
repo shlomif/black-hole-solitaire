@@ -8,13 +8,10 @@ use Math::Random::MT ();
 extends('Exporter');
 
 has [
-    '_board_cards',   '_board_lines',
-    '_board_values',  '_init_foundation',
-    '_init_queue',    '_talon_cards',
-    '_positions',     '_quiet',
-    '_output_handle', '_output_fn',
-    '_seeds',         '_tasks',
-    '_task_idx',
+    '_board_cards', '_board_lines',   '_board_values', '_init_foundation',
+    '_init_queue',  '_is_good_diff',  '_talon_cards',  '_positions',
+    '_quiet',       '_output_handle', '_output_fn',    '_seeds',
+    '_tasks',       '_task_idx',
 ] => ( is => 'rw' );
 our %EXPORT_TAGS = ( 'all' => [qw($card_re)] );
 our @EXPORT_OK   = ( @{ $EXPORT_TAGS{'all'} } );
@@ -301,6 +298,48 @@ sub _process_pending_items
         return $self->_next_task;
     }
     return $task;
+}
+
+sub _find_moves
+{
+    my ( $self, $_pending, $board_values, $state, $no_cards ) = @_;
+    my $fnd           = vec( $state, 0, 8 );
+    my $positions     = $self->_positions;
+    my $_is_good_diff = $self->_is_good_diff;
+    foreach my $col_idx ( 0 .. $#$board_values )
+    {
+        my $pos = vec( $state, 4 + $col_idx, 4 );
+
+        if ($pos)
+        {
+            $$no_cards = 0;
+
+            my $card = $board_values->[$col_idx][ $pos - 1 ];
+            if ( exists( $_is_good_diff->{ $card - $fnd } ) )
+            {
+                my $next_s = $state;
+                vec( $next_s, 0, 8 ) = $card;
+                --vec( $next_s, 4 + $col_idx, 4 );
+                my $exists = exists( $positions->{$next_s} );
+                my $to_add = 0;
+                if ( !$exists )
+                {
+                    $positions->{$next_s} = [ $state, $col_idx, 1, 0 ];
+                    $to_add = 1;
+                }
+                elsif ( $positions->{$next_s}->[2] )
+                {
+                    $to_add = 1;
+                }
+                if ($to_add)
+                {
+                    push( @$_pending, [ $next_s, $exists ] );
+                }
+            }
+        }
+    }
+
+    return;
 }
 
 package Games::Solitaire::BlackHole::Solver::App::Base::Task;
