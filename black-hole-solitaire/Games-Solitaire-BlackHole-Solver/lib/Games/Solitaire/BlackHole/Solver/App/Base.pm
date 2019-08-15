@@ -1,12 +1,14 @@
 package Games::Solitaire::BlackHole::Solver::App::Base;
 
 use Moo;
+use Getopt::Long;
+use Pod::Usage;
 
 extends('Exporter');
 
 has [
     '_board_cards', '_board_values', '_init_foundation', '_talon_cards',
-    '_positions',   '_quiet',
+    '_positions',   '_quiet',        '_output_handle',   '_output_fn',
 ] => ( is => 'rw' );
 our %EXPORT_TAGS = ( 'all' => [qw($card_re)] );
 our @EXPORT_OK   = ( @{ $EXPORT_TAGS{'all'} } );
@@ -52,7 +54,9 @@ sub _calc_lines
 
 sub _trace_solution
 {
-    my ( $self, $final_state, $output_handle ) = @_;
+    my ( $self, $final_state ) = @_;
+    my $output_handle = $self->_output_handle;
+    $output_handle->print("Solved!\n");
 
     return if $self->_quiet;
 
@@ -83,14 +87,15 @@ LOOP:
 
 sub _my_exit
 {
-    my ( $self, $verdict, $output_handle, $output_fn ) = @_;
+    my ( $self, $verdict, ) = @_;
+    my $output_handle = $self->_output_handle;
 
     if ( !$verdict )
     {
-        print {$output_handle} "Unsolved!\n";
+        $output_handle->print("Unsolved!\n");
     }
 
-    if ( defined($output_fn) )
+    if ( defined( $self->_output_fn ) )
     {
         close($output_handle);
     }
@@ -167,6 +172,51 @@ sub _shuffle
     }
     return;
 }
+
+sub _process_cmd_line
+{
+    my ( $self, $args ) = @_;
+
+    my $quiet = '';
+    my $output_fn;
+    my ( $help, $man, $version );
+
+    GetOptions(
+        "o|output=s" => \$output_fn,
+        "quiet!"     => \$quiet,
+        'help|h|?'   => \$help,
+        'man'        => \$man,
+        'version'    => \$version,
+        %{ $args->{extra_flags} },
+    ) or pod2usage(2);
+
+    pod2usage(1) if $help;
+    pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
+
+    if ($version)
+    {
+        print
+"black-hole-solve version $Games::Solitaire::BlackHole::Solver::App::Base::VERSION\n";
+        exit(0);
+    }
+
+    $self->_quiet($quiet);
+    my $output_handle;
+
+    if ( defined($output_fn) )
+    {
+        open( $output_handle, ">", $output_fn )
+            or die "Could not open '$output_fn' for writing";
+    }
+    else
+    {
+        open( $output_handle, ">&STDOUT" );
+    }
+    $self->_output_fn($output_fn);
+    $self->_output_handle($output_handle);
+    return;
+}
+
 1;
 
 __END__

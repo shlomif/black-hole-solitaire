@@ -6,8 +6,6 @@ use warnings;
 use 5.014;
 
 use Math::Random::MT ();
-use Getopt::Long;
-use Pod::Usage;
 
 use parent 'Games::Solitaire::BlackHole::Solver::App::Base';
 use Games::Solitaire::BlackHole::Solver::App::Base qw/ $card_re /;
@@ -106,47 +104,19 @@ sub run
 {
     my $self      = shift;
     my $RANK_KING = $self->_RANK_KING;
-    my $output_fn;
-    my $quiet = '';
-
-    my ( $help, $man, $version );
 
     my @seeds;
 
-    GetOptions(
-        "seed=i\@"   => \@seeds,
-        "o|output=s" => \$output_fn,
-        "quiet!"     => \$quiet,
-        'help|h|?'   => \$help,
-        'man'        => \$man,
-        'version'    => \$version,
-    ) or pod2usage(2);
+    $self->_process_cmd_line(
+        {
+            extra_flags => {
+                "seed=i\@" => \@seeds,
+            }
+        }
+    );
     push @seeds, 0 if not @seeds;
 
-    pod2usage(1) if $help;
-    pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
-
-    if ($version)
-    {
-        print
-"black-hole-solve version $Games::Solitaire::BlackHole::Solver::App::VERSION\n";
-        exit(0);
-    }
-
-    $self->_quiet($quiet);
     my $filename = shift(@ARGV);
-
-    my $output_handle;
-
-    if ( defined($output_fn) )
-    {
-        open( $output_handle, ">", $output_fn )
-            or die "Could not open '$output_fn' for writing";
-    }
-    else
-    {
-        open( $output_handle, ">&STDOUT" );
-    }
 
     my @lines = @{ $self->_calc_lines($filename) };
 
@@ -238,8 +208,7 @@ QUEUE_LOOP:
         # print "Checking ", join(",", @debug_pos), "\n";
         if ($no_cards)
         {
-            print {$output_handle} "Solved!\n";
-            $self->_trace_solution( $state, $output_handle );
+            $self->_trace_solution( $state, );
             $verdict = 1;
             last QUEUE_LOOP;
         }
@@ -272,7 +241,7 @@ QUEUE_LOOP:
         }
     }
 
-    return $self->_my_exit( $verdict, $output_handle, $output_fn );
+    return $self->_my_exit( $verdict, );
 }
 
 =head1 SEE ALSO

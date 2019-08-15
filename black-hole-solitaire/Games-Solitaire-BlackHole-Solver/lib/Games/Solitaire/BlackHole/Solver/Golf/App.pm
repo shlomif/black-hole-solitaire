@@ -5,9 +5,6 @@ use warnings;
 
 use 5.014;
 
-use Getopt::Long;
-use Pod::Usage;
-
 use parent 'Games::Solitaire::BlackHole::Solver::App::Base';
 use Games::Solitaire::BlackHole::Solver::App::Base qw/ $card_re /;
 
@@ -99,51 +96,22 @@ sub run
 {
     my $self      = shift;
     my $RANK_KING = $self->_RANK_KING;
-    my $output_fn;
-
-    my ( $help, $man, $version );
 
     # A boolean
     my $place_queens_on_kings = '';
 
     # A boolean
     my $wrap_ranks = '';
-    my $quiet      = '';
+    $self->_process_cmd_line(
+        {
+            extra_flags => {
+                "queens-on-kings!" => \$place_queens_on_kings,
+                "wrap-ranks!"      => \$wrap_ranks,
+            }
+        }
+    );
 
-    GetOptions(
-        "o|output=s"       => \$output_fn,
-        "quiet!"           => \$quiet,
-        "queens-on-kings!" => \$place_queens_on_kings,
-        "wrap-ranks!"      => \$wrap_ranks,
-        'help|h|?'         => \$help,
-        'man'              => \$man,
-        'version'          => \$version,
-    ) or pod2usage(2);
-
-    pod2usage(1) if $help;
-    pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
-
-    if ($version)
-    {
-        print
-"golf-solitaire-solve version $Games::Solitaire::BlackHole::Solver::Golf::App::VERSION\n";
-        exit(0);
-    }
-
-    $self->_quiet($quiet);
     my $filename = shift(@ARGV);
-
-    my $output_handle;
-
-    if ( defined($output_fn) )
-    {
-        open( $output_handle, ">", $output_fn )
-            or die "Could not open '$output_fn' for writing";
-    }
-    else
-    {
-        open( $output_handle, ">&STDOUT" );
-    }
 
     my @lines = @{ $self->_calc_lines($filename) };
 
@@ -231,8 +199,7 @@ QUEUE_LOOP:
         # print "Checking ", join(",", @debug_pos), "\n";
         if ($no_cards)
         {
-            print {$output_handle} "Solved!\n";
-            $self->_trace_solution( $state, $output_handle );
+            $self->_trace_solution( $state, );
             $verdict = 1;
             last QUEUE_LOOP;
         }
@@ -252,7 +219,7 @@ QUEUE_LOOP:
         push @queue, @sub_queue;
     }
 
-    return $self->_my_exit( $verdict, $output_handle, $output_fn );
+    return $self->_my_exit( $verdict, );
 }
 
 =head1 SEE ALSO
