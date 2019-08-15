@@ -104,11 +104,11 @@ sub run
     $self->_parse_board;
     $self->_set_up_initial_position(0);
     $self->_set_up_tasks;
-    my $positions    = $self->_positions;
-    my $board_values = $self->_board_values;
-
     $self->_is_good_diff(
         +{ map { $_ => 1 } map { $_, -$_ } ( 1, $RANK_KING ) } );
+
+    my $positions    = $self->_positions;
+    my $board_values = $self->_board_values;
 
     my $verdict = 0;
 
@@ -121,7 +121,6 @@ QUEUE_LOOP:
         next QUEUE_LOOP if not $rec->[2];
 
         # The foundation
-        my $fnd      = vec( $state, 0, 8 );
         my $no_cards = 1;
 
         my @_pending;

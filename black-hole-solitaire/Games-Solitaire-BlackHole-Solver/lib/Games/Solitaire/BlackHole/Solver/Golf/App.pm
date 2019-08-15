@@ -110,6 +110,10 @@ sub run
             }
         }
     );
+    if ($wrap_ranks)
+    {
+        $place_queens_on_kings = 1;
+    }
 
     my $talon_line = shift( @{ $self->_board_lines } );
     my @talon_values;
@@ -127,19 +131,15 @@ sub run
     $self->_parse_board;
     $self->_set_up_initial_position($talon_ptr);
     $self->_set_up_tasks;
-    my $positions    = $self->_positions;
-    my $board_values = $self->_board_values;
-    if ($wrap_ranks)
-    {
-        $place_queens_on_kings = 1;
-    }
-
     $self->_is_good_diff(
         +{
             map { $_ => 1 } map { $_, -$_ }
                 ( 1, ( $wrap_ranks ? ($RANK_KING) : () ) )
         }
     );
+
+    my $positions    = $self->_positions;
+    my $board_values = $self->_board_values;
 
     my $verdict = 0;
 
