@@ -101,11 +101,7 @@ sub run
         }
     );
 
-    $self->_parse_board;
-    $self->_set_up_initial_position(0);
-    $self->_set_up_tasks;
-    $self->_is_good_diff(
-        +{ map { $_ => 1 } map { $_, -$_ } ( 1, $RANK_KING ) } );
+    $self->_set_up_solver( 0, [ 1, $RANK_KING ] );
 
     my $positions    = $self->_positions;
     my $board_values = $self->_board_values;

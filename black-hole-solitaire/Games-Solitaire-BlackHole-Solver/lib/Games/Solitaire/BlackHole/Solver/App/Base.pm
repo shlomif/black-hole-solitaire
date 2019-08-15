@@ -342,6 +342,18 @@ sub _find_moves
     return;
 }
 
+sub _set_up_solver
+{
+    my ( $self, $talon_ptr, $diffs ) = @_;
+
+    $self->_parse_board;
+    $self->_set_up_initial_position($talon_ptr);
+    $self->_set_up_tasks;
+    $self->_is_good_diff( +{ map { $_ => 1 } map { $_, -$_ } @$diffs, } );
+
+    return;
+}
+
 package Games::Solitaire::BlackHole::Solver::App::Base::Task;
 
 use Moo;

@@ -128,15 +128,8 @@ sub run
         die "Could not match first talon line!";
     }
 
-    $self->_parse_board;
-    $self->_set_up_initial_position($talon_ptr);
-    $self->_set_up_tasks;
-    $self->_is_good_diff(
-        +{
-            map { $_ => 1 } map { $_, -$_ }
-                ( 1, ( $wrap_ranks ? ($RANK_KING) : () ) )
-        }
-    );
+    $self->_set_up_solver( $talon_ptr,
+        [ 1, ( $wrap_ranks ? ($RANK_KING) : () ) ] );
 
     my $positions    = $self->_positions;
     my $board_values = $self->_board_values;
