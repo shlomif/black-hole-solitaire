@@ -18,6 +18,7 @@ extern "C" {
 
 #include <stddef.h>
 #include "rinutils/likely.h"
+#include "rinutils/typeof_wrap.h"
 #include "state.h"
 
 #ifndef FCS_IA_PACK_SIZE
@@ -89,7 +90,23 @@ static inline void fcs_compact_alloc_release(compact_allocator *const allocator)
     allocator->ptr = allocator->rollback_ptr;
 }
 
-extern void fc_solve_compact_allocator_finish(compact_allocator *);
+#define FCS__COMPACT_ALLOC__OLD_LIST_NEXT(ptr) (*((char **)(ptr)))
+static inline void fc_solve_compact_allocator_finish(compact_allocator *const allocator)
+{
+    char *iter, *iter_next;
+    meta_allocator *const meta = allocator->meta;
+    var_AUTO(bin, meta->recycle_bin);
+    // Enqueue all the allocated buffers in the meta allocator for re-use.
+    for (iter = allocator->old_list, iter_next = FCS__COMPACT_ALLOC__OLD_LIST_NEXT(iter); iter_next;
+         iter = iter_next, iter_next = FCS__COMPACT_ALLOC__OLD_LIST_NEXT(iter))
+    {
+        FCS__COMPACT_ALLOC__OLD_LIST_NEXT(iter) = bin;
+        bin = iter;
+    }
+
+    FCS__COMPACT_ALLOC__OLD_LIST_NEXT(iter) = bin;
+    meta->recycle_bin = iter;
+}
 
 static inline void fc_solve_compact_allocator_recycle(
     compact_allocator *const allocator)
