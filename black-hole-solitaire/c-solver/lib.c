@@ -149,12 +149,13 @@ static inline rin_bit_data read_col(const bhs_state_key_t *key,
 
     return rin_bit_reader_read(&r, bits_per_column);
 }
+
 int DLLEXPORT black_hole_solver_create(
     black_hole_solver_instance_t **ret_instance)
 {
     bhs_solver_t *const ret = (bhs_solver_t *)malloc(sizeof(*ret));
 
-    if (!ret)
+    if (unlikely(!ret))
     {
         *ret_instance = NULL;
         return BLACK_HOLE_SOLVER__OUT_OF_MEMORY;
