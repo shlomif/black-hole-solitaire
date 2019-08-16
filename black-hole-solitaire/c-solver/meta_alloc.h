@@ -57,9 +57,6 @@ static inline void fc_solve_meta_compact_allocator_init(
 
 extern void fc_solve_meta_compact_allocator_finish(meta_allocator *);
 
-extern int fc_solve_compact_allocator_init(
-    compact_allocator *, meta_allocator *);
-
 static inline void *fcs_compact_alloc_ptr(
     compact_allocator *const allocator, const size_t how_much_proto)
 {
@@ -114,6 +111,15 @@ static inline void fc_solve_compact_allocator_recycle(
     fc_solve_compact_allocator_finish(allocator);
     fc_solve_compact_allocator_init_helper(allocator);
 }
+
+static inline int fc_solve_compact_allocator_init(
+    compact_allocator *const allocator, meta_allocator *const meta_alloc)
+{
+    allocator->meta = meta_alloc;
+
+    return fc_solve_compact_allocator_init_helper(allocator);
+}
+
 
 #ifdef __cplusplus
 };

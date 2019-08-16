@@ -15,14 +15,6 @@
 
 #define ALLOCED_SIZE (FCS_IA_PACK_SIZE * 1024 - (256 + 128))
 
-int fc_solve_compact_allocator_init(
-    compact_allocator *const allocator, meta_allocator *const meta_alloc)
-{
-    allocator->meta = meta_alloc;
-
-    return fc_solve_compact_allocator_init_helper(allocator);
-}
-
 #define OLD_LIST_DATA(ptr) ((char *)(&(((char **)(ptr))[1])))
 static inline char *meta_request_new_buffer(meta_allocator *const meta_alloc)
 {
