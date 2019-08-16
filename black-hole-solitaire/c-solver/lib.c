@@ -151,7 +151,7 @@ static inline rin_bit_data read_col(const bhs_state_key_t *key,
 }
 
 int DLLEXPORT black_hole_solver_create(
-    black_hole_solver_instance_t **ret_instance)
+    black_hole_solver_instance_t **const ret_instance)
 {
     bhs_solver_t *const ret = (bhs_solver_t *)malloc(sizeof(*ret));
 

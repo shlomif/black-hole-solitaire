@@ -88,13 +88,16 @@ static inline void fcs_compact_alloc_release(compact_allocator *const allocator)
 }
 
 #define FCS__COMPACT_ALLOC__OLD_LIST_NEXT(ptr) (*((char **)(ptr)))
-static inline void fc_solve_compact_allocator_finish(compact_allocator *const allocator)
+static inline void fc_solve_compact_allocator_finish(
+    compact_allocator *const allocator)
 {
     char *iter, *iter_next;
     meta_allocator *const meta = allocator->meta;
     var_AUTO(bin, meta->recycle_bin);
     // Enqueue all the allocated buffers in the meta allocator for re-use.
-    for (iter = allocator->old_list, iter_next = FCS__COMPACT_ALLOC__OLD_LIST_NEXT(iter); iter_next;
+    for (iter = allocator->old_list,
+        iter_next = FCS__COMPACT_ALLOC__OLD_LIST_NEXT(iter);
+         iter_next;
          iter = iter_next, iter_next = FCS__COMPACT_ALLOC__OLD_LIST_NEXT(iter))
     {
         FCS__COMPACT_ALLOC__OLD_LIST_NEXT(iter) = bin;
@@ -119,7 +122,6 @@ static inline int fc_solve_compact_allocator_init(
 
     return fc_solve_compact_allocator_init_helper(allocator);
 }
-
 
 #ifdef __cplusplus
 };
