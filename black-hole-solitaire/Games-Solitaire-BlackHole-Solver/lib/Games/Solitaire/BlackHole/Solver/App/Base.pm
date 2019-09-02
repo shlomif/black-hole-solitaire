@@ -8,10 +8,14 @@ use Math::Random::MT ();
 extends('Exporter');
 
 has [
-    '_active_task',     '_board_cards', '_board_lines',   '_board_values',
-    '_init_foundation', '_init_queue',  '_is_good_diff',  '_talon_cards',
-    '_positions',       '_quiet',       '_output_handle', '_output_fn',
-    '_seeds',           '_tasks',       '_task_idx',
+    '_active_record', '_active_task',
+    '_board_cards',   '_board_lines',
+    '_board_values',  '_init_foundation',
+    '_init_queue',    '_is_good_diff',
+    '_talon_cards',   '_positions',
+    '_quiet',         '_output_handle',
+    '_output_fn',     '_seeds',
+    '_tasks',         '_task_idx',
 ] => ( is => 'rw' );
 our %EXPORT_TAGS = ( 'all' => [qw($card_re)] );
 our @EXPORT_OK   = ( @{ $EXPORT_TAGS{'all'} } );
@@ -277,10 +281,26 @@ sub _get_next_state
     return pop( @{ $self->_active_task->_queue } );
 }
 
+sub _get_next_state_wrapper
+{
+    my ($self) = @_;
+
+    my $positions = $self->_positions;
+
+    while ( my $state = $self->_get_next_state )
+    {
+        my $rec = $positions->{$state};
+        $self->_active_record($rec);
+        return $state if $rec->[2];
+    }
+    return;
+}
+
 sub _process_pending_items
 {
-    my ( $self, $_pending, $state, $rec ) = @_;
+    my ( $self, $_pending, $state ) = @_;
 
+    my $rec  = $self->_active_record;
     my $task = $self->_active_task;
 
     if (@$_pending)

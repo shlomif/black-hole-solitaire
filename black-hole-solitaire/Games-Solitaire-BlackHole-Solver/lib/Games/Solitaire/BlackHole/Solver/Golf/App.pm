@@ -139,11 +139,8 @@ sub run
     $self->_next_task;
 
 QUEUE_LOOP:
-    while ( my $state = $self->_get_next_state )
+    while ( my $state = $self->_get_next_state_wrapper )
     {
-        my $rec = $positions->{$state};
-        next QUEUE_LOOP if not $rec->[2];
-
         # The foundation
         my $fnd      = vec( $state, 0, 8 );
         my $no_cards = 1;
@@ -195,7 +192,7 @@ QUEUE_LOOP:
         # Give preference to non-talon moves
         push @_pending, @sub_queue;
         last QUEUE_LOOP
-            if not $self->_process_pending_items( \@_pending, $state, $rec );
+            if not $self->_process_pending_items( \@_pending, $state );
     }
 
     return $self->_my_exit( $verdict, );

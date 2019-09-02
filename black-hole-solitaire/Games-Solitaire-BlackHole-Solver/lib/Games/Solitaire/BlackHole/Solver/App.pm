@@ -111,11 +111,8 @@ sub run
     $self->_next_task;
 
 QUEUE_LOOP:
-    while ( my $state = $self->_get_next_state )
+    while ( my $state = $self->_get_next_state_wrapper )
     {
-        my $rec = $positions->{$state};
-        next QUEUE_LOOP if not $rec->[2];
-
         # The foundation
         my $no_cards = 1;
 
@@ -133,7 +130,7 @@ QUEUE_LOOP:
             last QUEUE_LOOP;
         }
         last QUEUE_LOOP
-            if not $self->_process_pending_items( \@_pending, $state, $rec );
+            if not $self->_process_pending_items( \@_pending, $state );
     }
 
     return $self->_my_exit( $verdict, );
