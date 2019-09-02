@@ -8,10 +8,10 @@ use Math::Random::MT ();
 extends('Exporter');
 
 has [
-    '_board_cards', '_board_lines',   '_board_values', '_init_foundation',
-    '_init_queue',  '_is_good_diff',  '_talon_cards',  '_positions',
-    '_quiet',       '_output_handle', '_output_fn',    '_seeds',
-    '_tasks',       '_task_idx',
+    '_active_task',     '_board_cards', '_board_lines',   '_board_values',
+    '_init_foundation', '_init_queue',  '_is_good_diff',  '_talon_cards',
+    '_positions',       '_quiet',       '_output_handle', '_output_fn',
+    '_seeds',           '_tasks',       '_task_idx',
 ] => ( is => 'rw' );
 our %EXPORT_TAGS = ( 'all' => [qw($card_re)] );
 our @EXPORT_OK   = ( @{ $EXPORT_TAGS{'all'} } );
@@ -262,15 +262,26 @@ sub _next_task
         splice @$tasks, $self->_task_idx, 1;
         return $self->_next_task;
     }
-    my $ret = $tasks->[ $self->_task_idx ];
+    my $task = $tasks->[ $self->_task_idx ];
     $self->_task_idx( ( $self->_task_idx + 1 ) % @$tasks );
-    $ret->_remaining_iters(100);
-    return $ret;
+    $task->_remaining_iters(100);
+    $self->_active_task($task);
+
+    return 1;
+}
+
+sub _get_next_state
+{
+    my ($self) = @_;
+
+    return pop( @{ $self->_active_task->_queue } );
 }
 
 sub _process_pending_items
 {
-    my ( $self, $task, $_pending, $state, $rec ) = @_;
+    my ( $self, $_pending, $state, $rec ) = @_;
+
+    my $task = $self->_active_task;
 
     if (@$_pending)
     {
@@ -297,7 +308,7 @@ sub _process_pending_items
     {
         return $self->_next_task;
     }
-    return $task;
+    return 1;
 }
 
 sub _find_moves

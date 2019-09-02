@@ -108,10 +108,10 @@ sub run
 
     my $verdict = 0;
 
-    my $task = $self->_next_task;
+    $self->_next_task;
 
 QUEUE_LOOP:
-    while ( my $state = pop( @{ $task->_queue } ) )
+    while ( my $state = $self->_get_next_state )
     {
         my $rec = $positions->{$state};
         next QUEUE_LOOP if not $rec->[2];
@@ -133,8 +133,7 @@ QUEUE_LOOP:
             last QUEUE_LOOP;
         }
         last QUEUE_LOOP
-            if not $task =
-            $self->_process_pending_items( $task, \@_pending, $state, $rec );
+            if not $self->_process_pending_items( \@_pending, $state, $rec );
     }
 
     return $self->_my_exit( $verdict, );

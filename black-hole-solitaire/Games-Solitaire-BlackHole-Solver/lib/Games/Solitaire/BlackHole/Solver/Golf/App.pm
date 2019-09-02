@@ -136,10 +136,10 @@ sub run
 
     my $verdict = 0;
 
-    my $task = $self->_next_task;
+    $self->_next_task;
 
 QUEUE_LOOP:
-    while ( my $state = pop( @{ $task->_queue } ) )
+    while ( my $state = $self->_get_next_state )
     {
         my $rec = $positions->{$state};
         next QUEUE_LOOP if not $rec->[2];
@@ -178,7 +178,8 @@ QUEUE_LOOP:
             $verdict = 1;
             last QUEUE_LOOP;
         }
-        elsif ( $tln < @talon_values )
+
+        if ( $tln < @talon_values )
         {
             my $next_s = $state;
             vec( $next_s, 0, 8 ) = $talon_values[$tln];
@@ -187,15 +188,14 @@ QUEUE_LOOP:
             {
                 $positions->{$next_s} =
                     [ $state, scalar(@$board_values), 1, 0 ];
-                push( @_pending, [ $next_s, 0 ] );
+                push @_pending, [ $next_s, 0 ];
             }
         }
 
         # Give preference to non-talon moves
         push @_pending, @sub_queue;
         last QUEUE_LOOP
-            if not $task =
-            $self->_process_pending_items( $task, \@_pending, $state, $rec );
+            if not $self->_process_pending_items( \@_pending, $state, $rec );
     }
 
     return $self->_my_exit( $verdict, );
