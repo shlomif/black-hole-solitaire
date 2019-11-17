@@ -43,7 +43,7 @@ if ( !$ENV{SKIP_RINUTILS_INSTALL} )
     do_system(
         {
             cmd => [
-"git clone https://github.com/shlomif/rinutils && cd rinutils && mkdir B && cd B && cmake .. && $SUDO $MAKE install"
+qq#git clone "https://github.com/shlomif/rinutils" && cd rinutils && mkdir B && cd B && cmake .. && $SUDO $MAKE install#
             ]
         }
     );
