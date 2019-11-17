@@ -55,6 +55,7 @@ if ( !$ENV{SKIP_RINUTILS_INSTALL} )
                     ? " -DCMAKE_MAKE_PROGRAM=$ENV{CMAKE_MAKE_PROGRAM} "
                     : ""
                     )
+                    . ( $IS_WIN ? " -DCMAKE_INSTALL_PREFIX=C:/foo " : '' )
                     . qq# .. && $SUDO $MAKE install#
             ]
         }
@@ -62,8 +63,7 @@ if ( !$ENV{SKIP_RINUTILS_INSTALL} )
 }
 if ($IS_WIN)
 {
-    ( $ENV{PKG_CONFIG_PATH} //= '' ) .=
-        ";C:\\Program Files (x86)\\rinutils\\lib\\pkgconfig;";
+    ( $ENV{PKG_CONFIG_PATH} //= '' ) .= ";C:\\foo\\lib\\pkgconfig;";
 }
 do_system(
     {
