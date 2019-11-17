@@ -21,6 +21,7 @@ sub do_system
 my $IS_WIN = ( $^O eq "MSWin32" );
 my $SEP    = $IS_WIN ? "\\" : '/';
 my $MAKE   = $IS_WIN ? 'gmake' : 'make';
+my $SUDO   = $IS_WIN ? '' : 'sudo';
 
 my $cmake_gen;
 GetOptions( 'gen=s' => \$cmake_gen, )
@@ -42,7 +43,7 @@ if ( !$ENV{SKIP_RINUTILS_INSTALL} )
     do_system(
         {
             cmd => [
-"git clone https://github.com/shlomif/rinutils && cd rinutils && mkdir B && cd B && cmake .. && $MAKE install"
+"git clone https://github.com/shlomif/rinutils && cd rinutils && mkdir B && cd B && cmake .. && $SUDO $MAKE install"
             ]
         }
     );
