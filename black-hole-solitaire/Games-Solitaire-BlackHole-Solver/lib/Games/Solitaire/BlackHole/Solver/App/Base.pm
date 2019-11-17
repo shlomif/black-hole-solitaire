@@ -20,7 +20,7 @@ has [
 our %EXPORT_TAGS = ( 'all' => [qw($card_re)] );
 our @EXPORT_OK   = ( @{ $EXPORT_TAGS{'all'} } );
 
-my @ranks      = ( "A", 2 .. 9, qw(T J Q K) );
+my @ranks = ( "A", 2 .. 9, qw(T J Q K) );
 my %ranks_to_n = ( map { $ranks[$_] => $_ } 0 .. $#ranks );
 
 sub _RANK_KING
