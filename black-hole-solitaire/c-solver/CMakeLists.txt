@@ -90,12 +90,13 @@ IF (USE_SYSTEM_XXHASH)
     LIST(APPEND DEP_LIBS "xxhash")
 ENDIF ()
 
-SET (rinutils "rinutils")
-IF (NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${rinutils}")
-    EXECUTE_PROCESS(COMMAND "git" "clone" "https://github.com/shlomif/rinutils.git" "${rinutils}"
-        WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-    )
+PKG_CHECK_MODULES(RINUTILS REQUIRED "librinutils")
+IF (NOT "${RINUTILS_FOUND}")
+    MESSAGE (FATAL "rinutils could not be found.")
 ENDIF ()
+
+INCLUDE_DIRECTORIES(AFTER ${RINUTILS_INCLUDE_DIRS})
+
 SET(LIBTCMALLOC_LIB_LIST)
 
 # Avoid linking to tcmalloc if the test suite is enabled due to:
