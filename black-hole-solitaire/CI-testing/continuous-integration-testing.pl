@@ -63,7 +63,8 @@ if ( !$ENV{SKIP_RINUTILS_INSTALL} )
 }
 if ($IS_WIN)
 {
-    ( $ENV{PKG_CONFIG_PATH} //= '' ) .= ";C:\\foo\\lib\\pkgconfig;";
+    # ( $ENV{PKG_CONFIG_PATH} //= '' ) .= ";C:\\foo\\lib\\pkgconfig;";
+    ( $ENV{PKG_CONFIG_PATH} //= '' ) .= ":/foo/lib/pkgconfig/";
 }
 do_system(
     {
