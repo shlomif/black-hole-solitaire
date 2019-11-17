@@ -5,7 +5,7 @@ use warnings;
 
 my ($filename) = @ARGV;
 
-my @ranks      = ( "A", 2 .. 9, qw(T J Q K) );
+my @ranks = ( "A", 2 .. 9, qw(T J Q K) );
 my %ranks_to_n = ( map { $ranks[$_] => $_ } 0 .. $#ranks );
 
 my $card_re_str = '[' . join( "", @ranks ) . '][HSCD]';
