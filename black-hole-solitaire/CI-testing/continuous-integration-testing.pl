@@ -63,7 +63,7 @@ if ( !$ENV{SKIP_RINUTILS_INSTALL} )
 if ($IS_WIN)
 {
     ( $ENV{PKG_CONFIG_PATH} //= '' ) .=
-        ";C:/Program Files (x86)/rinutils/lib/pkgcomfig";
+        ";C:/Program Files (x86)/rinutils/lib/pkgconfig";
 }
 do_system(
     {
