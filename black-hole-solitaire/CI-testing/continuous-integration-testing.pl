@@ -50,7 +50,7 @@ if ( !$ENV{SKIP_RINUTILS_INSTALL} )
             cmd => [
                       qq#cd rinutils && mkdir B && cd B && cmake #
                     . ( defined($cmake_gen) ? qq# -G "$cmake_gen" # : "" )
-                    . qq# .. && $SUDO $MAKE install#
+                    . qq# .. && $SUDO $MAKE install#
             ]
         }
     );
