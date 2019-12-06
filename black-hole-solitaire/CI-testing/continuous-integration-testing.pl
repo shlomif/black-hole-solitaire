@@ -62,10 +62,19 @@ if ( !$ENV{SKIP_RINUTILS_INSTALL} )
     );
 }
 do_system( { cmd => [ "cmake", "--version" ] } );
+my $CMAKE_MODULE_PATH = join ";",
+    (
+    map { ; $_, s%/%\\%gr } (
+        map { ; $_, "$_/lib", "$_/lib64" } ( map { ; "c:$_", $_ } ("/foo") )
+    )
+    );
+
+# die "<$CMAKE_MODULE_PATH>";
 if ($IS_WIN)
 {
+    ( $ENV{CMAKE_MODULE_PATH} //= '' ) .= ";$CMAKE_MODULE_PATH;";
+
     # ( $ENV{PKG_CONFIG_PATH} //= '' ) .= ";C:\\foo\\lib\\pkgconfig;";
-    ( $ENV{CMAKE_MODULE_PATH} //= '' ) .= ";/foo/;c:/foo;c:/foo/lib;/foo/lib";
     ( $ENV{PKG_CONFIG_PATH} //= '' ) .=
         ";/foo/lib/pkgconfig/;/c/foo/lib/pkgconfig/";
 }
