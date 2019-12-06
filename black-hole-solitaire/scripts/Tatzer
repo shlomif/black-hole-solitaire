@@ -285,12 +285,12 @@ else
 unlink("CMakeCache.txt");
 path($_)->remove_tree foreach ( '_Inline', 't/_Inline' );
 unlink( glob("*.so") );
-
-my @cmd = (
+my $CMAKE_MODULE_PATH = $ENV{CMAKE_MODULE_PATH};
+my @cmd               = (
     "cmake",
     (
-        defined( $ENV{CMAKE_MODULE_PATH} )
-        ? "-DCMAKE_MODULE_PATH=$ENV{CMAKE_MODULE_PATH}"
+        defined($CMAKE_MODULE_PATH)
+        ? ( "-DCMAKE_MODULE_PATH=" . ( $CMAKE_MODULE_PATH =~ s%\\%\\\\%gr ) )
         : ()
     ),
     (
