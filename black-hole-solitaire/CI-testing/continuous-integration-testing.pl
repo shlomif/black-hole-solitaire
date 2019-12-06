@@ -61,6 +61,7 @@ if ( !$ENV{SKIP_RINUTILS_INSTALL} )
         }
     );
 }
+do_system( { cmd => [ "cmake", "--version" ] } );
 if ($IS_WIN)
 {
     # ( $ENV{PKG_CONFIG_PATH} //= '' ) .= ";C:\\foo\\lib\\pkgconfig;";

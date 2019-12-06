@@ -19,8 +19,8 @@ sub _calc_prove
 {
     return [
         'prove',
-        ( $ENV{HARNESS_VERBOSE} ? ('-v') : () ),
-        ( defined($num_jobs) ? sprintf( "-j%d", $num_jobs ) : () )
+        ( $ENV{HARNESS_VERBOSE} ? ('-v')                       : () ),
+        ( defined($num_jobs)    ? sprintf( "-j%d", $num_jobs ) : () )
     ];
 }
 
@@ -112,7 +112,7 @@ sub myglob
     # Put the valgrind tests last, because they take a long time.
     my @tests =
         sort { ( $a->[$BN] cmp $b->[$BN] ) || ( $a->[$FN] cmp $b->[$FN] ) }
-        map { [ path($_)->basename, $_ ] } (
+        map  { [ path($_)->basename, $_ ] } (
         myglob('t'),
         (
               ( $fcs_bin_path ne $src_dir )

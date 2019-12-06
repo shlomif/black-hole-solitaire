@@ -20,7 +20,7 @@ has [
 our %EXPORT_TAGS = ( 'all' => [qw($card_re)] );
 our @EXPORT_OK   = ( @{ $EXPORT_TAGS{'all'} } );
 
-my @ranks = ( "A", 2 .. 9, qw(T J Q K) );
+my @ranks      = ( "A", 2 .. 9, qw(T J Q K) );
 my %ranks_to_n = ( map { $ranks[$_] => $_ } 0 .. $#ranks );
 
 sub _RANK_KING
@@ -205,7 +205,7 @@ sub _process_cmd_line
     push @seeds, 0 if not @seeds;
     $self->_seeds( \@seeds );
 
-    pod2usage(1) if $help;
+    pod2usage(1)                                 if $help;
     pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
 
     if ($version)
