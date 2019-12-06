@@ -2,6 +2,7 @@
 # Shamelessly taken from https://github.com/plicease/Dist-Zilla-PluginBundle-Author-Plicease/blob/master/.appveyor.yml
 # Thanks!
 install:
+    - pkg-config --version
     - choco install strawberryperl
     - SET PATH=C:\strawberry\c\bin;C:\strawberry\perl\site\bin;C:\strawberry\perl\bin;%PATH%
     - perl -v
@@ -11,16 +12,20 @@ install:
     - SET PERL_LOCAL_LIB_ROOT=C:/Perl5
     - SET PERL_MB_OPT=--install_base C:/Perl5
     - SET PERL_MM_OPT=INSTALL_BASE=C:/Perl5
+    - pkg-config --version
     - cpanm --notest Dir::Manifest Dist::Zilla Env::Path Games::Solitaire::Verify::Solution IO::All Inline Inline::C Perl::Tidy Pod::Coverage::TrustPod Pod::Weaver::Section::Support String::ShellQuote Test::Code::TidyAll Test::CPAN::Changes Test::Differences Test::EOL Test::Kwalitee Test::NoTabs Test::Pod Test::Pod::Coverage Test::RunValgrind Test::TrailingSpace Test::Trap
     - cd black-hole-solitaire\Games-Solitaire-BlackHole-Solver
     - dzil authordeps --missing | cpanm -n
     - dzil listdeps   --missing | cpanm -n
+    - pkg-config --version
 build: off
 test_script:
+    - pkg-config --version
     - set CMAKE_MAKE_PROGRAM=C:\strawberry\c\bin\gmake.exe
     - cd ..\..
     # Removing for now because it is too much trouble on windows.
     # - set FCS_TEST_BUILD=1
+    - pkg-config --version
     - perl black-hole-solitaire/CI-testing/continuous-integration-testing.pl --gen="MSYS Makefiles"
 # cache:
 #   - C:\Perl5
