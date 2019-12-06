@@ -65,7 +65,8 @@ do_system( { cmd => [ "cmake", "--version" ] } );
 my $CMAKE_MODULE_PATH = join ";",
     (
     map { ; $_, s%/%\\%gr } (
-        map { ; $_, "$_/lib", "$_/lib64" } ( map { ; "c:$_", $_ } ("/foo") )
+        map { ; $_, "$_/Rinutils", "$_/Rinutils/cmake" }
+            map { ; $_, "$_/lib", "$_/lib64" } ( map { ; "c:$_", $_ } ("/foo") )
     )
     );
 
