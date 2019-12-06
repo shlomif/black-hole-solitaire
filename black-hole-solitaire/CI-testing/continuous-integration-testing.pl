@@ -65,6 +65,7 @@ do_system( { cmd => [ "cmake", "--version" ] } );
 if ($IS_WIN)
 {
     # ( $ENV{PKG_CONFIG_PATH} //= '' ) .= ";C:\\foo\\lib\\pkgconfig;";
+    ( $ENV{CMAKE_MODULE_PATH} //= '' ) .= ";/foo/;c:/foo;c:/foo/lib;/foo/lib";
     ( $ENV{PKG_CONFIG_PATH} //= '' ) .=
         ";/foo/lib/pkgconfig/;/c/foo/lib/pkgconfig/";
 }

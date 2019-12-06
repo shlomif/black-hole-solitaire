@@ -289,6 +289,11 @@ unlink( glob("*.so") );
 my @cmd = (
     "cmake",
     (
+        defined( $ENV{CMAKE_MODULE_PATH} )
+        ? "-DCMAKE_MODULE_PATH=$ENV{CMAKE_MODULE_PATH}"
+        : ()
+    ),
+    (
         defined( $ENV{CMAKE_MAKE_PROGRAM} )
         ? "-DCMAKE_MAKE_PROGRAM=$ENV{CMAKE_MAKE_PROGRAM}"
         : ()
