@@ -4,6 +4,14 @@ Shlomi Fish <shlomif@cpan.org>
 :Date: 2019-05-23
 :Revision: $Id$
 
+1.6.0       ( 07 Dec 2019 ):
+----------------------------
+
+* Extract the "rinutils" library as a cmake package:
+https://github.com/shlomif/rinutils/ .
+
+* Convert some functions to inline ones.
+
 1.4.0       ( 16 Jul 2019 ):
 ----------------------------
 
