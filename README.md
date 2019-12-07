@@ -25,3 +25,8 @@ Some related links:
 * [Freecell Solver](http://fc-solve.shlomifish.org/) - a solver for Freecell
 and related solitaire games.
 * [Other patience solvers](http://fc-solve.shlomifish.org/links.html#other_solvers)
+
+## CI Build+Tests
+
+* https://travis-ci.org/shlomif/black-hole-solitaire
+* https://ci.appveyor.com/project/shlomif/black-hole-solitaire
