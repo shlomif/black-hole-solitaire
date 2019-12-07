@@ -27,12 +27,15 @@ sub import
         $ccflags =~ s#(^|\s)-[Of][a-zA-Z0-9_\-]*#$1#gms;
     }
 
+    my $KEY                  = 'RINUTILS_INCLUDE_DIR';
+    my $RINUTILS_INCLUDE_DIR = exists $ENV{$KEY} ? "-I" . $ENV{$KEY} : '';
+
     my @inline_params = (
         C    => $src,
         name => $pkg,
         NAME => $pkg,
         INC =>
-"-I$ENV{FCS_BIN_PATH}/include -I$ENV{FCS_SRC_PATH}/rinutils/rinutils/include -I$ENV{FCS_SRC_PATH}/include -I$ENV{FCS_BIN_PATH} -I$ENV{FCS_SRC_PATH} -I$ENV{RINUTILS_INCLUDE_DIR}",
+"-I$ENV{FCS_BIN_PATH}/include -I$ENV{FCS_SRC_PATH}/rinutils/rinutils/include -I$ENV{FCS_SRC_PATH}/include -I$ENV{FCS_BIN_PATH} -I$ENV{FCS_SRC_PATH} $RINUTILS_INCLUDE_DIR",
         CCFLAGS           => $ccflags,
         CLEAN_AFTER_BUILD => 0,
         LIBS              => "-L$ENV{FCS_BIN_PATH} $libs",
