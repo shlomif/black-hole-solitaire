@@ -64,19 +64,15 @@ if ( !$ENV{SKIP_RINUTILS_INSTALL} )
     );
 }
 do_system( { cmd => [ "cmake", "--version" ] } );
-my $CMAKE_PREFIX_PATH;
 
 if ($IS_WIN)
 {
-    $CMAKE_PREFIX_PATH = join ";", ( map { ; $IS_WIN ? "c:$_" : $_ } ("/foo") );
-
+    my $CMAKE_PREFIX_PATH = join ";",
+        ( map { ; $IS_WIN ? "c:$_" : $_ } ("/foo") );
     ( $ENV{CMAKE_PREFIX_PATH} //= '' ) .= ";$CMAKE_PREFIX_PATH;";
-
-    # ( $ENV{PKG_CONFIG_PATH} //= '' ) .= ";C:\\foo\\lib\\pkgconfig;";
-    ( $ENV{PKG_CONFIG_PATH} //= '' ) .=
-        ";/foo/lib/pkgconfig/;/c/foo/lib/pkgconfig/";
     $ENV{RINUTILS_INCLUDE_DIR} = "C:/foo/include";
 }
+
 do_system(
     {
         cmd => [
