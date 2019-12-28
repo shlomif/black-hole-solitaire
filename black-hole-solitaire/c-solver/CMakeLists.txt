@@ -224,8 +224,6 @@ TARGET_LINK_LIBRARIES("${LIB_BASE}" ${DEP_LIBS})
 
 LIST (APPEND BLACK_HOLE_SOLVER_LIBS "${LIB_BASE}")
 
-INCLUDE_DIRECTORIES(BEFORE "${CMAKE_CURRENT_SOURCE_DIR}/${rinutils}/rinutils/include")
-
 IF (NOT USE_SYSTEM_XXHASH)
     INCLUDE("${private_mod_path}/xxhash_wrapper_bootstrap.cmake")
 ENDIF ()

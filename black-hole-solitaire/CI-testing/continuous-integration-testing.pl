@@ -1,10 +1,11 @@
 #!/usr/bin/env perl
 
+use 5.014;
 use strict;
 use warnings;
 use autodie;
 
-use Getopt::Long qw/GetOptions/;
+use Getopt::Long qw/ GetOptions /;
 
 sub do_system
 {
@@ -62,18 +63,13 @@ if ( !$ENV{SKIP_RINUTILS_INSTALL} )
     );
 }
 do_system( { cmd => [ "cmake", "--version" ] } );
-my $CMAKE_MODULE_PATH = join ";",
-    (
-    map { ; $_, s%/%\\%gr } (
-        map { ; $_, "$_/Rinutils", "$_/Rinutils/cmake" }
-            map { ; $_, "$_/lib", "$_/lib64" } ( map { ; "c:$_", $_ } ("/foo") )
-    )
-    );
+my $CMAKE_PREFIX_PATH;
 
-# die "<$CMAKE_MODULE_PATH>";
 if ($IS_WIN)
 {
-    ( $ENV{CMAKE_MODULE_PATH} //= '' ) .= ";$CMAKE_MODULE_PATH;";
+    $CMAKE_PREFIX_PATH = join ";", ( map { ; $IS_WIN ? "c:$_" : $_ } ("/foo") );
+
+    ( $ENV{CMAKE_PREFIX_PATH} //= '' ) .= ";$CMAKE_PREFIX_PATH;";
 
     # ( $ENV{PKG_CONFIG_PATH} //= '' ) .= ";C:\\foo\\lib\\pkgconfig;";
     ( $ENV{PKG_CONFIG_PATH} //= '' ) .=
