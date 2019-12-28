@@ -12,7 +12,7 @@ sub do_system
     my ($args) = @_;
 
     my $cmd = $args->{cmd};
-    print "Running [@$cmd]";
+    print "Running [@$cmd]\n";
     if ( system(@$cmd) )
     {
         die "Running [@$cmd] failed!";
@@ -50,6 +50,7 @@ if ( !$ENV{SKIP_RINUTILS_INSTALL} )
         {
             cmd => [
                       qq#cd rinutils && mkdir B && cd B && cmake #
+                    . " -DWITH_TEST_SUITE=OFF "
                     . ( defined($cmake_gen) ? qq# -G "$cmake_gen" # : "" )
                     . (
                     defined( $ENV{CMAKE_MAKE_PROGRAM} )
