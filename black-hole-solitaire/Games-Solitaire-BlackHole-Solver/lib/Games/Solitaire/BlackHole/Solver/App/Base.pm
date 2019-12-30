@@ -1,8 +1,8 @@
 package Games::Solitaire::BlackHole::Solver::App::Base;
 
 use Moo;
-use Getopt::Long;
-use Pod::Usage;
+use Getopt::Long qw/ GetOptions /;
+use Pod::Usage qw/ pod2usage /;
 use Math::Random::MT ();
 
 extends('Exporter');

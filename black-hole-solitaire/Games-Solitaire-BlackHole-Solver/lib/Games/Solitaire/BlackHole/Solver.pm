@@ -1,9 +1,8 @@
 package Games::Solitaire::BlackHole::Solver;
 
+use 5.014;
 use strict;
 use warnings;
-
-use 5.008;
 
 =head1 NAME
 
