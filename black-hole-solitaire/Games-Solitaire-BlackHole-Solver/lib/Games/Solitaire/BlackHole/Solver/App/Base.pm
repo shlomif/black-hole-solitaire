@@ -406,5 +406,3 @@ Games::Solitaire::BlackHole::Solver::App::Base - base class.
 For internal use.
 
 =cut
-
-
