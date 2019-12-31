@@ -154,7 +154,7 @@ QUEUE_LOOP:
         else
         {
         COL:
-            foreach my $col_idx ( 0 .. $#$board_values )
+            foreach my $col_idx ( keys @$board_values )
             {
                 my $pos = vec( $state, 4 + $col_idx, 4 );
 

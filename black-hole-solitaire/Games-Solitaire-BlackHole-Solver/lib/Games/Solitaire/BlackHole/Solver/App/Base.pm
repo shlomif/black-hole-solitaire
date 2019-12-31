@@ -152,7 +152,7 @@ sub _set_up_initial_position
     vec( $init_state, 1, 8 ) = $talon_ptr;
 
     my $board_values = $self->_board_values;
-    foreach my $col_idx ( 0 .. $#$board_values )
+    foreach my $col_idx ( keys @$board_values )
     {
         vec( $init_state, 4 + $col_idx, 4 ) =
             scalar( @{ $board_values->[$col_idx] } );
@@ -338,7 +338,7 @@ sub _find_moves
     my $fnd           = vec( $state, 0, 8 );
     my $positions     = $self->_positions;
     my $_is_good_diff = $self->_is_good_diff;
-    foreach my $col_idx ( 0 .. $#$board_values )
+    foreach my $col_idx ( keys @$board_values )
     {
         my $pos = vec( $state, 4 + $col_idx, 4 );
 
