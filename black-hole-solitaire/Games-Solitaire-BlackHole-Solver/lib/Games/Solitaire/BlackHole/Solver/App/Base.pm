@@ -333,7 +333,8 @@ sub _process_pending_items
 
 sub _find_moves
 {
-    my ( $self, $_pending, $board_values, $state, $no_cards ) = @_;
+    my ( $self, $_pending, $state, $no_cards ) = @_;
+    my $board_values  = $self->_board_values;
     my $fnd           = vec( $state, 0, 8 );
     my $positions     = $self->_positions;
     my $_is_good_diff = $self->_is_good_diff;

@@ -151,8 +151,7 @@ QUEUE_LOOP:
 
         if ( $place_queens_on_kings || ( $fnd != $RANK_KING ) )
         {
-            $self->_find_moves( \@sub_queue, $board_values, $state,
-                \$no_cards );
+            $self->_find_moves( \@sub_queue, $state, \$no_cards );
         }
         else
         {

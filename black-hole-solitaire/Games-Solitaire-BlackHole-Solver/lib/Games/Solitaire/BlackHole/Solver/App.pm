@@ -102,9 +102,6 @@ sub run
 
     $self->_set_up_solver( 0, [ 1, $RANK_KING ] );
 
-    my $positions    = $self->_positions;
-    my $board_values = $self->_board_values;
-
     my $verdict = 0;
 
     $self->_next_task;
@@ -119,7 +116,7 @@ QUEUE_LOOP:
 
         if (1)
         {
-            $self->_find_moves( \@_pending, $board_values, $state, \$no_cards );
+            $self->_find_moves( \@_pending, $state, \$no_cards );
         }
 
         if ($no_cards)
