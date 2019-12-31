@@ -1,11 +1,9 @@
 package Games::Solitaire::BlackHole::Solver::Golf::App;
 
-use strict;
-use warnings;
-
 use 5.014;
+use Moo;
 
-use parent 'Games::Solitaire::BlackHole::Solver::App::Base';
+extends('Games::Solitaire::BlackHole::Solver::App::Base');
 use Games::Solitaire::BlackHole::Solver::App::Base qw/ $card_re /;
 
 =head1 NAME
