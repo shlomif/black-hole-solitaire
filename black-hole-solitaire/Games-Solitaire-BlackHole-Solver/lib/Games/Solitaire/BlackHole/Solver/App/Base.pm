@@ -4,6 +4,7 @@ use Moo;
 use Getopt::Long qw/ GetOptions /;
 use Pod::Usage qw/ pod2usage /;
 use Math::Random::MT ();
+use List::Util qw/ any /;
 
 extends('Exporter');
 
@@ -11,11 +12,12 @@ has [
     '_active_record', '_active_task',
     '_board_cards',   '_board_lines',
     '_board_values',  '_init_foundation',
-    '_init_queue',    '_is_good_diff',
-    '_talon_cards',   '_positions',
-    '_quiet',         '_output_handle',
-    '_output_fn',     '_seeds',
-    '_tasks',         '_task_idx',
+    '_init_queue',    '_init_tasks_configs',
+    '_is_good_diff',  '_talon_cards',
+    '_positions',     '_quiet',
+    '_output_handle', '_output_fn',
+    '_tasks',         '_tasks_by_names',
+    '_task_idx',
 ] => ( is => 'rw' );
 our %EXPORT_TAGS = ( 'all' => [qw($card_re)] );
 our @EXPORT_OK   = ( @{ $EXPORT_TAGS{'all'} } );
@@ -191,19 +193,52 @@ sub _process_cmd_line
     my $quiet = '';
     my $output_fn;
     my ( $help, $man, $version );
-    my @seeds;
+    my @tasks;
 
+    my $push_task = sub {
+        push @tasks,
+            +{
+            name => undef(),
+            seed => 0,
+            };
+        return;
+    };
+    $push_task->();
     GetOptions(
         "o|output=s" => \$output_fn,
         "quiet!"     => \$quiet,
-        "seed=i\@"   => \@seeds,
-        'help|h|?'   => \$help,
-        'man'        => \$man,
-        'version'    => \$version,
+        "next-task"  => sub {
+            $push_task->();
+            return;
+        },
+        "task-name=s" => sub {
+            my ( undef, $val ) = @_;
+            if ( $val !~ /\A[A-Za-z0-9_]+\z/ )
+            {
+                die "Invalid task name '$val' - must be alphanumeric!";
+            }
+            $tasks[-1]->{name} = $val;
+            return;
+        },
+        "seed=i" => sub {
+            my ( undef, $val ) = @_;
+            $tasks[-1]->{seed} = $val;
+            return;
+        },
+        'help|h|?' => \$help,
+        'man'      => \$man,
+        'version'  => \$version,
         %{ $args->{extra_flags} },
     ) or pod2usage(2);
-    push @seeds, 0 if not @seeds;
-    $self->_seeds( \@seeds );
+    if ( @tasks == 1 )
+    {
+        $tasks[-1]{name} = 'default';
+    }
+    if ( any { !defined $_->{name} } @tasks )
+    {
+        die "You did not specify the task-names for some tasks";
+    }
+    $self->_init_tasks_configs( \@tasks );
 
     pod2usage(1)                                 if $help;
     pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
@@ -239,20 +274,31 @@ sub _set_up_tasks
     my ($self) = @_;
 
     my @tasks;
-    foreach my $iseed ( @{ $self->_seeds } )
+    my %tasks_by_names;
+    foreach my $task_rec ( @{ $self->_init_tasks_configs } )
     {
-        push @tasks,
+        my $iseed = $task_rec->{seed};
+        my $name  = $task_rec->{name};
+        my $task_obj =
             Games::Solitaire::BlackHole::Solver::App::Base::Task->new(
             {
+                _name            => $name,
                 _queue           => [ @{ $self->_init_queue } ],
                 _seed            => $iseed,
                 _gen             => Math::Random::MT->new( $iseed || 1 ),
                 _remaining_iters => 100,
             }
             );
+        push @tasks, $task_obj;
+        if ( exists $tasks_by_names{$name} )
+        {
+            die "Duplicate task-name '$name'!";
+        }
+        $tasks_by_names{$name} = $task_obj;
     }
     $self->_task_idx(0);
     $self->_tasks( \@tasks );
+    $self->_tasks_by_names( \%tasks_by_names );
     return;
 }
 
@@ -390,7 +436,8 @@ package Games::Solitaire::BlackHole::Solver::App::Base::Task;
 
 use Moo;
 
-has [ '_queue', '_gen', '_remaining_iters', '_seed', ] => ( is => 'rw' );
+has [ '_queue', '_gen', '_name', '_remaining_iters', '_seed', ] =>
+    ( is => 'rw' );
 
 1;
 
