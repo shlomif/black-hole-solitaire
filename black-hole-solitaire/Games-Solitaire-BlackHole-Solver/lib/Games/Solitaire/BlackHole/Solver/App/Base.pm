@@ -9,15 +9,16 @@ use List::Util qw/ any /;
 extends('Exporter');
 
 has [
-    '_active_record', '_active_task',
-    '_board_cards',   '_board_lines',
-    '_board_values',  '_init_foundation',
-    '_init_queue',    '_init_tasks_configs',
-    '_is_good_diff',  '_talon_cards',
-    '_positions',     '_quiet',
-    '_output_handle', '_output_fn',
-    '_tasks',         '_tasks_by_names',
-    '_task_idx',
+    '_active_record',  '_active_task',
+    '_board_cards',    '_board_lines',
+    '_board_values',   '_init_foundation',
+    '_init_queue',     '_init_tasks_configs',
+    '_is_good_diff',   '_prelude',
+    '_prelude_iter',   '_prelude_string',
+    '_talon_cards',    '_positions',
+    '_quiet',          '_output_handle',
+    '_output_fn',      '_tasks',
+    '_tasks_by_names', '_task_idx',
 ] => ( is => 'rw' );
 our %EXPORT_TAGS = ( 'all' => [qw($card_re)] );
 our @EXPORT_OK   = ( @{ $EXPORT_TAGS{'all'} } );
@@ -186,6 +187,9 @@ sub _shuffle
     return;
 }
 
+my $TASK_NAME_RE  = qr/[A-Za-z0-9_]+/;
+my $TASK_ALLOC_RE = qr/[0-9]+\@$TASK_NAME_RE/;
+
 sub _process_cmd_line
 {
     my ( $self, $args ) = @_;
@@ -211,9 +215,18 @@ sub _process_cmd_line
             $push_task->();
             return;
         },
+        "prelude=s" => sub {
+            my ( undef, $val ) = @_;
+            if ( $val !~ /\A$TASK_ALLOC_RE(?:,$TASK_ALLOC_RE)*\z/ )
+            {
+                die "Invalid prelude string '$val' !";
+            }
+            $self->_prelude_string($val);
+            return;
+        },
         "task-name=s" => sub {
             my ( undef, $val ) = @_;
-            if ( $val !~ /\A[A-Za-z0-9_]+\z/ )
+            if ( $val !~ /\A$TASK_NAME_RE\z/ )
             {
                 die "Invalid task name '$val' - must be alphanumeric!";
             }
@@ -277,8 +290,9 @@ sub _set_up_tasks
     my %tasks_by_names;
     foreach my $task_rec ( @{ $self->_init_tasks_configs } )
     {
-        my $iseed = $task_rec->{seed};
-        my $name  = $task_rec->{name};
+        my $iseed     = $task_rec->{seed};
+        my $name      = $task_rec->{name};
+        my $_task_idx = @tasks;
         my $task_obj =
             Games::Solitaire::BlackHole::Solver::App::Base::Task->new(
             {
@@ -287,6 +301,7 @@ sub _set_up_tasks
                 _seed            => $iseed,
                 _gen             => Math::Random::MT->new( $iseed || 1 ),
                 _remaining_iters => 100,
+                _task_idx        => $_task_idx,
             }
             );
         push @tasks, $task_obj;
@@ -299,12 +314,63 @@ sub _set_up_tasks
     $self->_task_idx(0);
     $self->_tasks( \@tasks );
     $self->_tasks_by_names( \%tasks_by_names );
+    my @prelude;
+    my $process_item = sub {
+        my $s = shift;
+        if ( my ( $quota, $name ) = $s =~ /\A([0-9]+)\@($TASK_NAME_RE)\z/ )
+        {
+            if ( not exists $self->_tasks_by_names->{$name} )
+            {
+                die "Unknown task name $name in prelude!";
+            }
+            my $task_obj = $self->_tasks_by_names->{$name};
+            return Games::Solitaire::BlackHole::Solver::App::Base::PreludeItem
+                ->new(
+                {
+                    _quota     => $quota,
+                    _task      => $task_obj,
+                    _task_idx  => $task_obj->_task_idx,
+                    _task_name => $task_obj->_name,
+                }
+                );
+        }
+        else
+        {
+            die "foo";
+        }
+    };
+    if ( my $_prelude_string = $self->_prelude_string )
+    {
+        push @prelude,
+            (
+            map { $process_item->($_) }
+                split /,/, $_prelude_string
+            );
+    }
+    $self->_prelude( \@prelude );
+    $self->_prelude_iter(0);
+    if ( @{ $self->_prelude } )
+    {
+        $self->_next_task;
+    }
     return;
 }
 
 sub _next_task
 {
     my ($self) = @_;
+    if ( $self->_prelude_iter < @{ $self->_prelude } )
+    {
+        my $alloc = $self->_prelude->[ $self->{_prelude_iter}++ ];
+        my $task  = $alloc->_task;
+        if ( !@{ $task->_queue } )
+        {
+            return $self->_next_task;
+        }
+        $task->_remaining_iters( $alloc->_quota );
+        $self->_active_task($task);
+        return 1;
+    }
     my $tasks = $self->_tasks;
     return if !@$tasks;
     if ( !@{ $tasks->[ $self->_task_idx ]->_queue } )
@@ -436,8 +502,14 @@ package Games::Solitaire::BlackHole::Solver::App::Base::Task;
 
 use Moo;
 
-has [ '_queue', '_gen', '_name', '_remaining_iters', '_seed', ] =>
+has [ '_queue', '_gen', '_task_idx', '_name', '_remaining_iters', '_seed', ] =>
     ( is => 'rw' );
+
+package Games::Solitaire::BlackHole::Solver::App::Base::PreludeItem;
+
+use Moo;
+
+has [ '_quota', '_task', '_task_idx', '_task_name', ] => ( is => 'rw' );
 
 1;
 
