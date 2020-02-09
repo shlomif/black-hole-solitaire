@@ -63,6 +63,27 @@ Other flags:
 
 Output to a solution file.
 
+=item * --quiet
+
+Do not emit the solution.
+
+=item * --next-task
+
+Add a new task (see L<https://en.wikipedia.org/wiki/Context_switch> ).
+
+=item * --task-name [name]
+
+Name the task.
+
+=item * --seed [index]
+
+Set the PRNG seed for the task.
+
+=item * --prelude [num-iters]@[task-name],[num-iters2]@[task-name2]
+
+Start from running the iters counts for each task IDs. Similar
+to L<https://fc-solve.shlomifish.org/docs/distro/USAGE.html#prelude_flag> .
+
 =back
 
 More information about Black Hole Solitaire can be found at:
