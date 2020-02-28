@@ -112,8 +112,6 @@ sub _my_exit
     }
 
     exit( !$verdict );
-
-    return;
 }
 
 sub _parse_board
