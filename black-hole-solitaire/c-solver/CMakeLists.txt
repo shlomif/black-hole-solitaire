@@ -3,6 +3,7 @@ PROJECT(black-hole-solver)
 
 INCLUDE ("${CMAKE_SOURCE_DIR}/cmake/shlomif_common_bootstrap.cmake")
 SHLOMIF_COMMON_SETUP("${private_mod_path}")
+INCLUDE(GNUInstallDirs)
 
 CMAKE_POLICY(SET CMP0054 NEW)
 option (FCS_WITH_TEST_SUITE "Also build and run the test suite." ON)
@@ -61,7 +62,7 @@ IF (NOT DISABLE_APPLYING_RPATH)
     SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
 
     # the RPATH to be used when installing
-    SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}")
+    SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_FULL_LIBDIR}")
 
     # add the automatically determined parts of the RPATH
     # which point to directories outside the build tree to the install RPATH
@@ -209,8 +210,8 @@ ADD_LIBRARY (
 
 INSTALL (
     TARGETS ${LIBS}
-    LIBRARY DESTINATION "lib${LIB_SUFFIX}"
-    ARCHIVE DESTINATION "lib${LIB_SUFFIX}"
+    LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+    ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
 )
 
 TARGET_LINK_LIBRARIES("${LIB_BASE}" ${DEP_LIBS})
@@ -234,7 +235,7 @@ ADD_EXECUTABLE(
     "single_board_main.c"
 )
 
-INSTALL (TARGETS "${BHS_EXE}" DESTINATION "bin")
+INSTALL (TARGETS "${BHS_EXE}" DESTINATION "${CMAKE_INSTALL_BINDIR}")
 
 ADD_EXECUTABLE(
     "multi-bhs-solver"
@@ -255,14 +256,14 @@ INSTALL(
         "include/black-hole-solver/bool.h"
         "include/black-hole-solver/fcs_dllexport.h"
     DESTINATION
-        "include/black-hole-solver"
+        "${CMAKE_INSTALL_INCLUDEDIR}/black-hole-solver"
 )
 
 INSTALL(
     FILES
         "${CMAKE_CURRENT_BINARY_DIR}/lib${CPACK_PACKAGE_NAME}.pc"
     DESTINATION
-        "lib${LIB_SUFFIX}/pkgconfig"
+        "${CMAKE_INSTALL_LIBDIR}/pkgconfig"
 )
 
 CONFIGURE_FILE(
