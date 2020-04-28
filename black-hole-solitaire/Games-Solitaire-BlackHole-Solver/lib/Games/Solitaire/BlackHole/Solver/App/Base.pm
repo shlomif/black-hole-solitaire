@@ -4,7 +4,7 @@ use Moo;
 use Getopt::Long qw/ GetOptions /;
 use Pod::Usage qw/ pod2usage /;
 use Math::Random::MT ();
-use List::Util qw/ any /;
+use List::Util 1.34 qw/ any /;
 
 extends('Exporter');
 

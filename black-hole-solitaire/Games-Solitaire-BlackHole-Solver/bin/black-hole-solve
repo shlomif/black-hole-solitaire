@@ -3,9 +3,11 @@
 use strict;
 use warnings;
 
-use Games::Solitaire::BlackHole::Solver::App;
+use Games::Solitaire::BlackHole::Solver::App ();
 
 Games::Solitaire::BlackHole::Solver::App->new->run;
+
+__END__
 
 =head1 NAME
 

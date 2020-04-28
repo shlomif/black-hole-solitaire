@@ -13,7 +13,7 @@ implemented as a class to solve the “Golf” variant of solitaire.
 
 =head1 SYNOPSIS
 
-    use Games::Solitaire::BlackHole::Solver::Golf::App;
+    use Games::Solitaire::BlackHole::Solver::Golf::App ();
 
     my $app = Games::Solitaire::BlackHole::Solver::Golf::App->new;
 

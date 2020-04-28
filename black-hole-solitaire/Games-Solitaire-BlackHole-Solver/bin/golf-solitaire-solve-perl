@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Games::Solitaire::BlackHole::Solver::Golf::App;
+use Games::Solitaire::BlackHole::Solver::Golf::App ();
 
 Games::Solitaire::BlackHole::Solver::Golf::App->new->run;
 

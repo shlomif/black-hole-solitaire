@@ -12,7 +12,7 @@ implemented as a class to solve the Black Hole solitaire.
 
 =head1 SYNOPSIS
 
-    use Games::Solitaire::BlackHole::Solver::App;
+    use Games::Solitaire::BlackHole::Solver::App ();
 
     my $app = Games::Solitaire::BlackHole::Solver::App->new;
 
