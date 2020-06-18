@@ -84,6 +84,7 @@ black_hole_solver_instance_t *instance, char *output);
 const char *black_hole_solver_get_lib_version(void);
 ''')
         self.user = self.ffi.new('black_hole_solver_instance_t * *')
+        self.error_on_line = self.ffi.new('int *')
         assert 0 == self.lib.black_hole_solver_create(self.user)
 
     def new_bhs_user_handle(self):
@@ -130,12 +131,16 @@ const char *black_hole_solver_get_lib_version(void);
                 'cmd_line_args_len': len(cmd_line_args)}
 
     def __del__(self):
-        self.lib.freecell_solver_user_free(self.user)
+        self.lib.black_hole_solver_free(self.user[0])
 
-    def solve_board(self, board):
-        return self.lib.freecell_solver_user_solve_board(
-            self.user,
-            bytes(board, 'UTF-8')
+    def read_board(self, board):
+        return self.lib.black_hole_solver_read_board(
+            self.user[0],
+            bytes(board, 'UTF-8'),
+            self.error_on_line,
+            13,
+            3,
+            10
         )
 
     def resume_solution(self):

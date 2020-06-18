@@ -15,5 +15,11 @@ def test_bhs():
     """Sample pytest test function with the pytest fixture as an argument.
     """
     import black_hole_solver
-    b = black_hole_solver.BlackHoleSolver()
-    assert b
+    solver = black_hole_solver.BlackHoleSolver()
+    assert solver
+    import pysol_cards.cards
+    from pysol_cards.deal_game import Game
+    from pysol_cards.random_base import RandomBase
+    solver.read_board(
+        Game('black_hole', 1, RandomBase.DEALS_MS).calc_deal_string(
+            1, pysol_cards.cards.CardRenderer(print_ts=True)))
