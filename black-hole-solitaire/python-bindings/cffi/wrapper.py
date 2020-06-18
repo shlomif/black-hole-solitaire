@@ -105,13 +105,15 @@ class DistGenerator(object):
             _re_mutate(
                 fn, "^PURPOSE\n.*?\n" + s, "{src_dir}/README.part.rst", '', s)
 
+        _append("{dist_name}/requirements.txt",
+                "{src_dir}/requirements.txt")
         _append("{dist_name}/tests/test_bhs.py",
                 "{src_dir}/tests/test_bhs.py",
                 make_exe=True)
         open(self._myformat("{dist_name}/tox.ini"), "wt").write(
             "[tox]\nenvlist = py38\n\n" +
-            "[testenv]\ndeps =\n\tpytest\n\t" +
-            "pytest-cov\ncommands = pytest\n")
+            "[testenv]\ndeps =\n\tpytest" +
+            "\n\tpytest-cov" + "\n\tcffi" + "\ncommands = pytest\n")
 
     def command__test(self):
         check_call(["bash", "-c", self._myformat("cd {dist_name} && tox")])
