@@ -22,39 +22,71 @@ class BlackHoleSolver(object):
         else:
             self.ffi = FFI()
             self.lib = self.ffi.dlopen(
-                "libfreecell-solver." + (
+                "libblack_hole_solver." + (
                     "dll" if (platform.system() == 'Windows') else "so"))
             self.ffi.cdef('''
-void * freecell_solver_user_alloc();
-typedef  struct{ char s[20];}fcs_move_t;
-int freecell_solver_user_get_moves_left (void * user);
-int freecell_solver_user_get_next_move (void * user, fcs_move_t * move);
-void freecell_solver_user_free(void * instance);
-typedef char * freecell_solver_str_t;
-typedef int (*freecell_solver_user_cmd_line_known_commands_callback_t)(
-    void *instance, int argc, freecell_solver_str_t argv[], int arg_index,
-    int *num_to_skip, int *ret, void *context);
-int freecell_solver_user_cmd_line_parse_args_with_file_nesting_count(
-    void *instance,
-    int argc, freecell_solver_str_t argv[], int start_arg,
-    freecell_solver_str_t *known_parameters,
-    freecell_solver_user_cmd_line_known_commands_callback_t callback,
-    void *callback_context, char **error_string,
-    int *last_arg, int file_nesting_count,
-    freecell_solver_str_t opened_files_dir);
-int freecell_solver_user_set_flares_plan(void * instance, char * s);
-long freecell_solver_user_get_num_times_long(void * user);
-long freecell_solver_user_get_num_states_in_collection_long(void * user);
-void freecell_solver_user_limit_iterations_long(
-    void * api_instance, const long max_iters);
-int freecell_solver_user_solve_board(void *api_instance,
-const char *const state_as_string);
-int freecell_solver_user_resume_solution(void * user);
-void freecell_solver_user_recycle(void *api_instance);
-''')
-        self.user = self.lib.freecell_solver_user_alloc()
+typedef struct
+{
+    unsigned long nothing;
+} black_hole_solver_instance_t;
+int black_hole_solver_create(
+black_hole_solver_instance_t **ret_instance);
 
-    def new_fcs_user_handle(self):
+
+int black_hole_solver_read_board(
+black_hole_solver_instance_t *instance, const char *board_string,
+int *error_line_number, unsigned int num_columns,
+unsigned int max_num_cards_in_col, unsigned int bits_per_column);
+
+int black_hole_solver_set_max_iters_limit(
+black_hole_solver_instance_t *instance, unsigned long limit);
+
+int black_hole_solver_enable_place_queens_on_kings(
+black_hole_solver_instance_t *instance, bool enabled_status);
+
+int black_hole_solver_enable_wrap_ranks(
+black_hole_solver_instance_t *instance, bool enabled_status);
+
+int black_hole_solver_enable_rank_reachability_prune(
+black_hole_solver_instance_t *instance, bool enabled_status);
+
+#define BLACK_HOLE_SOLVER__API__REQUIRES_SETUP_CALL 1
+int black_hole_solver_config_setup(
+black_hole_solver_instance_t *instance);
+int black_hole_solver_setup(
+black_hole_solver_instance_t *instance);
+
+int black_hole_solver_run(
+black_hole_solver_instance_t *instance);
+
+int black_hole_solver_recycle(
+black_hole_solver_instance_t *instance);
+
+int black_hole_solver_free(
+black_hole_solver_instance_t *instance);
+
+void black_hole_solver_init_solution_moves(
+black_hole_solver_instance_t *instance);
+int black_hole_solver_get_next_move(
+black_hole_solver_instance_t *instance, int *col_idx_ptr,
+int *card_rank_ptr, int *card_suit_ptr /* Will return H=0, C=1, D=2, S=3 */
+);
+
+unsigned long black_hole_solver_get_num_states_in_collection(
+black_hole_solver_instance_t *instance);
+
+unsigned long black_hole_solver_get_iterations_num(
+black_hole_solver_instance_t *instance);
+
+int black_hole_solver_get_current_solution_board(
+black_hole_solver_instance_t *instance, char *output);
+
+const char *black_hole_solver_get_lib_version(void);
+''')
+        self.user = self.ffi.new('black_hole_solver_instance_t * *')
+        assert 0 == self.lib.black_hole_solver_create(self.user)
+
+    def new_bhs_user_handle(self):
         return self.__class__(ffi=self.ffi, lib=self.lib)
 
     def ret_code_is_suspend(self, ret_code):
