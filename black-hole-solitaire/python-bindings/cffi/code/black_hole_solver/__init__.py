@@ -10,10 +10,19 @@ import platform
 from cffi import FFI
 
 
+class BlackHoleSolverMove(object):
+    def __init__(self, column_idx):
+        self._col_idx = column_idx
+
+    def get_column_idx(self):
+        """docstring for get_column_idx"""
+        return self._col_idx
+
+
 class BlackHoleSolver(object):
+    BLACK_HOLE_SOLVER__SUCCESS = 0
+    BLACK_HOLE_SOLVER__OUT_OF_ITERS = 10
     # TEST:$num_befs_weights=5;
-    NUM_BEFS_WEIGHTS = 5
-    FCS_STATE_SUSPEND_PROCESS = 5
     BHS__BLACK_HOLE__BITS_PER_COL = 2
     BHS__BLACK_HOLE__MAX_NUM_CARDS_IN_COL = 3
     BHS__BLACK_HOLE__NUM_COLUMNS = 17
@@ -88,6 +97,9 @@ const char *black_hole_solver_get_lib_version(void);
 ''')
         self.user_container = self.ffi.new('black_hole_solver_instance_t * *')
         self.error_on_line = self.ffi.new('int *')
+        self.col_idx_ptr = self.ffi.new('int *')
+        self.card_rank_ptr = self.ffi.new('int *')
+        self.card_suit_ptr = self.ffi.new('int *')
         assert 0 == self.lib.black_hole_solver_create(self.user_container)
         self.user = self.user_container[0]
         self.lib.black_hole_solver_enable_rank_reachability_prune(
@@ -102,16 +114,18 @@ const char *black_hole_solver_get_lib_version(void);
 
     def ret_code_is_suspend(self, ret_code):
         """docstring for ret_code_is_suspend"""
-        return ret_code == self.FCS_STATE_SUSPEND_PROCESS
+        return ret_code == self.BLACK_HOLE_SOLVER__OUT_OF_ITERS
 
     def get_next_move(self):
-        move = self.ffi.new('fcs_move_t *')
-        num_moves = self.lib.freecell_solver_user_get_moves_left(self.user)
-        if not num_moves:
+        ret_code = self.lib.black_hole_solver_get_next_move(
+            self.user,
+            self.col_idx_ptr,
+            self.card_rank_ptr,
+            self.card_suit_ptr,
+        )
+        if ret_code != self.BLACK_HOLE_SOLVER__SUCCESS:
             return None
-        ret = self.lib.freecell_solver_user_get_next_move(self.user, move)
-        success = 0
-        return (move if ret == success else None)
+        return BlackHoleSolverMove(column_idx=self.col_idx_ptr[0])
 
     def input_cmd_line(self, cmd_line_args):
         return {'last_arg': 0,
@@ -134,7 +148,10 @@ const char *black_hole_solver_get_lib_version(void);
         return ret
 
     def resume_solution(self):
-        return self.lib.black_hole_solver_run(self.user)
+        ret = self.lib.black_hole_solver_run(self.user)
+        if ret == self.BLACK_HOLE_SOLVER__SUCCESS:
+            self.lib.black_hole_solver_init_solution_moves(self.user)
+        return ret
 
     def limit_iterations(self, max_iters):
         self.lib.black_hole_solver_set_max_iters_limit(
