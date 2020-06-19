@@ -179,7 +179,7 @@ const char *black_hole_solver_get_lib_version(void);
             self.user)
 
     def get_num_states_in_collection(self):
-        return self.lib.freecell_solver_user_get_num_states_in_collection_long(
+        return self.lib.black_hole_solver_get_num_states_in_collection(
             self.user)
 
     def recycle(self):

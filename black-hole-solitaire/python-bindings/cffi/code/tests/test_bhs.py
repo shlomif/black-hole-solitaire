@@ -39,5 +39,6 @@ def test_limit_iters():
     solver.limit_iterations(200 * 1000)
     assert solver.resume_solution() == 0
     assert solver.get_num_times() > 0
+    assert solver.get_num_states_in_collection() > 0
     move = solver.get_next_move()
     assert 0 <= move.get_column_idx() < 17
