@@ -86,15 +86,16 @@ black_hole_solver_instance_t *instance, char *output);
 
 const char *black_hole_solver_get_lib_version(void);
 ''')
-        self.user = self.ffi.new('black_hole_solver_instance_t * *')
+        self.user_container = self.ffi.new('black_hole_solver_instance_t * *')
         self.error_on_line = self.ffi.new('int *')
-        assert 0 == self.lib.black_hole_solver_create(self.user)
+        assert 0 == self.lib.black_hole_solver_create(self.user_container)
+        self.user = self.user_container[0]
         self.lib.black_hole_solver_enable_rank_reachability_prune(
-            self.user[0], 1)
-        self.lib.black_hole_solver_enable_wrap_ranks(self.user[0], 1)
+            self.user, 1)
+        self.lib.black_hole_solver_enable_wrap_ranks(self.user, 1)
         self.lib.black_hole_solver_enable_place_queens_on_kings(
-            self.user[0], 1)
-        self.lib.black_hole_solver_config_setup(self.user[0])
+            self.user, 1)
+        self.lib.black_hole_solver_config_setup(self.user)
 
     def new_bhs_user_handle(self):
         return self.__class__(ffi=self.ffi, lib=self.lib)
@@ -113,38 +114,15 @@ const char *black_hole_solver_get_lib_version(void);
         return (move if ret == success else None)
 
     def input_cmd_line(self, cmd_line_args):
-        last_arg = self.ffi.new('int *')
-        error_string = self.ffi.new('char * *')
-        known_params = self.ffi.new('char * *')
-        opened_files_dir = self.ffi.new('char [32001]')
-
-        prefix = 'freecell_solver_user_cmd_line'
-        func = 'parse_args_with_file_nesting_count'
-
-        getattr(self.lib, prefix + '_' + func)(
-            self.user,  # instance
-            len(cmd_line_args),    # argc
-            [self.ffi.new('char[]', bytes(s, 'UTF-8')) \
-             for s in cmd_line_args],  # argv
-            0,   # start_arg
-            known_params,  # known_params
-            self.ffi.NULL,   # callback
-            self.ffi.NULL,   # callback_context
-            error_string,  # error_string
-            last_arg,   # last_arg
-            -1,  # file_nesting_count
-            opened_files_dir
-        )
-
-        return {'last_arg': last_arg[0],
+        return {'last_arg': 0,
                 'cmd_line_args_len': len(cmd_line_args)}
 
     def __del__(self):
-        self.lib.black_hole_solver_free(self.user[0])
+        self.lib.black_hole_solver_free(self.user)
 
     def read_board(self, board):
         ret = self.lib.black_hole_solver_read_board(
-            self.user[0],
+            self.user,
             bytes(board, 'UTF-8'),
             self.error_on_line,
             self.BHS__BLACK_HOLE__NUM_COLUMNS,
@@ -152,15 +130,15 @@ const char *black_hole_solver_get_lib_version(void);
             self.BHS__BLACK_HOLE__BITS_PER_COL,
         )
         assert ret == 0
-        assert 0 == self.lib.black_hole_solver_setup(self.user[0])
+        assert 0 == self.lib.black_hole_solver_setup(self.user)
         return ret
 
     def resume_solution(self):
-        return self.lib.black_hole_solver_run(self.user[0])
+        return self.lib.black_hole_solver_run(self.user)
 
     def limit_iterations(self, max_iters):
         self.lib.black_hole_solver_set_max_iters_limit(
-            self.user[0],
+            self.user,
             max_iters
         )
 
