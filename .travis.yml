@@ -20,7 +20,7 @@ cache:
     directories:
         - $HOME/perl_modules
 os: linux
-dist: bionic
+dist: xenial
 before_install:
     - cpanm local::lib
     - eval "$(perl -Mlocal::lib=$HOME/perl_modules)"
