@@ -11,15 +11,23 @@ from cffi import FFI
 
 
 class BlackHoleSolverMove(object):
+    """Represents a single solution move"""
     def __init__(self, column_idx):
         self._col_idx = column_idx
 
     def get_column_idx(self):
-        """docstring for get_column_idx"""
+        """
+        Returns the index of the column to move a card from.
+        If it is equal num_columns, it is the talon. Else
+        it is between 0 and num_columns-1.
+        """
         return self._col_idx
 
 
 class BlackHoleSolver(object):
+    """
+    The main solver class.
+    """
     BLACK_HOLE_SOLVER__SUCCESS = 0
     BLACK_HOLE_SOLVER__END = 9
     BLACK_HOLE_SOLVER__OUT_OF_ITERS = 10
@@ -114,6 +122,9 @@ const char *black_hole_solver_get_lib_version(void);
         return ret_code == self.BLACK_HOLE_SOLVER__OUT_OF_ITERS
 
     def get_next_move(self):
+        """
+        Returns the next move or None if they were all retrieved.
+        """
         if len(self._moves):
             return self._moves.pop(0)
         return None
@@ -130,6 +141,9 @@ const char *black_hole_solver_get_lib_version(void);
     BITS_PER_COL = {'black_hole': 2, 'all_in_a_row': 3, 'golf': 3}
 
     def read_board(self, board, game_type, place_queens_on_kings, wrap_ranks):
+        """
+        game_type is either 'golf' , 'black_hole' or 'all_in_a_row'
+        """
         self.lib.black_hole_solver_enable_wrap_ranks(self.user, wrap_ranks)
         self.lib.black_hole_solver_enable_place_queens_on_kings(
             self.user, place_queens_on_kings)

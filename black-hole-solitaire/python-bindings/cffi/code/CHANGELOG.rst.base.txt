@@ -1,2 +1,9 @@
+0.2.1
+    Fix the package name and description
+
+    Add / fix the requirements.
+
+    Add some docstrings.
+
 0.2.0
     Initial release.
