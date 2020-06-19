@@ -1,1 +1,4 @@
 cffi
+pysol_cards
+pytest
+pytest-cov
