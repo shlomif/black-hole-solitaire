@@ -21,5 +21,6 @@ def test_bhs():
     from pysol_cards.deal_game import Game
     from pysol_cards.random_base import RandomBase
     solver.read_board(
-        Game('black_hole', 1, RandomBase.DEALS_MS).calc_deal_string(
-            1, pysol_cards.cards.CardRenderer(print_ts=True)))
+        Game('black_hole', 5, RandomBase.DEALS_MS).calc_deal_string(
+            5, pysol_cards.cards.CardRenderer(print_ts=True)))
+    assert solver.resume_solution() == 0

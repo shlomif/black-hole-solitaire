@@ -14,6 +14,9 @@ class BlackHoleSolver(object):
     # TEST:$num_befs_weights=5;
     NUM_BEFS_WEIGHTS = 5
     FCS_STATE_SUSPEND_PROCESS = 5
+    BHS__BLACK_HOLE__BITS_PER_COL = 2
+    BHS__BLACK_HOLE__MAX_NUM_CARDS_IN_COL = 3
+    BHS__BLACK_HOLE__NUM_COLUMNS = 17
 
     def __init__(self, ffi=None, lib=None):
         if ffi:
@@ -86,6 +89,12 @@ const char *black_hole_solver_get_lib_version(void);
         self.user = self.ffi.new('black_hole_solver_instance_t * *')
         self.error_on_line = self.ffi.new('int *')
         assert 0 == self.lib.black_hole_solver_create(self.user)
+        self.lib.black_hole_solver_enable_rank_reachability_prune(
+            self.user[0], 1)
+        self.lib.black_hole_solver_enable_wrap_ranks(self.user[0], 1)
+        self.lib.black_hole_solver_enable_place_queens_on_kings(
+            self.user[0], 1)
+        self.lib.black_hole_solver_config_setup(self.user[0])
 
     def new_bhs_user_handle(self):
         return self.__class__(ffi=self.ffi, lib=self.lib)
@@ -134,17 +143,20 @@ const char *black_hole_solver_get_lib_version(void);
         self.lib.black_hole_solver_free(self.user[0])
 
     def read_board(self, board):
-        return self.lib.black_hole_solver_read_board(
+        ret = self.lib.black_hole_solver_read_board(
             self.user[0],
             bytes(board, 'UTF-8'),
             self.error_on_line,
-            13,
-            3,
-            10
+            self.BHS__BLACK_HOLE__NUM_COLUMNS,
+            self.BHS__BLACK_HOLE__MAX_NUM_CARDS_IN_COL,
+            self.BHS__BLACK_HOLE__BITS_PER_COL,
         )
+        assert ret == 0
+        assert 0 == self.lib.black_hole_solver_setup(self.user[0])
+        return ret
 
     def resume_solution(self):
-        return self.lib.freecell_solver_user_resume_solution(self.user)
+        return self.lib.black_hole_solver_run(self.user[0])
 
     def limit_iterations(self, max_iters):
         self.lib.freecell_solver_user_limit_iterations_long(
