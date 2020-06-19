@@ -129,14 +129,18 @@ const char *black_hole_solver_get_lib_version(void);
     def __del__(self):
         self.lib.black_hole_solver_free(self.user)
 
-    def read_board(self, board):
+    NUM_COLUMNS = {'black_hole': 17, 'all_in_a_row': 13, 'golf': 7}
+    MAX_NUM_CARDS_IN_COL = {'black_hole': 3, 'all_in_a_row': 4, 'golf': 5}
+    BITS_PER_COL = {'black_hole': 2, 'all_in_a_row': 3, 'golf': 3}
+
+    def read_board(self, board, game_type):
         ret = self.lib.black_hole_solver_read_board(
             self.user,
             bytes(board, 'UTF-8'),
             self.error_on_line,
-            self.BHS__BLACK_HOLE__NUM_COLUMNS,
-            self.BHS__BLACK_HOLE__MAX_NUM_CARDS_IN_COL,
-            self.BHS__BLACK_HOLE__BITS_PER_COL,
+            self.NUM_COLUMNS[game_type],
+            self.MAX_NUM_CARDS_IN_COL[game_type],
+            self.BITS_PER_COL[game_type],
         )
         assert ret == 0
         assert 0 == self.lib.black_hole_solver_setup(self.user)

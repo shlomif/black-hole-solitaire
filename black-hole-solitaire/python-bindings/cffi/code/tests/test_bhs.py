@@ -22,7 +22,8 @@ def test_bhs():
     from pysol_cards.random_base import RandomBase
     solver.read_board(
         Game('black_hole', 5, RandomBase.DEALS_MS).calc_deal_string(
-            5, pysol_cards.cards.CardRenderer(print_ts=True)))
+            5, pysol_cards.cards.CardRenderer(print_ts=True)),
+        'black_hole',)
     assert solver.resume_solution() == 0
 
 
@@ -36,7 +37,9 @@ def test_limit_iters():
     for deal_idx in [5, 4]:
         solver.read_board(
             Game('black_hole', deal_idx, RandomBase.DEALS_MS).calc_deal_string(
-                deal_idx, pysol_cards.cards.CardRenderer(print_ts=True)))
+                deal_idx, pysol_cards.cards.CardRenderer(print_ts=True)),
+            'black_hole',
+        )
         solver.limit_iterations(200 * 1000)
         assert solver.resume_solution() == 0
         assert solver.get_num_times() > 0
