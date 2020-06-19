@@ -26,10 +26,14 @@ install:
     - cpanm --notest Dir::Manifest Dist::Zilla Env::Path Games::Solitaire::Verify::Solution IO::All Inline Inline::C Perl::Tidy Pod::Weaver::PluginBundle::SHLOMIF Pod::Weaver::Section::Support Test::Code::TidyAll Test::CPAN::Changes Test::Differences Test::Kwalitee Test::Pod Test::Pod::Coverage Test::RunValgrind Test::TrailingSpace Test::Trap
     - "( cd black-hole-solitaire/Games-Solitaire-BlackHole-Solver/ && dzil authordeps --missing | grep -vP '[^\\w:]' | xargs -n 5 -P 10 cpanm --quiet --notest )"
     - "( cd black-hole-solitaire/Games-Solitaire-BlackHole-Solver/ && dzil listdeps --author --missing | grep -vP '[^\\w:]' | xargs cpanm --verbose --notest )"
+    - pip install cookiecutter
+    - ( cd black-hole-solitaire/python-bindings/cffi/ && python3 wrapper.py build_only )
+    - ( cd black-hole-solitaire/python-bindings/cffi/ && cd black_hole_solver && pip install -r requirements.txt
 perl:
     - "5.26"
 python:
     - "3.6"
 script:
     - "_verbose() { export HARNESS_VERBOSE=1 ; } ; export FCS_TEST_BUILD=1; perl black-hole-solitaire/CI-testing/continuous-integration-testing.pl"
+    - ( cd black-hole-solitaire/python-bindings/cffi/ && cd black_hole_solver && py.test --cov black_hole_solver --cov-report term-missing tests/ )
 sudo: false
