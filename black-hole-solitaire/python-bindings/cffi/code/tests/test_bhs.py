@@ -24,3 +24,17 @@ def test_bhs():
         Game('black_hole', 5, RandomBase.DEALS_MS).calc_deal_string(
             5, pysol_cards.cards.CardRenderer(print_ts=True)))
     assert solver.resume_solution() == 0
+
+
+def test_limit_iters():
+    import black_hole_solver
+    solver = black_hole_solver.BlackHoleSolver()
+    assert solver
+    import pysol_cards.cards
+    from pysol_cards.deal_game import Game
+    from pysol_cards.random_base import RandomBase
+    solver.read_board(
+        Game('black_hole', 5, RandomBase.DEALS_MS).calc_deal_string(
+            5, pysol_cards.cards.CardRenderer(print_ts=True)))
+    solver.limit_iterations(200 * 1000)
+    assert solver.resume_solution() == 0

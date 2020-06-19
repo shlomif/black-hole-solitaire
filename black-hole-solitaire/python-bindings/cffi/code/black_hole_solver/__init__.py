@@ -159,8 +159,8 @@ const char *black_hole_solver_get_lib_version(void);
         return self.lib.black_hole_solver_run(self.user[0])
 
     def limit_iterations(self, max_iters):
-        self.lib.freecell_solver_user_limit_iterations_long(
-            self.user,
+        self.lib.black_hole_solver_set_max_iters_limit(
+            self.user[0],
             max_iters
         )
 
