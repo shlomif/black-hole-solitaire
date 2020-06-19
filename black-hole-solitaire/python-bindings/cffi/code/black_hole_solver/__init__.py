@@ -183,4 +183,4 @@ const char *black_hole_solver_get_lib_version(void);
             self.user)
 
     def recycle(self):
-        self.lib.freecell_solver_user_recycle(self.user)
+        return self.lib.black_hole_solver_recycle(self.user)
