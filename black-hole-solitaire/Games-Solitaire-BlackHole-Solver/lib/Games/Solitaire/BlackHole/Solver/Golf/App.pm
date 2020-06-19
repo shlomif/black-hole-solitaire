@@ -6,10 +6,12 @@ use Moo;
 extends('Games::Solitaire::BlackHole::Solver::App::Base');
 use Games::Solitaire::BlackHole::Solver::App::Base qw/ $card_re /;
 
+=encoding utf8
+
 =head1 NAME
 
 Games::Solitaire::BlackHole::Solver::Golf::App - a command line application
-implemented as a class to solve the “Golf” variant of solitaire.
+implemented as a class to solve the "Golf" variant of solitaire.
 
 =head1 SYNOPSIS
 
