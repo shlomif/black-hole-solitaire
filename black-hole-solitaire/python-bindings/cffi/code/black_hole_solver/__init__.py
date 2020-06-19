@@ -143,7 +143,7 @@ const char *black_hole_solver_get_lib_version(void);
         )
 
     def get_num_times(self):
-        return self.lib.freecell_solver_user_get_num_times_long(
+        return self.lib.black_hole_solver_get_iterations_num(
             self.user)
 
     def get_num_states_in_collection(self):

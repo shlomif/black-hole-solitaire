@@ -38,3 +38,4 @@ def test_limit_iters():
             5, pysol_cards.cards.CardRenderer(print_ts=True)))
     solver.limit_iterations(200 * 1000)
     assert solver.resume_solution() == 0
+    assert solver.get_num_times() > 0
