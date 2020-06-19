@@ -105,10 +105,6 @@ const char *black_hole_solver_get_lib_version(void);
         self.user = self.user_container[0]
         self.lib.black_hole_solver_enable_rank_reachability_prune(
             self.user, 1)
-        self.lib.black_hole_solver_enable_wrap_ranks(self.user, 1)
-        self.lib.black_hole_solver_enable_place_queens_on_kings(
-            self.user, 1)
-        self.lib.black_hole_solver_config_setup(self.user)
 
     def new_bhs_user_handle(self):
         return self.__class__(ffi=self.ffi, lib=self.lib)
@@ -133,7 +129,11 @@ const char *black_hole_solver_get_lib_version(void);
     MAX_NUM_CARDS_IN_COL = {'black_hole': 3, 'all_in_a_row': 4, 'golf': 5}
     BITS_PER_COL = {'black_hole': 2, 'all_in_a_row': 3, 'golf': 3}
 
-    def read_board(self, board, game_type):
+    def read_board(self, board, game_type, place_queens_on_kings, wrap_ranks):
+        self.lib.black_hole_solver_enable_wrap_ranks(self.user, wrap_ranks)
+        self.lib.black_hole_solver_enable_place_queens_on_kings(
+            self.user, place_queens_on_kings)
+        self.lib.black_hole_solver_config_setup(self.user)
         ret = self.lib.black_hole_solver_read_board(
             self.user,
             bytes(board, 'UTF-8'),
