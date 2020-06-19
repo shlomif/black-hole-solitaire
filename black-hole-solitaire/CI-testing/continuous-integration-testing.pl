@@ -39,7 +39,9 @@ do_system(
         cmd => [ "prove", glob("root-tests/t/*.t") ],
     }
 );
-if ( !$ENV{SKIP_RINUTILS_INSTALL} )
+my $INSTALL = !$ENV{SKIP_RINUTILS_INSTALL};
+
+if ($INSTALL)
 {
     do_system(
         {
@@ -79,6 +81,7 @@ do_system(
 "cd black-hole-solitaire && mkdir B && cd B && $^X ..${SEP}scripts${SEP}Tatzer -l n2t "
                 . ( defined($cmake_gen) ? qq#--gen="$cmake_gen"# : "" )
                 . " && $MAKE && $^X ..${SEP}c-solver${SEP}run-tests.pl"
+                . ( $INSTALL ? qq# && $SUDO $MAKE install# : '' )
         ]
     }
 );
