@@ -21,6 +21,7 @@ class BlackHoleSolverMove(object):
 
 class BlackHoleSolver(object):
     BLACK_HOLE_SOLVER__SUCCESS = 0
+    BLACK_HOLE_SOLVER__END = 9
     BLACK_HOLE_SOLVER__OUT_OF_ITERS = 10
     # TEST:$num_befs_weights=5;
     BHS__BLACK_HOLE__BITS_PER_COL = 2
@@ -117,15 +118,9 @@ const char *black_hole_solver_get_lib_version(void);
         return ret_code == self.BLACK_HOLE_SOLVER__OUT_OF_ITERS
 
     def get_next_move(self):
-        ret_code = self.lib.black_hole_solver_get_next_move(
-            self.user,
-            self.col_idx_ptr,
-            self.card_rank_ptr,
-            self.card_suit_ptr,
-        )
-        if ret_code != self.BLACK_HOLE_SOLVER__SUCCESS:
-            return None
-        return BlackHoleSolverMove(column_idx=self.col_idx_ptr[0])
+        if len(self._moves):
+            return self._moves.pop(0)
+        return None
 
     def input_cmd_line(self, cmd_line_args):
         return {'last_arg': 0,
@@ -151,6 +146,26 @@ const char *black_hole_solver_get_lib_version(void);
         ret = self.lib.black_hole_solver_run(self.user)
         if ret == self.BLACK_HOLE_SOLVER__SUCCESS:
             self.lib.black_hole_solver_init_solution_moves(self.user)
+
+            def wrap():
+                return self.lib.black_hole_solver_get_next_move(
+                    self.user,
+                    self.col_idx_ptr,
+                    self.card_rank_ptr,
+                    self.card_suit_ptr,
+                )
+
+            _moves = []
+            ret_code = wrap()
+            while ret_code == self.BLACK_HOLE_SOLVER__SUCCESS:
+                _moves.append(
+                    BlackHoleSolverMove(
+                        column_idx=self.col_idx_ptr[0]
+                    )
+                )
+                ret_code = wrap()
+            assert ret_code == self.BLACK_HOLE_SOLVER__END
+            self._moves = _moves
         return ret
 
     def limit_iterations(self, max_iters):
