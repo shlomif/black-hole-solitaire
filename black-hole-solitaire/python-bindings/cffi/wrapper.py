@@ -57,9 +57,9 @@ class DistGenerator(object):
                 "project_short_description":
                     ("Iterate over sums of a certain" +
                      " number of elements"),
-                "release_date": "2020-02-25",
+                "release_date": "2020-06-19",
                 "repo_name": self.dist_name,
-                "version": "0.8.2",
+                "version": "0.2.0",
                 "year": "2020",
                 'aur_email': "shlomif@cpan.org",
                 'email': "shlomif@cpan.org",
