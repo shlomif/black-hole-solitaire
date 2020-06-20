@@ -6,47 +6,45 @@
 #
 # Distributed under the terms of the MIT license.
 #
-# This program displays increasing sums of two positive integers
+# This program is a black_hole_solver demo
+
+from black_hole_solver import BlackHoleSolver
 
 from six import print_
 
-from sum_walker import DWIM_SumWalker
-
 
 def main():
-    seq = [1, 2, 3, 4]
-
-    def request_more():
-        nonlocal seq
-        seq.append(seq[-1] + 1)
-
-    it = DWIM_SumWalker(2, seq, request_more)
-
-    def print_next():
-        nonlocal it
-        sum_, coords = next(it)
-        print_("{} = {}".format(
-            sum_, " ; ".join(
-                [" + ".join([str(seq[x]) for x in permutation])
-                 for permutation in coords])))
-
-    # Prints «2 = 1 + 1»
-    print_next()
-
-    # Prints «3 = 1 + 2»
-    print_next()
-
-    # Prints «4 = 1 + 3 ; 2 + 2»
-    print_next()
-
-    # Prints «5 = 1 + 4 ; 2 + 3»
-    print_next()
-
-    # Prints «6 = 1 + 5 ; 2 + 4 ; 3 + 3»
-    print_next()
-
-
-
+    solver = BlackHoleSolver()
+    pysolfc_5_black_hole_deal = """
+Foundations: AS
+AH KC 9D
+8S 3H KS
+2D KD QD
+QS 5H 4H
+4C 6S AC
+9H 8D 2H
+2S TD TC
+3D 7S TH
+5C JD 6D
+9C 7H 6H
+KH 8H 6C
+4D JH QC
+2C JC JS
+3C 7D 9S
+4S 5S AD
+3S QH 7C
+5D 8C TS
+    """
+    solver.read_board(
+        board=pysolfc_5_black_hole_deal,
+        game_type='black_hole',
+        place_queens_on_kings=True,
+        wrap_ranks=True)
+    assert solver.resume_solution() == solver.BLACK_HOLE_SOLVER__SUCCESS
+    m = solver.get_next_move()
+    while m:
+        print_("Move card in column No. {}".format(m.get_column_idx()))
+        m = solver.get_next_move()
 
 
 main()
