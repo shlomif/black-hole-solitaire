@@ -36,18 +36,25 @@ sub test_using_valgrind
     my $cmd_line_args = $args->{argv};
     my $prog          = $args->{prog};
 
-    Test::RunValgrind->new(
-        {
-            supress_stderr => $args->{supress_stderr},
-        }
-    )->run(
-        {
-            blurb  => $blurb,
-            log_fn => $log_fn,
-            prog   => $ENV{'FCS_BIN_PATH'} . "/$prog",
-            argv   => [ @$cmd_line_args, ],
-        },
-    );
+    if (
+        not Test::RunValgrind->new(
+            {
+                supress_stderr => $args->{supress_stderr},
+            }
+        )->run(
+            {
+                blurb  => $blurb,
+                log_fn => $log_fn,
+                prog   => $ENV{'FCS_BIN_PATH'} . "/$prog",
+                argv   => [ @$cmd_line_args, ],
+            },
+        )
+        )
+    {
+        diag( path($log_fn)->slurp_utf8 );
+        require Carp;
+        Carp::confess("valgrind error");
+    }
 }
 
 # TEST
