@@ -75,10 +75,11 @@ if ($IS_WIN)
     $ENV{RINUTILS_INCLUDE_DIR} = "C:/foo/include";
 }
 
+my $CPU_ARCH = ( delete( $ENV{GCC_CPU_ARCH} ) // 'n2' );
 do_system(
     {
         cmd => [
-"cd black-hole-solitaire && mkdir B && cd B && $^X ..${SEP}scripts${SEP}Tatzer -l n2t "
+"cd black-hole-solitaire && mkdir B && cd B && $^X ..${SEP}scripts${SEP}Tatzer -l ${CPU_ARCH}t "
                 . ( defined($cmake_gen) ? qq#--gen="$cmake_gen"# : "" )
                 . " && $MAKE && $^X ..${SEP}c-solver${SEP}run-tests.pl"
                 . ( $INSTALL ? qq# && $SUDO $MAKE install# : '' )
