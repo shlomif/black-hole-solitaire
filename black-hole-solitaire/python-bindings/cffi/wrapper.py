@@ -120,6 +120,12 @@ class DistGenerator(object):
     def command__test(self):
         check_call(["bash", "-c", self._myformat("cd {dist_name} && tox")])
 
+    def command__release(self):
+        self.command__build()
+        check_call(["bash", "-c", self._myformat(
+            "cd {dist_name} && python3 setup.py sdist " +
+            " && twine upload --verbose dist/{dist_name}*.tar.gz")])
+
     def command__gen_travis_yaml(self):
         import yaml
 
@@ -152,6 +158,8 @@ class DistGenerator(object):
             obj.command__build()
         elif cmd == 'build_only':
             obj.command__build_only()
+        elif cmd == 'release':
+            obj.command__release()
         else:
             raise BaseException("Unknown sub-command")
 
