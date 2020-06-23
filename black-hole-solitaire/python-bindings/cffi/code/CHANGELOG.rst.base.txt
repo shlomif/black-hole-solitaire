@@ -1,3 +1,6 @@
+0.2.3
+    Fix the description's RST (PyPI).
+
 0.2.2
     Fix loading the library without the development package.
 

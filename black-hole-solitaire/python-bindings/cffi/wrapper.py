@@ -55,11 +55,10 @@ class DistGenerator(object):
                 "entry_point": ["none", "cli", "gui", ],
                 "project_name": "Black Hole Solver cffi-based Wrapper",
                 "project_short_description":
-                    ("Allow solving Golf, Black Hole, and All in a Row " +
-                     "solitaires using libblack_hole_solver"),
-                "release_date": "2020-06-19",
+                    "lib",
+                "release_date": "2020-06-23",
                 "repo_name": self.dist_name,
-                "version": "0.2.2",
+                "version": "0.2.3",
                 "year": "2020",
                 'aur_email': "shlomif@cpan.org",
                 'email': "shlomif@cpan.org",
