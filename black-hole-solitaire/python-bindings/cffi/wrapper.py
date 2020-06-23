@@ -59,7 +59,7 @@ class DistGenerator(object):
                      "solitaires using libblack_hole_solver"),
                 "release_date": "2020-06-19",
                 "repo_name": self.dist_name,
-                "version": "0.2.1",
+                "version": "0.2.2",
                 "year": "2020",
                 'aur_email': "shlomif@cpan.org",
                 'email': "shlomif@cpan.org",

@@ -1,3 +1,8 @@
+0.2.2
+    Fix loading the library without the development package.
+
+    Fixes for freeing or unloading resources.
+
 0.2.1
     Fix the package name and description
 

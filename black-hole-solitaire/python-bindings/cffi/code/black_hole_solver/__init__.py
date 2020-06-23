@@ -37,6 +37,7 @@ class BlackHoleSolver(object):
     BHS__BLACK_HOLE__NUM_COLUMNS = 17
 
     def __init__(self, ffi=None, lib=None):
+        self.user = None
         if ffi:
             self.ffi = ffi
             self.lib = lib
@@ -44,7 +45,10 @@ class BlackHoleSolver(object):
             self.ffi = FFI()
             self.lib = self.ffi.dlopen(
                 "libblack_hole_solver." + (
-                    "dll" if (platform.system() == 'Windows') else "so"))
+                    "dll" if (platform.system() == 'Windows') else "so.1"))
+            if not self.lib:
+                self.ffi = None
+                raise ImportError("Could not find shared library")
             self.ffi.cdef('''
 typedef struct
 {
@@ -104,13 +108,13 @@ black_hole_solver_instance_t *instance, char *output);
 
 const char *black_hole_solver_get_lib_version(void);
 ''')
-        self.user_container = self.ffi.new('black_hole_solver_instance_t * *')
-        self.error_on_line = self.ffi.new('int *')
-        self.col_idx_ptr = self.ffi.new('int *')
-        self.card_rank_ptr = self.ffi.new('int *')
-        self.card_suit_ptr = self.ffi.new('int *')
-        assert 0 == self.lib.black_hole_solver_create(self.user_container)
-        self.user = self.user_container[0]
+        self._user_container = self.ffi.new('black_hole_solver_instance_t * *')
+        self._error_on_line = self.ffi.new('int *')
+        self._col_idx_ptr = self.ffi.new('int *')
+        self._card_rank_ptr = self.ffi.new('int *')
+        self._card_suit_ptr = self.ffi.new('int *')
+        assert 0 == self.lib.black_hole_solver_create(self._user_container)
+        self.user = self._user_container[0]
         self.lib.black_hole_solver_enable_rank_reachability_prune(
             self.user, 1)
 
@@ -134,7 +138,14 @@ const char *black_hole_solver_get_lib_version(void);
                 'cmd_line_args_len': len(cmd_line_args)}
 
     def __del__(self):
-        self.lib.black_hole_solver_free(self.user)
+        if self.user:
+            self.lib.black_hole_solver_free(self.user)
+            self.user = None
+            self._user_container = None
+            self._error_on_line = None
+            self._col_idx_ptr = None
+            self._card_rank_ptr = None
+            self._card_suit_ptr = None
 
     NUM_COLUMNS = {'black_hole': 17, 'all_in_a_row': 13, 'golf': 7}
     MAX_NUM_CARDS_IN_COL = {'black_hole': 3, 'all_in_a_row': 4, 'golf': 5}
@@ -151,7 +162,7 @@ const char *black_hole_solver_get_lib_version(void);
         ret = self.lib.black_hole_solver_read_board(
             self.user,
             bytes(board, 'UTF-8'),
-            self.error_on_line,
+            self._error_on_line,
             self.NUM_COLUMNS[game_type],
             self.MAX_NUM_CARDS_IN_COL[game_type],
             self.BITS_PER_COL[game_type],
@@ -168,9 +179,9 @@ const char *black_hole_solver_get_lib_version(void);
             def wrap():
                 return self.lib.black_hole_solver_get_next_move(
                     self.user,
-                    self.col_idx_ptr,
-                    self.card_rank_ptr,
-                    self.card_suit_ptr,
+                    self._col_idx_ptr,
+                    self._card_rank_ptr,
+                    self._card_suit_ptr,
                 )
 
             _moves = []
@@ -178,7 +189,7 @@ const char *black_hole_solver_get_lib_version(void);
             while ret_code == self.BLACK_HOLE_SOLVER__SUCCESS:
                 _moves.append(
                     BlackHoleSolverMove(
-                        column_idx=self.col_idx_ptr[0]
+                        column_idx=self._col_idx_ptr[0]
                     )
                 )
                 ret_code = wrap()
