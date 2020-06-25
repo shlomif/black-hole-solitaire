@@ -5,6 +5,9 @@ install:
     # - pkg-config --version
     - choco install strawberryperl
     - SET PATH=C:\strawberry\c\bin;C:\strawberry\perl\site\bin;C:\strawberry\perl\bin;%PATH%
+    - SET PATH=C:\Python38-x64;%PATH%
+    - python38 --version
+    - python3 --version
     - perl -v
     - if not exist C:\Perl5 mkdir C:\Perl5
     - SET PATH=C:\msys64\bin;C:\Perl5\bin;C:\strawberry\c\bin;C:\strawberry\perl\site\bin;C:\strawberry\perl\bin;%PATH%
@@ -26,6 +29,7 @@ test_script:
     # Removing for now because it is too much trouble on windows.
     # - set FCS_TEST_BUILD=1
     - pkg-config --version
+    - set TOXENV="py38"
     - perl black-hole-solitaire/CI-testing/continuous-integration-testing.pl --gen="MSYS Makefiles"
 # cache:
 #   - C:\Perl5
