@@ -5,7 +5,9 @@ install:
     # - pkg-config --version
     - choco install strawberryperl
     - SET PATH=C:\strawberry\c\bin;C:\strawberry\perl\site\bin;C:\strawberry\perl\bin;%PATH%
-    - SET PATH=C:\Python38-x64\bin;%PATH%
+    - SET PATH=C:\Python38-x64;%PATH%
+    - copy c:\Python38-x64\python.exe c:\Python38-x64\python3.exe
+    - copy c:\Python38-x64\python.exe c:\Python38-x64\python38.exe
     - python38 --version
     - python3 --version
     - perl -v
