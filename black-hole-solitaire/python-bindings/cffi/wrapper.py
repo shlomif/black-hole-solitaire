@@ -171,6 +171,8 @@ class DistGenerator(object):
             obj.command__build_only()
         elif cmd == 'release':
             obj.command__release()
+        elif cmd == 'test':
+            obj.command__build()
         else:
             raise BaseException("Unknown sub-command")
 

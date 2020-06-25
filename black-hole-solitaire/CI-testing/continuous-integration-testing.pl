@@ -95,10 +95,16 @@ do_system(
     }
 );
 
+my $pytest =
+" && cd dest && py.test --cov black_hole_solver --cov-report term-missing tests${SEP}";
+if ($IS_WIN)
+{
+    $pytest = '';
+}
 do_system(
     {
         cmd => [
-"cd black-hole-solitaire${SEP}python-bindings${SEP}cffi${SEP} && python3 wrapper.py && cd dest && py.test --cov black_hole_solver --cov-report term-missing tests${SEP}",
+"cd black-hole-solitaire${SEP}python-bindings${SEP}cffi${SEP} && python3 wrapper.py test $pytest"
         ],
     }
 );
