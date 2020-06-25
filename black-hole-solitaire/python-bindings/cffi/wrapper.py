@@ -53,9 +53,8 @@ class DistGenerator(object):
             overwrite_if_exists=True,
             extra_context={
                 "entry_point": ["none", "cli", "gui", ],
-                "project_name": "Black Hole Solver cffi-based Wrapper",
-                "project_short_description":
-                    "lib",
+                "project_name": "Black Hole Solver Wrapper",
+                "project_short_description": "lib",
                 "release_date": "2020-06-23",
                 "repo_name": self.dist_name,
                 "version": "0.2.3",
