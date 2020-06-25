@@ -216,7 +216,16 @@ INSTALL (
 
 TARGET_LINK_LIBRARIES("${LIB_BASE}" ${DEP_LIBS})
 
-LIST (APPEND BLACK_HOLE_SOLVER_LIBS "${LIB_BASE}")
+IF (WIN32 AND NOT UNIX)
+    # This is so on Windows, the .dll's will be installed in the bin/
+    # directory as well where the command-line utilities
+    # will be able to find them.
+
+    INSTALL(
+        TARGETS "${LIB_BASE}"
+        DESTINATION "${CMAKE_INSTALL_BINDIR}"
+    )
+ENDIF ()
 
 IF (NOT USE_SYSTEM_XXHASH)
     INCLUDE("${private_mod_path}/xxhash_wrapper_bootstrap.cmake")

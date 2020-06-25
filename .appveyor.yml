@@ -39,6 +39,8 @@ test_script:
     - set TOXENV=py38
     - set bhslibdir=%HOME%\apps\fcs\lib
     - SET PATH=%PATH%;%bhslibdir%
+    - set bhslibdir2=%HOME%\apps\fcs\bin
+    - SET PATH=%PATH%;%bhslibdir2%
     - perl black-hole-solitaire/CI-testing/continuous-integration-testing.pl --gen="MSYS Makefiles"
 # cache:
 #   - C:\Perl5
