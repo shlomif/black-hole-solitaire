@@ -36,7 +36,7 @@ test_script:
     # Removing for now because it is too much trouble on windows.
     # - set FCS_TEST_BUILD=1
     - pkg-config --version
-    - set TOXENV="py38"
+    - set TOXENV=py38
     - perl black-hole-solitaire/CI-testing/continuous-integration-testing.pl --gen="MSYS Makefiles"
 # cache:
 #   - C:\Perl5
