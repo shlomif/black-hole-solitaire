@@ -47,6 +47,8 @@ class DistGenerator(object):
         self.command__test()
 
     def command__build_only(self):
+        if os.path.exists(self.dest_dir):
+            shutil.rmtree(self.dest_dir)
         if os.path.exists(self.dist_name):
             shutil.rmtree(self.dist_name)
         cookiecutter.main.cookiecutter(

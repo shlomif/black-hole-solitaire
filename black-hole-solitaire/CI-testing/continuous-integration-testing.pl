@@ -94,3 +94,11 @@ do_system(
         ]
     }
 );
+
+do_system(
+    {
+        cmd => [
+"cd black-hole-solitaire${SEP}python-bindings${SEP}cffi${SEP} && python3 wrapper.py && cd dest && py.test --cov black_hole_solver --cov-report term-missing tests${SEP}",
+        ],
+    }
+);
