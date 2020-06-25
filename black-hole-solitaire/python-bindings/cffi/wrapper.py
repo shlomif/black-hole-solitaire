@@ -8,6 +8,7 @@
 
 import os
 import os.path
+import platform
 import re
 import shutil
 import sys
@@ -25,6 +26,10 @@ class DistGenerator(object):
         self.src_modules_dir = self.src_dir + "/" + dist_name
         self.dest_dir = 'dest'
         self.dest_modules_dir = self.dest_dir + "/" + dist_name
+        system = platform.system().lower()
+        self.tox_cmd = (
+            "py -3.8 -m tox"
+            if (('windows' in system) or ('cygwin' in system)) else 'tox')
 
     def _slurp(self, fn):
         return open(fn, "rt").read()
@@ -40,6 +45,7 @@ class DistGenerator(object):
             dist_name=self.dist_name,
             src_dir=self.src_dir,
             src_modules_dir=self.src_modules_dir,
+            tox_cmd=self.tox_cmd
         )
 
     def command__build(self):
@@ -122,7 +128,8 @@ class DistGenerator(object):
             "\ncommands = pytest\n")
 
     def command__test(self):
-        check_call(["bash", "-c", self._myformat("cd {dest_dir} && tox")])
+        check_call(["bash", "-c",
+                    self._myformat("cd {dest_dir} && {tox_cmd}")])
 
     def command__release(self):
         self.command__build()
