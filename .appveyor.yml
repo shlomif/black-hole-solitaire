@@ -1,4 +1,6 @@
 ---
+environment:
+    PY3MODS: cookiecutter cffi pycotap pysol_cards pytest pytest-cov random2 six tox
 # Shamelessly taken from https://github.com/plicease/Dist-Zilla-PluginBundle-Author-Plicease/blob/master/.appveyor.yml
 # Thanks!
 install:
@@ -10,6 +12,7 @@ install:
     - copy c:\Python38-x64\python.exe c:\Python38-x64\python38.exe
     - python38 --version
     - python3 --version
+    - python3 -mpip install %PY3MODS%
     - perl -v
     - if not exist C:\Perl5 mkdir C:\Perl5
     - SET PATH=C:\msys64\bin;C:\Perl5\bin;C:\strawberry\c\bin;C:\strawberry\perl\site\bin;C:\strawberry\perl\bin;%PATH%
