@@ -46,6 +46,8 @@ foreach my $fn (@filenames)
         unlink("$fn.orig");
     }
 }
+
+# TEST
 ok( $all_ok, "Success - all files are properly formatted." );
 
 __END__
