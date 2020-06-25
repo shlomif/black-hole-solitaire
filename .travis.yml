@@ -31,12 +31,12 @@ install:
     - "( cd black-hole-solitaire/Games-Solitaire-BlackHole-Solver/ && dzil listdeps --author --missing | grep -vP '[^\\w:]' | xargs cpanm --verbose --notest )"
     - python3 -m pip install --user cookiecutter
     - ( cd black-hole-solitaire/python-bindings/cffi/ && python3 wrapper.py build_only )
-    - ( cd black-hole-solitaire/python-bindings/cffi/ && cd black_hole_solver && python3 -m pip install --user -r requirements.txt )
+    - ( cd black-hole-solitaire/python-bindings/cffi/ && cd dest && python3 -m pip install --user -r requirements.txt )
 perl:
     - "5.26"
 python:
     - "3.6"
 script:
     - "_verbose() { export HARNESS_VERBOSE=1 ; } ; export FCS_TEST_BUILD=1 ; export GCC_CPU_ARCH=x64 ; perl black-hole-solitaire/CI-testing/continuous-integration-testing.pl"
-    - ( libdir="$HOME/apps/fcs/lib"; LD_LIBRARY_PATH+=":$libdir" ; LIBRARY_PATH+=":$libdir" ; export LIBRARY_PATH LD_LIBRARY_PATH ; cd black-hole-solitaire/python-bindings/cffi/ && cd black_hole_solver && py.test --cov black_hole_solver --cov-report term-missing tests/ )
+    - ( libdir="$HOME/apps/fcs/lib"; LD_LIBRARY_PATH+=":$libdir" ; LIBRARY_PATH+=":$libdir" ; export LIBRARY_PATH LD_LIBRARY_PATH ; cd black-hole-solitaire/python-bindings/cffi/ && cd dest && py.test --cov black_hole_solver --cov-report term-missing tests/ )
 sudo: false

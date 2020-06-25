@@ -23,7 +23,8 @@ class DistGenerator(object):
         self.base_dir = base_dir
         self.src_dir = "code"
         self.src_modules_dir = self.src_dir + "/" + dist_name
-        self.dest_modules_dir = dist_name + "/" + dist_name
+        self.dest_dir = 'dest'
+        self.dest_modules_dir = self.dest_dir + "/" + dist_name
 
     def _slurp(self, fn):
         return open(fn, "rt").read()
@@ -34,6 +35,7 @@ class DistGenerator(object):
     def _myformat(self, mystring):
         return mystring.format(
             base_dir=self.base_dir,
+            dest_dir=self.dest_dir,
             dest_modules_dir=self.dest_modules_dir,
             dist_name=self.dist_name,
             src_dir=self.src_dir,
@@ -65,6 +67,7 @@ class DistGenerator(object):
                 'github_username': "shlomif",
                 },
             )
+        os.rename(self.dist_name, self.dest_dir)
 
         def _append(to_proto, from_, make_exe=False):
             to = self._myformat(to_proto)
@@ -94,22 +97,22 @@ class DistGenerator(object):
             assert count == 1
             open(fn, "wt").write(txt)
         _re_mutate(
-            "{dist_name}/CHANGELOG.rst",
+            "{dest_dir}/CHANGELOG.rst",
             "\n0\\.1\\.0\n.*",
             "{src_dir}/CHANGELOG.rst.base.txt", "\n")
         s = "COPYRIGHT\n"
-        for fn in ["{dist_name}/README", "{dist_name}/README.rst",
-                   "{dist_name}/docs/README.rst", ]:
+        for fn in ["{dest_dir}/README", "{dest_dir}/README.rst",
+                   "{dest_dir}/docs/README.rst", ]:
             _re_mutate(
                 fn, "^PURPOSE\n.*?\n" + s, "{src_dir}/README.part.rst", '', s)
 
         req_fn = "{src_dir}/requirements.txt"
-        _append("{dist_name}/requirements.txt",
+        _append("{dest_dir}/requirements.txt",
                 req_fn)
-        _append("{dist_name}/tests/test_bhs.py",
+        _append("{dest_dir}/tests/test_bhs.py",
                 "{src_dir}/tests/test_bhs.py",
                 make_exe=True)
-        open(self._myformat("{dist_name}/tox.ini"), "wt").write(
+        open(self._myformat("{dest_dir}/tox.ini"), "wt").write(
             "[tox]\nenvlist = py38\n\n" +
             "[testenv]\ndeps =" + "".join(
                 ["\n\t" + x for x in
@@ -117,12 +120,12 @@ class DistGenerator(object):
             "\ncommands = pytest\n")
 
     def command__test(self):
-        check_call(["bash", "-c", self._myformat("cd {dist_name} && tox")])
+        check_call(["bash", "-c", self._myformat("cd {dest_dir} && tox")])
 
     def command__release(self):
         self.command__build()
         check_call(["bash", "-c", self._myformat(
-            "cd {dist_name} && python3 setup.py sdist " +
+            "cd {dest_dir} && python3 setup.py sdist " +
             " && twine upload --verbose dist/{dist_name}*.tar.gz")])
 
     def command__gen_travis_yaml(self):
@@ -137,12 +140,12 @@ class DistGenerator(object):
                         '( cd {base_dir} && ' +
                         'python3 wrapper.py build_only )'),
                     self._myformat(
-                        '( cd {base_dir} && cd {dist_name} && ' +
+                        '( cd {base_dir} && cd {dest_dir} && ' +
                         'pip install -r requirements.txt && pip install . )')
                 ],
                 'script': [
                     self._myformat(
-                        '( cd {base_dir} && cd {dist_name} && ' +
+                        '( cd {base_dir} && cd {dest_dir} && ' +
                         'py.test --cov {dist_name} ' +
                         '--cov-report term-missing tests/ )')
                 ],
