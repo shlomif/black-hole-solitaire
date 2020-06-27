@@ -1,8 +1,19 @@
 Black Hole Solver's News File
 =============================
 Shlomi Fish <shlomif@cpan.org>
-:Date: 2019-05-23
+:Date: 2020-06-28
 :Revision: $Id$
+
+1.8.0       ( 28 Jun 2020 ):
+----------------------------
+
+* Convert +CMakeLists.txt+ to GNUInstallDirs.
+
+* Install the .dll on MS Windows builds. (Bug fix.)
+
+* Better https://metacpan.org/release/Code-TidyAll[tidyall] compliance.
+
+* Released a https://pypi.org/project/black-hole-solver/[Python wrapper].
 
 1.6.0       ( 07 Dec 2019 ):
 ----------------------------
