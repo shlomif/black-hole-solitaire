@@ -104,7 +104,7 @@ if ($IS_WIN)
 do_system(
     {
         cmd => [
-"cd black-hole-solitaire${SEP}python-bindings${SEP}cffi${SEP} && python3 wrapper.py test $pytest"
+"cd black-hole-solitaire${SEP}python-bindings${SEP}cffi${SEP} && python3 python_pypi_dist_manager.py test $pytest"
         ],
     }
 );
