@@ -32,7 +32,7 @@ install:
     - python3 -m pip install --user cookiecutter tox
     - python3 --version
     - which python3.6
-    - ( set -e -x ; cd black-hole-solitaire/python-bindings/cffi/ && python3 wrapper.py build_only && cd dest && python3 -m pip install --user -r requirements.txt )
+    - ( set -e -x ; cd black-hole-solitaire/python-bindings/cffi/ && python3 python_pypi_dist_manager.py build_only && cd dest && python3 -m pip install --user -r requirements.txt )
 perl:
     - "5.26"
 python:
