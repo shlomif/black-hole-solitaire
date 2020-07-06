@@ -32,7 +32,9 @@ class DistGenerator(object):
             if (('windows' in system) or ('cygwin' in system)) else 'tox')
 
     def _slurp(self, fn):
-        return open(fn, "rt").read()
+        with open(fn, "rt") as ifh:
+            ret = ifh.read()
+        return ret
 
     def _fmt_slurp(self, fn_proto):
         return self._slurp(self._myformat(fn_proto))
@@ -79,8 +81,8 @@ class DistGenerator(object):
 
         def _append(to_proto, from_, make_exe=False):
             to = self._myformat(to_proto)
-            open(to, "at").write(
-                self._fmt_slurp(from_))
+            with open(to, "at") as ofh:
+                ofh.write(self._fmt_slurp(from_))
             if make_exe:
                 os.chmod(to, 0o755)
 
@@ -108,9 +110,9 @@ class DistGenerator(object):
                 1,
                 re.M | re.S
             )
-            # print(count)
             assert count == 1
-            open(fn, "wt").write(txt)
+            with open(fn, "wt") as ofh:
+                ofh.write(txt)
         _re_mutate(
             "{dest_dir}/CHANGELOG.rst",
             "\n0\\.1\\.0\n.*",
@@ -123,10 +125,37 @@ class DistGenerator(object):
 
         req_bn = "requirements.txt"
         req_fn = "{src_dir}/" + req_bn
+        dest_req_fn = "{dest_dir}/" + req_bn
         _dest_append(req_bn)
+        def _reqs_mutate(fn_proto):
+            fn = self._myformat(fn_proto)
+            txt = self._slurp(fn)
+            d = {}
+            for line in txt.split("\n"):
+                if 0 == len(line):
+                    continue
+                m = re.match("\\A([A-Za-z0-9_\\-]+)>=([0-9\.]+)\\Z", line)
+                if m:
+                    req = m.group(1)
+                    ver = m.group(2)
+                else:
+                    req = line
+                    ver = '0'
+                if ver == '0':
+                    if req not in d:
+                        d[req] = '0'
+                else:
+                    if req not in d or d[req] == '0':
+                        d[req] = ver
+                    else:
+                        raise BaseException("mismatch reqs: {} {} {}".format(req, ver, d[req]))
+            txt = "".join(sorted([x + ('' if v=='0' else '>='+v) + "\n" for x, v in d.items()]))
+            with open(fn, "wt") as ofh:
+                ofh.write(txt)
+        _reqs_mutate(dest_req_fn)
         _dest_append("tests/test_bhs.py", make_exe=True)
-        open(self._myformat("{dest_dir}/tox.ini"), "wt").write(
-            "[tox]\nenvlist = py38\n\n" +
+        with open(self._myformat("{dest_dir}/tox.ini"), "wt") as ofh:
+            ofh.write("[tox]\nenvlist = py38\n\n" +
             "[testenv]\ndeps =" + "".join(
                 ["\n\t" + x for x in
                  self._fmt_slurp(req_fn).split("\n")]) + "\n" +
@@ -149,10 +178,15 @@ class DistGenerator(object):
             f.write(yaml.dump({
                 'install':
                 [
+                    'pip install -U pip',
                     'pip install cookiecutter',
+                    'pip --version',
                     self._myformat(
                         '( cd {base_dir} && ' +
                         'python3 python_pypi_dist_manager.py build_only )'),
+                    self._myformat(
+                        '( cd {base_dir} && ' +
+                        'cat {dest_dir}/requirements.txt )'),
                     self._myformat(
                         '( cd {base_dir} && cd {dest_dir} && ' +
                         'pip install -r requirements.txt && pip install . )')
