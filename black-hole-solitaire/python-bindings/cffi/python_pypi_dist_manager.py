@@ -127,6 +127,7 @@ class DistGenerator(object):
         req_fn = "{src_dir}/" + req_bn
         dest_req_fn = "{dest_dir}/" + req_bn
         _dest_append(req_bn)
+
         def _reqs_mutate(fn_proto):
             fn = self._myformat(fn_proto)
             txt = self._slurp(fn)
@@ -134,7 +135,7 @@ class DistGenerator(object):
             for line in txt.split("\n"):
                 if 0 == len(line):
                     continue
-                m = re.match("\\A([A-Za-z0-9_\\-]+)>=([0-9\.]+)\\Z", line)
+                m = re.match("\\A([A-Za-z0-9_\\-]+)>=([0-9\\.]+)\\Z", line)
                 if m:
                     req = m.group(1)
                     ver = m.group(2)
@@ -148,18 +149,22 @@ class DistGenerator(object):
                     if req not in d or d[req] == '0':
                         d[req] = ver
                     else:
-                        raise BaseException("mismatch reqs: {} {} {}".format(req, ver, d[req]))
-            txt = "".join(sorted([x + ('' if v=='0' else '>='+v) + "\n" for x, v in d.items()]))
+                        raise BaseException(
+                            "mismatch reqs: {} {} {}".format(req, ver, d[req]))
+            txt = "".join(sorted([
+                x + ('' if v == '0' else '>='+v) + "\n"
+                for x, v in d.items()]))
             with open(fn, "wt") as ofh:
                 ofh.write(txt)
         _reqs_mutate(dest_req_fn)
         _dest_append("tests/test_bhs.py", make_exe=True)
         with open(self._myformat("{dest_dir}/tox.ini"), "wt") as ofh:
-            ofh.write("[tox]\nenvlist = py38\n\n" +
-            "[testenv]\ndeps =" + "".join(
-                ["\n\t" + x for x in
-                 self._fmt_slurp(req_fn).split("\n")]) + "\n" +
-            "\ncommands = pytest\n")
+            ofh.write(
+                "[tox]\nenvlist = py38\n\n" +
+                "[testenv]\ndeps =" + "".join(
+                    ["\n\t" + x for x in
+                     self._fmt_slurp(req_fn).split("\n")]) + "\n" +
+                "\ncommands = pytest\n")
 
     def command__test(self):
         check_call(["bash", "-c",
