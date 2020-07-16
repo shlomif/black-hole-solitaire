@@ -50,15 +50,19 @@ class DistGenerator(object):
             tox_cmd=self.tox_cmd
         )
 
+    def _fmt_rmtree(self, fn_proto):
+        """rmtree the formatted fn_proto if it exists."""
+        fn = self._myformat(fn_proto)
+        if os.path.exists(fn):
+            shutil.rmtree(fn)
+
     def command__build(self):
         self.command__build_only()
         self.command__test()
 
     def command__build_only(self):
-        if os.path.exists(self.dest_dir):
-            shutil.rmtree(self.dest_dir)
-        if os.path.exists(self.dist_name):
-            shutil.rmtree(self.dist_name)
+        self._fmt_rmtree("{dest_dir}")
+        self._fmt_rmtree("{dist_name}")
         cookiecutter.main.cookiecutter(
             'gh:Kwpolska/python-project-template',
             no_input=True,
