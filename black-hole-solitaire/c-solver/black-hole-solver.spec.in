@@ -57,38 +57,24 @@ static libraries necessary for developing programs using Freecell Solver.
 You should install it if you are a game developer who would like to use
 Freecell Solver from within your programs.
 
-%package -n libblack_hole_solver1-static
-Summary: The Freecell Solver static libraries
-Group: Amusement/Games
-Requires: libblack_hole_solver1 = %{version}
-
-%description -n libblack_hole_solver1-static
-Freecell Solver is a library for automatically solving boards of Freecell and
-similar variants of card Solitaire. This package contains the static libraries.
-
-It is not generally required.
-
 %prep
 %setup
 
 %build
 %cmake -DLOCALE_INSTALL_DIR=%{_datadir}/locale -DLIB_INSTALL_DIR=%{_libdir}
-%make_build
+%cmake_build
 
 %check
-cd build
 unset FCS_TEST_BUILD
-%__make check
+rm -f t/clang-format.t
+%ctest
 
 %install
 rm -rf %buildroot
-%make_install -C build
+%cmake_install
 
 %files -n libblack_hole_solver1
 %{_libdir}/libblack_hole_solver.so*
-
-%files -n libblack_hole_solver1-static
-%{_libdir}/libblack_hole_solver.a
 
 %files
 %defattr(-,root,root)

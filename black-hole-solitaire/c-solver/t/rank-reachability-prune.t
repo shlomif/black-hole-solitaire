@@ -2,19 +2,20 @@
 
 use strict;
 use warnings;
+use autodie;
 
 use Test::More tests => 120;
 
 use lib './t/lib';
 
-use Games::Solitaire::BlackHole::RankReachPrune::PP;
-use Games::Solitaire::BlackHole::RankReachPrune::XS;
+use Games::Solitaire::BlackHole::RankReachPrune::PP ();
+use Games::Solitaire::BlackHole::RankReachPrune::XS ();
 
 my $SUCCESS = $Games::Solitaire::BlackHole::RankReachPrune::PP::SUCCESS;
 my $NOT_REACHABLE =
     $Games::Solitaire::BlackHole::RankReachPrune::PP::NOT_REACHABLE;
 
-# TEST:$b=2;
+# TEST:$num_backends=2;
 my @backend_specs = (
     {
         id      => "perl",
@@ -74,84 +75,85 @@ sub _verdict_to_s
         }
     };
 
-    # TEST:$c=0;
+    # TEST:FILTER(MULT($num_backends))
     foreach my $backend_var (@backend_specs)
     {
         $backend = $backend_var;
 
-        # TEST:$c++;
+        # TEST
         $test->(
-            8, [ 2, 3, 2, 1, 1, 2, 2, 1, 0, 0, 1, 2, 2 ],
+            8,         [ 2, 3, 2, 1, 1, 2, 2, 1, 0, 0, 1, 2, 2 ],
             'SUCCESS', "Failure in C backend No. 1",
         );
 
-        # TEST:$c++;
+        # TEST
         $test->(
-            -1, [ (1) x 13 ],
+            -1,        [ (1) x 13 ],
             'SUCCESS', "Always true on foundation of -1."
         );
 
-        # TEST:$c++;
+        # TEST
         $test->( 0, [ (1) x 13 ], 'SUCCESS', "All is all-ranks-reachable." );
 
-        # TEST:$c++;
+        # TEST
         $test->(
-            0, [ ( (1) x 10 ), ( (0) x 3 ) ],
+            0,         [ ( (1) x 10 ), ( (0) x 3 ) ],
             'SUCCESS', "First 10 ranks",
         );
 
-        # TEST:$c++;
+        # TEST
         $test->(
-            0, [ ( (1) x 10 ), 0, 1, 0 ],
+            0,               [ ( (1) x 10 ), 0, 1, 0 ],
             'NOT_REACHABLE', "Unreachable island.",
         );
 
-        # TEST:$c++;
+        # TEST
         $test->(
-            4, [ 0, 0, 0, 2, 1, 2, 0, 0, 0, 0, 0, 0, 0, ],
+            4,         [ 0, 0, 0, 2, 1, 2, 0, 0, 0, 0, 0, 0, 0, ],
             'SUCCESS', "two reachable segment",
         );
 
-        # TEST:$c++;
+        # TEST
         $test->(
-            2, [ 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, ],
+            2,         [ 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, ],
             'SUCCESS', "two reachable segment",
         );
 
-        # TEST:$c++;
+        # TEST
         $test->(
-            2, [ 0, 0, 0, 2, 1, 0, 0, 1, 0, 0, 0, 0, 0, ],
+            2,               [ 0, 0, 0, 2, 1, 0, 0, 1, 0, 0, 0, 0, 0, ],
             'NOT_REACHABLE', "One island.",
         );
 
-        # TEST:$c=$c+$unr;
+        # TEST:FILTER(MULT($unr))
+        # TEST
         $test_unreachable_for_all->(
             [ 0, 0, 0, 2, 1, 0, 0, 1, 0, 1, 0, 0, 0, ],
             "Two islands.",
         );
 
-        # TEST:$c=$c+$unr;
+        # TEST
         $test_unreachable_for_all->(
             [ 3, 0, 0, 2, 1, 0, 0, 1, 0, 1, 0, 0, 0, ],
             "Three islands",
         );
 
-        # TEST:$c=$c+$unr;
+        # TEST
         $test_unreachable_for_all->(
             [ 3, 0, 0, 2, 1, 0, 0, 1, 0, 1, 0, 0, 0, ],
             "Three islands",
         );
 
-        # TEST:$c=$c+$unr;
+        # TEST
         $test_unreachable_for_all->(
             [ 0, 1, 1, 1, 0, 0, 0, 0, 2, 2, 0, 0, 0, ],
             "Two separated islands.",
         );
 
+        # TEST:ENDFILTER()
+
     }
 
-    # TEST:$per_backend_tests=$c;
-
-    # TEST*$per_backend_tests*$b
+    # TEST:ENDFILTER()
 }
 
