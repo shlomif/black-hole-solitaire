@@ -19,9 +19,9 @@ import cookiecutter.main
 
 class DistGenerator(object):
     """docstring for DistGenerator"""
-    def __init__(self, dist_name, base_dir):
+    def __init__(self, dist_name, base_dir=None):
         self.dist_name = dist_name
-        self.base_dir = base_dir
+        self.base_dir = (base_dir or ("python-" + dist_name))
         self.src_dir = "code"
         self.src_modules_dir = self.src_dir + "/" + dist_name
         self.dest_dir = 'dest'
@@ -240,7 +240,6 @@ except IndexError:
     cmd = 'build'
 
 dist_name = "black_hole_solver"
-base_dir = "python-" + dist_name
 
-obj = DistGenerator(dist_name=dist_name, base_dir=base_dir)
+obj = DistGenerator(dist_name=dist_name)
 obj.run_command(cmd=cmd, args=[])
