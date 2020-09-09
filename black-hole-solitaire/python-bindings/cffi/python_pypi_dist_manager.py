@@ -23,6 +23,7 @@ class DistGenerator(object):
     dist_name = attr.ib()
     dist_version = attr.ib()
     project_name = attr.ib()
+    project_short_description = attr.ib()
 
     """docstring for DistGenerator"""
     def __attrs_post_init__(self):
@@ -110,7 +111,7 @@ class DistGenerator(object):
             extra_context={
                 "entry_point": ["none", "cli", "gui", ],
                 "project_name": self.project_name,
-                "project_short_description": "lib",
+                "project_short_description": self.project_short_description,
                 "release_date": "2020-06-23",
                 "repo_name": self.dist_name,
                 "version": self.dist_version,
@@ -255,5 +256,6 @@ obj = DistGenerator(
     dist_name=dist_name,
     dist_version="0.2.3",
     project_name="Black Hole Solver Wrapper",
+    project_short_description="Solve Golf and Black Hole solitaires",
 )
 obj.run_command(cmd=cmd, args=[])
