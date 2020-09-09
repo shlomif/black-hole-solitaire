@@ -6,6 +6,7 @@
 #
 # Distributed under terms of the MIT license.
 
+import glob
 import os
 import os.path
 import platform
@@ -101,6 +102,16 @@ class DistGenerator(object):
         with open(fn, "wt") as ofh:
             ofh.write(txt)
 
+    def _src_glob(self, proto_expr):
+        prefix = self.src_dir + "/"
+        glob_expr = prefix + proto_expr
+        prefix_len = len(prefix)
+        ret = []
+        for fn in glob.glob(glob_expr):
+            assert fn.startswith(prefix)
+            self._dest_append(fn[prefix_len:])
+        return ret
+
     def command__build_only(self):
         self._fmt_rmtree("{dest_dir}")
         self._fmt_rmtree("{dist_name}")
@@ -172,7 +183,9 @@ class DistGenerator(object):
             with open(fn, "wt") as ofh:
                 ofh.write(txt)
         _reqs_mutate(dest_req_fn)
-        self._dest_append("tests/test_bhs.py", make_exe=True)
+
+        for fn in self._src_glob("tests/test*.py"):
+            self._dest_append(fn, make_exe=True)
         with open(self._myformat("{dest_dir}/tox.ini"), "wt") as ofh:
             ofh.write(
                 "[tox]\nenvlist = py38\n\n" +
