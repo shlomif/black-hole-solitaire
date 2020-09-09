@@ -19,10 +19,14 @@ import cookiecutter.main
 
 class DistGenerator(object):
     """docstring for DistGenerator"""
-    def __init__(self, dist_name, base_dir=None, dist_version=None):
+    def __init__(self, dist_name, base_dir=None, dist_version=None,
+                 project_name=None):
         if not dist_version:
             raise Exception("dist_version must be specified.")
         self.dist_version = dist_version
+        if not project_name:
+            raise Exception("project_name must be specified.")
+        self.project_name = project_name
         self.dist_name = dist_name
         self.base_dir = (base_dir or ("python-" + dist_name))
         self.src_dir = "code"
@@ -106,7 +110,7 @@ class DistGenerator(object):
             overwrite_if_exists=True,
             extra_context={
                 "entry_point": ["none", "cli", "gui", ],
-                "project_name": "Black Hole Solver Wrapper",
+                "project_name": self.project_name,
                 "project_short_description": "lib",
                 "release_date": "2020-06-23",
                 "repo_name": self.dist_name,
@@ -251,5 +255,6 @@ dist_name = "black_hole_solver"
 obj = DistGenerator(
     dist_name=dist_name,
     dist_version="0.2.3",
+    project_name="Black Hole Solver Wrapper",
 )
 obj.run_command(cmd=cmd, args=[])
