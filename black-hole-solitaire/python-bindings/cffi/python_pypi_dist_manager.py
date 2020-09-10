@@ -83,12 +83,13 @@ class DistGenerator(object):
             make_exe
         )
 
-    def _re_mutate(self, fn_proto, pattern, repl_fn_proto,
+    def _re_mutate(self, fn_proto, pattern, repl_fn_proto=None,
                    prefix='', suffix=''):
         fn = self._myformat(fn_proto)
         replacement_string = \
             (prefix +
-             self._fmt_slurp(repl_fn_proto) +
+             ('' if repl_fn_proto is None else
+              self._fmt_slurp(repl_fn_proto)) +
              suffix)
         txt = self._slurp(fn)
         txt, count = re.subn(
