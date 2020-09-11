@@ -204,6 +204,10 @@ class DistGenerator(object):
                     ["\n\t" + x for x in
                      self._fmt_slurp(req_fn).split("\n")]) + "\n" +
                 "\ncommands = pytest\n")
+        self._build_only_command_custom_steps()
+
+    def _build_only_command_custom_steps(self):
+        return
 
     def command__test(self):
         check_call(["bash", "-c",
