@@ -19,8 +19,8 @@ cache:
     ccache: true
     directories:
         - $HOME/perl_modules
+dist: focal
 os: linux
-dist: bionic
 before_install:
     - cpanm local::lib
     - eval "$(perl -Mlocal::lib=$HOME/perl_modules)"
@@ -39,4 +39,3 @@ python:
     - "3.8"
 script:
     - "_verbose() { export HARNESS_VERBOSE=1 ; } ; libdir=\"$HOME/apps/fcs/lib\"; LD_LIBRARY_PATH+=\":$libdir\" ; LIBRARY_PATH+=\":$libdir\" ; export LIBRARY_PATH LD_LIBRARY_PATH ; export FCS_TEST_BUILD=1 TOXENV=\"py36\" ; export GCC_CPU_ARCH=x64 ; perl black-hole-solitaire/CI-testing/continuous-integration-testing.pl"
-sudo: false
