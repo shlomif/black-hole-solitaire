@@ -28,7 +28,7 @@ int call_prune(int foundation, AV * rank_counts_av)
 
 EOF
     CLEAN_AFTER_BUILD => 0,
-    INC =>
+    INC               =>
 "-I$ENV{FCS_BIN_PATH} -I$ENV{FCS_SRC_PATH} -I$ENV{FCS_SRC_PATH}/include",
     LIBS => "-L" . $ENV{FCS_BIN_PATH} . " -lbhs_rank_reach_prune",
 

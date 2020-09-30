@@ -34,7 +34,7 @@ sub import
         C    => $src,
         name => $pkg,
         NAME => $pkg,
-        INC =>
+        INC  =>
 "-I$ENV{FCS_BIN_PATH}/include -I$ENV{FCS_SRC_PATH}/rinutils/rinutils/include -I$ENV{FCS_SRC_PATH}/include -I$ENV{FCS_BIN_PATH} -I$ENV{FCS_SRC_PATH} $RINUTILS_INCLUDE_DIR",
         CCFLAGS           => $ccflags,
         CLEAN_AFTER_BUILD => 0,
