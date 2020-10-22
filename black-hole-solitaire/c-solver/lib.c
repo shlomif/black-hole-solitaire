@@ -91,7 +91,7 @@ typedef struct
     unsigned long iterations_num, num_states_in_collection, max_iters_limit;
     uint_fast32_t num_columns;
     uint_fast32_t bits_per_column;
-    uint_fast32_t queue_len;
+    uint_fast32_t queue_len, max_reached_queue_len;
     int_fast32_t sol_foundations_card_rank, sol_foundations_card_suit;
     // This is the ranks of the cards in the columns. It remains constant
     // for the duration of the game.
@@ -603,7 +603,7 @@ static inline bhs_state_key_value_pair_t setup_first_queue_item(
 
 static inline void setup_config(bhs_solver_t *const solver)
 {
-    solver->queue_len = 0;
+    solver->max_reached_queue_len = solver->queue_len = 0;
     solver->num_states_in_collection = 0;
     solver->effective_place_queens_on_kings =
         (solver->place_queens_on_kings || solver->wrap_ranks);
@@ -654,9 +654,14 @@ extern int DLLEXPORT black_hole_solver_run(
     const_SLOT(effective_place_queens_on_kings, solver);
     const_SLOT(max_iters_limit, solver);
     var_AUTO(iterations_num, solver->iterations_num);
+    var_AUTO(max_reached_queue_len, solver->max_reached_queue_len);
 
     while (solver->queue_len > 0)
     {
+        if (solver->queue_len > max_reached_queue_len)
+        {
+            max_reached_queue_len = solver->queue_len;
+        }
         --solver->queue_len;
         const_AUTO(queue_item_copy, solver->queue[solver->queue_len]);
         const_AUTO(foundations, queue_item_copy.s.packed.key.foundations);
@@ -723,19 +728,21 @@ extern int DLLEXPORT black_hole_solver_run(
         if (no_cards)
         {
             solver->final_state = queue_item_copy.s.packed;
-
+            solver->max_reached_queue_len = max_reached_queue_len;
             solver->iterations_num = iterations_num;
 
             return BLACK_HOLE_SOLVER__SUCCESS;
         }
         else if (iterations_num == max_iters_limit)
         {
+            solver->max_reached_queue_len = max_reached_queue_len;
             solver->iterations_num = iterations_num;
 
             return BLACK_HOLE_SOLVER__OUT_OF_ITERS;
         }
     }
 
+    solver->max_reached_queue_len = max_reached_queue_len;
     solver->iterations_num = iterations_num;
 
     return BLACK_HOLE_SOLVER__NOT_SOLVABLE;
@@ -877,6 +884,13 @@ black_hole_solver_get_iterations_num(
     black_hole_solver_instance_t *instance_proto)
 {
     return ((bhs_solver_t *)instance_proto)->iterations_num;
+}
+
+DLLEXPORT extern unsigned long __attribute__((pure))
+black_hole_solver_get_max_reached_depth(
+    black_hole_solver_instance_t *instance_proto)
+{
+    return ((bhs_solver_t *)instance_proto)->max_reached_queue_len;
 }
 
 DLLEXPORT extern int black_hole_solver_get_current_solution_board(
