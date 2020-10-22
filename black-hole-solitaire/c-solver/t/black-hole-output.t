@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 22;
+use Test::More tests => 24;
 use Test::Differences qw/ eq_or_diff /;
 
 use Test::Trap qw(
@@ -61,6 +61,29 @@ Unsolved!
 --------------------
 Total number of states checked is 8.
 This scan generated 8 states.
+EOF
+
+# TEST
+eq_or_diff( as_lf( $trap->stdout() ), as_lf($expected_output),
+    "Right output." );
+
+trap
+{
+    mysys( './black-hole-solve', '--game', 'black_hole',
+        '--show-max-reached-depth', $data_dir->child("1.bh.board.txt") );
+};
+
+# TEST
+ok( $exit_code, "Non-zero exit status on unsolved." );
+
+$expected_output = <<'EOF';
+Unsolved!
+
+
+--------------------
+Total number of states checked is 8.
+This scan generated 8 states.
+Reached a maximal depth of 3.
 EOF
 
 # TEST
