@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 24;
+use Test::More tests => 27;
 use Test::Differences qw/ eq_or_diff /;
 
 use Test::Trap qw(
@@ -105,6 +105,33 @@ eq_or_diff(
     $mani->text( "26464608654870335080.bh.sol.txt", { lf => 1 } ),
     "Right output."
 );
+
+trap
+{
+    mysys( './black-hole-solve', '--game', 'black_hole',
+        "--show-max-reached-depth",
+        $data_dir->child("26464608654870335080.bh.board.txt") );
+};
+
+# TEST
+ok( scalar( !$exit_code ),
+    "Running --show-max-reached-depth program successfully." );
+{
+    my $re      = qr/\AReached a maximal depth of ([0-9]+)\.\n?\z/ms;
+    my @matches = (
+        grep { /$re/ }
+        map  { as_lf($_) } split( /^/ms, $trap->stdout() ),
+    );
+
+    # TEST
+    is( scalar(@matches), 1, "One line." );
+
+    # TEST
+    is_deeply(
+        [ map { /$re/ ? ($1) : ( die "not matched!" ) } @matches ],
+        ["51"], "4*13-1 cards moved.",
+    );
+}
 
 trap
 {

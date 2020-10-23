@@ -91,7 +91,7 @@ typedef struct
     unsigned long iterations_num, num_states_in_collection, max_iters_limit;
     uint_fast32_t num_columns;
     uint_fast32_t bits_per_column;
-    uint_fast32_t queue_len, max_reached_queue_len;
+    uint_fast32_t queue_len, max_reached_queue_len, current_depths_stack_len;
     int_fast32_t sol_foundations_card_rank, sol_foundations_card_suit;
     // This is the ranks of the cards in the columns. It remains constant
     // for the duration of the game.
@@ -116,6 +116,7 @@ typedef struct
     can_move__row *can_move;
     bhs_queue_item_t queue[QUEUE_MAX_SIZE];
 #define MAX_NUM_STATES (NUM_SUITS * NUM_RANKS + 1)
+    uint_fast32_t depths_stack[MAX_NUM_STATES];
     bhs_solution_state_t states_in_solution[MAX_NUM_STATES];
 } bhs_solver_t;
 
@@ -603,7 +604,8 @@ static inline bhs_state_key_value_pair_t setup_first_queue_item(
 
 static inline void setup_config(bhs_solver_t *const solver)
 {
-    solver->max_reached_queue_len = solver->queue_len = 0;
+    solver->max_reached_queue_len = solver->current_depths_stack_len = 0;
+    solver->queue_len = 0;
     solver->num_states_in_collection = 0;
     solver->effective_place_queens_on_kings =
         (solver->place_queens_on_kings || solver->wrap_ranks);
@@ -658,11 +660,22 @@ extern int DLLEXPORT black_hole_solver_run(
 
     while (solver->queue_len > 0)
     {
-        if (solver->queue_len > max_reached_queue_len)
+        if (solver->current_depths_stack_len > max_reached_queue_len)
         {
-            max_reached_queue_len = solver->queue_len;
+            max_reached_queue_len = solver->current_depths_stack_len;
         }
+        const_AUTO(prev_len, solver->queue_len);
         --solver->queue_len;
+#if 0
+        printf("current_depths_stack_len = %ld\n", (long)solver->current_depths_stack_len);
+#endif
+        while (solver->current_depths_stack_len &&
+               (solver->depths_stack[solver->current_depths_stack_len - 1] ==
+                   prev_len))
+        {
+            --solver->current_depths_stack_len;
+        }
+        solver->depths_stack[solver->current_depths_stack_len++] = prev_len - 1;
         const_AUTO(queue_item_copy, solver->queue[solver->queue_len]);
         const_AUTO(foundations, queue_item_copy.s.packed.key.foundations);
         rin_bit_reader r;
@@ -680,6 +693,7 @@ extern int DLLEXPORT black_hole_solver_run(
 
         bool no_cards = true;
         const bool has_talon = talon_ptr < talon_len;
+        bool was_moved = false;
 
         if (has_talon)
         {
@@ -689,6 +703,7 @@ extern int DLLEXPORT black_hole_solver_run(
             {
                 return BLACK_HOLE_SOLVER__OUT_OF_MEMORY;
             }
+            was_moved = true;
         }
         if (effective_place_queens_on_kings || (foundations != RANK_K))
         {
@@ -708,6 +723,7 @@ extern int DLLEXPORT black_hole_solver_run(
                         {
                             return BLACK_HOLE_SOLVER__OUT_OF_MEMORY;
                         }
+                        was_moved = true;
                     }
                 }
             }
@@ -723,6 +739,11 @@ extern int DLLEXPORT black_hole_solver_run(
                     break;
                 }
             }
+        }
+        if (was_moved)
+        {
+            solver->depths_stack[solver->current_depths_stack_len++] =
+                solver->queue_len;
         }
 
         if (no_cards)
@@ -758,6 +779,7 @@ extern int DLLEXPORT black_hole_solver_recycle(
 #endif
     solver->iterations_num = 0;
     solver->queue_len = 0;
+    solver->max_reached_queue_len = solver->current_depths_stack_len = 0;
     solver->num_states_in_collection = 0;
 
     return BLACK_HOLE_SOLVER__SUCCESS;
@@ -890,7 +912,7 @@ DLLEXPORT extern unsigned long __attribute__((pure))
 black_hole_solver_get_max_reached_depth(
     black_hole_solver_instance_t *instance_proto)
 {
-    return ((bhs_solver_t *)instance_proto)->max_reached_queue_len;
+    return ((bhs_solver_t *)instance_proto)->max_reached_queue_len - 1;
 }
 
 DLLEXPORT extern int black_hole_solver_get_current_solution_board(
