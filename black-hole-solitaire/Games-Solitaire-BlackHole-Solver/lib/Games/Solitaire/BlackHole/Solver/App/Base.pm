@@ -116,7 +116,7 @@ sub get_max_reached_depth
 
     $self->_update_max_reached_q_len__all();
 
-    return $self->_max_reached_queues_len() - 1;
+    return $self->_max_reached_queues_len() - 2;
 }
 
 sub _my_exit
@@ -436,20 +436,15 @@ sub _get_next_state
 {
     my ($self) = @_;
 
-    my $queue = $self->_active_task->_queue;
-
-    while ( @{$queue} )
+    my $l     = @{ $self->_active_task->_queue };
+    my $ret   = pop( @{ $self->_active_task->_queue } );
+    my $stack = $self->_active_task->_depths_stack;
+    while ( @$stack and ( $stack->[-1] == $l ) )
     {
-        if ( @{ $queue->[-1] } )
-        {
-            return pop @{ $queue->[-1] };
-        }
-        else
-        {
-            pop( @{$queue} );
-        }
+        pop @$stack;
     }
-    return;
+    push @$stack, ( $l - 1 );
+    return $ret;
 }
 
 sub _get_next_state_wrapper
@@ -561,7 +556,8 @@ package Games::Solitaire::BlackHole::Solver::App::Base::Task;
 
 use Moo;
 
-has '_queue'                 => ( is => 'ro', default => sub { return []; }, );
+has '_queue'        => ( is => 'ro', default => sub { return []; }, );
+has '_depths_stack' => ( is => 'ro', default => sub { return [ 0, ]; }, );
 has '_max_reached_queue_len' => ( is => 'rw', default => 0 );
 has [ '_gen', '_task_idx', '_name', '_remaining_iters', '_seed', ] =>
     ( is => 'rw' );
@@ -569,8 +565,10 @@ has [ '_gen', '_task_idx', '_name', '_remaining_iters', '_seed', ] =>
 sub _push_to_queue
 {
     my ( $self, $items ) = @_;
-    push @{ $self->_queue }, [@$items];
-    my $l = @{ $self->_queue };
+    die if not @$items;
+    push @{ $self->_queue },        @$items;
+    push @{ $self->_depths_stack }, scalar( @{ $self->_queue } );
+    my $l = @{ $self->_depths_stack };
     if ( $l > $self->_max_reached_queue_len() )
     {
         $self->_max_reached_queue_len($l);
