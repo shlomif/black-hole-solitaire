@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 27;
+use Test::More tests => 30;
 use Test::Differences qw/ eq_or_diff /;
 
 use Test::Trap qw(
@@ -127,9 +127,37 @@ ok( scalar( !$exit_code ),
     is( scalar(@matches), 1, "One line." );
 
     # TEST
-    is_deeply(
+    eq_or_diff(
         [ map { /$re/ ? ($1) : ( die "not matched!" ) } @matches ],
         ["51"], "4*13-1 cards moved.",
+    );
+}
+
+trap
+{
+    mysys( './black-hole-solve', '--game', 'all_in_a_row',
+        "--show-max-reached-depth",
+        $data_dir->child('24.all_in_a_row.board.txt'),
+    );
+};
+
+# TEST
+ok( scalar( !$exit_code ),
+    "Running all_in_a_row --show-max-reached-depth program successfully." );
+{
+    my $re      = qr/\AReached a maximal depth of ([0-9]+)\.\n?\z/ms;
+    my @matches = (
+        grep { /$re/ }
+        map  { as_lf($_) } split( /^/ms, $trap->stdout() ),
+    );
+
+    # TEST
+    is( scalar(@matches), 1, "One line." );
+
+    # TEST
+    eq_or_diff(
+        [ map { /$re/ ? ($1) : ( die "not matched!" ) } @matches ],
+        ["52"], "all_in_a_row 4*13 cards moved.",
     );
 }
 
