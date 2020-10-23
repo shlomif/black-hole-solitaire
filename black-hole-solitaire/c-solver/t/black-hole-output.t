@@ -183,14 +183,13 @@ eq_or_diff(
     "Right output for --max-iters."
 );
 
-my $ret_code;
 trap
 {
-    $ret_code = mysys( './black-hole-solve', '--version' );
+    mysys( './black-hole-solve', '--version' );
 };
 
 # TEST
-is( $ret_code, 0, "Exited successfully." );
+is( $exit_code, 0, "Exited successfully." );
 
 # TEST
 like(
