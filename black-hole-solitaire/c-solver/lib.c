@@ -116,7 +116,7 @@ typedef struct
     can_move__row *can_move;
     bhs_queue_item_t queue[QUEUE_MAX_SIZE];
 #define MAX_NUM_STATES (NUM_SUITS * NUM_RANKS + 1)
-    uint_fast32_t depths_stack[MAX_NUM_STATES];
+    uint8_t depths_stack[MAX_NUM_STATES + 1];
     bhs_solution_state_t states_in_solution[MAX_NUM_STATES];
 } bhs_solver_t;
 
