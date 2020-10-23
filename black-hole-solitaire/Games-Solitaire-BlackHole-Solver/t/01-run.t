@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 6;
+use Test::More tests => 9;
 
 use File::Spec ();
 use Path::Tiny qw/ path /;
@@ -195,6 +195,35 @@ EOF
         _normalize_lf( path($sol_fn)->slurp_utf8 ),
         _normalize_lf($GOLF_35_SOLUTION),
         "Testing for correct Golf solution.",
+    );
+
+    unlink($sol_fn);
+}
+
+{
+    my $sol_fn = _filename("26464608654870335080-with-max-depth.bh.sol.txt");
+
+    # TEST
+    ok(
+        !system( $^X, "-Mblib",
+            File::Spec->catfile(
+                File::Spec->curdir(), "bin", "black-hole-solve"
+            ),
+            "--show-max-reached-depth",
+            "-o", $sol_fn,
+            _filename("26464608654870335080.bh.board.txt")
+        )
+    );
+    my $re      = qr/\AReached a maximal depth of ([0-9]+)\.\n?\z/ms;
+    my @matches = ( grep { /$re/ } path($sol_fn)->lines_utf8() );
+
+    # TEST
+    is( scalar(@matches), 1, "One line." );
+
+    # TEST
+    is_deeply(
+        [ map { /$re/ ? ($1) : ( die "not matched!" ) } @matches ],
+        ["51"], "4*13-1 cards moved.",
     );
 
     unlink($sol_fn);

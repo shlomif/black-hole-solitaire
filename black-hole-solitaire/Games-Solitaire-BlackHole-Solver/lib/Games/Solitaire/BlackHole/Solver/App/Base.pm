@@ -116,7 +116,7 @@ sub get_max_reached_depth
 
     $self->_update_max_reached_q_len__all();
 
-    return $self->_max_reached_queues_len();
+    return $self->_max_reached_queues_len() - 1;
 }
 
 sub _my_exit
@@ -436,7 +436,18 @@ sub _get_next_state
 {
     my ($self) = @_;
 
-    return pop( @{ $self->_active_task->_queue } );
+    while ( @{ $self->_active_task->_queue } )
+    {
+        if ( not @{ $self->_active_task->_queue->[-1] } )
+        {
+            pop( @{ $self->_active_task->_queue } );
+        }
+        else
+        {
+            return pop @{ $self->_active_task->_queue->[-1] };
+        }
+    }
+    return;
 }
 
 sub _get_next_state_wrapper
@@ -556,7 +567,7 @@ has [ '_gen', '_task_idx', '_name', '_remaining_iters', '_seed', ] =>
 sub _push_to_queue
 {
     my ( $self, $items ) = @_;
-    push @{ $self->_queue }, @$items;
+    push @{ $self->_queue }, [@$items];
     my $l = @{ $self->_queue };
     if ( $l > $self->_max_reached_queue_len() )
     {
