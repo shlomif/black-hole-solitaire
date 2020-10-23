@@ -116,7 +116,7 @@ sub get_max_reached_depth
 
     $self->_update_max_reached_q_len__all();
 
-    return $self->_max_reached_queues_len() - 2;
+    return $self->_max_reached_queues_len() - 1;
 }
 
 sub _my_exit
@@ -556,8 +556,8 @@ package Games::Solitaire::BlackHole::Solver::App::Base::Task;
 
 use Moo;
 
-has '_queue'        => ( is => 'ro', default => sub { return []; }, );
-has '_depths_stack' => ( is => 'ro', default => sub { return [ 0, ]; }, );
+has '_queue'                 => ( is => 'ro', default => sub { return []; }, );
+has '_depths_stack'          => ( is => 'ro', default => sub { return []; }, );
 has '_max_reached_queue_len' => ( is => 'rw', default => 0 );
 has [ '_gen', '_task_idx', '_name', '_remaining_iters', '_seed', ] =>
     ( is => 'rw' );
