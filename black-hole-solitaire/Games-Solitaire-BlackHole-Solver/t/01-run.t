@@ -3,8 +3,7 @@ use warnings;
 
 use Test::More tests => 9;
 
-use File::Spec ();
-use Path::Tiny qw/ path /;
+use Path::Tiny qw/ path cwd /;
 use Socket qw/ :crlf /;
 
 sub _normalize_lf
@@ -16,8 +15,16 @@ sub _normalize_lf
 
 sub _filename
 {
-    return File::Spec->catfile( File::Spec->curdir(), "t", "data", shift() );
+    return cwd()->child( "t", "data", shift() );
 }
+
+sub _exe
+{
+    return cwd()->child( "bin", shift );
+}
+
+my $BHS    = _exe("black-hole-solve");
+my $GOLF_S = _exe("golf-solitaire-solve-perl");
 
 my $solution1 = <<'EOF';
 Solved!
@@ -106,11 +113,7 @@ EOF
 
     # TEST
     ok(
-        !system( $^X, "-Mblib",
-            File::Spec->catfile(
-                File::Spec->curdir(), "bin", "black-hole-solve"
-            ),
-            "-o", $sol_fn,
+        !system( $^X, "-Mblib", $BHS, "-o", $sol_fn,
             _filename("26464608654870335080.bh.board.txt")
         )
     );
@@ -180,12 +183,7 @@ EOF
 
     # TEST
     ok(
-        !system( $^X, "-Mblib",
-            File::Spec->catfile(
-                File::Spec->curdir(), "bin", "golf-solitaire-solve-perl"
-            ),
-            "--queens-on-kings",
-            "-o", $sol_fn,
+        !system( $^X, "-Mblib", $GOLF_S, "--queens-on-kings",, "-o", $sol_fn,
             _filename("35.golf.board.txt")
         )
     );
@@ -205,17 +203,15 @@ EOF
 
     # TEST
     ok(
-        !system( $^X, "-Mblib",
-            File::Spec->catfile(
-                File::Spec->curdir(), "bin", "black-hole-solve"
-            ),
-            "--show-max-reached-depth",
-            "-o", $sol_fn,
+        !system( $^X, "-Mblib", $BHS, "--show-max-reached-depth", "-o", $sol_fn,
             _filename("26464608654870335080.bh.board.txt")
         )
     );
     my $re      = qr/\AReached a maximal depth of ([0-9]+)\.\n?\z/ms;
-    my @matches = ( grep { /$re/ } path($sol_fn)->lines_utf8() );
+    my @matches = (
+        grep { /$re/ }
+        map  { _normalize_lf($_) } path($sol_fn)->lines_utf8()
+    );
 
     # TEST
     is( scalar(@matches), 1, "One line." );
