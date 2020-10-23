@@ -660,10 +660,6 @@ extern int DLLEXPORT black_hole_solver_run(
 
     while (solver->queue_len > 0)
     {
-        if (solver->current_depths_stack_len > max_reached_queue_len)
-        {
-            max_reached_queue_len = solver->current_depths_stack_len;
-        }
         const_AUTO(prev_len, solver->queue_len);
         --solver->queue_len;
 #if 0
@@ -744,6 +740,10 @@ extern int DLLEXPORT black_hole_solver_run(
         {
             solver->depths_stack[solver->current_depths_stack_len++] =
                 solver->queue_len;
+            if (solver->current_depths_stack_len > max_reached_queue_len)
+            {
+                max_reached_queue_len = solver->current_depths_stack_len;
+            }
         }
 
         if (no_cards)
