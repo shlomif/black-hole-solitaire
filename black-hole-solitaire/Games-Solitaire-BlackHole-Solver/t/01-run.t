@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 9;
+use Test::More tests => 12;
 
 use Path::Tiny qw/ path cwd /;
 use Socket qw/ :crlf /;
@@ -220,6 +220,32 @@ EOF
     is_deeply(
         [ map { /$re/ ? ($1) : ( die "not matched!" ) } @matches ],
         ["51"], "4*13-1 cards moved.",
+    );
+
+    unlink($sol_fn);
+}
+
+{
+    my $sol_fn = _filename("1-with-max-depth.bh.sol.txt");
+
+    # TEST
+    ok(
+        system( $^X, "-Mblib", $BHS, "--show-max-reached-depth", "-o", $sol_fn,
+            _filename("1.bh.board.txt") ) != 0
+    );
+    my $re      = qr/\AReached a maximal depth of ([0-9]+)\.\n?\z/ms;
+    my @matches = (
+        grep { /$re/ }
+        map  { _normalize_lf($_) } path($sol_fn)->lines_utf8()
+    );
+
+    # TEST
+    is( scalar(@matches), 1, "One line." );
+
+    # TEST
+    is_deeply(
+        [ map { /$re/ ? ($1) : ( die "not matched!" ) } @matches ],
+        ["3"], "on failure cards moved.",
     );
 
     unlink($sol_fn);
