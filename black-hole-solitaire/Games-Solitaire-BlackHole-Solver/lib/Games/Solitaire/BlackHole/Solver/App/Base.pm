@@ -436,15 +436,17 @@ sub _get_next_state
 {
     my ($self) = @_;
 
-    while ( @{ $self->_active_task->_queue } )
+    my $queue = $self->_active_task->_queue;
+
+    while ( @{$queue} )
     {
-        if ( not @{ $self->_active_task->_queue->[-1] } )
+        if ( @{ $queue->[-1] } )
         {
-            pop( @{ $self->_active_task->_queue } );
+            return pop @{ $queue->[-1] };
         }
         else
         {
-            return pop @{ $self->_active_task->_queue->[-1] };
+            pop( @{$queue} );
         }
     }
     return;
