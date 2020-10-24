@@ -657,21 +657,21 @@ extern int DLLEXPORT black_hole_solver_run(
     const_SLOT(max_iters_limit, solver);
     var_AUTO(iterations_num, solver->iterations_num);
     var_AUTO(max_reached_queue_len, solver->max_reached_queue_len);
+    var_AUTO(current_depths_stack_len, solver->current_depths_stack_len);
 
     while (solver->queue_len > 0)
     {
         const_AUTO(prev_len, solver->queue_len);
         --solver->queue_len;
 #if 0
-        printf("current_depths_stack_len = %ld\n", (long)solver->current_depths_stack_len);
+        printf("current_depths_stack_len = %ld\n", (long)current_depths_stack_len);
 #endif
-        while (solver->current_depths_stack_len &&
-               (solver->depths_stack[solver->current_depths_stack_len - 1] ==
-                   prev_len))
+        while (current_depths_stack_len &&
+               (solver->depths_stack[current_depths_stack_len - 1] == prev_len))
         {
-            --solver->current_depths_stack_len;
+            --current_depths_stack_len;
         }
-        solver->depths_stack[solver->current_depths_stack_len++] = prev_len - 1;
+        solver->depths_stack[current_depths_stack_len++] = prev_len - 1;
         const_AUTO(queue_item_copy, solver->queue[solver->queue_len]);
         const_AUTO(foundations, queue_item_copy.s.packed.key.foundations);
         rin_bit_reader r;
@@ -738,11 +738,11 @@ extern int DLLEXPORT black_hole_solver_run(
         }
         if (was_moved)
         {
-            solver->depths_stack[solver->current_depths_stack_len++] =
+            solver->depths_stack[current_depths_stack_len++] =
                 solver->queue_len;
-            if (solver->current_depths_stack_len > max_reached_queue_len)
+            if (current_depths_stack_len > max_reached_queue_len)
             {
-                max_reached_queue_len = solver->current_depths_stack_len;
+                max_reached_queue_len = current_depths_stack_len;
             }
         }
 
@@ -751,6 +751,7 @@ extern int DLLEXPORT black_hole_solver_run(
             solver->final_state = queue_item_copy.s.packed;
             solver->max_reached_queue_len = max_reached_queue_len;
             solver->iterations_num = iterations_num;
+            solver->current_depths_stack_len = current_depths_stack_len;
 
             return BLACK_HOLE_SOLVER__SUCCESS;
         }
@@ -758,6 +759,7 @@ extern int DLLEXPORT black_hole_solver_run(
         {
             solver->max_reached_queue_len = max_reached_queue_len;
             solver->iterations_num = iterations_num;
+            solver->current_depths_stack_len = current_depths_stack_len;
 
             return BLACK_HOLE_SOLVER__OUT_OF_ITERS;
         }
@@ -765,6 +767,7 @@ extern int DLLEXPORT black_hole_solver_run(
 
     solver->max_reached_queue_len = max_reached_queue_len;
     solver->iterations_num = iterations_num;
+    solver->current_depths_stack_len = current_depths_stack_len;
 
     return BLACK_HOLE_SOLVER__NOT_SOLVABLE;
 }
