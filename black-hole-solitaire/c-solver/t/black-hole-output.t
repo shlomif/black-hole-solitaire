@@ -70,7 +70,7 @@ eq_or_diff( as_lf( $trap->stdout() ), as_lf($expected_output),
 trap
 {
     mysys( './black-hole-solve', '--game', 'black_hole',
-        '--show-max-reached-depth', $data_dir->child("1.bh.board.txt") );
+        '--show-max-num-moved-cards', $data_dir->child("1.bh.board.txt") );
 };
 
 # TEST
@@ -83,7 +83,7 @@ Unsolved!
 --------------------
 Total number of states checked is 8.
 This scan generated 8 states.
-Reached a maximal depth of 3.
+At most 3 cards could be played.
 EOF
 
 # TEST
@@ -109,17 +109,18 @@ eq_or_diff(
 trap
 {
     mysys( './black-hole-solve', '--game', 'black_hole',
-        "--show-max-reached-depth",
+        "--show-max-num-moved-cards",
         $data_dir->child("26464608654870335080.bh.board.txt") );
 };
 
 # TEST
 ok( scalar( !$exit_code ),
-    "Running --show-max-reached-depth program successfully." );
+    "Running --show-max-num-moved-cards program successfully." );
+my $MAX_NUM_MOVED_CARDS_RE =
+    qr/\AAt most ([0-9]+) cards could be played\.\n?\z/ms;
 {
-    my $re      = qr/\AReached a maximal depth of ([0-9]+)\.\n?\z/ms;
     my @matches = (
-        grep { /$re/ }
+        grep { /$MAX_NUM_MOVED_CARDS_RE/ }
         map  { as_lf($_) } split( /^/ms, $trap->stdout() ),
     );
 
@@ -128,26 +129,29 @@ ok( scalar( !$exit_code ),
 
     # TEST
     eq_or_diff(
-        [ map { /$re/ ? ($1) : ( die "not matched!" ) } @matches ],
-        ["51"], "4*13-1 cards moved.",
+        [
+            map { /$MAX_NUM_MOVED_CARDS_RE/ ? ($1) : ( die "not matched!" ) }
+                @matches
+        ],
+        ["51"],
+        "4*13-1 cards moved.",
     );
 }
 
 trap
 {
     mysys( './black-hole-solve', '--game', 'all_in_a_row',
-        "--show-max-reached-depth",
+        "--show-max-num-moved-cards",
         $data_dir->child('24.all_in_a_row.board.txt'),
     );
 };
 
 # TEST
 ok( scalar( !$exit_code ),
-    "Running all_in_a_row --show-max-reached-depth program successfully." );
+    "Running all_in_a_row --show-max-num-moved-cards program successfully." );
 {
-    my $re      = qr/\AReached a maximal depth of ([0-9]+)\.\n?\z/ms;
     my @matches = (
-        grep { /$re/ }
+        grep { /$MAX_NUM_MOVED_CARDS_RE/ }
         map  { as_lf($_) } split( /^/ms, $trap->stdout() ),
     );
 
@@ -156,8 +160,12 @@ ok( scalar( !$exit_code ),
 
     # TEST
     eq_or_diff(
-        [ map { /$re/ ? ($1) : ( die "not matched!" ) } @matches ],
-        ["52"], "all_in_a_row 4*13 cards moved.",
+        [
+            map { /$MAX_NUM_MOVED_CARDS_RE/ ? ($1) : ( die "not matched!" ) }
+                @matches
+        ],
+        ["52"],
+        "all_in_a_row 4*13 cards moved.",
     );
 }
 

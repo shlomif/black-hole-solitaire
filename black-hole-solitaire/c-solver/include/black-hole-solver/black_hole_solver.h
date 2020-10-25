@@ -87,7 +87,7 @@ DLLEXPORT extern unsigned long black_hole_solver_get_iterations_num(
     black_hole_solver_instance_t *instance);
 
 // Added in version 1.10.0
-DLLEXPORT extern unsigned long black_hole_solver_get_max_reached_depth(
+DLLEXPORT extern unsigned long black_hole_solver_get_max_num_moved_cards(
     black_hole_solver_instance_t *instance);
 
 DLLEXPORT extern int black_hole_solver_get_current_solution_board(
