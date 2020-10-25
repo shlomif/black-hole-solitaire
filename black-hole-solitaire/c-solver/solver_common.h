@@ -164,11 +164,6 @@ static inline bhs_settings parse_cmd_line(
             ++arg_idx;
             settings.place_queens_on_kings = true;
         }
-        else if (!strcmp(argv[arg_idx], "--show-max-num-moved-cards"))
-        {
-            ++arg_idx;
-            settings.show_max_num_moved_cards = true;
-        }
         else if (!strcmp(argv[arg_idx], "--no-wrap-ranks"))
         {
             ++arg_idx;
@@ -203,6 +198,11 @@ static inline bhs_settings parse_cmd_line(
                 exit(-1);
             }
             settings.iters_display_step = (unsigned long)atol(argv[arg_idx++]);
+        }
+        else if (unlikely(!strcmp(argv[arg_idx], "--show-max-num-moved-cards")))
+        {
+            ++arg_idx;
+            settings.show_max_num_moved_cards = true;
         }
         else
         {
@@ -356,7 +356,7 @@ static inline int solve_filename(
         "This scan generated %lu states.\n",
         black_hole_solver_get_iterations_num(solver),
         black_hole_solver_get_num_states_in_collection(solver));
-    if (settings.show_max_num_moved_cards)
+    if (unlikely(settings.show_max_num_moved_cards))
     {
         fprintf(out_fh, "At most %lu cards could be played.\n",
             black_hole_solver_get_max_num_moved_cards(solver));
