@@ -12,6 +12,13 @@ my $bin_dir   = path(__FILE__)->parent->absolute;
 my $data_dir  = $bin_dir->child('data');
 my $texts_dir = $data_dir->child('texts');
 
+my $exit_code;
+
+sub mysys
+{
+    return $exit_code = system(@_);
+}
+
 use Dir::Manifest ();
 use Dir::Manifest::Slurp qw/ as_lf /;
 my $mani = Dir::Manifest->new(
@@ -25,13 +32,13 @@ use Test::Trap qw( trap $trap :flow:stderr(systemsafe):stdout(systemsafe):warn);
 {
     trap
     {
-        system( './black-hole-solve', '--game', 'all_in_a_row',
+        mysys( './black-hole-solve', '--game', 'all_in_a_row',
             $data_dir->child('24.all_in_a_row.board.txt'),
         );
     };
 
     # TEST
-    ok( !( $trap->exit ), "Running the program successfully for board #24." );
+    ok( !($exit_code), "Running the program successfully for board #24." );
 
     # TEST
     eq_or_diff(
@@ -44,13 +51,13 @@ use Test::Trap qw( trap $trap :flow:stderr(systemsafe):stdout(systemsafe):warn);
 {
     trap
     {
-        system( './black-hole-solve', '--game', 'all_in_a_row',
+        mysys( './black-hole-solve', '--game', 'all_in_a_row',
             '--display-boards', $data_dir->child('24.all_in_a_row.board.txt'),
         );
     };
 
     # TEST
-    ok( !( $trap->exit ), "Exit code for --display-boards for board #24." );
+    ok( !($exit_code), "Exit code for --display-boards for board #24." );
 
     my $expected_prefix = as_lf(<<'EOF');
 Solved!
