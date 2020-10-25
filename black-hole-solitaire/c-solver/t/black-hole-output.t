@@ -70,6 +70,22 @@ eq_or_diff( as_lf( $trap->stdout() ), as_lf($expected_output),
 
 trap
 {
+    mysys( './black-hole-solve', '--game', 'black_hole', "--max-iters",
+        "10000", $data_dir->child("26464608654870335080.bh.board.txt") );
+};
+
+# TEST
+ok( scalar( !$exit_code ), "Running --max-iters program successfully." );
+
+# TEST
+eq_or_diff(
+    as_lf( $trap->stdout() ),
+    $mani->text( "26464608654870335080.bh.sol.txt", { lf => 1 } ),
+    "Right output."
+);
+
+trap
+{
     mysys( './black-hole-solve', '--game', 'black_hole',
         $data_dir->child("1.bh.board.txt") );
 };
