@@ -42,6 +42,18 @@ def process_black_hole_solver_h(text):
     return pre + suf
 
 
+def _clear_all_individual_lines(text, pat):
+    """docstring for _clear_all_individual_lines"""
+    while True:
+        m = re.search(pat, text)
+        if m:
+            text1, text2 = _newlinify(text, m)
+            text = text1 + text2
+        else:
+            break
+    return text
+
+
 def process_lib_c(text):
     """docstring for process_lib_c"""
     pre, text = _remove(
@@ -54,15 +66,9 @@ def process_lib_c(text):
         text, "^DLLEXPORT extern[^\n]+\n" +
         "black_hole_solver_get_max_num_played_cards.*?^\\}")
     text = pre + pre2 + pre3 + pre4 + text
-    while True:
-        m = re.search(
-            "(?:max_num_played|depths_stack|prev_len|was_moved)", text)
-        if m:
-            text1, text2 = _newlinify(text, m)
-            text = text1 + text2
-        else:
-            break
-    return text
+    return _clear_all_individual_lines(
+        text, "(?:depths_stack|max_num_played|prev_len|was_moved)"
+    )
 
 
 def process_solver_common_h(text):
@@ -74,14 +80,7 @@ def process_solver_common_h(text):
         text, "^ *if \\(unlikely\\(settings\\." +
         "show_max_num_played_cards.*?^ *\\}$")
     text = pre + pre2 + text
-    while True:
-        m = re.search("max_num_played", text)
-        if m:
-            text1, text2 = _newlinify(text, m)
-            text = text1 + text2
-        else:
-            break
-    return text
+    return _clear_all_individual_lines(text, "max_num_played")
 
 
 def wrapper(basename, cb):
