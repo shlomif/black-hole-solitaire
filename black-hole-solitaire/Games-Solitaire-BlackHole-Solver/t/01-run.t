@@ -4,14 +4,7 @@ use warnings;
 use Test::More tests => 12;
 
 use Path::Tiny qw/ path cwd /;
-use Socket qw/ :crlf /;
-
-sub _normalize_lf
-{
-    my ($s) = @_;
-    $s =~ s#$CRLF#$LF#g;
-    return $s;
-}
+use Dir::Manifest::Slurp qw/ as_lf /;
 
 sub _filename
 {
@@ -100,9 +93,8 @@ EOF
 
     # TEST
     is(
-        _normalize_lf( path($sol_fn)->slurp_utf8 ),
-        _normalize_lf($solution1),
-        "Testing for correct solution.",
+        as_lf( path($sol_fn)->slurp_utf8 ),
+        as_lf($solution1), "Testing for correct solution.",
     );
 
     unlink($sol_fn);
@@ -120,9 +112,8 @@ EOF
 
     # TEST
     is(
-        _normalize_lf( path($sol_fn)->slurp_utf8 ),
-        _normalize_lf($solution1),
-        "Testing for correct solution.",
+        as_lf( path($sol_fn)->slurp_utf8 ),
+        as_lf($solution1), "Testing for correct solution.",
     );
 
     unlink($sol_fn);
@@ -190,8 +181,8 @@ EOF
 
     # TEST
     is(
-        _normalize_lf( path($sol_fn)->slurp_utf8 ),
-        _normalize_lf($GOLF_35_SOLUTION),
+        as_lf( path($sol_fn)->slurp_utf8 ),
+        as_lf($GOLF_35_SOLUTION),
         "Testing for correct Golf solution.",
     );
 
@@ -210,7 +201,7 @@ EOF
     my $re      = qr/\AReached a maximal depth of ([0-9]+)\.\n?\z/ms;
     my @matches = (
         grep { /$re/ }
-        map  { _normalize_lf($_) } path($sol_fn)->lines_utf8()
+        map  { as_lf($_) } path($sol_fn)->lines_utf8()
     );
 
     # TEST
@@ -236,7 +227,7 @@ EOF
     my $re      = qr/\AReached a maximal depth of ([0-9]+)\.\n?\z/ms;
     my @matches = (
         grep { /$re/ }
-        map  { _normalize_lf($_) } path($sol_fn)->lines_utf8()
+        map  { as_lf($_) } path($sol_fn)->lines_utf8()
     );
 
     # TEST
