@@ -911,7 +911,7 @@ black_hole_solver_get_iterations_num(
 }
 
 DLLEXPORT extern unsigned long __attribute__((pure))
-black_hole_solver_get_max_num_moved_cards(
+black_hole_solver_get_max_num_played_cards(
     black_hole_solver_instance_t *instance_proto)
 {
     return (((bhs_solver_t *)instance_proto)->max_reached_depths_stack_len - 1);
