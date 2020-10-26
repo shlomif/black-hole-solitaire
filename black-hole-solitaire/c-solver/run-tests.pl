@@ -64,6 +64,7 @@ sub myglob
     local $ENV{FCS_PATH}     = $fcs_bin_path;
     local $ENV{FCS_BIN_PATH} = $fcs_bin_path;
     local $ENV{FCS_SRC_PATH} = $src_dir;
+    local $ENV{TEST_SOME} = $fcs_bin_path->child("TEST_TAGS.txt")->slurp_raw();
 
     local $ENV{FREECELL_SOLVER_QUIET} = 1;
     Env::Path->PATH->Prepend(

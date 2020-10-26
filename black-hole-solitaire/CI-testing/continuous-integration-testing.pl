@@ -76,17 +76,31 @@ if ($IS_WIN)
 }
 
 my $CPU_ARCH = ( delete( $ENV{GCC_CPU_ARCH} ) // 'n2' );
-do_system(
+foreach my $config_record (
     {
-        cmd => [
-"cd black-hole-solitaire && mkdir B && cd B && $^X ..${SEP}scripts${SEP}Tatzer -l ${CPU_ARCH}t "
-                . ( defined($cmake_gen) ? qq#--gen="$cmake_gen"# : "" )
-                . " && $MAKE && $^X ..${SEP}c-solver${SEP}run-tests.pl"
-                . ( $INSTALL ? qq# && $SUDO $MAKE install# : '' )
-        ]
-    }
-);
-
+        dir         => "B",
+        tatzer_args => [],
+    },
+    {
+        dir         => "B_with_max_num_played",
+        tatzer_args => [
+            qw/ --cmakedefine ENABLE_DISPLAYING_MAX_NUM_PLAYED_CARDS:BOOL=TRUE /
+        ],
+    },
+    )
+{
+    my ( $dir, $tatzer_args ) = @{$config_record}{qw/ dir tatzer_args /};
+    do_system(
+        {
+            cmd => [
+"cd black-hole-solitaire && mkdir $dir && cd $dir && $^X ..${SEP}scripts${SEP}Tatzer @$tatzer_args -l ${CPU_ARCH}t "
+                    . ( defined($cmake_gen) ? qq#--gen="$cmake_gen"# : "" )
+                    . " && $MAKE && $^X ..${SEP}c-solver${SEP}run-tests.pl"
+                    . ( $INSTALL ? qq# && $SUDO $MAKE install# : '' )
+            ]
+        }
+    );
+}
 do_system(
     {
         cmd => [
