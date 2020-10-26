@@ -9,17 +9,28 @@ use List::Util 1.34 qw/ any max /;
 extends('Exporter');
 
 has [
-    '_active_record',          '_active_task',
-    '_board_cards',            '_board_lines',
-    '_board_values',           '_init_foundation',
-    '_init_queue',             '_init_tasks_configs',
-    '_is_good_diff',           '_max_reached_queues_len',
-    '_prelude',                '_prelude_iter',
-    '_prelude_string',         '_talon_cards',
-    '_positions',              '_quiet',
-    '_output_handle',          '_output_fn',
-    '_show_max_reached_depth', '_tasks',
-    '_tasks_by_names',         '_task_idx',
+    '_active_record',
+    '_active_task',
+    '_board_cards',
+    '_board_lines',
+    '_board_values',
+    '_init_foundation',
+    '_init_queue',
+    '_init_tasks_configs',
+    '_is_good_diff',
+    '_maximal_num_moved_cards__from_all_tasks',
+    '_prelude',
+    '_prelude_iter',
+    '_prelude_string',
+    '_talon_cards',
+    '_positions',
+    '_quiet',
+    '_output_handle',
+    '_output_fn',
+    '_should_show_maximal_num_moved_cards',
+    '_tasks',
+    '_tasks_by_names',
+    '_task_idx',
 ] => ( is => 'rw' );
 our %EXPORT_TAGS = ( 'all' => [qw($card_re)] );
 our @EXPORT_OK   = ( @{ $EXPORT_TAGS{'all'} } );
@@ -64,7 +75,7 @@ sub _calc_lines
     return;
 }
 
-sub _update_max_reached_q_len__all
+sub _update_max_num_played_cards
 {
     my $self = shift;
 
@@ -79,7 +90,7 @@ sub _update_max_reached_q_len__all
 sub _trace_solution
 {
     my ( $self, $final_state ) = @_;
-    $self->_update_max_reached_q_len__all();
+    $self->_update_max_num_played_cards();
     my $output_handle = $self->_output_handle;
     $output_handle->print("Solved!\n");
 
@@ -110,13 +121,13 @@ LOOP:
     return;
 }
 
-sub get_max_reached_depth
+sub get_max_num_played_cards
 {
     my $self = shift;
 
-    $self->_update_max_reached_q_len__all();
+    $self->_update_max_num_played_cards();
 
-    return $self->_max_reached_queues_len() - 1;
+    return $self->_maximal_num_moved_cards__from_all_tasks() - 1;
 }
 
 sub _my_exit
@@ -128,11 +139,11 @@ sub _my_exit
     {
         $output_handle->print("Unsolved!\n");
     }
-    if ( $self->_show_max_reached_depth() )
+    if ( $self->_should_show_maximal_num_moved_cards() )
     {
         $output_handle->printf(
             "At most %u cards could be played.\n",
-            $self->get_max_reached_depth()
+            $self->get_max_num_played_cards()
         );
     }
 
@@ -222,7 +233,7 @@ sub _process_cmd_line
 {
     my ( $self, $args ) = @_;
 
-    $self->_show_max_reached_depth(0);
+    $self->_should_show_maximal_num_moved_cards(0);
     my $quiet = '';
     my $output_fn;
     my ( $help, $man, $version );
@@ -267,9 +278,9 @@ sub _process_cmd_line
             $tasks[-1]->{seed} = $val;
             return;
         },
-        "show-max-reached-depth!" => sub {
+        "show-max-num-moved-cards!" => sub {
             my ( undef, $val ) = @_;
-            $self->_show_max_reached_depth($val);
+            $self->_should_show_maximal_num_moved_cards($val);
             return;
         },
         'help|h|?' => \$help,
@@ -319,7 +330,7 @@ sub _process_cmd_line
 sub _set_up_tasks
 {
     my ($self) = @_;
-    $self->_max_reached_queues_len(0);
+    $self->_maximal_num_moved_cards__from_all_tasks(0);
 
     my @tasks;
     my %tasks_by_names;
@@ -395,8 +406,12 @@ sub _update_max_reached_q_len
 {
     my ( $self, $task ) = @_;
 
-    $self->_max_reached_queues_len(
-        max( $self->_max_reached_queues_len, $task->_max_reached_queue_len ) );
+    $self->_maximal_num_moved_cards__from_all_tasks(
+        max(
+            $self->_maximal_num_moved_cards__from_all_tasks,
+            $task->_max_reached_queue_len
+        )
+    );
 
     return;
 }
@@ -597,8 +612,8 @@ Games::Solitaire::BlackHole::Solver::App::Base - base class.
 
 For internal use.
 
-=head2 get_max_reached_depth
+=head2 get_max_num_played_cards
 
-Returns the maximal reached depth.
+Returns the maximal number of played cards.
 
 =cut
