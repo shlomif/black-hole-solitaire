@@ -42,6 +42,29 @@ def process_black_hole_solver_h(text):
     return pre + suf
 
 
+def process_lib_c(text):
+    """docstring for process_lib_c"""
+    pre, text = _remove(
+        text, "^ *var_AUTO\\(\\s*max_reached_depths_stack_len.*?\\);$")
+    pre2, text = _remove(
+        text, "^ *while \\(current_depths_stack_len.*?^ *\\}$")
+    pre3, text = _remove(
+        text, "^( *)if \\(was_moved\\).*?^\\1\\}$")
+    pre4, text = _remove(
+        text, "^DLLEXPORT extern[^\n]+\n" +
+        "black_hole_solver_get_max_num_played_cards.*?^\\}")
+    text = pre + pre2 + pre3 + pre4 + text
+    while True:
+        m = re.search(
+            "(?:max_num_played|depths_stack|prev_len|was_moved)", text)
+        if m:
+            text1, text2 = _newlinify(text, m)
+            text = text1 + text2
+        else:
+            break
+    return text
+
+
 def process_solver_common_h(text):
     """docstring for process_black_hole_solver_h"""
     pre, text = _remove(
@@ -51,7 +74,6 @@ def process_solver_common_h(text):
         text, "^ *if \\(unlikely\\(settings\\." +
         "show_max_num_played_cards.*?^ *\\}$")
     text = pre + pre2 + text
-    print(text)
     while True:
         m = re.search("max_num_played", text)
         if m:
@@ -86,4 +108,9 @@ wrapper(
 wrapper(
     "solver_common.h",
     process_solver_common_h
+)
+
+wrapper(
+    "lib.c",
+    process_lib_c
 )

@@ -1,7 +1,7 @@
 // Copyright (C) 2018 Shlomi Fish <shlomif@cpan.org>
 //
 // Distributed under terms of the Expat license.
-#include "solver_common.h"
+#include <solver_common.h>
 
 int main(int argc, char *argv[])
 {
