@@ -1,10 +1,11 @@
 use strict;
 use warnings;
 
-use Test::More tests => 12;
+use Test::More tests => 10;
 
 use Path::Tiny qw/ path cwd /;
 use Dir::Manifest::Slurp qw/ as_lf /;
+use Test::Differences qw/ eq_or_diff /;
 
 sub _filename
 {
@@ -193,6 +194,35 @@ my $MAX_NUM_MOVED_CARDS_RE =
     qr/\AAt most ([0-9]+) cards could be played\.\n?\z/ms;
 
 my @MAX_NUM_PLAYED_FLAG = ("--show-max-num-moved-cards");
+
+sub _test_max_num_moved_cards
+{
+    my ($args) = @_;
+    my ( $name, $want, $input_lines ) =
+        @{$args}{qw/ name expected_num input_lines/};
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    return subtest $name => sub {
+        plan tests => 2;
+        my @matches = (
+            grep { /$MAX_NUM_MOVED_CARDS_RE/ }
+            map  { as_lf($_) } @$input_lines,
+        );
+
+        is( scalar(@matches), 1, "One line." );
+
+        eq_or_diff(
+            [
+                map {
+                    /$MAX_NUM_MOVED_CARDS_RE/
+                        ? ($1)
+                        : ( die "not matched!" )
+                } @matches
+            ],
+            [$want],
+            "num cards moved.",
+        );
+    };
+}
 {
     my $sol_fn = _filename("26464608654870335080-with-max-depth.bh.sol.txt");
 
@@ -202,22 +232,14 @@ my @MAX_NUM_PLAYED_FLAG = ("--show-max-num-moved-cards");
             _filename("26464608654870335080.bh.board.txt")
         )
     );
-    my @matches = (
-        grep { /$MAX_NUM_MOVED_CARDS_RE/ }
-        map  { as_lf($_) } path($sol_fn)->lines_utf8()
-    );
 
     # TEST
-    is( scalar(@matches), 1, "One line." );
-
-    # TEST
-    is_deeply(
-        [
-            map { /$MAX_NUM_MOVED_CARDS_RE/ ? ($1) : ( die "not matched!" ) }
-                @matches
-        ],
-        ["51"],
-        "4*13-1 cards moved.",
+    _test_max_num_moved_cards(
+        {
+            name         => "max-num-moved on success",
+            expected_num => 51,
+            input_lines  => [ path($sol_fn)->lines_utf8() ]
+        }
     );
 
     unlink($sol_fn);
@@ -231,22 +253,14 @@ my @MAX_NUM_PLAYED_FLAG = ("--show-max-num-moved-cards");
         system( $^X, "-Mblib", $BHS, @MAX_NUM_PLAYED_FLAG, "-o", $sol_fn,
             _filename("1.bh.board.txt") ) != 0
     );
-    my @matches = (
-        grep { /$MAX_NUM_MOVED_CARDS_RE/ }
-        map  { as_lf($_) } path($sol_fn)->lines_utf8()
-    );
 
     # TEST
-    is( scalar(@matches), 1, "One line." );
-
-    # TEST
-    is_deeply(
-        [
-            map { /$MAX_NUM_MOVED_CARDS_RE/ ? ($1) : ( die "not matched!" ) }
-                @matches
-        ],
-        ["3"],
-        "on failure cards moved.",
+    _test_max_num_moved_cards(
+        {
+            name         => "max-num-moved on fail",
+            expected_num => 3,
+            input_lines  => [ path($sol_fn)->lines_utf8() ]
+        }
     );
 
     unlink($sol_fn);
