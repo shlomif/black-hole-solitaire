@@ -45,14 +45,9 @@ def process_black_hole_solver_h(text):
 
 def _clear_all_individual_lines(text, pat):
     """docstring for _clear_all_individual_lines"""
-    while True:
-        m = re.search(pat, text)
-        if m:
-            text1, text2 = _newlinify(text, m)
-            text = text1 + text2
-        else:
-            break
-    return text
+    return re.sub(
+        '^[^\\n]*?(?:'+pat+')[^\\n]*?$', '', text, flags=(re.M | re.S)
+    )
 
 
 def process_lib_c(text):
