@@ -19,22 +19,9 @@ else:
     raise Exception("wrong invocation")
 
 
-def process_black_hole_solver_h(text):
-    """docstring for process_black_hole_solver_h"""
-    m = re.search(
-        "^// Added.*?DLLEXPORT extern unsigned " +
-        "long black_hole_solver_get_max_num_played_cards\\(.*?(?:\\n){2,2}",
-        text, flags=(re.M | re.S))
-    assert m
+def _newlinify(text, m):
     start = text.rindex("\n", 0, m.start(0)+1)
     end = text.index("\n", m.end(0)-1, -1)
-    return text[0:start] + "".join([
-        x for x in text[start:end] if x == '\n']) + text[end:]
-
-
-def _newlinify(text, m):
-    start = text.rindex("\n", 0, m.start(0))
-    end = text.index("\n", m.end(0))
     return (text[0:start] + "".join([
         x for x in text[start:end] if x == '\n']), text[end:])
 
@@ -43,6 +30,16 @@ def _remove(text, pat):
     m = re.search(pat, text, flags=(re.M | re.S))
     assert m
     return _newlinify(text, m)
+
+
+def process_black_hole_solver_h(text):
+    """docstring for process_black_hole_solver_h"""
+    pre, suf = _remove(
+        text,
+        "^// Added.*?DLLEXPORT extern unsigned " +
+        "long black_hole_solver_get_max_num_played_cards\\(.*?(?:\\n){2,2}"
+    )
+    return pre + suf
 
 
 def process_solver_common_h(text):
