@@ -146,8 +146,10 @@ ENDIF ()
 ADD_DEFINITIONS("-Wno-unknown-pragmas")
 
 # So it can find config.h
-INCLUDE_DIRECTORIES(BEFORE "${CMAKE_CURRENT_BINARY_DIR}")
+INCLUDE_DIRECTORIES(BEFORE "${CMAKE_CURRENT_BINARY_DIR}/generated")
+INCLUDE_DIRECTORIES(BEFORE "${CMAKE_CURRENT_BINARY_DIR}/generated/include")
 INCLUDE_DIRECTORIES(BEFORE "${CMAKE_CURRENT_SOURCE_DIR}/include")
+INCLUDE_DIRECTORIES(BEFORE "${CMAKE_CURRENT_BINARY_DIR}")
 
 SET (is_parent_gen "${CMAKE_CURRENT_SOURCE_DIR}/scripts/gen-c-lookup-files.pl")
 SET (is_parent_args "${is_parent_gen}")
@@ -162,6 +164,24 @@ ADD_CUSTOM_COMMAND(
 )
 # Execute it right away to avoid missing files/includes
 SET(cmd "${PERL_EXECUTABLE}" ${is_parent_args})
+EXECUTE_PROCESS(COMMAND ${cmd} RESULT_VARIABLE ret)
+IF (NOT ("${ret}" STREQUAL "0"))
+    MESSAGE(FATAL_ERROR "${cmd} failed!")
+ENDIF ()
+
+IF (ENABLE_DISPLAYING_MAX_NUM_PLAYED_CARDS)
+    SET(process_args "--process=none")
+ELSE ()
+    SET(process_args "--process=no_max_num_played")
+ENDIF ()
+
+FIND_PROGRAM(_PYTHON3 "python3")
+SET (found_python3 )
+IF (NOT "${_PYTHON3}" STREQUAL "_PYTHON3-NOTFOUND")
+    SET (found_python3 "1")
+    SET (PYTHON3_EXECUTABLE "python3")
+ENDIF ()
+SET(cmd "${PYTHON3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/scripts/source_filter.py" ${process_args})
 EXECUTE_PROCESS(COMMAND ${cmd} RESULT_VARIABLE ret)
 IF (NOT ("${ret}" STREQUAL "0"))
     MESSAGE(FATAL_ERROR "${cmd} failed!")
