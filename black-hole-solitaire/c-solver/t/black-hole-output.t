@@ -3,8 +3,12 @@
 use strict;
 use warnings;
 
-use Test::More tests => 28;
+use Test::More tests => 21;
 use Test::Differences qw/ eq_or_diff /;
+use Test::Some sub {
+    return not( exists( $_{max_num_moved} )
+        && ( ( $ENV{TEST_SOME} // '' ) =~ /:max_num_moved/ ) );
+};
 
 use Test::Trap qw(
     trap $trap :flow:stderr(systemsafe):stdout(systemsafe):warn
@@ -66,117 +70,6 @@ EOF
 # TEST
 eq_or_diff( as_lf( $trap->stdout() ), as_lf($expected_output),
     "Right output." );
-
-trap
-{
-    mysys( './black-hole-solve', '--game', 'black_hole',
-        '--show-max-num-moved-cards', $data_dir->child("1.bh.board.txt") );
-};
-
-# TEST
-ok( $exit_code, "Non-zero exit status on unsolved." );
-
-$expected_output = <<'EOF';
-Unsolved!
-
-
---------------------
-Total number of states checked is 8.
-This scan generated 8 states.
-At most 3 cards could be played.
-EOF
-
-# TEST
-eq_or_diff( as_lf( $trap->stdout() ), as_lf($expected_output),
-    "Right output." );
-
-trap
-{
-    mysys( './black-hole-solve', '--game', 'black_hole', "--max-iters",
-        "10000", $data_dir->child("26464608654870335080.bh.board.txt") );
-};
-
-# TEST
-ok( scalar( !$exit_code ), "Running --max-iters program successfully." );
-
-# TEST
-eq_or_diff(
-    as_lf( $trap->stdout() ),
-    $mani->text( "26464608654870335080.bh.sol.txt", { lf => 1 } ),
-    "Right output."
-);
-
-trap
-{
-    mysys( './black-hole-solve', '--game', 'black_hole',
-        "--show-max-num-moved-cards",
-        $data_dir->child("26464608654870335080.bh.board.txt") );
-};
-
-# TEST
-ok( scalar( !$exit_code ),
-    "Running --show-max-num-moved-cards program successfully." );
-my $MAX_NUM_MOVED_CARDS_RE =
-    qr/\AAt most ([0-9]+) cards could be played\.\n?\z/ms;
-
-sub _test_max_num_moved_cards
-{
-    my ($args) = @_;
-    my ( $name, $want, $input_text ) =
-        @{$args}{qw/ name expected_num input_text/};
-    local $Test::Builder::Level = $Test::Builder::Level + 1;
-    return subtest $name => sub {
-        plan tests => 2;
-        my @matches = (
-            grep { /$MAX_NUM_MOVED_CARDS_RE/ }
-            map  { as_lf($_) } split( /^/ms, $input_text ),
-        );
-
-        is( scalar(@matches), 1, "One line." );
-
-        eq_or_diff(
-            [
-                map {
-                    /$MAX_NUM_MOVED_CARDS_RE/
-                        ? ($1)
-                        : ( die "not matched!" )
-                } @matches
-            ],
-            [$want],
-            "num cards moved.",
-        );
-    };
-}
-
-# TEST
-_test_max_num_moved_cards(
-    {
-        name         => "success moves",
-        expected_num => 51,
-        input_text   => scalar( $trap->stdout() ),
-    },
-);
-
-trap
-{
-    mysys( './black-hole-solve', '--game', 'all_in_a_row',
-        "--show-max-num-moved-cards",
-        $data_dir->child('24.all_in_a_row.board.txt'),
-    );
-};
-
-# TEST
-ok( scalar( !$exit_code ),
-    "Running all_in_a_row --show-max-num-moved-cards program successfully." );
-
-# TEST
-_test_max_num_moved_cards(
-    {
-        name         => "all_in_a_row success moves",
-        expected_num => 52,
-        input_text   => scalar( $trap->stdout() ),
-    },
-);
 
 trap
 {
@@ -379,3 +272,118 @@ foreach my $exe ( './black-hole-solve', )
         "recycling works",
     );
 }
+
+my $MAX_NUM_MOVED_CARDS_RE =
+    qr/\AAt most ([0-9]+) cards could be played\.\n?\z/ms;
+
+sub _test_max_num_moved_cards
+{
+    my ($args) = @_;
+    my ( $name, $want, $input_text ) =
+        @{$args}{qw/ name expected_num input_text/};
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    return subtest $name => sub {
+        plan tests => 2;
+        my @matches = (
+            grep { /$MAX_NUM_MOVED_CARDS_RE/ }
+            map  { as_lf($_) } split( /^/ms, $input_text ),
+        );
+
+        is( scalar(@matches), 1, "One line." );
+
+        eq_or_diff(
+            [
+                map {
+                    /$MAX_NUM_MOVED_CARDS_RE/
+                        ? ($1)
+                        : ( die "not matched!" )
+                } @matches
+            ],
+            [$want],
+            "num cards moved.",
+        );
+    };
+}
+
+# TEST
+subtest 'max_num_moved' => sub {
+    plan tests => 8;
+    trap
+    {
+        mysys( './black-hole-solve', '--game', 'black_hole',
+            '--show-max-num-moved-cards', $data_dir->child("1.bh.board.txt") );
+    };
+
+    ok( $exit_code, "Non-zero exit status on unsolved." );
+
+    $expected_output = <<'EOF';
+Unsolved!
+
+
+--------------------
+Total number of states checked is 8.
+This scan generated 8 states.
+At most 3 cards could be played.
+EOF
+
+    eq_or_diff(
+        as_lf( $trap->stdout() ),
+        as_lf($expected_output),
+        "Right output."
+    );
+
+    trap
+    {
+        mysys( './black-hole-solve', '--game', 'black_hole', "--max-iters",
+            "10000", $data_dir->child("26464608654870335080.bh.board.txt") );
+    };
+
+    ok( scalar( !$exit_code ), "Running --max-iters program successfully." );
+
+    eq_or_diff(
+        as_lf( $trap->stdout() ),
+        $mani->text( "26464608654870335080.bh.sol.txt", { lf => 1 } ),
+        "Right output."
+    );
+
+    trap
+    {
+        mysys( './black-hole-solve', '--game', 'black_hole',
+            "--show-max-num-moved-cards",
+            $data_dir->child("26464608654870335080.bh.board.txt") );
+    };
+
+    ok( scalar( !$exit_code ),
+        "Running --show-max-num-moved-cards program successfully." );
+
+    _test_max_num_moved_cards(
+        {
+            name         => "success moves",
+            expected_num => 51,
+            input_text   => scalar( $trap->stdout() ),
+        },
+    );
+
+    trap
+    {
+        mysys( './black-hole-solve', '--game', 'all_in_a_row',
+            "--show-max-num-moved-cards",
+            $data_dir->child('24.all_in_a_row.board.txt'),
+        );
+    };
+
+    ok(
+        scalar( !$exit_code ),
+        "Running all_in_a_row --show-max-num-moved-cards program successfully."
+    );
+
+    _test_max_num_moved_cards(
+        {
+            name         => "all_in_a_row success moves",
+            expected_num => 52,
+            input_text   => scalar( $trap->stdout() ),
+        },
+    );
+
+    },
+    'max_num_moved';
