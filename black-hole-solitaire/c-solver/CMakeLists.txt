@@ -12,6 +12,7 @@ option (USE_SYSTEM_XXHASH "Link to the system's xxHash instead of the bundled co
 option (BUILD_STATIC_LIBRARY "Build and install the static library")
 option (LINK_TO_STATIC "Link the executables to the static library")
 option (DISABLE_APPLYING_RPATH "Disable applying rpath")
+option (ENABLE_DISPLAYING_MAX_NUM_PLAYED_CARDS "Allow recording and displaying the maximal number of played/\"moved\" cards. Enabling it may make the non-related run time somewhat slower.")
 
 INCLUDE(FindPkgConfig)
 
@@ -298,6 +299,12 @@ ADD_CUSTOM_COMMAND(
 )
 
 ENABLE_TESTING()
+
+SET (test_tags)
+IF (NOT ENABLE_DISPLAYING_MAX_NUM_PLAYED_CARDS)
+    LIST(APPEND test_tags ":no_max_num_played")
+ENDIF ()
+FILE (WRITE "${CMAKE_CURRENT_BINARY_DIR}/TEST_TAGS.txt" "${test_tags}")
 ADD_TEST(
     NAME perl_run_tests
     COMMAND "perl" "${CMAKE_CURRENT_SOURCE_DIR}/run-tests.pl"

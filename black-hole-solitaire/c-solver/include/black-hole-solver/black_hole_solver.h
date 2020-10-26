@@ -87,6 +87,7 @@ DLLEXPORT extern unsigned long black_hole_solver_get_iterations_num(
     black_hole_solver_instance_t *instance);
 
 // Added in version 1.10.0
+#define BLACK_HOLE_SOLVER__API__WITH_GET_MAX_NUM_PLAYED_CARDS 1
 DLLEXPORT extern unsigned long black_hole_solver_get_max_num_played_cards(
     black_hole_solver_instance_t *instance);
 

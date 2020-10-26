@@ -206,6 +206,8 @@ if ( $ENV{VERBOSE} )
     print "<@ARGV>";
 }
 
+my %cmake_defines;
+
 GetOptions(
     'd|debug' => sub {
         my ( $opt, $val ) = @_;
@@ -256,6 +258,7 @@ GetOptions(
     'static!'                 => \$build_static_lib,
     'with-ctx-var!'           => \$with_context_var,
     'max-bench-threads-num=i' => \$max_bench_threads_num,
+    'cmakedefine=s'           => \%cmake_defines,
     (
         map { ; "$_!" => \( $bool_opts_with_false_defaults__values{$_} ) }
             @BOOL_OPTS_WITH_FALSE_DEFAULTS__KEYS
@@ -288,6 +291,13 @@ unlink( glob("*.so") );
 my $CMAKE_PREFIX_PATH = $ENV{CMAKE_PREFIX_PATH};
 my @cmd               = (
     "cmake",
+    (
+        map {
+            my $k = $_;
+            my $v = $cmake_defines{$k};
+            "-D$k=$v";
+        } keys(%cmake_defines)
+    ),
     (
         defined($CMAKE_PREFIX_PATH)
         ? (
