@@ -189,6 +189,8 @@ EOF
     unlink($sol_fn);
 }
 
+my $MAX_NUM_MOVED_CARDS_RE =
+    qr/\AAt most ([0-9]+) cards could be played\.\n?\z/ms;
 {
     my $sol_fn = _filename("26464608654870335080-with-max-depth.bh.sol.txt");
 
@@ -198,9 +200,8 @@ EOF
             _filename("26464608654870335080.bh.board.txt")
         )
     );
-    my $re      = qr/\AReached a maximal depth of ([0-9]+)\.\n?\z/ms;
     my @matches = (
-        grep { /$re/ }
+        grep { /$MAX_NUM_MOVED_CARDS_RE/ }
         map  { as_lf($_) } path($sol_fn)->lines_utf8()
     );
 
@@ -209,8 +210,12 @@ EOF
 
     # TEST
     is_deeply(
-        [ map { /$re/ ? ($1) : ( die "not matched!" ) } @matches ],
-        ["51"], "4*13-1 cards moved.",
+        [
+            map { /$MAX_NUM_MOVED_CARDS_RE/ ? ($1) : ( die "not matched!" ) }
+                @matches
+        ],
+        ["51"],
+        "4*13-1 cards moved.",
     );
 
     unlink($sol_fn);
@@ -224,9 +229,8 @@ EOF
         system( $^X, "-Mblib", $BHS, "--show-max-reached-depth", "-o", $sol_fn,
             _filename("1.bh.board.txt") ) != 0
     );
-    my $re      = qr/\AReached a maximal depth of ([0-9]+)\.\n?\z/ms;
     my @matches = (
-        grep { /$re/ }
+        grep { /$MAX_NUM_MOVED_CARDS_RE/ }
         map  { as_lf($_) } path($sol_fn)->lines_utf8()
     );
 
@@ -235,8 +239,12 @@ EOF
 
     # TEST
     is_deeply(
-        [ map { /$re/ ? ($1) : ( die "not matched!" ) } @matches ],
-        ["3"], "on failure cards moved.",
+        [
+            map { /$MAX_NUM_MOVED_CARDS_RE/ ? ($1) : ( die "not matched!" ) }
+                @matches
+        ],
+        ["3"],
+        "on failure cards moved.",
     );
 
     unlink($sol_fn);
