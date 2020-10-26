@@ -7,6 +7,7 @@
 # Licensed under the terms of the MIT license.
 
 import re
+from pathlib import Path
 import sys
 
 should_process = None
@@ -85,7 +86,6 @@ def process_solver_common_h(text):
 
 def wrapper(basename, cb):
     global should_process
-    from pathlib import Path
 
     src_fn = Path(sys.argv[0]).parent.parent / basename
     dest_fn = Path(".") / "generated" / basename
