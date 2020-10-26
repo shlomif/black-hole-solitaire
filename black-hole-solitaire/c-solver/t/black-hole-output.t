@@ -6,8 +6,8 @@ use warnings;
 use Test::More tests => 21;
 use Test::Differences qw/ eq_or_diff /;
 use Test::Some sub {
-    return not( exists( $_{max_num_moved} )
-        && ( ( $ENV{TEST_SOME} // '' ) =~ /:max_num_moved/ ) );
+    return not( exists( $_{max_num_played} )
+        && ( ( $ENV{TEST_SOME} // '' ) =~ /:max_num_played/ ) );
 };
 
 use Test::Trap qw(
@@ -276,7 +276,7 @@ foreach my $exe ( './black-hole-solve', )
 my $MAX_NUM_MOVED_CARDS_RE =
     qr/\AAt most ([0-9]+) cards could be played\.\n?\z/ms;
 
-sub _test_max_num_moved_cards
+sub _test_max_num_played_cards
 {
     my ($args) = @_;
     my ( $name, $want, $input_text ) =
@@ -306,12 +306,12 @@ sub _test_max_num_moved_cards
 }
 
 # TEST
-subtest 'max_num_moved' => sub {
+subtest 'max_num_played' => sub {
     plan tests => 8;
     trap
     {
         mysys( './black-hole-solve', '--game', 'black_hole',
-            '--show-max-num-moved-cards', $data_dir->child("1.bh.board.txt") );
+            '--show-max-num-played-cards', $data_dir->child("1.bh.board.txt") );
     };
 
     ok( $exit_code, "Non-zero exit status on unsolved." );
@@ -349,14 +349,14 @@ EOF
     trap
     {
         mysys( './black-hole-solve', '--game', 'black_hole',
-            "--show-max-num-moved-cards",
+            "--show-max-num-played-cards",
             $data_dir->child("26464608654870335080.bh.board.txt") );
     };
 
     ok( scalar( !$exit_code ),
-        "Running --show-max-num-moved-cards program successfully." );
+        "Running --show-max-num-played-cards program successfully." );
 
-    _test_max_num_moved_cards(
+    _test_max_num_played_cards(
         {
             name         => "success moves",
             expected_num => 51,
@@ -367,17 +367,17 @@ EOF
     trap
     {
         mysys( './black-hole-solve', '--game', 'all_in_a_row',
-            "--show-max-num-moved-cards",
+            "--show-max-num-played-cards",
             $data_dir->child('24.all_in_a_row.board.txt'),
         );
     };
 
     ok(
         scalar( !$exit_code ),
-        "Running all_in_a_row --show-max-num-moved-cards program successfully."
+        "Running all_in_a_row --show-max-num-played-cards program successfully."
     );
 
-    _test_max_num_moved_cards(
+    _test_max_num_played_cards(
         {
             name         => "all_in_a_row success moves",
             expected_num => 52,
@@ -386,4 +386,4 @@ EOF
     );
 
     },
-    'max_num_moved';
+    'max_num_played';

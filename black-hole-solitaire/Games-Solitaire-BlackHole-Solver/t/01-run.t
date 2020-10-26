@@ -193,9 +193,9 @@ EOF
 my $MAX_NUM_MOVED_CARDS_RE =
     qr/\AAt most ([0-9]+) cards could be played\.\n?\z/ms;
 
-my @MAX_NUM_PLAYED_FLAG = ("--show-max-num-moved-cards");
+my @MAX_NUM_PLAYED_FLAG = ("--show-max-num-played-cards");
 
-sub _test_max_num_moved_cards
+sub _test_max_num_played_cards
 {
     my ($args) = @_;
     my ( $name, $want, $input_lines ) =
@@ -234,9 +234,9 @@ sub _test_max_num_moved_cards
     );
 
     # TEST
-    _test_max_num_moved_cards(
+    _test_max_num_played_cards(
         {
-            name         => "max-num-moved on success",
+            name         => "max-num-played on success",
             expected_num => 51,
             input_lines  => [ path($sol_fn)->lines_utf8() ]
         }
@@ -255,9 +255,9 @@ sub _test_max_num_moved_cards
     );
 
     # TEST
-    _test_max_num_moved_cards(
+    _test_max_num_played_cards(
         {
-            name         => "max-num-moved on fail",
+            name         => "max-num-played on fail",
             expected_num => 3,
             input_lines  => [ path($sol_fn)->lines_utf8() ]
         }

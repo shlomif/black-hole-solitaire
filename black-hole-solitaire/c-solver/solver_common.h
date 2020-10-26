@@ -73,7 +73,7 @@ typedef struct
     bool place_queens_on_kings;
     bool quiet_output;
     bool wrap_ranks;
-    bool show_max_num_moved_cards;
+    bool show_max_num_played_cards;
 } bhs_settings;
 #pragma clang diagnostic pop
 
@@ -90,7 +90,7 @@ static inline bhs_settings parse_cmd_line(
     settings.quiet_output = false;
     settings.wrap_ranks = true;
     settings.max_iters_limit = ULONG_MAX;
-    settings.show_max_num_moved_cards = false;
+    settings.show_max_num_played_cards = false;
 
     int arg_idx = 1;
     while (argc > arg_idx)
@@ -199,10 +199,11 @@ static inline bhs_settings parse_cmd_line(
             }
             settings.iters_display_step = (unsigned long)atol(argv[arg_idx++]);
         }
-        else if (unlikely(!strcmp(argv[arg_idx], "--show-max-num-moved-cards")))
+        else if (unlikely(
+                     !strcmp(argv[arg_idx], "--show-max-num-played-cards")))
         {
             ++arg_idx;
-            settings.show_max_num_moved_cards = true;
+            settings.show_max_num_played_cards = true;
         }
         else
         {
@@ -262,17 +263,15 @@ static inline int solve_filename(
     int error_line_num;
     const enum GAME_TYPE game_type = settings.game_type;
     const unsigned num_columns =
-        ((game_type == GAME__BH)
-                ? BHS__BLACK_HOLE__NUM_COLUMNS
-                : (game_type == GAME__GOLF) ? BHS__GOLF__NUM_COLUMNS
-                                            : BHS__ALL_IN_A_ROW__NUM_COLUMNS);
+        ((game_type == GAME__BH)        ? BHS__BLACK_HOLE__NUM_COLUMNS
+            : (game_type == GAME__GOLF) ? BHS__GOLF__NUM_COLUMNS
+                                        : BHS__ALL_IN_A_ROW__NUM_COLUMNS);
     if (black_hole_solver_read_board(solver, board, &error_line_num,
             num_columns,
-            ((game_type == GAME__BH)
-                    ? BHS__BLACK_HOLE__MAX_NUM_CARDS_IN_COL
-                    : (game_type == GAME__GOLF)
-                          ? BHS__GOLF__MAX_NUM_CARDS_IN_COL
-                          : BHS__ALL_IN_A_ROW__MAX_NUM_CARDS_IN_COL),
+            ((game_type == GAME__BH) ? BHS__BLACK_HOLE__MAX_NUM_CARDS_IN_COL
+                : (game_type == GAME__GOLF)
+                    ? BHS__GOLF__MAX_NUM_CARDS_IN_COL
+                    : BHS__ALL_IN_A_ROW__MAX_NUM_CARDS_IN_COL),
             ((game_type == GAME__BH) ? BHS__BLACK_HOLE__BITS_PER_COL
                                      : BHS__GOLF__BITS_PER_COL)))
     {
@@ -356,10 +355,10 @@ static inline int solve_filename(
         "This scan generated %lu states.\n",
         black_hole_solver_get_iterations_num(solver),
         black_hole_solver_get_num_states_in_collection(solver));
-    if (unlikely(settings.show_max_num_moved_cards))
+    if (unlikely(settings.show_max_num_played_cards))
     {
         fprintf(out_fh, "At most %lu cards could be played.\n",
-            black_hole_solver_get_max_num_moved_cards(solver));
+            black_hole_solver_get_max_num_played_cards(solver));
     }
 
     black_hole_solver_recycle(solver);

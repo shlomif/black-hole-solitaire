@@ -278,7 +278,7 @@ sub _process_cmd_line
             $tasks[-1]->{seed} = $val;
             return;
         },
-        "show-max-num-moved-cards!" => sub {
+        "show-max-num-played-cards!" => sub {
             my ( undef, $val ) = @_;
             $self->_should_show_maximal_num_moved_cards($val);
             return;
