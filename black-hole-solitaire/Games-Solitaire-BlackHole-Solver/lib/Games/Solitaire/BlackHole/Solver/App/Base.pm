@@ -131,7 +131,7 @@ sub _my_exit
     if ( $self->_show_max_reached_depth() )
     {
         $output_handle->printf(
-            "Reached a maximal depth of %lu.\n",
+            "At most %u cards could be played.\n",
             $self->get_max_reached_depth()
         );
     }
