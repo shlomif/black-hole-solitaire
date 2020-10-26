@@ -273,7 +273,7 @@ foreach my $exe ( './black-hole-solve', )
     );
 }
 
-my $MAX_NUM_MOVED_CARDS_RE =
+my $MAX_NUM_PLAYED_CARDS_RE =
     qr/\AAt most ([0-9]+) cards could be played\.\n?\z/ms;
 
 sub _test_max_num_played_cards
@@ -285,7 +285,7 @@ sub _test_max_num_played_cards
     return subtest $name => sub {
         plan tests => 2;
         my @matches = (
-            grep { /$MAX_NUM_MOVED_CARDS_RE/ }
+            grep { /$MAX_NUM_PLAYED_CARDS_RE/ }
             map  { as_lf($_) } split( /^/ms, $input_text ),
         );
 
@@ -294,7 +294,7 @@ sub _test_max_num_played_cards
         eq_or_diff(
             [
                 map {
-                    /$MAX_NUM_MOVED_CARDS_RE/
+                    /$MAX_NUM_PLAYED_CARDS_RE/
                         ? ($1)
                         : ( die "not matched!" )
                 } @matches
