@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 30;
+use Test::More tests => 28;
 use Test::Differences qw/ eq_or_diff /;
 
 use Test::Trap qw(
@@ -118,25 +118,44 @@ ok( scalar( !$exit_code ),
     "Running --show-max-num-moved-cards program successfully." );
 my $MAX_NUM_MOVED_CARDS_RE =
     qr/\AAt most ([0-9]+) cards could be played\.\n?\z/ms;
+
+sub _test_max_num_moved_cards
 {
-    my @matches = (
-        grep { /$MAX_NUM_MOVED_CARDS_RE/ }
-        map  { as_lf($_) } split( /^/ms, $trap->stdout() ),
-    );
+    my ($args) = @_;
+    my ( $name, $want, $input_text ) =
+        @{$args}{qw/ name expected_num input_text/};
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    return subtest $name => sub {
+        plan tests => 2;
+        my @matches = (
+            grep { /$MAX_NUM_MOVED_CARDS_RE/ }
+            map  { as_lf($_) } split( /^/ms, $input_text ),
+        );
 
-    # TEST
-    is( scalar(@matches), 1, "One line." );
+        is( scalar(@matches), 1, "One line." );
 
-    # TEST
-    eq_or_diff(
-        [
-            map { /$MAX_NUM_MOVED_CARDS_RE/ ? ($1) : ( die "not matched!" ) }
-                @matches
-        ],
-        ["51"],
-        "4*13-1 cards moved.",
-    );
+        eq_or_diff(
+            [
+                map {
+                    /$MAX_NUM_MOVED_CARDS_RE/
+                        ? ($1)
+                        : ( die "not matched!" )
+                } @matches
+            ],
+            [$want],
+            "num cards moved.",
+        );
+    };
 }
+
+# TEST
+_test_max_num_moved_cards(
+    {
+        name         => "success moves",
+        expected_num => 51,
+        input_text   => scalar( $trap->stdout() ),
+    },
+);
 
 trap
 {
@@ -149,25 +168,15 @@ trap
 # TEST
 ok( scalar( !$exit_code ),
     "Running all_in_a_row --show-max-num-moved-cards program successfully." );
-{
-    my @matches = (
-        grep { /$MAX_NUM_MOVED_CARDS_RE/ }
-        map  { as_lf($_) } split( /^/ms, $trap->stdout() ),
-    );
 
-    # TEST
-    is( scalar(@matches), 1, "One line." );
-
-    # TEST
-    eq_or_diff(
-        [
-            map { /$MAX_NUM_MOVED_CARDS_RE/ ? ($1) : ( die "not matched!" ) }
-                @matches
-        ],
-        ["52"],
-        "all_in_a_row 4*13 cards moved.",
-    );
-}
+# TEST
+_test_max_num_moved_cards(
+    {
+        name         => "all_in_a_row success moves",
+        expected_num => 52,
+        input_text   => scalar( $trap->stdout() ),
+    },
+);
 
 trap
 {
