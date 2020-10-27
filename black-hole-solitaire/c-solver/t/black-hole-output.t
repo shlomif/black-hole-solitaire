@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 23;
+use Test::More tests => 24;
 use Test::Differences qw/ eq_or_diff /;
 use Test::Some;
 
@@ -267,7 +267,7 @@ foreach my $exe ( './black-hole-solve', )
             'golf',
             '--display-boards',
             '--wrap-ranks',
-            ( map { $mani->get_obj("golf$_.board")->fh } 1 .. 20 )
+            ( map { $mani->fh("golf$_.board") } 1 .. 20 )
         );
     };
 
@@ -317,6 +317,13 @@ sub _test_max_num_played_cards
         );
     };
 }
+my $no_moves_deal = $mani->fh("black_hole_27.board");
+
+# TEST
+unlike(
+    $no_moves_deal->slurp_raw(),
+    qr#[2K][CDHS]$#ms, "No legal moves in deal black_hole_27",
+);
 
 # TEST
 subtest 'max_num_played' => sub {
@@ -401,8 +408,7 @@ EOF
     trap
     {
         mysys( './black-hole-solve', '--game', 'black_hole',
-            "--show-max-num-played-cards", $mani->fh("black_hole_27.board"),
-        );
+            "--show-max-num-played-cards", $no_moves_deal, );
     };
 
     ok( scalar($exit_code),
