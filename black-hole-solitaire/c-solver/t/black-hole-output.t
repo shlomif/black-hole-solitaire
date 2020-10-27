@@ -390,11 +390,12 @@ EOF
     };
 
     ok( scalar($exit_code),
-        "Running --show-max-num-played-cards program successfully." );
+"Running no-moves-possible --show-max-num-played-cards program exited with an error."
+    );
 
     _test_max_num_played_cards(
         {
-            name         => "0 moves",
+            name         => "black_hole deal #27 - 0 moves",
             expected_num => 0,
             input_text   => scalar( $trap->stdout() ),
         },
