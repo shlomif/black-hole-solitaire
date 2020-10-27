@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 10;
+use Test::More tests => 12;
 
 use Path::Tiny qw/ path cwd /;
 use Dir::Manifest::Slurp qw/ as_lf /;
@@ -260,6 +260,27 @@ sub _test_max_num_played_cards
         {
             name         => "max-num-played on fail",
             expected_num => 3,
+            input_lines  => [ path($sol_fn)->lines_utf8() ]
+        }
+    );
+
+    unlink($sol_fn);
+}
+
+{
+    my $sol_fn = _filename("27.bh.sol.txt");
+
+    # TEST
+    ok(
+        system( $^X, "-Mblib", $BHS, @MAX_NUM_PLAYED_FLAG, "-o", $sol_fn,
+            _filename("27.bh.board.txt") ) != 0
+    );
+
+    # TEST
+    _test_max_num_played_cards(
+        {
+            name         => "max-num-played on no moves",
+            expected_num => 0,
             input_lines  => [ path($sol_fn)->lines_utf8() ]
         }
     );
