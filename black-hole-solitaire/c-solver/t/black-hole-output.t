@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 21;
+use Test::More tests => 23;
 use Test::Differences qw/ eq_or_diff /;
 use Test::Some;
 
