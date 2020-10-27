@@ -5,10 +5,7 @@ use warnings;
 
 use Test::More tests => 21;
 use Test::Differences qw/ eq_or_diff /;
-use Test::Some sub {
-    return not( exists( $_{max_num_played} )
-        && ( ( $ENV{TEST_SOME} // '' ) =~ / :no_max_num_played /x ) );
-};
+use Test::Some;
 
 use Test::Trap qw(
     trap $trap :flow:stderr(systemsafe):stdout(systemsafe):warn
@@ -403,4 +400,4 @@ EOF
         },
     );
     },
-    'max_num_played';
+    '!no_max_num_played';
