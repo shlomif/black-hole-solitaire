@@ -223,6 +223,7 @@ sub _test_max_num_played_cards
         );
     };
 }
+
 {
     my $sol_fn = _filename("26464608654870335080-with-max-depth.bh.sol.txt");
 
