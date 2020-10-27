@@ -7,10 +7,8 @@
 # Licensed under the terms of the MIT license.
 
 import re
-from pathlib import Path
 import sys
-
-should_process = None
+from pathlib import Path
 
 if sys.argv[1] == '--process=no_max_num_played':
     should_process = True
@@ -23,8 +21,10 @@ else:
 def _newlinify(text, m):
     start = text.rindex("\n", 0, m.start(0)+1)
     end = text.index("\n", m.end(0)-1, -1)
-    return (text[0:start] + "".join([
-        x for x in text[start:end] if x == '\n']), text[end:])
+    prefix = text[0:start] + "".join([
+        x for x in text[start:end] if x == '\n'
+    ])
+    return (prefix, text[end:])
 
 
 def _remove(text, pat):
@@ -80,8 +80,6 @@ def process_solver_common_h(text):
 
 
 def wrapper(basename, cb):
-    global should_process
-
     src_fn = Path(sys.argv[0]).parent.parent / basename
     dest_fn = Path(".") / "generated" / basename
 
