@@ -182,7 +182,19 @@ IF (NOT "${_PYTHON3}" STREQUAL "_PYTHON3-NOTFOUND")
     SET (found_python3 "1")
     SET (PYTHON3_EXECUTABLE "python3")
 ENDIF ()
-SET(cmd "${PYTHON3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/scripts/source_filter.py" ${process_args})
+SET(py3_prog "${CMAKE_CURRENT_SOURCE_DIR}/scripts/source_filter.py")
+SET(cmd "${PYTHON3_EXECUTABLE}" "${py3_prog}" ${process_args})
+SET(sources)
+SET(dests)
+FOREACH (src "lib.c" "solver_common.h" "include/black-hole-solver/black_hole_solver.h")
+    LIST(APPEND sources "${CMAKE_CURRENT_SOURCE_DIR}/${src}")
+    LIST(APPEND dests "${CMAKE_CURRENT_BINARY_DIR}/generated/${src}")
+ENDFOREACH()
+ADD_CUSTOM_COMMAND(
+    OUTPUT ${dests}
+    COMMAND ${cmd}
+    DEPENDS "${py3_prog}" ${sources}
+)
 EXECUTE_PROCESS(COMMAND ${cmd} RESULT_VARIABLE ret)
 IF (NOT ("${ret}" STREQUAL "0"))
     MESSAGE(FATAL_ERROR "${cmd} failed!")
