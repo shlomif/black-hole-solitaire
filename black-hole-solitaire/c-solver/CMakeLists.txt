@@ -270,8 +270,16 @@ ADD_EXECUTABLE(
     "multi-bhs-solver"
     "multi_solver.c"
 )
+SET(exes  "${BHS_EXE}" "multi-bhs-solver")
+IF (ENABLE_DISPLAYING_MAX_NUM_PLAYED_CARDS)
+    ADD_EXECUTABLE(
+        "stats-multi-bhs-solver"
+        "multi_solver_stats.c"
+    )
+    LIST(APPEND exes "stats-multi-bhs-solver")
+ENDIF ()
 
-FOREACH (exe "${BHS_EXE}" "multi-bhs-solver")
+FOREACH (exe ${exes})
     TARGET_LINK_LIBRARIES(
         "${exe}"
         "${LINKLIB}"
