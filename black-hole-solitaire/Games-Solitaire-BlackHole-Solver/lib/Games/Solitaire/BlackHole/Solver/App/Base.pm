@@ -81,7 +81,7 @@ sub _update_max_num_played_cards
 
     foreach my $task ( @{ $self->_tasks } )
     {
-        $self->_update_max_reached_q_len($task);
+        $self->_update_max_reached_depths_stack_len($task);
     }
 
     return;
@@ -402,14 +402,14 @@ sub _set_up_tasks
     return;
 }
 
-sub _update_max_reached_q_len
+sub _update_max_reached_depths_stack_len
 {
     my ( $self, $task ) = @_;
 
     $self->_maximal_num_played_cards__from_all_tasks(
         max(
             $self->_maximal_num_played_cards__from_all_tasks,
-            $task->_max_reached_queue_len
+            $task->_max_reached_depths_stack_len
         )
     );
 
@@ -425,7 +425,7 @@ sub _next_task
         my $task  = $alloc->_task;
         if ( !@{ $task->_queue } )
         {
-            $self->_update_max_reached_q_len($task);
+            $self->_update_max_reached_depths_stack_len($task);
             return $self->_next_task;
         }
         $task->_remaining_iters( $alloc->_quota );
@@ -571,9 +571,9 @@ package Games::Solitaire::BlackHole::Solver::App::Base::Task;
 
 use Moo;
 
-has '_queue'                 => ( is => 'ro', default => sub { return []; }, );
-has '_depths_stack'          => ( is => 'ro', default => sub { return []; }, );
-has '_max_reached_queue_len' => ( is => 'rw', default => 0 );
+has '_queue'        => ( is => 'ro', default => sub { return []; }, );
+has '_depths_stack' => ( is => 'ro', default => sub { return []; }, );
+has '_max_reached_depths_stack_len' => ( is => 'rw', default => 0 );
 has [ '_gen', '_task_idx', '_name', '_remaining_iters', '_seed', ] =>
     ( is => 'rw' );
 
@@ -584,9 +584,9 @@ sub _push_to_queue
     push @{ $self->_queue },        @$items;
     push @{ $self->_depths_stack }, scalar( @{ $self->_queue } );
     my $l = @{ $self->_depths_stack };
-    if ( $l > $self->_max_reached_queue_len() )
+    if ( $l > $self->_max_reached_depths_stack_len() )
     {
-        $self->_max_reached_queue_len($l);
+        $self->_max_reached_depths_stack_len($l);
     }
 
     return;
