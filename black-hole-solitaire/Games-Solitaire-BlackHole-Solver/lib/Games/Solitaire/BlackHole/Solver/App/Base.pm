@@ -616,4 +616,6 @@ For internal use.
 
 Returns the maximal number of played cards.
 
+Added in version 0.6.0.
+
 =cut
