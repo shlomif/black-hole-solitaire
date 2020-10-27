@@ -307,7 +307,7 @@ sub _test_max_num_played_cards
 
 # TEST
 subtest 'max_num_played' => sub {
-    plan tests => 8;
+    plan tests => 10;
     trap
     {
         mysys( './black-hole-solve', '--game', 'black_hole',
@@ -385,5 +385,22 @@ EOF
         },
     );
 
+    trap
+    {
+        mysys( './black-hole-solve', '--game', 'black_hole',
+            "--show-max-num-played-cards", $mani->fh("black_hole_27.board"),
+        );
+    };
+
+    ok( scalar($exit_code),
+        "Running --show-max-num-played-cards program successfully." );
+
+    _test_max_num_played_cards(
+        {
+            name         => "0 moves",
+            expected_num => 0,
+            input_text   => scalar( $trap->stdout() ),
+        },
+    );
     },
     'max_num_played';

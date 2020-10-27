@@ -7,6 +7,7 @@
 26464608654870335080.bh-sol-with-display-boards.txt
 26464608654870335080.bh.sol.txt
 906.golf.solution.txt
+black_hole_27.board
 golf-1to20.sol.txt
 golf1.board
 golf10.board
