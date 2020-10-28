@@ -4,6 +4,12 @@ Shlomi Fish <shlomif@cpan.org>
 :Date: 2020-06-28
 :Revision: $Id$
 
+1.10.1       ( 28 October 2020 ):
+---------------------------------
+
+* Fix the shared library's SOVERSION (it is back compat with
+earlier 1.x.y versions).
+
 1.10.0       ( 28 October 2020 ):
 ---------------------------------
 
