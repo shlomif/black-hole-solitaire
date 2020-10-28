@@ -85,13 +85,11 @@ sub test_cmd
 
     my $orig_cwd = cwd;
 
-    chdir($base);
-
     mkdir("build");
     chdir("build");
 
     # TEST
-    test_cmd( [ "cmake", ".." ], "CMaking in the unpacked dir" );
+    test_cmd( [ "cmake", "../${base}" ], "CMaking in the unpacked dir" );
 
     # TEST
     test_cmd( [ "make", "package_source" ] );
@@ -99,7 +97,7 @@ sub test_cmd
     # local $ENV{WML_TEST_QUIET} = 1;
 
     # TEST
-    test_cmd( [ $^X, "../run-tests.pl" ] );
+    test_cmd( [ $^X, "../${base}/run-tests.pl" ] );
 
     # For cleanup of the temp_dir.
     chdir($before_temp_cwd);

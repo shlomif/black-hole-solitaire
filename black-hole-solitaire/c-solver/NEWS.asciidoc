@@ -4,6 +4,18 @@ Shlomi Fish <shlomif@cpan.org>
 :Date: 2020-06-28
 :Revision: $Id$
 
+1.10.0       ( 28 October 2020 ):
+---------------------------------
+
+* Add ENABLE_DISPLAYING_MAX_NUM_PLAYED_CARDS (off by default) which
+gives the "--show-max-num-played-cards" flag.
+** Inspired by https://politaire.com/article/blackhole.html by Jan Wolter. Thanks!
+
+* New build dependency: python3 (3.4.0 or above).
+
+* New "make check" dependency: https://metacpan.org/pod/Test::Some .
+** Thanks to +#perl-qa+ on irc.perl.org.
+
 1.8.0       ( 28 Jun 2020 ):
 ----------------------------
 
