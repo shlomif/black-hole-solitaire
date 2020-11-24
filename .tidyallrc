@@ -1,6 +1,7 @@
 [PerlCritic]
 argv =
 select = **/*.{pl,pm,t}
+ignore = black-hole-solitaire/c-solver/rinutils/t/lib/Rinutils/InlineWrap.pm
 
 [PerlTidy]
 argv = -ci=4 -bl -cti=0 --character-encoding=none
