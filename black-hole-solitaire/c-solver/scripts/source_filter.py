@@ -14,9 +14,13 @@ import re
 import sys
 from pathlib import Path
 
-if sys.argv[1] == '--process=no_max_num_played':
+if len(sys.argv) != 2:
+    raise Exception("too many or too few arguments")
+
+arg = sys.argv[1]
+if arg == '--process=no_max_num_played':
     SHOULD_PROCESS = True
-elif sys.argv[1] == '--process=none':
+elif arg == '--process=none':
     SHOULD_PROCESS = False
 else:
     raise Exception("wrong invocation")
