@@ -48,7 +48,7 @@ def _multi_remove(text, patterns_list):
 
 
 def process_black_hole_solver_h(text):
-    """docstring for process_black_hole_solver_h"""
+    """process include/black-hole-solver/black_hole_solver.h"""
     return _multi_remove(
         text,
         [
@@ -60,14 +60,13 @@ def process_black_hole_solver_h(text):
 
 
 def _clear_all_individual_lines(text, pat):
-    """docstring for _clear_all_individual_lines"""
     return re.sub(
         '^[^\\n]*?(?:'+pat+')[^\\n]*?$', '', text, flags=(re.M | re.S)
     )
 
 
 def process_lib_c(text):
-    """docstring for process_lib_c"""
+    """process lib.c"""
     out_text = _multi_remove(
         text,
         [
@@ -84,7 +83,7 @@ def process_lib_c(text):
 
 
 def process_solver_common_h(text):
-    """docstring for process_black_hole_solver_h"""
+    """process solver_common.h"""
     out_text = _multi_remove(
         text,
         [
