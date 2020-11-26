@@ -99,7 +99,7 @@ def _process_solver_common_h(text):
 
 
 def _process_file_or_copy(basename, callback):
-    """optionally filter file basename through callback"""
+    """optionally filter the file in 'basename' using 'callback'"""
     src_fn = Path(sys.argv[0]).parent.parent / basename
     dest_fn = Path(".") / "generated" / basename
 
