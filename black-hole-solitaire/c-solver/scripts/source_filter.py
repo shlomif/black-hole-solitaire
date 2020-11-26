@@ -56,31 +56,31 @@ def _clear_all_individual_lines(text, pat):
 
 def process_lib_c(text):
     """docstring for process_lib_c"""
-    pre, text = _remove(
+    pre, remaining_text = _remove(
         text, "^ *var_AUTO\\(\\s*max_reached_depths_stack_len.*?\\);$")
-    pre2, text = _remove(
-        text, "^ *while \\(current_depths_stack_len.*?^ *\\}$")
-    pre3, text = _remove(
-        text, "^( *)if \\(was_moved\\).*?^\\1\\}$")
-    pre4, text = _remove(
-        text, "^DLLEXPORT extern[^\n]+\n" +
+    pre2, remaining_text = _remove(
+        remaining_text, "^ *while \\(current_depths_stack_len.*?^ *\\}$")
+    pre3, remaining_text = _remove(
+        remaining_text, "^( *)if \\(was_moved\\).*?^\\1\\}$")
+    pre4, remaining_text = _remove(
+        remaining_text, "^DLLEXPORT extern[^\n]+\n" +
         "black_hole_solver_get_max_num_played_cards.*?^\\}")
-    text = pre + pre2 + pre3 + pre4 + text
+    out_text = pre + pre2 + pre3 + pre4 + remaining_text
     return _clear_all_individual_lines(
-        text, "(?:depths_stack|max_num_played|prev_len|was_moved)"
+        out_text, "(?:depths_stack|max_num_played|prev_len|was_moved)"
     )
 
 
 def process_solver_common_h(text):
     """docstring for process_black_hole_solver_h"""
-    pre, text = _remove(
+    pre, remaining_text = _remove(
         text, "^ *else if \\(unlikely\\(" +
         "\n[^\\n]*\"--show-max-num-played-cards\".*?^ *\\}$")
-    pre2, text = _remove(
-        text, "^ *if \\(unlikely\\(settings\\." +
+    pre2, remaining_text = _remove(
+        remaining_text, "^ *if \\(unlikely\\(settings\\." +
         "show_max_num_played_cards.*?^ *\\}$")
-    text = pre + pre2 + text
-    return _clear_all_individual_lines(text, "max_num_played")
+    out_text = pre + pre2 + remaining_text
+    return _clear_all_individual_lines(out_text, "max_num_played")
 
 
 def wrapper(basename, callback):
