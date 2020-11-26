@@ -38,10 +38,13 @@ def _remove(text, pat):
 
 
 def _multi_remove(text, patterns_list):
-    if len(patterns_list) == 0:
-        return text
-    prefix, remaining_text = _remove(text, patterns_list[0])
-    return prefix + _multi_remove(remaining_text, patterns_list[1:])
+    ret = []
+    remaining_text = text
+    for pat in patterns_list:
+        prefix, remaining_text = _remove(remaining_text, pat)
+        ret.append(prefix)
+    ret.append(remaining_text)
+    return "".join(ret)
 
 
 def process_black_hole_solver_h(text):
