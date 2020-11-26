@@ -82,13 +82,15 @@ def process_lib_c(text):
 
 def process_solver_common_h(text):
     """docstring for process_black_hole_solver_h"""
-    pre, remaining_text = _remove(
-        text, "^ *else if \\(unlikely\\(" +
-        "\n[^\\n]*\"--show-max-num-played-cards\".*?^ *\\}$")
-    pre2, remaining_text = _remove(
-        remaining_text, "^ *if \\(unlikely\\(settings\\." +
-        "show_max_num_played_cards.*?^ *\\}$")
-    out_text = pre + pre2 + remaining_text
+    out_text = _multi_remove(
+        text,
+        [
+         ("^ *else if \\(unlikely\\(" +
+          "\n[^\\n]*\"--show-max-num-played-cards\".*?^ *\\}$"),
+         ("^ *if \\(unlikely\\(settings\\." +
+          "show_max_num_played_cards.*?^ *\\}$"),
+        ]
+    )
     return _clear_all_individual_lines(out_text, "max_num_played")
 
 
