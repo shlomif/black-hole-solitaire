@@ -37,14 +37,23 @@ def _remove(text, pat):
     return _newlinify(text, match_object)
 
 
+def _multi_remove(text, patterns_list):
+    if len(patterns_list) == 0:
+        return text
+    prefix, remaining_text = _remove(text, patterns_list[0])
+    return prefix + _multi_remove(remaining_text, patterns_list[1:])
+
+
 def process_black_hole_solver_h(text):
     """docstring for process_black_hole_solver_h"""
-    pre, suf = _remove(
+    return _multi_remove(
         text,
-        "^// Added.*?DLLEXPORT extern unsigned " +
-        "long black_hole_solver_get_max_num_played_cards\\(.*?(?:\\n){2,2}"
+        [
+            "^// Added.*?DLLEXPORT extern unsigned " +
+            "long black_hole_solver_get_max_num_played_cards" +
+            "\\(.*?(?:\\n){2,2}",
+        ]
     )
-    return pre + suf
 
 
 def _clear_all_individual_lines(text, pat):
@@ -56,16 +65,16 @@ def _clear_all_individual_lines(text, pat):
 
 def process_lib_c(text):
     """docstring for process_lib_c"""
-    pre, remaining_text = _remove(
-        text, "^ *var_AUTO\\(\\s*max_reached_depths_stack_len.*?\\);$")
-    pre2, remaining_text = _remove(
-        remaining_text, "^ *while \\(current_depths_stack_len.*?^ *\\}$")
-    pre3, remaining_text = _remove(
-        remaining_text, "^( *)if \\(was_moved\\).*?^\\1\\}$")
-    pre4, remaining_text = _remove(
-        remaining_text, "^DLLEXPORT extern[^\n]+\n" +
-        "black_hole_solver_get_max_num_played_cards.*?^\\}")
-    out_text = pre + pre2 + pre3 + pre4 + remaining_text
+    out_text = _multi_remove(
+        text,
+        [
+         "^ *var_AUTO\\(\\s*max_reached_depths_stack_len.*?\\);$",
+         "^ *while \\(current_depths_stack_len.*?^ *\\}$",
+         "^( *)if \\(was_moved\\).*?^\\1\\}$",
+         ("^DLLEXPORT extern[^\n]+\n" +
+             "black_hole_solver_get_max_num_played_cards.*?^\\}"),
+        ]
+    )
     return _clear_all_individual_lines(
         out_text, "(?:depths_stack|max_num_played|prev_len|was_moved)"
     )
