@@ -88,9 +88,9 @@ def wrapper(basename, callback):
     src_fn = Path(sys.argv[0]).parent.parent / basename
     dest_fn = Path(".") / "generated" / basename
 
-    parent = dest_fn.parent
-    if not parent.exists():
-        parent.mkdir(parents=True)
+    dest_parent = dest_fn.parent
+    if not dest_parent.exists():
+        dest_parent.mkdir(parents=True)
     with open(dest_fn, "wt") as ofh:
         with open(src_fn, "rt") as ifh:
             text = ifh.read()
