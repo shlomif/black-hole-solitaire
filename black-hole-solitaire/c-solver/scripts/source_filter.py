@@ -106,11 +106,10 @@ def _process_solver_common_h(text):
 
 class SourceFilter:
     """docstring for SourceFilter:"""
-    def __init__(self, SHOULD_PROCESS):
-        self.SHOULD_PROCESS = SHOULD_PROCESS
-        return
+    def __init__(self, should_process):
+        self.should_process = should_process
 
-    def _process_file_or_copy(self, basename, callback):
+    def process_file_or_copy(self, basename, callback):
         """optionally filter the file in 'basename' using 'callback'"""
         src_fn = Path(sys.argv[0]).parent.parent / basename
         dest_fn = Path(".") / "generated" / basename
@@ -121,21 +120,21 @@ class SourceFilter:
         with open(dest_fn, "wt") as ofh:
             with open(src_fn, "rt") as ifh:
                 text = ifh.read()
-                ofh.write(callback(text) if self.SHOULD_PROCESS else text)
+                ofh.write(callback(text) if self.should_process else text)
 
     def run(self):
         """docstring for run"""
-        self._process_file_or_copy(
+        self.process_file_or_copy(
             "include/black-hole-solver/black_hole_solver.h",
             _process_black_hole_solver_h
         )
 
-        self._process_file_or_copy(
+        self.process_file_or_copy(
             "solver_common.h",
             _process_solver_common_h
         )
 
-        self._process_file_or_copy(
+        self.process_file_or_copy(
             "lib.c",
             _process_lib_c
         )
