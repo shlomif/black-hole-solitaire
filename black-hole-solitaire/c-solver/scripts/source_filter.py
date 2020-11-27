@@ -112,17 +112,21 @@ def _process_file_or_copy(basename, callback):
             ofh.write(callback(text) if SHOULD_PROCESS else text)
 
 
-_process_file_or_copy(
-    "include/black-hole-solver/black_hole_solver.h",
-    _process_black_hole_solver_h
-)
+def main():
+    _process_file_or_copy(
+        "include/black-hole-solver/black_hole_solver.h",
+        _process_black_hole_solver_h
+    )
 
-_process_file_or_copy(
-    "solver_common.h",
-    _process_solver_common_h
-)
+    _process_file_or_copy(
+        "solver_common.h",
+        _process_solver_common_h
+    )
 
-_process_file_or_copy(
-    "lib.c",
-    _process_lib_c
-)
+    _process_file_or_copy(
+        "lib.c",
+        _process_lib_c
+    )
+
+
+main()
