@@ -104,35 +104,41 @@ def _process_solver_common_h(text):
     return _clear_all_individual_lines(out_text, "max_num_played")
 
 
-def _process_file_or_copy(basename, callback):
-    """optionally filter the file in 'basename' using 'callback'"""
-    src_fn = Path(sys.argv[0]).parent.parent / basename
-    dest_fn = Path(".") / "generated" / basename
+class SourceFilter:
+    """docstring for SourceFilter:"""
+    def __init__(self, SHOULD_PROCESS):
+        self.SHOULD_PROCESS = SHOULD_PROCESS
+        return
 
-    dest_parent = dest_fn.parent
-    if not dest_parent.exists():
-        dest_parent.mkdir(parents=True)
-    with open(dest_fn, "wt") as ofh:
-        with open(src_fn, "rt") as ifh:
-            text = ifh.read()
-            ofh.write(callback(text) if SHOULD_PROCESS else text)
+    def _process_file_or_copy(self, basename, callback):
+        """optionally filter the file in 'basename' using 'callback'"""
+        src_fn = Path(sys.argv[0]).parent.parent / basename
+        dest_fn = Path(".") / "generated" / basename
+
+        dest_parent = dest_fn.parent
+        if not dest_parent.exists():
+            dest_parent.mkdir(parents=True)
+        with open(dest_fn, "wt") as ofh:
+            with open(src_fn, "rt") as ifh:
+                text = ifh.read()
+                ofh.write(callback(text) if self.SHOULD_PROCESS else text)
+
+    def run(self):
+        """docstring for run"""
+        self._process_file_or_copy(
+            "include/black-hole-solver/black_hole_solver.h",
+            _process_black_hole_solver_h
+        )
+
+        self._process_file_or_copy(
+            "solver_common.h",
+            _process_solver_common_h
+        )
+
+        self._process_file_or_copy(
+            "lib.c",
+            _process_lib_c
+        )
 
 
-def main():
-    _process_file_or_copy(
-        "include/black-hole-solver/black_hole_solver.h",
-        _process_black_hole_solver_h
-    )
-
-    _process_file_or_copy(
-        "solver_common.h",
-        _process_solver_common_h
-    )
-
-    _process_file_or_copy(
-        "lib.c",
-        _process_lib_c
-    )
-
-
-main()
+SourceFilter(SHOULD_PROCESS).run()
