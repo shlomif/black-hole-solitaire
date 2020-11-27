@@ -10,17 +10,23 @@ Source filter (or C pre-processor) for removing the max_num_played feature
 from black-hole-solver's C code.
 """
 
+import argparse
 import re
 import sys
 from pathlib import Path
 
-if len(sys.argv) != 2:
-    raise Exception("Too many or too few arguments")
+parser = argparse.ArgumentParser()
+parser.add_argument(
+    '--process', action='store', dest='process_mode',
+    help='The processing mode',
+    required=True
+)
+results = parser.parse_args()
 
-arg = sys.argv[1]
-if arg == '--process=no_max_num_played':
+arg = results.process_mode
+if arg == 'no_max_num_played':
     SHOULD_PROCESS = True
-elif arg == '--process=none':
+elif arg == 'none':
     SHOULD_PROCESS = False
 else:
     raise Exception("wrong invocation")
