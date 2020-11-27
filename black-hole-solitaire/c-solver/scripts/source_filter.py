@@ -15,22 +15,6 @@ import re
 import sys
 from pathlib import Path
 
-parser = argparse.ArgumentParser()
-parser.add_argument(
-    '--process', action='store', dest='process_mode',
-    help='The processing mode',
-    required=True
-)
-results = parser.parse_args()
-
-arg = results.process_mode
-if arg == 'no_max_num_played':
-    SHOULD_PROCESS = True
-elif arg == 'none':
-    SHOULD_PROCESS = False
-else:
-    raise Exception("wrong invocation")
-
 
 def _newlinify(text, match_object):
     start = text.rindex("\n", 0, match_object.start(0)+1)
@@ -106,12 +90,13 @@ def _process_solver_common_h(text):
 
 class SourceFilter:
     """docstring for SourceFilter:"""
-    def __init__(self, should_process):
+    def __init__(self, should_process, exe_path):
+        self.exe_path = exe_path
         self.should_process = should_process
 
     def process_file_or_copy(self, basename, callback):
         """optionally filter the file in 'basename' using 'callback'"""
-        src_fn = Path(sys.argv[0]).parent.parent / basename
+        src_fn = Path(self.exe_path).parent.parent / basename
         dest_fn = Path(".") / "generated" / basename
 
         dest_parent = dest_fn.parent
@@ -140,4 +125,25 @@ class SourceFilter:
         )
 
 
-SourceFilter(SHOULD_PROCESS).run()
+def main():
+    """main function"""
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '--process', action='store', dest='process_mode',
+        help='The processing mode',
+        required=True
+    )
+    results = parser.parse_args()
+
+    arg = results.process_mode
+    if arg == 'no_max_num_played':
+        should_process = True
+    elif arg == 'none':
+        should_process = False
+    else:
+        raise Exception("wrong invocation")
+
+    SourceFilter(should_process=should_process, exe_path=sys.argv[0]).run()
+
+
+main()
