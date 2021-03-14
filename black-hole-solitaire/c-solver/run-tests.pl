@@ -93,7 +93,7 @@ sub myglob
     local $ENV{HARNESS_PLUGINS} = join(
         ' ', qw(
             BreakOnFailure ColorSummary ColorFileVerdicts TrimDisplayedFilenames
-            )
+        )
     );
 
     my $is_ninja = ( -e "build.ninja" );
