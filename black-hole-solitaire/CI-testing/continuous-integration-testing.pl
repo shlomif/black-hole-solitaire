@@ -34,6 +34,16 @@ if ( defined $cmake_gen )
     $ENV{CMAKE_GEN} = $cmake_gen;
 }
 
+if ( !$IS_WIN )
+{
+    $ENV{PATH} .= ":$ENV{HOME}/.local/bin";
+
+    do_system(
+        {
+            cmd => [ "which", "tox", ],
+        }
+    );
+}
 do_system(
     {
         cmd => [ "prove", glob("root-tests/t/*.t") ],

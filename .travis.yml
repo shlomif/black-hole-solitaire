@@ -22,6 +22,7 @@ cache:
 dist: focal
 os: linux
 before_install:
+    - PATH+=":${HOME}/.local/bin"
     - cpanm local::lib
     - eval "$(perl -Mlocal::lib=$HOME/perl_modules)"
 install:
