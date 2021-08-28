@@ -2,8 +2,9 @@ jobs:
     test-black-hole-solver:
         runs-on: ubuntu-latest
         steps:
+        -   uses: actions/checkout@v2
         -   run: sudo apt-get update -qq
-        -   run: sudo apt-get --no-install-recommends install build-essential cmake
+        -   run: sudo apt-get --no-install-recommends install -y build-essential cmake
                 cmake-data cpanminus libperl-dev mercurial ninja-build perl python3-dev
                 python3-pip python3-setuptools valgrind xz-utils zip
         -   run: cpanm local::lib

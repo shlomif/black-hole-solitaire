@@ -18,9 +18,18 @@ def main():
     with open("./.travis.yml", "rt") as infh:
         data = yaml.safe_load(infh)
         steps = []
+        steps.append({"uses": ("actions/checkout@v2"), })
+        if 0:
+            steps.append({
+                "run":
+                ("cd workflow ; (ls -lrtA ; false)"), })
+        elif 0:
+            steps.append({
+                "run":
+                ("cd . ; (ls -lrtA ; false)"), })
         steps.append({"run": ("sudo apt-get update -qq"), })
         steps.append({
-            "run": ("sudo apt-get --no-install-recommends install " +
+            "run": ("sudo apt-get --no-install-recommends install -y " +
                     " ".join(data['addons']['apt']['packages'])
                     ),
             }
