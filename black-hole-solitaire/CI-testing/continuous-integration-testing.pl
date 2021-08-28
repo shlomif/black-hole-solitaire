@@ -41,6 +41,12 @@ do_system(
 );
 my $INSTALL = !$ENV{SKIP_RINUTILS_INSTALL};
 
+sub _refresh_dir
+{
+    my ($dir) = @_;
+    return "rm -fr $dir && mkdir $dir && cd $dir";
+}
+
 if ($INSTALL)
 {
     do_system(
@@ -51,7 +57,7 @@ if ($INSTALL)
     do_system(
         {
             cmd => [
-                      qq#cd rinutils && mkdir B && cd B && cmake #
+                      qq#cd rinutils && @{[_refresh_dir('B')]} && cmake #
                     . " -DWITH_TEST_SUITE=OFF "
                     . ( defined($cmake_gen) ? qq# -G "$cmake_gen" # : "" )
                     . (
@@ -93,7 +99,7 @@ foreach my $config_record (
     do_system(
         {
             cmd => [
-"cd black-hole-solitaire && mkdir $dir && cd $dir && $^X ..${SEP}scripts${SEP}Tatzer @$tatzer_args -l ${CPU_ARCH}t "
+"cd black-hole-solitaire && @{[_refresh_dir($dir)]} && $^X ..${SEP}scripts${SEP}Tatzer @$tatzer_args -l ${CPU_ARCH}t "
                     . ( defined($cmake_gen) ? qq#--gen="$cmake_gen"# : "" )
                     . " && $MAKE && $^X ..${SEP}c-solver${SEP}run-tests.pl"
                     . ( $INSTALL ? qq# && $SUDO $MAKE install# : '' )
