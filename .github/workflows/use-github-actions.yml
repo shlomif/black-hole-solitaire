@@ -11,6 +11,8 @@ jobs:
         -   run: cpanm local::lib
         -   run: eval "$(perl -Mlocal::lib=$HOME/perl_modules)"
         -   run: which python3
+        -   run: cpanm --notest Test::Code::TidyAll
+        -   run: perl -M"Test::Code::TidyAll 9999"
         -   run: cpanm --notest Code::TidyAll::Plugin::ClangFormat Code::TidyAll::Plugin::TestCount
                 Dir::Manifest Dist::Zilla Env::Path Games::Solitaire::Verify::Solution
                 IO::All Inline Inline::C Perl::Critic Perl::Tidy Pod::Weaver::PluginBundle::SHLOMIF
