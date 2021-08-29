@@ -34,8 +34,11 @@ def main():
                     ),
             }
         )
+        local_lib_shim = 'local_lib_shim() { eval "$(perl ' + \
+            '-Mlocal::lib=$HOME/' + \
+            'perl_modules)"; } ; local_lib_shim ; '
         for arr in ['before_install', 'install', 'script']:
-            steps += [{"run": x} for x in data[arr]]
+            steps += [{"run": local_lib_shim + x} for x in data[arr]]
         o = {'jobs': {'test-black-hole-solver': {'runs-on': 'ubuntu-latest',
              'steps': steps, }},
              'name': 'use-github-actions', 'on': ['push', ], }

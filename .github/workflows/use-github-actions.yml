@@ -7,30 +7,45 @@ jobs:
         -   run: sudo apt-get --no-install-recommends install -y build-essential cmake
                 cmake-data cpanminus libperl-dev mercurial ninja-build perl python3-dev
                 python3-pip python3-setuptools valgrind xz-utils zip
-        -   run: PATH+=":${HOME}/.local/bin"
-        -   run: cpanm local::lib
-        -   run: eval "$(perl -Mlocal::lib=$HOME/perl_modules)"
-        -   run: which python3
-        -   run: cpanm --notest Test::Code::TidyAll
-        -   run: perl -M"Test::Code::TidyAll 9999"
-        -   run: cpanm --notest Code::TidyAll::Plugin::ClangFormat Code::TidyAll::Plugin::TestCount
-                Dir::Manifest Dist::Zilla Env::Path Games::Solitaire::Verify::Solution
-                IO::All Inline Inline::C Perl::Critic Perl::Tidy Pod::Weaver::PluginBundle::SHLOMIF
-                Pod::Weaver::Section::Support Test::CPAN::Changes Test::Code::TidyAll
-                Test::Differences Test::Kwalitee Test::Pod Test::Pod::Coverage Test::RunValgrind
-                Test::Some Test::TrailingSpace Test::Trap
-        -   run: ( cd black-hole-solitaire/Games-Solitaire-BlackHole-Solver/ && dzil
-                authordeps --missing | grep -vP '[^\w:]' | xargs -n 5 -P 10 cpanm
-                --quiet --notest )
-        -   run: ( cd black-hole-solitaire/Games-Solitaire-BlackHole-Solver/ && dzil
-                listdeps --author --missing | grep -vP '[^\w:]' | xargs cpanm --verbose
-                --notest )
-        -   run: python3 -m pip install --user cookiecutter pydistman tox
-        -   run: python3 --version
-        -   run: ( set -e -x ; cd black-hole-solitaire/python-bindings/cffi/ && python3
-                python_pypi_dist_manager.py build_only && cd dest && python3 -m pip
-                install --user -r requirements.txt )
-        -   run: _verbose() { export HARNESS_VERBOSE=1 ; } ; libdir="$HOME/apps/fcs/lib";
+        -   run: local_lib_shim() { eval "$(perl -Mlocal::lib=$HOME/perl_modules)";
+                } ; local_lib_shim ; PATH+=":${HOME}/.local/bin"
+        -   run: local_lib_shim() { eval "$(perl -Mlocal::lib=$HOME/perl_modules)";
+                } ; local_lib_shim ; cpanm local::lib
+        -   run: local_lib_shim() { eval "$(perl -Mlocal::lib=$HOME/perl_modules)";
+                } ; local_lib_shim ; eval "$(perl -Mlocal::lib=$HOME/perl_modules)"
+        -   run: local_lib_shim() { eval "$(perl -Mlocal::lib=$HOME/perl_modules)";
+                } ; local_lib_shim ; which python3
+        -   run: local_lib_shim() { eval "$(perl -Mlocal::lib=$HOME/perl_modules)";
+                } ; local_lib_shim ; cpanm --notest Test::Code::TidyAll
+        -   run: local_lib_shim() { eval "$(perl -Mlocal::lib=$HOME/perl_modules)";
+                } ; local_lib_shim ; ( perl -M"Test::Code::TidyAll 9999" || true )
+        -   run: local_lib_shim() { eval "$(perl -Mlocal::lib=$HOME/perl_modules)";
+                } ; local_lib_shim ; cpanm --notest Code::TidyAll::Plugin::ClangFormat
+                Code::TidyAll::Plugin::TestCount Dir::Manifest Dist::Zilla Env::Path
+                Games::Solitaire::Verify::Solution IO::All Inline Inline::C Perl::Critic
+                Perl::Tidy Pod::Weaver::PluginBundle::SHLOMIF Pod::Weaver::Section::Support
+                Test::CPAN::Changes Test::Code::TidyAll Test::Differences Test::Kwalitee
+                Test::Pod Test::Pod::Coverage Test::RunValgrind Test::Some Test::TrailingSpace
+                Test::Trap
+        -   run: local_lib_shim() { eval "$(perl -Mlocal::lib=$HOME/perl_modules)";
+                } ; local_lib_shim ; ( cd black-hole-solitaire/Games-Solitaire-BlackHole-Solver/
+                && dzil authordeps --missing | grep -vP '[^\w:]' | xargs -n 5 -P 10
+                cpanm --quiet --notest )
+        -   run: local_lib_shim() { eval "$(perl -Mlocal::lib=$HOME/perl_modules)";
+                } ; local_lib_shim ; ( cd black-hole-solitaire/Games-Solitaire-BlackHole-Solver/
+                && dzil listdeps --author --missing | grep -vP '[^\w:]' | xargs cpanm
+                --verbose --notest )
+        -   run: local_lib_shim() { eval "$(perl -Mlocal::lib=$HOME/perl_modules)";
+                } ; local_lib_shim ; python3 -m pip install --user cookiecutter pydistman
+                tox
+        -   run: local_lib_shim() { eval "$(perl -Mlocal::lib=$HOME/perl_modules)";
+                } ; local_lib_shim ; python3 --version
+        -   run: local_lib_shim() { eval "$(perl -Mlocal::lib=$HOME/perl_modules)";
+                } ; local_lib_shim ; ( set -e -x ; cd black-hole-solitaire/python-bindings/cffi/
+                && python3 python_pypi_dist_manager.py build_only && cd dest && python3
+                -m pip install --user -r requirements.txt )
+        -   run: local_lib_shim() { eval "$(perl -Mlocal::lib=$HOME/perl_modules)";
+                } ; local_lib_shim ; _verbose() { export HARNESS_VERBOSE=1 ; } ; libdir="$HOME/apps/fcs/lib";
                 LD_LIBRARY_PATH+=":$libdir" ; LIBRARY_PATH+=":$libdir" ; export LIBRARY_PATH
                 LD_LIBRARY_PATH ; export FCS_TEST_BUILD=1 TOXENV="py38" ; export GCC_CPU_ARCH=x64
                 ; perl black-hole-solitaire/CI-testing/continuous-integration-testing.pl
