@@ -38,12 +38,15 @@ if ( !$IS_WIN )
 {
     $ENV{PATH} .= ":$ENV{HOME}/.local/bin";
 
+    # See: https://pypi.org/project/tox/
+    # A Python tester - must be invocable
     do_system(
         {
             cmd => [ "which", "tox", ],
         }
     );
 }
+
 do_system(
     {
         cmd => [ "prove", glob("root-tests/t/*.t") ],
