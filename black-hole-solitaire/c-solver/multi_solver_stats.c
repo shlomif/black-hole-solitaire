@@ -3,12 +3,10 @@
 // Distributed under terms of the Expat license.
 #include <solver_common.h>
 
-static inline int output_stats_filename(
+static inline void output_stats__solve_file(
     const char *const filename, bhs_settings *const settings_ptr)
 {
 #define settings (*settings_ptr)
-    int ret = 0;
-
     FILE *fh = stdin;
     if (filename)
     {
@@ -70,18 +68,15 @@ static inline int output_stats_filename(
     else if (solver_ret_code == BLACK_HOLE_SOLVER__OUT_OF_ITERS)
     {
         fputs("Intractable!\n", out_fh);
-        ret = -2;
     }
     else
     {
         fputs("Unsolved!\n", out_fh);
         fprintf(out_fh, "At most %lu cards could be played.\n",
             black_hole_solver_get_max_num_played_cards(solver));
-        ret = -1;
     }
 
     black_hole_solver_recycle(solver);
-    return ret;
 #undef settings
 }
 
@@ -94,7 +89,7 @@ int main(int argc, char *argv[])
     {
         char *const filename = argv[arg_idx];
         fprintf(settings.out_fh, "[= Starting file %s =]\n", filename);
-        output_stats_filename(filename, &settings);
+        output_stats__solve_file(filename, &settings);
         fprintf(settings.out_fh, "[= END of file %s =]\n", filename);
     }
     fflush(settings.out_fh);
