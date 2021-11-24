@@ -14,7 +14,7 @@ static inline void output_stats__solve_file(
         if (!fh)
         {
             fprintf(stderr, "Cannot open '%s' for reading!\n", filename);
-            return -1;
+            return;
         }
     }
     char board[MAX_LEN_BOARD_STRING];
