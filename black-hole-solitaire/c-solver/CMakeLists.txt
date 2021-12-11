@@ -114,9 +114,9 @@ ENDIF ()
 include(TestBigEndian)
 TEST_BIG_ENDIAN(BIG_ENDIAN)
 IF (BIG_ENDIAN)
-    ADD_DEFINITIONS("-DXXH_CPU_LITTLE_ENDIAN=XXH_bigEndian")
+    ADD_DEFINITIONS("-DXXH_CPU_LITTLE_ENDIAN=0")
 ELSE ()
-    ADD_DEFINITIONS("-DXXH_CPU_LITTLE_ENDIAN=XXH_littleEndian")
+    ADD_DEFINITIONS("-DXXH_CPU_LITTLE_ENDIAN=1")
 ENDIF ()
 
 # Add the google_hash.cpp if (and only if) it is being used.
