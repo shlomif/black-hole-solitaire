@@ -3,6 +3,8 @@ jobs:
         runs-on: ubuntu-latest
         steps:
         -   uses: actions/checkout@v2
+            with:
+                submodules: 'true'
         -   run: sudo apt-get update -qq
         -   run: sudo apt-get --no-install-recommends install -y build-essential cmake
                 cmake-data cpanminus libperl-dev mercurial ninja-build perl python3-dev
