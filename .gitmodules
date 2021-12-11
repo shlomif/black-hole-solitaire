@@ -1,0 +1,3 @@
+[submodule "black-hole-solitaire/c-solver/xxHash-wrapper"]
+	path = black-hole-solitaire/c-solver/xxHash-wrapper
+	url = https://github.com/shlomif/xxHash-wrapper
