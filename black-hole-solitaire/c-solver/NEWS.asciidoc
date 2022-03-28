@@ -4,6 +4,13 @@ Shlomi Fish <shlomif@cpan.org>
 :Date: 2020-06-28
 :Revision: $Id$
 
+1.12.0       ( 28 March 2022 ):
+-------------------------------
+
+* Convert to cmake/rinutils_bootstrap.cmake .
+
+* Minor refactorings .
+
 1.10.1       ( 28 October 2020 ):
 ---------------------------------
 
