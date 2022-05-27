@@ -23,9 +23,9 @@ sub do_system
 
     my $cmd = $args->{cmd};
     print "Running [@$cmd]\n";
-    if (0)    # system(@$cmd) >> 1 )
+    if ( system(@$cmd) )
     {
-        die "Running [@$cmd] failed!";
+        # die "Running [@$cmd] failed!";
     }
 
     return;
