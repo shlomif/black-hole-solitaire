@@ -1,6 +1,7 @@
 #!/bin/bash
 export PATH="$HOME/apps/perl/modules/local/bin:$PATH"
-export PERL5LIB="$HOME/apps/perl/modules/lib/perl5/site_perl/5.10.1/"
+PERL5LIB+=":$HOME/apps/perl/modules/lib/perl5/site_perl/5.10.1/"
+export PERL5LIB
     (
         seq 1 20
     ) |
