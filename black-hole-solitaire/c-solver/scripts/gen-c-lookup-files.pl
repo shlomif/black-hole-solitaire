@@ -26,14 +26,6 @@ my $NUM_SUITS = 4;
 my $MAX_SUIT  = ( $NUM_SUITS - 1 );
 my @RANKS     = ( 1 .. $MAX_RANK );
 
-my $NUM_CHILD_CARDS  = 64;
-my $NUM_PARENT_CARDS = make_card( $MAX_RANK, $MAX_SUIT ) + 1;
-my @is_king          = ( ($FALSE) x $NUM_PARENT_CARDS );
-my %lookup;
-my @state_pos = ( map { [ (0) x $NUM_SUITS ] } 0 .. $MAX_RANK );
-my @card_pos;
-my @positions_by_rank__lookup;
-my @pos_by_rank;
 my @can_move;
 
 foreach my $wrap_ranks ( 0, 1 )
