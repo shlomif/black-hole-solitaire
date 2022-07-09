@@ -6,6 +6,26 @@ use warnings;
 use autodie;
 use Path::Tiny qw/ path /;
 
+sub emit
+{
+    my ( $DECL, $bn, $header_headers, $contents, $types ) = @_;
+    $types //= '';
+
+    my $header_fn = "$bn.h";
+
+    path($header_fn)
+        ->spew_utf8( "#pragma once\n"
+            . join( '', map { qq{#include $_\n} } @$header_headers )
+            . $types
+            . "extern $DECL;\n" );
+    path("$bn.c")
+        ->spew_utf8( qq/#include "$header_fn"\n\n$DECL = {/
+            . join( ',', @$contents )
+            . "};\n" );
+
+    return;
+}
+
 sub make_card
 {
     my ( $rank, $suit ) = @_;
@@ -59,26 +79,6 @@ path('board_gen_lookup1.h')->spew_utf8(
     ),
     "};\n"
 );
-
-sub emit
-{
-    my ( $DECL, $bn, $header_headers, $contents, $types ) = @_;
-    $types //= '';
-
-    my $header_fn = "$bn.h";
-
-    path($header_fn)
-        ->spew_utf8( "#pragma once\n"
-            . join( '', map { qq{#include $_\n} } @$header_headers )
-            . $types
-            . "extern $DECL;\n" );
-    path("$bn.c")
-        ->spew_utf8( qq/#include "$header_fn"\n\n$DECL = {/
-            . join( ',', @$contents )
-            . "};\n" );
-
-    return;
-}
 
 emit(
 qq#const bool black_hole_solver__can_move[2][@{[$MAX_RANK+1]}][@{[$MAX_RANK]}]#,
