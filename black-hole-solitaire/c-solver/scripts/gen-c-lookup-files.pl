@@ -26,18 +26,6 @@ sub emit
     return;
 }
 
-sub make_card
-{
-    my ( $rank, $suit ) = @_;
-    return ( ( $rank << 2 ) | $suit );
-}
-
-sub key
-{
-    my ( $parent, $child ) = @_;
-    return "${parent}\t${child}";
-}
-
 my $FALSE = 0;
 my $TRUE  = 1;
 
