@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Path::Tiny qw/ path /;
+use Path::Tiny                     qw/ path /;
 use Games::Solitaire::Verify::Card ();
 
 use lib './t/lib';

@@ -33,7 +33,7 @@ trap
 # TEST
 ok( !($exit_code), "Running the program successfully." );
 
-use Dir::Manifest ();
+use Dir::Manifest        ();
 use Dir::Manifest::Slurp qw/ as_lf /;
 my $mani = Dir::Manifest->new(
     {

@@ -3,9 +3,9 @@ use warnings;
 
 use Test::More tests => 12;
 
-use Path::Tiny qw/ path cwd /;
+use Path::Tiny           qw/ path cwd /;
 use Dir::Manifest::Slurp qw/ as_lf /;
-use Test::Differences qw/ eq_or_diff /;
+use Test::Differences    qw/ eq_or_diff /;
 
 sub _filename
 {

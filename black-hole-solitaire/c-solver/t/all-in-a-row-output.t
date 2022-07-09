@@ -19,7 +19,7 @@ sub mysys
     return $exit_code = system(@_);
 }
 
-use Dir::Manifest ();
+use Dir::Manifest        ();
 use Dir::Manifest::Slurp qw/ as_lf /;
 my $mani = Dir::Manifest->new(
     {

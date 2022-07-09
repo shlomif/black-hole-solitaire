@@ -6,8 +6,8 @@ use warnings;
 use autodie;
 
 use Getopt::Long qw/ GetOptions /;
-use Env::Path ();
-use Path::Tiny qw/ path /;
+use Env::Path    ();
+use Path::Tiny   qw/ path /;
 
 my $src_dir = path(__FILE__)->parent->absolute;
 

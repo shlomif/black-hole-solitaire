@@ -5,7 +5,7 @@ use warnings;
 
 use Test::More;
 use Test::RunValgrind ();
-use Path::Tiny qw/ path /;
+use Path::Tiny        qw/ path /;
 
 my $bin_dir  = path($0)->parent->absolute;
 my $data_dir = $bin_dir->child('data');
