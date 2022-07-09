@@ -6,17 +6,6 @@ use warnings;
 use autodie;
 use Path::Tiny qw/ path /;
 
-my $FALSE = 0;
-my $TRUE  = 1;
-
-my $MAX_RANK              = $ENV{FCS_MAX_RANK} || 13;
-my $NUM_SUITS             = 4;
-my @SUITS                 = ( 0 .. $NUM_SUITS - 1 );
-my @RANKS                 = ( 1 .. $MAX_RANK );
-my @PARENT_RANKS          = ( 2 .. $MAX_RANK );
-my $MAX_NUM_DECKS         = 1;
-my $FCS_POS_BY_RANK_WIDTH = ( $MAX_NUM_DECKS << 3 );
-
 sub make_card
 {
     my ( $rank, $suit ) = @_;
@@ -29,8 +18,16 @@ sub key
     return "${parent}\t${child}";
 }
 
+my $FALSE = 0;
+my $TRUE  = 1;
+
+my $MAX_RANK  = $ENV{FCS_MAX_RANK} || 13;
+my $NUM_SUITS = 4;
+my $MAX_SUIT  = ( $NUM_SUITS - 1 );
+my @RANKS     = ( 1 .. $MAX_RANK );
+
 my $NUM_CHILD_CARDS  = 64;
-my $NUM_PARENT_CARDS = make_card( $MAX_RANK, $SUITS[-1] ) + 1;
+my $NUM_PARENT_CARDS = make_card( $MAX_RANK, $MAX_SUIT ) + 1;
 my @is_king          = ( ($FALSE) x $NUM_PARENT_CARDS );
 my %lookup;
 my @state_pos = ( map { [ (0) x $NUM_SUITS ] } 0 .. $MAX_RANK );
