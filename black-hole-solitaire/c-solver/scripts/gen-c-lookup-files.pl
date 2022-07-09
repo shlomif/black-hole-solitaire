@@ -21,10 +21,8 @@ sub key
 my $FALSE = 0;
 my $TRUE  = 1;
 
-my $MAX_RANK  = $ENV{FCS_MAX_RANK} || 13;
-my $NUM_SUITS = 4;
-my $MAX_SUIT  = ( $NUM_SUITS - 1 );
-my @RANKS     = ( 1 .. $MAX_RANK );
+my $MAX_RANK = $ENV{FCS_MAX_RANK} || 13;
+my @RANKS    = ( 1 .. $MAX_RANK );
 
 my @can_move;
 
