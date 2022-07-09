@@ -3,9 +3,7 @@
 use strict;
 use warnings;
 
-use Data::Dump;
 use DBI;
-use IO::All;
 use List::MoreUtils qw(zip part);
 
 my $DATABASE_FILE = "black_hole_solver.sqlite";
