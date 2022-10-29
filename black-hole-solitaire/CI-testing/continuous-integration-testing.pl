@@ -95,49 +95,57 @@ if ($IS_WIN)
 }
 
 my $CPU_ARCH = ( delete( $ENV{GCC_CPU_ARCH} ) // 'n2' );
-foreach my $config_record (
-    {
-        dir         => "B",
-        tatzer_args => [],
-    },
-    {
-        dir         => "B_with_max_num_played",
-        tatzer_args => [
-            qw/ --cmakedefine ENABLE_DISPLAYING_MAX_NUM_PLAYED_CARDS:BOOL=TRUE /
-        ],
-    },
+
+foreach my $SIGNED_CHARS_ARGS (
+    [ "--cmakedefine", "USE_SIGNED_CHARS:BOOL=TRUE", ],
+    [ "--cmakedefine", "USE_UNSIGNED_CHARS:BOOL=TRUE", ],
     )
 {
-    my ( $dir, $tatzer_args ) = @{$config_record}{qw/ dir tatzer_args /};
+    foreach my $config_record (
+        {
+            dir         => "B",
+            tatzer_args => [],
+        },
+        {
+            dir         => "B_with_max_num_played",
+            tatzer_args => [
+                qw/ --cmakedefine ENABLE_DISPLAYING_MAX_NUM_PLAYED_CARDS:BOOL=TRUE /
+            ],
+        },
+        )
+    {
+        my ( $dir, $tatzer_args ) = @{$config_record}{qw/ dir tatzer_args /};
+        $tatzer_args = [ @$tatzer_args, @$SIGNED_CHARS_ARGS, ];
+        do_system(
+            {
+                cmd => [
+"cd black-hole-solitaire && @{[_refresh_dir($dir)]} && $^X ..${SEP}scripts${SEP}Tatzer @$tatzer_args -l ${CPU_ARCH}t "
+                        . ( defined($cmake_gen) ? qq#--gen="$cmake_gen"# : "" )
+                        . " && $MAKE && $^X ..${SEP}c-solver${SEP}run-tests.pl"
+                        . ( $INSTALL ? qq# && $SUDO $MAKE install# : '' )
+                ]
+            }
+        );
+    }
     do_system(
         {
             cmd => [
-"cd black-hole-solitaire && @{[_refresh_dir($dir)]} && $^X ..${SEP}scripts${SEP}Tatzer @$tatzer_args -l ${CPU_ARCH}t "
-                    . ( defined($cmake_gen) ? qq#--gen="$cmake_gen"# : "" )
-                    . " && $MAKE && $^X ..${SEP}c-solver${SEP}run-tests.pl"
-                    . ( $INSTALL ? qq# && $SUDO $MAKE install# : '' )
+"cd black-hole-solitaire${SEP}Games-Solitaire-BlackHole-Solver && dzil test --all"
             ]
         }
     );
-}
-do_system(
-    {
-        cmd => [
-"cd black-hole-solitaire${SEP}Games-Solitaire-BlackHole-Solver && dzil test --all"
-        ]
-    }
-);
 
-my $pytest =
+    my $pytest =
 " && cd dest && py.test --cov black_hole_solver --cov-report term-missing tests${SEP}";
-if ($IS_WIN)
-{
-    $pytest = '';
-}
-do_system(
+    if ($IS_WIN)
     {
-        cmd => [
-"cd black-hole-solitaire${SEP}python-bindings${SEP}cffi${SEP} && python3 python_pypi_dist_manager.py test $pytest"
-        ],
+        $pytest = '';
     }
-);
+    do_system(
+        {
+            cmd => [
+"cd black-hole-solitaire${SEP}python-bindings${SEP}cffi${SEP} && python3 python_pypi_dist_manager.py test $pytest"
+            ],
+        }
+    );
+}

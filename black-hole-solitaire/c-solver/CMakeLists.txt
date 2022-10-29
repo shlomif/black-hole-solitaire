@@ -13,6 +13,8 @@ option (BUILD_STATIC_LIBRARY "Build and install the static library")
 option (LINK_TO_STATIC "Link the executables to the static library")
 option (DISABLE_APPLYING_RPATH "Disable applying rpath")
 option (ENABLE_DISPLAYING_MAX_NUM_PLAYED_CARDS "Allow recording and displaying the maximal number of played/\"moved\" cards. Enabling it may make the non-related run time somewhat slower.")
+option (USE_SIGNED_CHARS "-fsigned-char")
+option (USE_UNSIGNED_CHARS "-funsigned-char")
 
 INCLUDE(FindPkgConfig)
 
@@ -145,6 +147,12 @@ IF ("$ENV{FCS_GCC}")
     ENDIF ()
 ENDIF ()
 ADD_DEFINITIONS("-Wno-unknown-pragmas")
+
+IF (USE_UNSIGNED_CHARS)
+    ADD_DEFINITIONS("-funsigned-char")
+ELSEIF (USE_SIGNED_CHARS)
+    ADD_DEFINITIONS("-fsigned-char")
+ENDIF ()
 
 # So it can find config.h
 INCLUDE_DIRECTORIES(BEFORE "${CMAKE_CURRENT_SOURCE_DIR}")
