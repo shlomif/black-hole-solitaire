@@ -10,7 +10,7 @@ use strict;
 use warnings;
 
 use Getopt::Long qw/ GetOptions /;
-use Path::Tiny qw/path/;
+use Path::Tiny   qw/path/;
 
 my %BOOL_OPTS_WITH_FALSE_DEFAULTS =
     ( 'omit-frame' => 'OPTIMIZATION_OMIT_FRAME_POINTER', );
@@ -296,13 +296,11 @@ my @cmd               = (
             my $k = $_;
             my $v = $cmake_defines{$k};
             "-D$k=$v";
-        } keys(%cmake_defines)
+        } sort { $a cmp $b } keys(%cmake_defines)
     ),
     (
         defined($CMAKE_PREFIX_PATH)
-        ? (
-            "-DCMAKE_PREFIX_PATH=" . ( $CMAKE_PREFIX_PATH =~ s%\\%\\\\%gr ),
-            )
+        ? ( "-DCMAKE_PREFIX_PATH=" . ( $CMAKE_PREFIX_PATH =~ s%\\%\\\\%gr ), )
         : ()
     ),
     (
