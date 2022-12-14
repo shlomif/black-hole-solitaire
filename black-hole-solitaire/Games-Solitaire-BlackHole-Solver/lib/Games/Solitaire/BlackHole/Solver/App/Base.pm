@@ -318,7 +318,9 @@ sub _process_cmd_line
     }
     else
     {
+        ## no critic
         open( $output_handle, ">&STDOUT" );
+        ## use critic
     }
     $self->_output_fn($output_fn);
     $self->_output_handle($output_handle);
@@ -370,7 +372,8 @@ sub _set_up_tasks
                 die "Unknown task name $name in prelude!";
             }
             my $task_obj = $self->_tasks_by_names->{$name};
-            return Games::Solitaire::BlackHole::Solver::App::Base::PreludeItem
+            return
+                Games::Solitaire::BlackHole::Solver::App::Base::PreludeItem
                 ->new(
                 {
                     _quota     => $quota,
