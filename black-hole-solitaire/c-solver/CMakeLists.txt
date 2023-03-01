@@ -135,6 +135,7 @@ SHLOMIF_FINALIZE_FLAGS()
 
 IF ("$ENV{FCS_CLANG}")
     ADD_DEFINITIONS("-Weverything -Wno-language-extension-token -Wno-gnu-statement-expression -Wno-used-but-marked-unused -Wno-padded -Wno-cast-align -Wno-extra-semi-stmt")
+    ADD_DEFINITIONS("-Wno-declaration-after-statement")
 ENDIF ()
 
 IF ("$ENV{FCS_GCC}")
