@@ -95,15 +95,7 @@ jobs:
                 if not exist C:\Perl5 mkdir C:\Perl5 || ( echo Failed & exit /B 1
                 )
 
-                pkg-config --version || ( echo Failed & exit /B 1 )
-
-                pkg-config --version || ( echo Failed & exit /B 1 )
-
-                pkg-config --version || ( echo Failed & exit /B 1 )
-
                 set CMAKE_MAKE_PROGRAM=C:\strawberry\c\bin\gmake.exe
-
-                pkg-config --version || ( echo Failed & exit /B 1 )
 
                 set TOXENV=py310
 
