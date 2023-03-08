@@ -171,7 +171,8 @@ def generate_windows_yaml(plat, output_path, is_act):
                 shim = ''
                 if not (r.lower().startswith("set ")):
                     shim = " || ( echo Failed & exit /B 1 )"
-                batch += r + shim + "\n"
+                if not (r.lower().startswith("set perl")):
+                    batch += r + shim + "\n"
         return batch
 
     steps.append({
