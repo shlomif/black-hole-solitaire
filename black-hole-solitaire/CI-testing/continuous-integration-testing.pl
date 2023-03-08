@@ -127,13 +127,19 @@ foreach my $SIGNED_CHARS_ARGS (
             }
         );
     }
-    do_system(
-        {
-            cmd => [
-"cd black-hole-solitaire${SEP}Games-Solitaire-BlackHole-Solver && dzil test --all"
-            ]
-        }
-    );
+    my $dzil = sub {
+        my $cmd = shift;
+        return do_system(
+            {
+                cmd => [
+"cd black-hole-solitaire${SEP}Games-Solitaire-BlackHole-Solver && $cmd"
+                ]
+            }
+        );
+    };
+    $dzil->("dzil authordeps --missing | cpanm --notest");
+    $dzil->("dzil listdeps --missing | cpanm --notest");
+    $dzil->("dzil test --all");
 
     my $pytest =
 " && cd dest && py.test --cov black_hole_solver --cov-report term-missing tests${SEP}";
