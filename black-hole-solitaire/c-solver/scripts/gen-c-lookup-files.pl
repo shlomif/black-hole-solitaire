@@ -79,8 +79,7 @@ qq#const bool black_hole_solver__can_move[2][@{[$MAX_RANK+1]}][@{[$MAX_RANK]}]#,
                 ',',
                 map {
                     my $row = $_;
-                    '{'
-                        . join( ',', map { $_ ? 'true' : 'false' } @$row ) . '}'
+                    '{' . join( ',', map { $_ ? 'true' : 'false' } @$row ) . '}'
                 } @{$table}
                 )
                 . '}'
