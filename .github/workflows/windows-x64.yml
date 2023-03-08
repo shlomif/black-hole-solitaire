@@ -100,11 +100,9 @@ jobs:
                 cd black-hole-solitaire\Games-Solitaire-BlackHole-Solver || ( echo
                 Failed & exit /B 1 )
 
-                dzil authordeps --missing | cpanm -n || ( echo Failed & exit /B 1
-                )
+                dzil authordeps --missing | cpanm -n
 
-                dzil listdeps   --missing | cpanm -n || ( echo Failed & exit /B 1
-                )
+                dzil listdeps   --missing | cpanm -n
 
                 pkg-config --version || ( echo Failed & exit /B 1 )
 

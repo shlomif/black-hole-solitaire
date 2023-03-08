@@ -169,7 +169,7 @@ def generate_windows_yaml(plat, output_path, is_act):
                 # See:
                 # https://serverfault.com/questions/157173
                 shim = ''
-                if not (r.lower().startswith("set ")):
+                if not (r.lower().startswith("set ") or ("|" in r)):
                     shim = " || ( echo Failed & exit /B 1 )"
                 if not (r.lower().startswith("set perl")):
                     batch += r + shim + "\n"
