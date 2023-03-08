@@ -12,7 +12,6 @@ install:
     - SET PATH=C:\Python38-x64;%PATH%
     - copy c:\Python38-x64\python.exe c:\Python38-x64\python3.exe
     - copy c:\Python38-x64\python.exe c:\Python38-x64\python38.exe
-    - python38 --version
     - python3 --version
     - python3 -mpip install %PY3MODS%
     - perl -v
