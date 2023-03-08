@@ -23,15 +23,15 @@ install:
     - SET PERL_MM_OPT=INSTALL_BASE=C:/Perl5
     - pkg-config --version
     - cpanm --notest Code::TidyAll::Plugin::ClangFormat Code::TidyAll::Plugin::TestCount Dir::Manifest Dist::Zilla Env::Path Games::Solitaire::Verify::Solution IO::All Inline Inline::C Perl::Critic Perl::Tidy Pod::Coverage::TrustPod Pod::Weaver::Section::Support String::ShellQuote Test::CPAN::Changes Test::Code::TidyAll Test::Differences Test::EOL Test::Kwalitee Test::NoTabs Test::Pod Test::Pod::Coverage Test::RunValgrind Test::Some Test::TrailingSpace Test::Trap
-    - cd black-hole-solitaire\Games-Solitaire-BlackHole-Solver
-    - dzil authordeps --missing | cpanm -n
-    - dzil listdeps   --missing | cpanm -n
+      # - cd black-hole-solitaire\Games-Solitaire-BlackHole-Solver
+      # - dzil authordeps --missing | cpanm -n
+      # - dzil listdeps   --missing | cpanm -n
     - pkg-config --version
 build: off
 test_script:
     - pkg-config --version
     - set CMAKE_MAKE_PROGRAM=C:\strawberry\c\bin\gmake.exe
-    - cd ..\..
+      # - cd ..\..
     # Removing for now because it is too much trouble on windows.
     # - set FCS_TEST_BUILD=1
     - pkg-config --version

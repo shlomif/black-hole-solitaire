@@ -97,20 +97,11 @@ jobs:
 
                 pkg-config --version || ( echo Failed & exit /B 1 )
 
-                cd black-hole-solitaire\Games-Solitaire-BlackHole-Solver || ( echo
-                Failed & exit /B 1 )
-
-                dzil authordeps --missing | cpanm -n
-
-                dzil listdeps   --missing | cpanm -n
-
                 pkg-config --version || ( echo Failed & exit /B 1 )
 
                 pkg-config --version || ( echo Failed & exit /B 1 )
 
                 set CMAKE_MAKE_PROGRAM=C:\strawberry\c\bin\gmake.exe
-
-                cd ..\.. || ( echo Failed & exit /B 1 )
 
                 pkg-config --version || ( echo Failed & exit /B 1 )
 
