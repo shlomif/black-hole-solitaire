@@ -25,7 +25,8 @@ my $MAKE   = $IS_WIN ? 'gmake' : 'make';
 my $SUDO   = $IS_WIN ? ''      : 'sudo';
 
 my $cmake_gen;
-GetOptions( 'gen=s' => \$cmake_gen, )
+my $skip_pypi = 0;
+GetOptions( 'gen=s' => \$cmake_gen, 'skip-pypi!' => \$skip_pypi, )
     or die 'Wrong options';
 
 local $ENV{RUN_TESTS_VERBOSE} = 1;
@@ -141,17 +142,20 @@ foreach my $SIGNED_CHARS_ARGS (
     $dzil->("dzil listdeps --missing | cpanm --notest");
     $dzil->("dzil test --all");
 
-    my $pytest =
-" && cd dest && py.test --cov black_hole_solver --cov-report term-missing tests${SEP}";
-    if ($IS_WIN)
+    if ( not $skip_pypi )
     {
-        $pytest = '';
-    }
-    do_system(
+        my $pytest =
+" && cd dest && py.test --cov black_hole_solver --cov-report term-missing tests${SEP}";
+        if ($IS_WIN)
         {
-            cmd => [
-"cd black-hole-solitaire${SEP}python-bindings${SEP}cffi${SEP} && python3 python_pypi_dist_manager.py test $pytest"
-            ],
+            $pytest = '';
         }
-    );
+        do_system(
+            {
+                cmd => [
+"cd black-hole-solitaire${SEP}python-bindings${SEP}cffi${SEP} && python3 python_pypi_dist_manager.py test $pytest"
+                ],
+            }
+        );
+    }
 }
