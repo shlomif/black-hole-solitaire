@@ -15,12 +15,14 @@ from pysol_cards.deal_game import Game
 from pysol_cards.random_base import RandomBase
 # from pysol_cards.single_deal_args_parse import SingleDealArgsParser
 
+renderer = CardRenderer(True)
+
 
 def make_pysol_board__main(game_num):
     return Game(
         "black_hole", game_num,
         RandomBase.DEALS_PYSOLFC,
-    ).calc_layout_string(CardRenderer(True))
+    ).calc_layout_string(renderer)
 
 
 def main():
