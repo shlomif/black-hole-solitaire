@@ -18,20 +18,20 @@ from pysol_cards.random_base import RandomBase
 renderer = CardRenderer(True)
 
 
-def make_pysol_board(game_num):
+def make_pysol_board(deal_idx):
     return Game(
-        "black_hole", game_num,
+        "black_hole", deal_idx,
         RandomBase.DEALS_PYSOLFC,
     ).calc_layout_string(renderer)
 
 
 def main():
     solver = BlackHoleSolver()
-    idx = 0
+    deal_idx = 0
     while True:
-        idx += 1
-        print('Reached deal No. {}'.format(idx), flush=True)
-        pysolfc_black_hole_deal = make_pysol_board(idx)
+        deal_idx += 1
+        print('Reached deal No. {}'.format(deal_idx), flush=True)
+        pysolfc_black_hole_deal = make_pysol_board(deal_idx)
         solver.read_board(
             board=pysolfc_black_hole_deal,
             game_type='black_hole',
