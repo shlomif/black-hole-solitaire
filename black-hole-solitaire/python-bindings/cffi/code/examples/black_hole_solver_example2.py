@@ -15,12 +15,13 @@ from pysol_cards.deal_game import Game
 from pysol_cards.random_base import RandomBase
 # from pysol_cards.single_deal_args_parse import SingleDealArgsParser
 
+VARIANT = "black_hole"
 renderer = CardRenderer(True)
 
 
 def make_pysol_board(deal_idx):
     return Game(
-        "black_hole", deal_idx,
+        VARIANT, deal_idx,
         RandomBase.DEALS_PYSOLFC,
     ).calc_layout_string(renderer)
 
@@ -31,10 +32,10 @@ def main():
     while True:
         deal_idx += 1
         print('Reached deal No. {}'.format(deal_idx), flush=True)
-        pysolfc_black_hole_deal = make_pysol_board(deal_idx)
+        board = make_pysol_board(deal_idx)
         solver.read_board(
-            board=pysolfc_black_hole_deal,
-            game_type='black_hole',
+            board=board,
+            game_type=VARIANT,
             place_queens_on_kings=True,
             wrap_ranks=True,
         )
