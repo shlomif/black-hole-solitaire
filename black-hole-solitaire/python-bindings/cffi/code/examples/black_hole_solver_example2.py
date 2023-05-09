@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # vim:fenc=utf-8
 #
-# Copyright © 2020 Shlomi Fish <shlomif@cpan.org>
+# Copyright © 2023 Shlomi Fish <shlomif@cpan.org>
 #
 # Distributed under the terms of the MIT license.
 #
@@ -30,13 +30,14 @@ def main():
     idx = 0
     while True:
         idx += 1
-        print('reached {}'.format(idx), flush=True)
+        print('Reached deal No. {}'.format(idx), flush=True)
         pysolfc_black_hole_deal = make_pysol_board(idx)
         solver.read_board(
             board=pysolfc_black_hole_deal,
             game_type='black_hole',
             place_queens_on_kings=True,
-            wrap_ranks=True)
+            wrap_ranks=True,
+        )
         solver.resume_solution()
         solver.recycle()
 
