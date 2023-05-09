@@ -10,8 +10,6 @@
 
 from black_hole_solver import BlackHoleSolver
 
-from six import print_
-
 from pysol_cards.cards import CardRenderer
 from pysol_cards.deal_game import Game
 # from pysol_cards.single_deal_args_parse import SingleDealArgsParser
@@ -37,7 +35,7 @@ def main():
         solver.resume_solution()
         solver.recycle()
         idx += 1
-        print_('reached', idx)
+        print('reached {}'.format(idx))
 
 
 main()
