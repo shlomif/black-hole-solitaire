@@ -43,4 +43,5 @@ def main():
         solver.recycle()
 
 
-main()
+if __name__ == "__main__":
+    main()

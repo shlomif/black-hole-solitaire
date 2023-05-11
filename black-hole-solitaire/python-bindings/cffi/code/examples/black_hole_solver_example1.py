@@ -47,4 +47,5 @@ KH 8H 6C
         m = solver.get_next_move()
 
 
-main()
+if __name__ == "__main__":
+    main()
