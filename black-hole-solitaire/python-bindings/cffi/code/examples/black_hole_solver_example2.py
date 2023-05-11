@@ -7,6 +7,9 @@
 # Distributed under the terms of the MIT license.
 #
 # This program is a black_hole_solver demo
+'''
+A range-solver to test memory-consumption .
+'''
 
 from black_hole_solver import BlackHoleSolver
 
