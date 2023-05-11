@@ -128,34 +128,34 @@ foreach my $SIGNED_CHARS_ARGS (
             }
         );
     }
-    my $dzil = sub {
-        my $cmd = shift;
-        return do_system(
-            {
-                cmd => [
-"cd black-hole-solitaire${SEP}Games-Solitaire-BlackHole-Solver && $cmd"
-                ]
-            }
-        );
-    };
-    $dzil->("dzil authordeps --missing | cpanm --notest");
-    $dzil->("dzil listdeps --missing | cpanm --notest");
-    $dzil->("dzil test --all");
-
-    if ( not $skip_pypi )
-    {
-        my $pytest =
-" && cd dest && py.test --cov black_hole_solver --cov-report term-missing tests${SEP}";
-        if ($IS_WIN)
+}
+my $dzil = sub {
+    my $cmd = shift;
+    return do_system(
         {
-            $pytest = '';
+            cmd => [
+"cd black-hole-solitaire${SEP}Games-Solitaire-BlackHole-Solver && $cmd"
+            ]
         }
-        do_system(
-            {
-                cmd => [
-"cd black-hole-solitaire${SEP}python-bindings${SEP}cffi${SEP} && python3 python_pypi_dist_manager.py test $pytest"
-                ],
-            }
-        );
+    );
+};
+$dzil->("dzil authordeps --missing | cpanm --notest");
+$dzil->("dzil listdeps --missing | cpanm --notest");
+$dzil->("dzil test --all");
+
+if ( not $skip_pypi )
+{
+    my $pytest =
+" && cd dest && py.test --cov black_hole_solver --cov-report term-missing tests${SEP}";
+    if ($IS_WIN)
+    {
+        $pytest = '';
     }
+    do_system(
+        {
+            cmd => [
+"cd black-hole-solitaire${SEP}python-bindings${SEP}cffi${SEP} && python3 python_pypi_dist_manager.py test $pytest"
+            ],
+        }
+    );
 }
