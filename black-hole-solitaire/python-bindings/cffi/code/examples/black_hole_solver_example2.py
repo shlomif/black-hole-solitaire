@@ -29,9 +29,11 @@ def make_pysol_board(deal_idx):
 def main():
     solver = BlackHoleSolver()
     deal_idx = 0
+    max_num_times = -1
     while True:
         deal_idx += 1
-        print('Reached deal No. {}'.format(deal_idx), flush=True)
+        print('Reached deal No. {} [{}]'.format(
+            deal_idx, max_num_times), flush=True)
         board = make_pysol_board(deal_idx)
         solver.read_board(
             board=board,
@@ -40,6 +42,7 @@ def main():
             wrap_ranks=True,
         )
         solver.resume_solution()
+        max_num_times = max(max_num_times, solver.get_num_times())
         solver.recycle()
 
 
