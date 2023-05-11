@@ -32,7 +32,7 @@ def main():
     max_num_times = -1
     while True:
         deal_idx += 1
-        print('Reached deal No. {} [{}]'.format(
+        print('Reached deal No. {} [ max_num_times = {} ]'.format(
             deal_idx, max_num_times), flush=True)
         board = make_pysol_board(deal_idx)
         solver.read_board(
