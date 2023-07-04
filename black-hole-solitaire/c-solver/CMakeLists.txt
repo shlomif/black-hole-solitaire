@@ -35,7 +35,7 @@ SET(CPACK_SOURCE_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSIO
 
 SET (BHS_STATE_STORAGE "BHS_STATE_STORAGE_INTERNAL_HASH" CACHE STRING "The State Storage Type")
 SET (FCS_IA_PACK_SIZE 64 CACHE STRING "Size of a single pack in kilo-bytes.")
-SET (IA_STATE_PACKS_GROW_BY 32 CACHE STRING "Amount to Grow State Packs By")
+SET (IA_STATE_PACKS_GROW_BY 32 CACHE STRING "Amount to Grow State Packs By ( UNUSED! Kept for backward compatibility. )")
 SET (base_with_ver "black_hole_solver-[0-9]+\\\\.[0-9]+\\\\.[0-9]+")
 SET(CPACK_SOURCE_GENERATOR "TXZ")
 SET(CPACK_SOURCE_IGNORE_FILES
