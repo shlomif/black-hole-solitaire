@@ -1,0 +1,39 @@
+== Black Hole Solitaire Solver
+
+http://www.shlomifish.org/open-source/projects/black-hole-solitaire-solver/[Black
+Hole Solitaire Solver] is an automated solver for the card Solitaire
+games https://en.wikipedia.org/wiki/Golf_%28patience%29[“Golf”],
+http://en.wikipedia.org/wiki/Black_Hole_%28solitaire%29[“Black Hole”],
+and http://en.wikipedia.org/wiki/All_in_a_Row_%28Solitaire%29[“All in a Row”] .
+
+https://travis-ci.org/shlomif/black-hole-solitaire[image:https://travis-ci.org/shlomif/black-hole-solitaire.svg?branch=master[Build
+Status]]
+https://ci.appveyor.com/project/shlomif/black-hole-solitaire[image:https://ci.appveyor.com/api/projects/status/yvne045w9dmd4h92?svg=true[AppVeyor
+Build Status]]
+
+=== Screenshots
+
+image::http://i.imgur.com/htp5UZq.jpg[Running using PySol FC on KDE Plasma 5]
+
+==== Videos
+
+https://www.youtube.com/watch?v=t_cuDHj5V2k&feature=youtu.be[Solving
+Black Hole in PySolFC]
+
+=== Guide to the code
+
+The interesting code in C is under the black-hole-solitaire/c-solver/
+directory and there’s also some older code in Perl under
+black-hole-solitaire/Games-Solitaire-BlackHole-Solver/ .
+
+Some related links:
+
+* http://fc-solve.shlomifish.org/[Freecell Solver] - a solver for
+Freecell and related solitaire games.
+* http://fc-solve.shlomifish.org/links.html#other_solvers[Other patience
+solvers]
+
+=== CI Build+Tests
+
+* https://travis-ci.org/shlomif/black-hole-solitaire
+* https://ci.appveyor.com/project/shlomif/black-hole-solitaire
