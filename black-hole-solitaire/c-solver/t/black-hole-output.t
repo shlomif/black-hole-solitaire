@@ -11,7 +11,7 @@ use Test::Trap qw(
     trap $trap :flow:stderr(systemsafe):stdout(systemsafe):warn
 );
 
-use Path::Tiny qw/ path /;
+use Path::Tiny qw/ path tempdir /;
 
 my $bin_dir   = path(__FILE__)->parent->absolute;
 my $data_dir  = $bin_dir->child('data');
@@ -256,7 +256,8 @@ foreach my $exe ( './black-hole-solve', )
 }
 
 {
-    my $out_fn = "golf1to20out.txt";
+    my $tmp    = tempdir();
+    my $out_fn = $tmp->child("golf1to20out.txt");
     trap
     {
         mysys(
