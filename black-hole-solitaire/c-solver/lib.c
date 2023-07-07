@@ -49,7 +49,7 @@ enum BHS_SUITS
     INVALID_SUIT = -1
 };
 
-static int suit_char_to_index(char suit)
+static int suit_char_to_index(const char suit)
 {
     switch (suit)
     {
@@ -629,7 +629,7 @@ static inline int setup_init_state(bhs_solver_t *const solver)
 }
 
 extern int DLLEXPORT black_hole_solver_config_setup(
-    black_hole_solver_instance_t *instance_proto)
+    black_hole_solver_instance_t *const instance_proto)
 {
     bhs_solver_t *const solver = (bhs_solver_t *)instance_proto;
     setup_config(solver);
@@ -637,14 +637,14 @@ extern int DLLEXPORT black_hole_solver_config_setup(
 }
 
 extern int DLLEXPORT black_hole_solver_setup(
-    black_hole_solver_instance_t *instance_proto)
+    black_hole_solver_instance_t *const instance_proto)
 {
     bhs_solver_t *const solver = (bhs_solver_t *)instance_proto;
     return setup_init_state(solver);
 }
 
 extern int DLLEXPORT black_hole_solver_run(
-    black_hole_solver_instance_t *instance_proto)
+    black_hole_solver_instance_t *const instance_proto)
 {
     bhs_solver_t *const solver = (bhs_solver_t *)instance_proto;
 
@@ -772,7 +772,7 @@ extern int DLLEXPORT black_hole_solver_run(
 }
 
 extern int DLLEXPORT black_hole_solver_recycle(
-    black_hole_solver_instance_t *instance_proto)
+    black_hole_solver_instance_t *const instance_proto)
 {
     bhs_solver_t *const solver = (bhs_solver_t *)instance_proto;
 
@@ -788,7 +788,7 @@ extern int DLLEXPORT black_hole_solver_recycle(
 }
 
 DLLEXPORT void black_hole_solver_init_solution_moves(
-    black_hole_solver_instance_t *instance_proto)
+    black_hole_solver_instance_t *const instance_proto)
 {
     bhs_solver_t *const solver = (bhs_solver_t *)instance_proto;
     const_SLOT(num_columns, solver);
@@ -905,14 +905,14 @@ black_hole_solver_get_num_states_in_collection(
 
 DLLEXPORT extern unsigned long __attribute__((pure))
 black_hole_solver_get_iterations_num(
-    black_hole_solver_instance_t *instance_proto)
+    black_hole_solver_instance_t *const instance_proto)
 {
     return ((bhs_solver_t *)instance_proto)->iterations_num;
 }
 
 DLLEXPORT extern unsigned long __attribute__((pure))
 black_hole_solver_get_max_num_played_cards(
-    black_hole_solver_instance_t *instance_proto)
+    black_hole_solver_instance_t *const instance_proto)
 {
     const_AUTO(
         ret, ((bhs_solver_t *)instance_proto)->max_reached_depths_stack_len);
@@ -920,7 +920,7 @@ black_hole_solver_get_max_num_played_cards(
 }
 
 DLLEXPORT extern int black_hole_solver_get_current_solution_board(
-    black_hole_solver_instance_t *instance_proto, char *const output)
+    black_hole_solver_instance_t *const instance_proto, char *const output)
 {
     bhs_solver_t *const solver = (bhs_solver_t *)instance_proto;
 
@@ -982,7 +982,7 @@ DLLEXPORT const __attribute__((const)) char *black_hole_solver_get_lib_version(
 }
 
 extern int DLLEXPORT black_hole_solver_free(
-    black_hole_solver_instance_t *instance_proto)
+    black_hole_solver_instance_t *const instance_proto)
 {
     bhs_solver_t *const solver = (bhs_solver_t *)instance_proto;
 
