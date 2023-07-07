@@ -27,7 +27,7 @@ enum GAME_TYPE
     GAME__GOLF
 };
 
-static inline void out_board(FILE *out_fh,
+static inline void out_board(FILE *const out_fh,
     black_hole_solver_instance_t *const solver, const bool display_boards)
 {
     if (!display_boards)
@@ -78,7 +78,7 @@ typedef struct
 #pragma clang diagnostic pop
 
 static inline bhs_settings parse_cmd_line(
-    int argc, char *argv[], int *out_arg_idx)
+    const int argc, char *argv[], int *const out_arg_idx)
 {
     bhs_settings settings;
     settings.out_fh = stdout;
