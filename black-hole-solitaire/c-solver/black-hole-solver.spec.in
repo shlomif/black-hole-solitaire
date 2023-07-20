@@ -41,22 +41,20 @@ Summary: The Black Hole Solitaire Solver dynamic libraries
 Group: Amusement/Games
 
 %description -n libblack_hole_solver1
-Contains the Blach Hole Solitaire libraries.
+Contains the Black Hole Solitaire libraries.
 
 This package is mandatory for the Black Hole Solitaire executable too.
 
 %package -n libblack_hole_solver1-devel
-Summary: The Freecell Solver development tools for solving Freecell games
+Summary: The Black Hole Solitaire development tools
 Group: Amusement/Games
 Requires: libblack_hole_solver1 = %{version}
 
 %description -n libblack_hole_solver1-devel
-Freecell Solver is a library for automatically solving boards of Freecell and
-similar variants of card Solitaire. This package contains the header files and
-static libraries necessary for developing programs using Freecell Solver.
+Contains the Black Hole Solitaire development libraries.
 
 You should install it if you are a game developer who would like to use
-Freecell Solver from within your programs.
+Black Hole Solitaire Solver from within your programs.
 
 %prep
 %setup

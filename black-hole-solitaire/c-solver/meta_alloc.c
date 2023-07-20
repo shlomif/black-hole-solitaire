@@ -30,7 +30,7 @@ static inline char *meta_request_new_buffer(meta_allocator *const meta_alloc)
     }
 }
 
-int fc_solve_compact_allocator_extend(compact_allocator *const allocator)
+int bh_solve_compact_allocator_extend(compact_allocator *const allocator)
 {
     char *const new_data = meta_request_new_buffer(allocator->meta);
     if (unlikely(!new_data))
@@ -46,7 +46,7 @@ int fc_solve_compact_allocator_extend(compact_allocator *const allocator)
     return 0;
 }
 
-void fc_solve_meta_compact_allocator_finish(meta_allocator *const meta_alloc)
+void bh_solve_meta_compact_allocator_finish(meta_allocator *const meta_alloc)
 {
     char *iter = meta_alloc->recycle_bin;
     char *iter_next = iter ? FCS__COMPACT_ALLOC__OLD_LIST_NEXT(iter) : NULL;

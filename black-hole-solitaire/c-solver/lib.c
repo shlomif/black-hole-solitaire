@@ -173,7 +173,7 @@ int DLLEXPORT black_hole_solver_create(
     fc_solve_meta_compact_allocator_init(&(ret->meta_alloc));
     if (unlikely(bh_solve_hash_init(&(ret->positions), &(ret->meta_alloc))))
     {
-        fc_solve_meta_compact_allocator_finish(&(ret->meta_alloc));
+        bh_solve_meta_compact_allocator_finish(&(ret->meta_alloc));
         free(ret);
         *ret_instance = NULL;
         return BLACK_HOLE_SOLVER__OUT_OF_MEMORY;
@@ -987,7 +987,7 @@ extern int DLLEXPORT black_hole_solver_free(
     bhs_solver_t *const solver = (bhs_solver_t *)instance_proto;
 
     bh_solve_hash_free(&(solver->positions));
-    fc_solve_meta_compact_allocator_finish(&(solver->meta_alloc));
+    bh_solve_meta_compact_allocator_finish(&(solver->meta_alloc));
 
     free(solver);
 

@@ -39,14 +39,14 @@ typedef struct
     meta_allocator *meta;
 } compact_allocator;
 
-extern int fc_solve_compact_allocator_extend(compact_allocator *);
+extern int bh_solve_compact_allocator_extend(compact_allocator *);
 
 /* To be called after the meta_alloc was set. */
 static inline int fc_solve_compact_allocator_init_helper(
     compact_allocator *const allocator)
 {
     allocator->old_list = NULL;
-    return fc_solve_compact_allocator_extend(allocator);
+    return bh_solve_compact_allocator_extend(allocator);
 }
 
 static inline void fc_solve_meta_compact_allocator_init(
@@ -55,7 +55,7 @@ static inline void fc_solve_meta_compact_allocator_init(
     meta->recycle_bin = NULL;
 }
 
-extern void fc_solve_meta_compact_allocator_finish(meta_allocator *);
+extern void bh_solve_meta_compact_allocator_finish(meta_allocator *);
 
 static inline void *fcs_compact_alloc_ptr(
     compact_allocator *const allocator, const size_t how_much_proto)
@@ -68,7 +68,7 @@ static inline void *fcs_compact_alloc_ptr(
 
     if ((size_t)(allocator->max_ptr - allocator->ptr) < how_much)
     {
-        if (unlikely(fc_solve_compact_allocator_extend(allocator)))
+        if (unlikely(bh_solve_compact_allocator_extend(allocator)))
         {
             return NULL;
         }
