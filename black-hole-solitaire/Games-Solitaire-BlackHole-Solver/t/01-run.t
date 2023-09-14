@@ -80,7 +80,8 @@ EOF
 
     # TEST
     ok(
-        !system( $^X,
+        !system(
+            $^X,
             "-Mblib",
             "-MGames::Solitaire::BlackHole::Solver::App",
             "-e",
@@ -106,7 +107,8 @@ EOF
 
     # TEST
     ok(
-        !system( $^X, "-Mblib", $BHS, "-o", $sol_fn,
+        !system(
+            $^X, "-Mblib", $BHS, "-o", $sol_fn,
             _filename("26464608654870335080.bh.board.txt")
         )
     );
@@ -175,7 +177,8 @@ EOF
 
     # TEST
     ok(
-        !system( $^X, "-Mblib", $GOLF_S, "--queens-on-kings",, "-o", $sol_fn,
+        !system(
+            $^X, "-Mblib", $GOLF_S, "--queens-on-kings",, "-o", $sol_fn,
             _filename("35.golf.board.txt")
         )
     );
@@ -229,7 +232,8 @@ sub _test_max_num_played_cards
 
     # TEST
     ok(
-        !system( $^X, "-Mblib", $BHS, @MAX_NUM_PLAYED_FLAG, "-o", $sol_fn,
+        !system(
+            $^X, "-Mblib", $BHS, @MAX_NUM_PLAYED_FLAG, "-o", $sol_fn,
             _filename("26464608654870335080.bh.board.txt")
         )
     );
