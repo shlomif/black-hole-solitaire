@@ -8,6 +8,8 @@ use List::Util 1.34  qw/ any max /;
 
 extends('Exporter');
 
+has '_num_foundations' => ( default => 1, is => 'ro', );
+
 has [
     '_active_record',
     '_active_task',
@@ -163,9 +165,12 @@ sub _parse_board
     my $found_line = shift(@$lines);
 
     my $init_foundation;
-    if ( my ($card) = $found_line =~ m{\AFoundations: ($card_re)\z} )
+    my $_num_foundations = $self->_num_foundations();
+    if ( my ($card) =
+        $found_line =~ m{\AFoundations:((?: $card_re){$_num_foundations})\z} )
     {
-        $init_foundation = $self->_get_rank($card);
+        $card =~ s#\A ## or die "no whitespace";
+        $init_foundation = [ map { $self->_get_rank($_) } split /\s+/, $card ];
     }
     else
     {
@@ -190,13 +195,19 @@ sub _set_up_initial_position
 
     my $init_state = "";
 
-    vec( $init_state, 0, 8 ) = $self->_init_foundation;
-    vec( $init_state, 1, 8 ) = $talon_ptr;
+    my $_num_foundations = $self->_num_foundations();
+    my $offset           = 2 + 2 * $_num_foundations;
+    my $o                = 0;
+    foreach my $x ( @{ $self->_init_foundation } )
+    {
+        vec( $init_state, $o++, 8 ) = $x;
+    }
+    vec( $init_state, $o, 8 ) = $talon_ptr;
 
     my $board_values = $self->_board_values;
     foreach my $col_idx ( keys @$board_values )
     {
-        vec( $init_state, 4 + $col_idx, 4 ) =
+        vec( $init_state, $offset + $col_idx, 4 ) =
             scalar( @{ $board_values->[$col_idx] } );
     }
 
@@ -518,8 +529,20 @@ sub _process_pending_items
 sub _find_moves
 {
     my ( $self, $_pending, $state, $no_cards ) = @_;
-    my $board_values  = $self->_board_values;
-    my $fnd           = vec( $state, 0, 8 );
+    my $board_values     = $self->_board_values;
+    my $_num_foundations = $self->_num_foundations();
+    my $offset           = 2 + 2 * $_num_foundations;
+    my $used             = '';
+    my @fnd;
+    foreach my $i ( 0 .. $_num_foundations - 1 )
+    {
+        my $v = vec( $state, $i, 8 );
+        if ( not vec( $used, $v, 1 ) )
+        {
+            vec( $used, $v, 1 ) = 1;
+            push @fnd, [ $i, $v ];
+        }
+    }
     my $positions     = $self->_positions;
     my $_is_good_diff = $self->_is_good_diff;
     foreach my $col_idx ( keys @$board_values )
@@ -531,25 +554,29 @@ sub _find_moves
             $$no_cards = 0;
 
             my $card = $board_values->[$col_idx][ $pos - 1 ];
-            if ( exists( $_is_good_diff->{ $card - $fnd } ) )
+            foreach my $x (@fnd)
             {
-                my $next_s = $state;
-                vec( $next_s, 0, 8 ) = $card;
-                --vec( $next_s, 4 + $col_idx, 4 );
-                my $exists = exists( $positions->{$next_s} );
-                my $to_add = 0;
-                if ( !$exists )
+                my ( $i, $v ) = @$x;
+                if ( exists( $_is_good_diff->{ $card - $v } ) )
                 {
-                    $positions->{$next_s} = [ $state, $col_idx, 1, 0 ];
-                    $to_add = 1;
-                }
-                elsif ( $positions->{$next_s}->[2] )
-                {
-                    $to_add = 1;
-                }
-                if ($to_add)
-                {
-                    push( @$_pending, [ $next_s, $exists ] );
+                    my $next_s = $state;
+                    vec( $next_s, $i, 8 ) = $card;
+                    --vec( $next_s, $offset + $col_idx, 4 );
+                    my $exists = exists( $positions->{$next_s} );
+                    my $to_add = 0;
+                    if ( !$exists )
+                    {
+                        $positions->{$next_s} = [ $state, $col_idx, 1, 0 ];
+                        $to_add = 1;
+                    }
+                    elsif ( $positions->{$next_s}->[2] )
+                    {
+                        $to_add = 1;
+                    }
+                    if ($to_add)
+                    {
+                        push( @$_pending, [ $next_s, $exists ] );
+                    }
                 }
             }
         }
