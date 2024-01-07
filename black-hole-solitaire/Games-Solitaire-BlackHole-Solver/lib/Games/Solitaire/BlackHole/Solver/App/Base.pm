@@ -8,7 +8,7 @@ use List::Util 1.34  qw/ any max /;
 
 extends('Exporter');
 
-has '_num_foundations' => ( default => 1, is => 'ro', );
+has '_num_foundations' => ( default => 1, is => 'rw', );
 
 has [
     '_active_record',
@@ -92,6 +92,10 @@ sub _update_max_num_played_cards
 sub _trace_solution
 {
     my ( $self, $final_state ) = @_;
+
+    my $_num_foundations = $self->_num_foundations();
+    my $offset           = 2 + 2 * $_num_foundations;
+
     $self->_update_max_num_played_cards();
     my $output_handle = $self->_output_handle;
     $output_handle->print("Solved!\n");
@@ -111,7 +115,7 @@ LOOP:
             ( $col_idx == @{ $self->_board_cards } )
             ? "Deal talon " . $self->_talon_cards->[ vec( $prev_state, 1, 8 ) ]
             : $self->_board_cards->[$col_idx]
-                [ vec( $prev_state, 4 + $col_idx, 4 ) - 1 ]
+                [ vec( $prev_state, $offset + $col_idx, 4 ) - 1 ]
             );
     }
     continue
@@ -264,6 +268,15 @@ sub _process_cmd_line
         "quiet!"     => \$quiet,
         "next-task"  => sub {
             $push_task->();
+            return;
+        },
+        "num-foundations=i" => sub {
+            my ( undef, $val ) = @_;
+            if ( not( ( $val eq "1" ) or ( $val eq "2" ) ) )
+            {
+                die;
+            }
+            $self->_num_foundations($val);
             return;
         },
         "prelude=s" => sub {
@@ -547,13 +560,14 @@ sub _find_moves
     my $_is_good_diff = $self->_is_good_diff;
     foreach my $col_idx ( keys @$board_values )
     {
-        my $pos = vec( $state, 4 + $col_idx, 4 );
+        my $pos = vec( $state, $offset + $col_idx, 4 );
 
         if ($pos)
         {
             $$no_cards = 0;
 
             my $card = $board_values->[$col_idx][ $pos - 1 ];
+            die if not defined $card;
             foreach my $x (@fnd)
             {
                 my ( $i, $v ) = @$x;
