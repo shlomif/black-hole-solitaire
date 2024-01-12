@@ -1,6 +1,7 @@
 package Games::Solitaire::BlackHole::Solver::App::Base;
 
 use Moo;
+use utf8;
 use Getopt::Long     qw/ GetOptions /;
 use Pod::Usage       qw/ pod2usage /;
 use Math::Random::MT ();
@@ -16,6 +17,7 @@ has [
     '_board_cards',
     '_board_lines',
     '_board_values',
+    '_display_boards',
     '_init_foundation',
     '_init_queue',
     '_init_tasks_configs',
@@ -109,7 +111,31 @@ sub _trace_solution
 LOOP:
     while ( ( $prev_state, $col_idx ) = @{ $self->_positions->{$state} } )
     {
+        my $outboard = sub {
+            if ( not $self->_display_boards )
+            {
+                return;
+            }
+            my $ret = '';
+            while ( my ( $i, $col ) = each( @{ $self->_board_cards } ) )
+            {
+                my $prevlen = vec( $prev_state, $offset + $i, 4 );
+                my $iscurr  = ( $col_idx == $i );
+                my @c       = @$col[ 0 .. $prevlen - 1 ];
+                if ($iscurr)
+                {
+                    foreach my $x ( $c[-1] )
+                    {
+                        $x = "[ $x → ]";
+                    }
+                }
+                $ret .= join( " ", ":", @c ) . "\n";
+            }
+            push @moves, $ret;
+            return;
+        };
         last LOOP if not defined $prev_state;
+        $outboard->();
         push @moves,
             (
             ( $col_idx == @{ $self->_board_cards } )
@@ -249,7 +275,8 @@ sub _process_cmd_line
     my ( $self, $args ) = @_;
 
     $self->_should_show_maximal_num_played_cards(0);
-    my $quiet = '';
+    my $display_boards = '';
+    my $quiet          = '';
     my $output_fn;
     my ( $help, $man, $version );
     my @tasks;
@@ -264,9 +291,10 @@ sub _process_cmd_line
     };
     $push_task->();
     GetOptions(
-        "o|output=s" => \$output_fn,
-        "quiet!"     => \$quiet,
-        "next-task"  => sub {
+        "display-boards!" => \$display_boards,
+        "o|output=s"      => \$output_fn,
+        "quiet!"          => \$quiet,
+        "next-task"       => sub {
             $push_task->();
             return;
         },
@@ -332,6 +360,7 @@ sub _process_cmd_line
         exit(0);
     }
 
+    $self->_display_boards($display_boards);
     $self->_quiet($quiet);
     my $output_handle;
 
