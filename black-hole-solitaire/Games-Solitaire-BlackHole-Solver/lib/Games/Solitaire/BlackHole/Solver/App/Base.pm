@@ -12,29 +12,18 @@ extends('Exporter');
 has '_num_foundations' => ( default => 1, is => 'rw', );
 
 has [
-    '_active_record',
-    '_active_task',
-    '_board_cards',
-    '_board_lines',
-    '_board_values',
-    '_display_boards',
-    '_init_foundation',
-    '_init_foundation_cards',
-    '_init_queue',
-    '_init_tasks_configs',
-    '_is_good_diff',
-    '_maximal_num_played_cards__from_all_tasks',
-    '_prelude',
-    '_prelude_iter',
-    '_prelude_string',
-    '_talon_cards',
-    '_positions',
-    '_quiet',
-    '_output_handle',
-    '_output_fn',
-    '_should_show_maximal_num_played_cards',
-    '_tasks',
-    '_tasks_by_names',
+    '_active_record',   '_active_task',
+    '_board_cards',     '_board_lines',
+    '_board_values',    '_display_boards',
+    '_init_foundation', '_init_foundation_cards',
+    '_init_queue',      '_init_tasks_configs',
+    '_is_good_diff',    '_maximal_num_played_cards__from_all_tasks',
+    '_max_iters_limit', '_prelude',
+    '_prelude_iter',    '_prelude_string',
+    '_talon_cards',     '_positions',
+    '_quiet',           '_output_handle',
+    '_output_fn',       '_should_show_maximal_num_played_cards',
+    '_tasks',           '_tasks_by_names',
     '_task_idx',
 ] => ( is => 'rw' );
 our %EXPORT_TAGS = ( 'all' => [qw($card_re)] );
@@ -332,6 +321,7 @@ sub _process_cmd_line
 {
     my ( $self, $args ) = @_;
 
+    $self->_max_iters_limit( ( 1 << 31 ) );
     $self->_should_show_maximal_num_played_cards(0);
     my $display_boards = '';
     my $quiet          = '';
@@ -391,6 +381,11 @@ sub _process_cmd_line
         "show-max-num-played-cards!" => sub {
             my ( undef, $val ) = @_;
             $self->_should_show_maximal_num_played_cards($val);
+            return;
+        },
+        "max-iters=i" => sub {
+            my ( undef, $val ) = @_;
+            $self->_max_iters_limit($val);
             return;
         },
         'help|h|?' => \$help,
@@ -643,8 +638,9 @@ sub _find_moves
             push @fnd, [ $i, $v ];
         }
     }
-    my $positions     = $self->_positions;
-    my $_is_good_diff = $self->_is_good_diff;
+    my $max_iters_limit = $self->_max_iters_limit;
+    my $positions       = $self->_positions;
+    my $_is_good_diff   = $self->_is_good_diff;
     foreach my $col_idx ( keys @$board_values )
     {
         my $pos = vec( $state, $offset + $col_idx, 4 );
@@ -668,6 +664,10 @@ sub _find_moves
                     if ( !$exists )
                     {
                         $positions->{$next_s} = [ $state, $col_idx, 1, 0 ];
+                        if ( keys(%$positions) > $max_iters_limit )
+                        {
+                            die "Exceeded max_iters_limit !";
+                        }
                         $to_add = 1;
                     }
                     elsif ( $positions->{$next_s}->[2] )
