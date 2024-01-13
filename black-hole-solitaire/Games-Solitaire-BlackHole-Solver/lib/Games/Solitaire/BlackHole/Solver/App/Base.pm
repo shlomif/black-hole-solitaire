@@ -181,7 +181,8 @@ LOOP:
         my $str;
         if ( $type eq "card" )
         {
-            $str = $move_rec->{"str"};
+            $str = "";
+            $str .= $move_rec->{"str"};
         }
         elsif ( $type eq "board" )
         {
@@ -191,7 +192,9 @@ LOOP:
             }
             $foundation_cards[ $move_rec->{"changed_foundation"} ] =
                 $move_rec->{"foundation_str"};
-            $str = join( " ", "Foundations:", @foundation_cards ) . "\n";
+            $str = "";
+            $str .= "\n";
+            $str .= join( " ", "Foundations:", @foundation_cards ) . "\n";
             $str .= $move_rec->{"str"};
         }
         else
