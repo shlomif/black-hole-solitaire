@@ -5,7 +5,7 @@ use utf8;
 use Getopt::Long     qw/ GetOptions /;
 use Pod::Usage       qw/ pod2usage /;
 use Math::Random::MT ();
-use List::Util 1.34  qw/ any max /;
+use List::Util 1.34  qw/ any first max /;
 
 extends('Exporter');
 
@@ -19,6 +19,7 @@ has [
     '_board_values',
     '_display_boards',
     '_init_foundation',
+    '_init_foundation_cards',
     '_init_queue',
     '_init_tasks_configs',
     '_is_good_diff',
@@ -117,38 +118,88 @@ LOOP:
                 return;
             }
             my $ret = '';
+            my $foundation_val;
+            my $foundation_str;
             while ( my ( $i, $col ) = each( @{ $self->_board_cards } ) )
             {
                 my $prevlen = vec( $prev_state, $offset + $i, 4 );
+                my $height  = $prevlen - 1;
                 my $iscurr  = ( $col_idx == $i );
-                my @c       = @$col[ 0 .. $prevlen - 1 ];
+                my @c       = @$col[ 0 .. $height ];
                 if ($iscurr)
                 {
+                    $foundation_val = $self->_board_values->[$col_idx][$height];
                     foreach my $x ( $c[-1] )
                     {
-                        $x = "[ $x → ]";
+                        $foundation_str = $x;
+                        $x              = "[ $x → ]";
                     }
                 }
                 $ret .= join( " ", ":", @c ) . "\n";
             }
-            push @moves, $ret;
+            my $changed_foundation =
+                first { vec( $state, $_, 8 ) ne vec( $prev_state, $_, 8 ) }
+                ( 0 .. $_num_foundations - 1 );
+            if ( not defined $changed_foundation )
+            {
+                die;
+            }
+
+            push @moves,
+                +{
+                type               => "board",
+                str                => $ret,
+                foundation_str     => $foundation_str,
+                foundation_val     => $foundation_val,
+                changed_foundation => $changed_foundation,
+                };
             return;
         };
         last LOOP if not defined $prev_state;
         $outboard->();
         push @moves,
-            (
-            ( $col_idx == @{ $self->_board_cards } )
-            ? "Deal talon " . $self->_talon_cards->[ vec( $prev_state, 1, 8 ) ]
-            : $self->_board_cards->[$col_idx]
-                [ vec( $prev_state, $offset + $col_idx, 4 ) - 1 ]
-            );
+            +{
+            type => "card",
+            str  => scalar(
+                ( $col_idx == @{ $self->_board_cards } )
+                ? "Deal talon "
+                    . $self->_talon_cards->[ vec( $prev_state, 1, 8 ) ]
+                : $self->_board_cards->[$col_idx]
+                    [ vec( $prev_state, $offset + $col_idx, 4 ) - 1 ]
+            ),
+            };
     }
     continue
     {
         $state = $prev_state;
     }
-    print {$output_handle} map { "$_\n" } reverse(@moves);
+
+    my @foundation_cards = @{ $self->_init_foundation_cards() };
+    foreach my $move_rec ( reverse(@moves) )
+    {
+        my $type = $move_rec->{"type"};
+        my $str;
+        if ( $type eq "card" )
+        {
+            $str = $move_rec->{"str"};
+        }
+        elsif ( $type eq "board" )
+        {
+            if ( not $self->_display_boards )
+            {
+                die;
+            }
+            $foundation_cards[ $move_rec->{"changed_foundation"} ] =
+                $move_rec->{"foundation_str"};
+            $str = join( " ", "Foundations:", @foundation_cards ) . "\n";
+            $str .= $move_rec->{"str"};
+        }
+        else
+        {
+            die;
+        }
+        print {$output_handle} "$str\n";
+    }
 
     return;
 }
@@ -195,17 +246,21 @@ sub _parse_board
     my $found_line = shift(@$lines);
 
     my $init_foundation;
+    my @init_foundation_cards;
     my $_num_foundations = $self->_num_foundations();
     if ( my ($card) =
         $found_line =~ m{\AFoundations:((?: $card_re){$_num_foundations})\z} )
     {
         $card =~ s#\A ## or die "no whitespace";
-        $init_foundation = [ map { $self->_get_rank($_) } split /\s+/, $card ];
+        @init_foundation_cards = split /\s+/, $card;
+        $init_foundation =
+            [ map { $self->_get_rank($_) } @init_foundation_cards ];
     }
     else
     {
         die "Could not match first foundation line!";
     }
+    $self->_init_foundation_cards( \@init_foundation_cards );
     $self->_init_foundation($init_foundation);
 
     $self->_board_cards( [ map { [ split /\s+/, $_ ] } @$lines ] );
