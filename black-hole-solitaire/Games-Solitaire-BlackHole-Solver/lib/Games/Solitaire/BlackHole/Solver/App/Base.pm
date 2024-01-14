@@ -101,6 +101,8 @@ sub _trace_solution
 LOOP:
     while ( ( $prev_state, $col_idx ) = @{ $self->_positions->{$state} } )
     {
+        my $foundation_str;
+        my $changed_foundation;
         my $outboard = sub {
             if ( not $self->_display_boards )
             {
@@ -108,7 +110,6 @@ LOOP:
             }
             my $ret = '';
             my $foundation_val;
-            my $foundation_str;
             while ( my ( $i, $col ) = each( @{ $self->_board_cards } ) )
             {
                 my $prevlen = vec( $prev_state, $offset + $i, 4 );
@@ -126,7 +127,7 @@ LOOP:
                 }
                 $ret .= join( " ", ":", @c ) . "\n";
             }
-            my $changed_foundation =
+            $changed_foundation =
                 first { vec( $state, $_, 8 ) ne vec( $prev_state, $_, 8 ) }
                 ( 0 .. $_num_foundations - 1 );
             if ( not defined $changed_foundation )
@@ -150,9 +151,11 @@ LOOP:
             +{
             type => "card",
             str  => scalar(
-                ( $col_idx == @{ $self->_board_cards } )
-                ? "Deal talon "
+                ( $col_idx == @{ $self->_board_cards } ) ? "Deal talon "
                     . $self->_talon_cards->[ vec( $prev_state, 1, 8 ) ]
+                : $self->_display_boards
+                ? sprintf( "Move %s from stack %d to foundations %d",
+                    $foundation_str, $col_idx, $changed_foundation, )
                 : $self->_board_cards->[$col_idx]
                     [ vec( $prev_state, $offset + $col_idx, 4 ) - 1 ]
             ),
