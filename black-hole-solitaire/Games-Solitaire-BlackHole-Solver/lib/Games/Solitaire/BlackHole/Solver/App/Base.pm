@@ -179,12 +179,15 @@ LOOP:
             {
                 die;
             }
-            $foundation_cards[ $move_rec->{"changed_foundation"} ] =
-                $move_rec->{"foundation_str"};
+            my $i     = $move_rec->{"changed_foundation"};
+            my $new   = $move_rec->{"foundation_str"};
+            my @shown = @foundation_cards;
+            $shown[$i] = "[ $shown[ $i ] → $new ]";
             $str = "";
             $str .= "\n";
-            $str .= join( " ", "Foundations:", @foundation_cards ) . "\n";
+            $str .= join( " ", "Foundations:", @shown ) . "\n";
             $str .= $move_rec->{"str"};
+            $foundation_cards[$i] = $new;
         }
         else
         {
