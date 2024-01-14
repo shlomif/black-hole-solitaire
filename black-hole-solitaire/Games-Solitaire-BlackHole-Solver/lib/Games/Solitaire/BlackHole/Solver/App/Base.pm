@@ -185,7 +185,10 @@ LOOP:
             my $i     = $move_rec->{"changed_foundation"};
             my $new   = $move_rec->{"foundation_str"};
             my @shown = @foundation_cards;
-            $shown[$i] = "[ $shown[ $i ] → $new ]";
+            foreach my $x ( $shown[$i] )
+            {
+                $x = "[ $x → $new ]";
+            }
             $str = "";
             $str .= "\n";
             $str .= join( " ", "Foundations:", @shown ) . "\n";
