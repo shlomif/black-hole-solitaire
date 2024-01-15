@@ -12,19 +12,19 @@ extends('Exporter');
 has '_num_foundations' => ( default => 1, is => 'rw', );
 
 has [
-    '_active_record',   '_active_task',
-    '_board_cards',     '_board_lines',
-    '_board_values',    '_display_boards',
-    '_init_foundation', '_init_foundation_cards',
-    '_init_queue',      '_init_tasks_configs',
-    '_is_good_diff',    '_maximal_num_played_cards__from_all_tasks',
-    '_max_iters_limit', '_prelude',
-    '_prelude_iter',    '_prelude_string',
-    '_talon_cards',     '_positions',
-    '_quiet',           '_output_handle',
-    '_output_fn',       '_should_show_maximal_num_played_cards',
-    '_tasks',           '_tasks_by_names',
-    '_task_idx',
+    '_active_record',                            '_active_task',
+    '_bits_offset',                              '_board_cards',
+    '_board_lines',                              '_board_values',
+    '_display_boards',                           '_init_foundation',
+    '_init_foundation_cards',                    '_init_queue',
+    '_init_tasks_configs',                       '_is_good_diff',
+    '_maximal_num_played_cards__from_all_tasks', '_max_iters_limit',
+    '_prelude',                                  '_prelude_iter',
+    '_prelude_string',                           '_talon_cards',
+    '_positions',                                '_quiet',
+    '_output_handle',                            '_output_fn',
+    '_should_show_maximal_num_played_cards',     '_tasks',
+    '_tasks_by_names',                           '_task_idx',
 ] => ( is => 'rw' );
 our %EXPORT_TAGS = ( 'all' => [qw($card_re)] );
 our @EXPORT_OK   = ( @{ $EXPORT_TAGS{'all'} } );
@@ -86,7 +86,7 @@ sub _trace_solution
     my ( $self, $final_state ) = @_;
 
     my $_num_foundations = $self->_num_foundations();
-    my $offset           = 2 + 2 * $_num_foundations;
+    my $offset           = $self->_bits_offset();
 
     $self->_update_max_num_played_cards();
     my $output_handle = $self->_output_handle;
@@ -281,9 +281,8 @@ sub _set_up_initial_position
 
     my $init_state = "";
 
-    my $_num_foundations = $self->_num_foundations();
-    my $offset           = 2 + 2 * $_num_foundations;
-    my $o                = 0;
+    my $offset = $self->_bits_offset();
+    my $o      = 0;
     foreach my $x ( @{ $self->_init_foundation } )
     {
         vec( $init_state, $o++, 8 ) = $x;
@@ -323,6 +322,17 @@ sub _shuffle
     return;
 }
 
+sub _set_bits_offset
+{
+    my $self = shift;
+
+    my $_num_foundations = $self->_num_foundations();
+    my $offset           = 2 + 2 * $_num_foundations;
+    $self->_bits_offset($offset);
+
+    return;
+}
+
 my $TASK_NAME_RE  = qr/[A-Za-z0-9_]+/;
 my $TASK_ALLOC_RE = qr/[0-9]+\@$TASK_NAME_RE/;
 
@@ -330,6 +340,7 @@ sub _process_cmd_line
 {
     my ( $self, $args ) = @_;
 
+    $self->_set_bits_offset();
     $self->_max_iters_limit( ( 1 << 31 ) );
     $self->_should_show_maximal_num_played_cards(0);
     my $display_boards = '';
@@ -362,6 +373,7 @@ sub _process_cmd_line
                 die;
             }
             $self->_num_foundations($val);
+            $self->_set_bits_offset();
             return;
         },
         "prelude=s" => sub {
@@ -636,7 +648,7 @@ sub _find_moves
     my ( $self, $_pending, $state, $no_cards ) = @_;
     my $board_values     = $self->_board_values;
     my $_num_foundations = $self->_num_foundations();
-    my $offset           = 2 + 2 * $_num_foundations;
+    my $offset           = $self->_bits_offset();
     my $used             = '';
     my @fnd;
     foreach my $i ( 0 .. $_num_foundations - 1 )
