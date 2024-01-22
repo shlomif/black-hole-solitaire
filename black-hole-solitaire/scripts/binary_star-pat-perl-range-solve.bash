@@ -14,7 +14,7 @@ mkdir -p boards
   }
   mkdir -p "solutions"
   i=1
-  while test "$i" -le "50"
+  while test "$i" -le "10000"
   do
       fn=boards/binary_star"$i".board
       outfn=solutions/binary_star"$i".sol
