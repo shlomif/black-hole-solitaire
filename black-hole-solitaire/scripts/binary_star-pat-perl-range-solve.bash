@@ -12,11 +12,15 @@ mkdir -p boards
       echo "== ] $fn $args [ =="
       $cmd $args "$fn"
   }
-  for i in $(seq 1 50)
+  mkdir -p "solutions"
+  i=1
+  while test "$i" -le "50"
   do
       fn=boards/binary_star"$i".board
+      outfn=solutions/binary_star"$i".sol
       echo "== $fn =="
-      run ""
+      run "" | tee "$outfn"
       # run "--queens-on-kings"
+      let ++i
   done
-) |& timestamper | tee ~/solver-log-binary_star1.txt
+) |& tee ~/solver-log-binary_star1.txt | timestamper-with-elapsed
