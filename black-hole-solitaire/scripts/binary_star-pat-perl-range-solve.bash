@@ -9,8 +9,10 @@ mkdir -p boards
   {
       local args="$1"
       shift
+      local outfn="$1"
+      shift
       echo "== ] $fn $args [ =="
-      $cmd $args "$fn"
+      $cmd $args "$fn" | tee "$outfn"
   }
   mkdir -p "solutions"
   i=1
@@ -19,8 +21,8 @@ mkdir -p boards
       fn=boards/binary_star"$i".board
       outfn=solutions/binary_star"$i".sol
       echo "== $fn =="
-      run "" | tee "$outfn"
-      # run "--queens-on-kings"
+      run "" "$outfn"
+      # run "--queens-on-kings" "$outfn"
       let ++i
   done
 ) |& tee ~/solver-log-binary_star1.txt | timestamper-with-elapsed
