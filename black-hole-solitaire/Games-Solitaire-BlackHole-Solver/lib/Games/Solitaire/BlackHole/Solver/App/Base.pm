@@ -1,7 +1,6 @@
 package Games::Solitaire::BlackHole::Solver::App::Base;
 
 use Moo;
-use utf8;
 use Getopt::Long     qw/ GetOptions /;
 use Pod::Usage       qw/ pod2usage /;
 use Math::Random::MT ();
@@ -122,7 +121,7 @@ LOOP:
                     foreach my $x ( $c[-1] )
                     {
                         $foundation_str = $x;
-                        $x              = "[ $x → ]";
+                        $x              = "[ $x -> ]";
                     }
                 }
                 $ret .= join( " ", ":", @c ) . "\n";
@@ -187,7 +186,7 @@ LOOP:
             my @shown = @foundation_cards;
             foreach my $x ( $shown[$i] )
             {
-                $x = "[ $x → $new ]";
+                $x = "[ $x -> $new ]";
             }
             $str = "";
             $str .= "\n";
