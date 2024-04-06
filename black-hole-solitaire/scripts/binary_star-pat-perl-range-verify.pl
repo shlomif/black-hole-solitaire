@@ -1,11 +1,4 @@
 #! /usr/bin/env perl
-#
-# Short description for r.pl
-#
-# Version 0.0.1
-# Copyright (C) 2024 Shlomi Fish < https://www.shlomifish.org/ >
-#
-# Licensed under the terms of the MIT license.
 
 use strict;
 use warnings;
@@ -13,10 +6,9 @@ use 5.014;
 use autodie;
 use bytes;
 
-use Carp                                   qw/ confess /;
-use Getopt::Long                           qw/ GetOptions /;
-use Path::Tiny                             qw/ cwd path tempdir tempfile /;
-use Docker::CLI::Wrapper::Container v0.0.4 ();
+use Carp         qw/ confess /;
+use Getopt::Long qw/ GetOptions /;
+use Path::Tiny   qw/ cwd path /;
 
 # use lib "./lib";
 
@@ -26,8 +18,6 @@ sub run
 {
     my $output_fn;
 
-    my $obj = Docker::CLI::Wrapper::Container->new(
-        { container => "rinutils--deb--test-build", sys => "debian:sid", } );
     GetOptions( "output|o=s" => \$output_fn, )
         or confess("error in cmdline args: $!");
 
@@ -36,8 +26,6 @@ sub run
         # confess("Output filename not specified! Use the -o|--output flag!");
     }
 
-    # $obj->do_system( { cmd => [ "git", "clone", "-b", $BRANCH, $URL, ] } );
-    #
     my $BASE_DIR = $ENV{HOME};
 
     # my $D = "$BASE_DIR/Games-Solitaire-BlackHole-Solver";
@@ -81,6 +69,12 @@ run();
 __END__
 
 =encoding UTF-8
+
+=head1 ABOUT
+
+A command-line Binary Star solitaire's solutions range verifier.
+
+See: L<https://github.com/shlomif/black-hole-solitaire/issues/8> .
 
 =head1 COPYRIGHT AND LICENSE
 
