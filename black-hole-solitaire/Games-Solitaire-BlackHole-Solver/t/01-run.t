@@ -1273,7 +1273,7 @@ EOF
     # TEST
     ok(
         !system(
-            $^X, "-Mblib", $GOLF_S, "--queens-on-kings",, "-o", $sol_fn,
+            $^X, "-Mblib", $GOLF_S, "--queens-on-kings", "-o", $sol_fn,
             _filename("35.golf.board.txt")
         )
     );
