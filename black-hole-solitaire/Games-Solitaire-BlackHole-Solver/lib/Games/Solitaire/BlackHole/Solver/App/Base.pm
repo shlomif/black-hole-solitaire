@@ -100,8 +100,11 @@ sub _trace_solution
 LOOP:
     while ( ( $prev_state, $col_idx ) = @{ $self->_positions->{$state} } )
     {
+        last LOOP if not defined $prev_state;
         my $foundation_str;
-        my $changed_foundation;
+        my $changed_foundation =
+            first { vec( $state, $_, 8 ) ne vec( $prev_state, $_, 8 ) }
+            ( 0 .. $_num_foundations - 1 );
         my $outboard = sub {
             if ( not $self->_display_boards )
             {
@@ -126,9 +129,6 @@ LOOP:
                 }
                 $ret .= join( " ", ":", @c ) . "\n";
             }
-            $changed_foundation =
-                first { vec( $state, $_, 8 ) ne vec( $prev_state, $_, 8 ) }
-                ( 0 .. $_num_foundations - 1 );
             if ( not defined $changed_foundation )
             {
                 die;
@@ -144,7 +144,6 @@ LOOP:
                 };
             return;
         };
-        last LOOP if not defined $prev_state;
         $outboard->();
         push @moves,
             +{
