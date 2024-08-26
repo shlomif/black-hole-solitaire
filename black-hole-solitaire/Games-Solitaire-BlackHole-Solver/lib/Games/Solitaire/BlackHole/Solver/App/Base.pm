@@ -447,7 +447,6 @@ sub _process_cmd_line
         open( $output_handle, ">&STDOUT" );
         ## use critic
     }
-    binmode( $output_handle, ":encoding(utf8)" );
     $self->_output_fn($output_fn);
     $self->_output_handle($output_handle);
     $self->_calc_lines( shift(@ARGV) );
