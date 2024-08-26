@@ -105,6 +105,11 @@ LOOP:
         my $changed_foundation =
             first { vec( $state, $_, 8 ) ne vec( $prev_state, $_, 8 ) }
             ( 0 .. $_num_foundations - 1 );
+        if ( not defined($changed_foundation) )
+        {
+            die
+"ERROR! Could not find changed_foundation. It must not have happened!";
+        }
         my $outboard = sub {
             if ( not $self->_display_boards )
             {
@@ -128,10 +133,6 @@ LOOP:
                     }
                 }
                 $ret .= join( " ", ":", @c ) . "\n";
-            }
-            if ( not defined $changed_foundation )
-            {
-                die;
             }
 
             push @moves,
