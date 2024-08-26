@@ -94,11 +94,10 @@ sub _trace_solution
     return if $self->_quiet;
 
     my $state = $final_state;
-    my ( $prev_state, $col_idx );
 
     my @moves;
 LOOP:
-    while ( ( $prev_state, $col_idx ) = @{ $self->_positions->{$state} } )
+    while ( my ( $prev_state, $col_idx ) = @{ $self->_positions->{$state} } )
     {
         last LOOP if not defined $prev_state;
         my $foundation_str;
