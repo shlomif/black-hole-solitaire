@@ -80,6 +80,47 @@ sub _update_max_num_played_cards
     return;
 }
 
+sub _output_board
+{
+    my ( $self, $prev_state, $moves, $changed_foundation, $col_idx, ) = @_;
+    if ( not $self->_display_boards )
+    {
+        return;
+    }
+    my $_num_foundations = $self->_num_foundations();
+    my $offset           = $self->_bits_offset();
+    my $ret              = '';
+    my $foundation_val;
+    my $foundation_str;
+    while ( my ( $i, $col ) = each( @{ $self->_board_cards } ) )
+    {
+        my $prevlen = vec( $prev_state, $offset + $i, 4 );
+        my $height  = $prevlen - 1;
+        my $iscurr  = ( $col_idx == $i );
+        my @c       = @$col[ 0 .. $height ];
+        if ($iscurr)
+        {
+            $foundation_val = $self->_board_values->[$col_idx][$height];
+            foreach my $x ( $c[-1] )
+            {
+                $foundation_str = $x;
+                $x              = "[ $x -> ]";
+            }
+        }
+        $ret .= join( " ", ":", @c ) . "\n";
+    }
+
+    push @$moves,
+        +{
+        type               => "board",
+        str                => $ret,
+        foundation_str     => $foundation_str,
+        foundation_val     => $foundation_val,
+        changed_foundation => $changed_foundation,
+        };
+    return ($foundation_str);
+}
+
 sub _trace_solution
 {
     my ( $self, $final_state ) = @_;
@@ -100,7 +141,6 @@ LOOP:
     while ( my ( $prev_state, $col_idx ) = @{ $self->_positions->{$state} } )
     {
         last LOOP if not defined $prev_state;
-        my $foundation_str;
         my $changed_foundation =
             first { vec( $state, $_, 8 ) ne vec( $prev_state, $_, 8 ) }
             ( 0 .. $_num_foundations - 1 );
@@ -109,42 +149,9 @@ LOOP:
             die
 "ERROR! Could not find changed_foundation. It must not have happened!";
         }
-        my $outboard = sub {
-            if ( not $self->_display_boards )
-            {
-                return;
-            }
-            my $ret = '';
-            my $foundation_val;
-            while ( my ( $i, $col ) = each( @{ $self->_board_cards } ) )
-            {
-                my $prevlen = vec( $prev_state, $offset + $i, 4 );
-                my $height  = $prevlen - 1;
-                my $iscurr  = ( $col_idx == $i );
-                my @c       = @$col[ 0 .. $height ];
-                if ($iscurr)
-                {
-                    $foundation_val = $self->_board_values->[$col_idx][$height];
-                    foreach my $x ( $c[-1] )
-                    {
-                        $foundation_str = $x;
-                        $x              = "[ $x -> ]";
-                    }
-                }
-                $ret .= join( " ", ":", @c ) . "\n";
-            }
-
-            push @moves,
-                +{
-                type               => "board",
-                str                => $ret,
-                foundation_str     => $foundation_str,
-                foundation_val     => $foundation_val,
-                changed_foundation => $changed_foundation,
-                };
-            return;
-        };
-        $outboard->();
+        my ($foundation_str) =
+            $self->_output_board( $prev_state, \@moves, $changed_foundation,
+            $col_idx, );
         push @moves,
             +{
             type => "card",
