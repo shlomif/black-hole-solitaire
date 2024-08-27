@@ -25,4 +25,4 @@ mkdir -p boards
       # run "--queens-on-kings" "$outfn"
       let ++i
   done
-) |& tee ~/solver-log-binary_star1.txt | timestamper-with-elapsed
+) |& timestamper-with-elapsed --from-start --output ~/solver-log-binary_star1.ts.txt
