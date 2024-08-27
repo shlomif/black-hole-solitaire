@@ -82,7 +82,10 @@ sub _update_max_num_played_cards
 
 sub _output_board
 {
-    my ( $self, $prev_state, $moves, $changed_foundation, $col_idx, ) = @_;
+    my (
+        $self,               $prev_state, $moves,
+        $changed_foundation, $col_idx,    $foundation_str_ref
+    ) = @_;
     if ( not $self->_display_boards )
     {
         return;
@@ -91,7 +94,6 @@ sub _output_board
     my $offset           = $self->_bits_offset();
     my $ret              = '';
     my $foundation_val;
-    my $foundation_str;
     while ( my ( $i, $col ) = each( @{ $self->_board_cards } ) )
     {
         my $prevlen = vec( $prev_state, $offset + $i, 4 );
@@ -103,8 +105,8 @@ sub _output_board
             $foundation_val = $self->_board_values->[$col_idx][$height];
             foreach my $x ( $c[-1] )
             {
-                $foundation_str = $x;
-                $x              = "[ $x -> ]";
+                $$foundation_str_ref = $x;
+                $x                   = "[ $x -> ]";
             }
         }
         $ret .= join( " ", ":", @c ) . "\n";
@@ -114,11 +116,11 @@ sub _output_board
         +{
         type               => "board",
         str                => $ret,
-        foundation_str     => $foundation_str,
+        foundation_str     => $$foundation_str_ref,
         foundation_val     => $foundation_val,
         changed_foundation => $changed_foundation,
         };
-    return ($foundation_str);
+    return;
 }
 
 sub _trace_solution
@@ -149,9 +151,11 @@ LOOP:
             die
 "ERROR! Could not find changed_foundation. It must not have happened!";
         }
-        my ($foundation_str) =
-            $self->_output_board( $prev_state, \@moves, $changed_foundation,
-            $col_idx, );
+        my $foundation_str;
+        $self->_output_board(
+            $prev_state, \@moves, $changed_foundation,
+            $col_idx,    \$foundation_str
+        );
         push @moves,
             +{
             type => "card",
