@@ -97,8 +97,8 @@ static inline void fc_solve_compact_allocator_finish(
     // Enqueue all the allocated buffers in the meta allocator for re-use.
     for (iter = allocator->old_list,
         iter_next = FCS__COMPACT_ALLOC__OLD_LIST_NEXT(iter);
-         iter_next;
-         iter = iter_next, iter_next = FCS__COMPACT_ALLOC__OLD_LIST_NEXT(iter))
+        iter_next;
+        iter = iter_next, iter_next = FCS__COMPACT_ALLOC__OLD_LIST_NEXT(iter))
     {
         FCS__COMPACT_ALLOC__OLD_LIST_NEXT(iter) = bin;
         bin = iter;

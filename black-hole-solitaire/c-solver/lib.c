@@ -824,7 +824,7 @@ DLLEXPORT void black_hole_solver_init_solution_moves(
                 states[num_states + 1].packed.value.prev_foundation;
             unsigned char *data = states[num_states + 1].packed.key.data;
             for (size_t i = 0; i < TALON_PTR_BITS;
-                 ++i, new_moved_card_height >>= 1)
+                ++i, new_moved_card_height >>= 1)
             {
                 data[0] &= (~(1 << (i)));
                 data[0] |= ((new_moved_card_height & 0x1) << (i));
@@ -841,7 +841,7 @@ DLLEXPORT void black_hole_solver_init_solution_moves(
             var_AUTO(offset, TALON_PTR_BITS + bits_per_column * col_idx);
             unsigned char *data = states[num_states + 1].packed.key.data;
             for (size_t i = 0; i < bits_per_column;
-                 ++i, ++offset, new_moved_card_height >>= 1)
+                ++i, ++offset, new_moved_card_height >>= 1)
             {
                 data[offset >> 3] &= (~(1 << (offset & 0x7)));
                 data[offset >> 3] |=

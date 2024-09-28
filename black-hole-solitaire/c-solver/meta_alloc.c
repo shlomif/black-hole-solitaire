@@ -51,7 +51,7 @@ void bh_solve_meta_compact_allocator_finish(meta_allocator *const meta_alloc)
     char *iter = meta_alloc->recycle_bin;
     char *iter_next = iter ? FCS__COMPACT_ALLOC__OLD_LIST_NEXT(iter) : NULL;
     for (; iter_next;
-         iter = iter_next, iter_next = FCS__COMPACT_ALLOC__OLD_LIST_NEXT(iter))
+        iter = iter_next, iter_next = FCS__COMPACT_ALLOC__OLD_LIST_NEXT(iter))
     {
         free(iter);
     }
