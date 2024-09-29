@@ -12,7 +12,7 @@ use Inline (
 int call_prune(int foundation, AV * rank_counts_av)
 {
     bhs_rank_counts rank_counts;
-    for (int i = 0; i < NUM_RANKS; i++)
+    for (int i = 0; i < NUM_RANKS; ++i)
     {
         SV * * item = av_fetch(rank_counts_av, i, false);
         assert(item);

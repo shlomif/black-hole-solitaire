@@ -41,7 +41,7 @@ static inline bool bh_solve_hash_rehash(bh_solve_hash_t *hash)
     }
 
     /* Copy the items to the new hash while not allocating them again */
-    for (bh_solve_hash_value_t i = 0; i < old_size; i++)
+    for (bh_solve_hash_value_t i = 0; i < old_size; ++i)
     {
         var_AUTO(item, hash->entries[i].first_item);
         /* traverse the chain item by item */

@@ -549,7 +549,7 @@ static inline int perform_move(bhs_solver_t *const solver,
     next_queue_item.s.packed.value.prev_foundation = prev_foundation;
 
     next_queue_item.rank_counts = queue_item_copy_ptr->rank_counts;
-    next_queue_item.rank_counts.c[(ssize_t)card]--;
+    --next_queue_item.rank_counts.c[(ssize_t)card];
 
     const int ret =
         bh_solve_hash_insert(&(solver->positions), &(next_queue_item.s.packed));

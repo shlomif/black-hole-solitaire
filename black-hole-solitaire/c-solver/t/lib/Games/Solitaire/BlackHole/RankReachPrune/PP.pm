@@ -27,7 +27,7 @@ sub prune
     # Count the foundation - the starting point - in.
     if ( $rank_counts->[$foundation] == 0 )
     {
-        $full_max++;
+        ++$full_max;
     }
 
     my $full_count = 0;
@@ -45,7 +45,7 @@ MAIN:
         }
 
         $reached[$rank] = $TRUE;
-        $full_count++;
+        ++$full_count;
 
         for my $link ( -1, 1 )
         {
