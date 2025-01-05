@@ -50,8 +50,8 @@ DEALS:
         );
 
         open my $fh, '<:raw', $sol;
-        $verifier->process_solution( sub { my $l = <$fh>; chomp $l; return $l; }
-        );
+        $verifier->process_solution(
+            sub { my $l = <$fh>; chomp $l; return $l; } );
         my $msg =
             sprintf( "Solution for deal no. %d appears to be valid.\n",
             $deal, );
