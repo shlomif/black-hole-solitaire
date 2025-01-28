@@ -9,8 +9,8 @@ jobs:
                 submodules: 'true'
         -   run: sudo apt-get update -qq
         -   run: sudo apt-get --no-install-recommends install -y build-essential cmake
-                cmake-data cpanminus libperl-dev mercurial ninja-build perl python3-dev
-                python3-pip python3-setuptools valgrind xz-utils zip
+                cmake-data cpanminus libperl-dev ninja-build perl python3-dev python3-pip
+                python3-setuptools valgrind xz-utils zip
         -   run: local_lib_shim() { eval "$(perl -Mlocal::lib=$HOME/perl_modules)";
                 } ; local_lib_shim ; PATH+=":${HOME}/.local/bin"
         -   run: local_lib_shim() { eval "$(perl -Mlocal::lib=$HOME/perl_modules)";
@@ -19,10 +19,6 @@ jobs:
                 } ; local_lib_shim ; eval "$(perl -Mlocal::lib=$HOME/perl_modules)"
         -   run: local_lib_shim() { eval "$(perl -Mlocal::lib=$HOME/perl_modules)";
                 } ; local_lib_shim ; which python3
-        -   run: local_lib_shim() { eval "$(perl -Mlocal::lib=$HOME/perl_modules)";
-                } ; local_lib_shim ; cpanm --notest Test::Code::TidyAll
-        -   run: local_lib_shim() { eval "$(perl -Mlocal::lib=$HOME/perl_modules)";
-                } ; local_lib_shim ; ( perl -M"Test::Code::TidyAll 9999" || true )
         -   run: local_lib_shim() { eval "$(perl -Mlocal::lib=$HOME/perl_modules)";
                 } ; local_lib_shim ; cpanm --notest Code::TidyAll::Plugin::ClangFormat
                 Code::TidyAll::Plugin::TestCount Dir::Manifest Dist::Zilla Env::Path
