@@ -5,6 +5,10 @@ environment:
     TOX_APPVEYOR_X64: "1"
 # Shamelessly taken from https://github.com/plicease/Dist-Zilla-PluginBundle-Author-Plicease/blob/master/.appveyor.yml
 # Thanks!
+# The image specification may be required by python3.13 on MS Windows:
+# https://www.appveyor.com/docs/lang/python/
+image:
+    - Visual Studio 2022
 install:
     # - pkg-config --version
     - choco install strawberryperl
