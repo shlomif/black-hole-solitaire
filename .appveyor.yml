@@ -1,7 +1,7 @@
 ---
 environment:
     PY3MODS: cookiecutter cffi pycotap pydistman pysol_cards pytest pytest-cov random2 six tox tox-appveyor wheel
-    TOXENV: py310
+    TOXENV: py313
     TOX_APPVEYOR_X64: "1"
 # Shamelessly taken from https://github.com/plicease/Dist-Zilla-PluginBundle-Author-Plicease/blob/master/.appveyor.yml
 # Thanks!
@@ -9,9 +9,9 @@ install:
     # - pkg-config --version
     - choco install strawberryperl
     - SET PATH=C:\strawberry\c\bin;C:\strawberry\perl\site\bin;C:\strawberry\perl\bin;%PATH%
-    - SET PATH=C:\Python38-x64;%PATH%
-    - copy c:\Python38-x64\python.exe c:\Python38-x64\python3.exe
-    - copy c:\Python38-x64\python.exe c:\Python38-x64\python38.exe
+    - SET PATH=C:\Python313-x64;%PATH%
+    - copy c:\Python313-x64\python.exe c:\Python313-x64\python3.exe
+    - copy c:\Python313-x64\python.exe c:\Python313-x64\python313.exe
     - python3 --version
     - python3 -mpip install %PY3MODS%
     - perl -v
@@ -35,7 +35,7 @@ test_script:
     # Removing for now because it is too much trouble on windows.
     # - set FCS_TEST_BUILD=1
     # - pkg-config --version
-    - set TOXENV=py310
+    - set TOXENV=py313
     - set bhslibdir=%HOME%\apps\fcs\lib
     - SET PATH=%PATH%;%bhslibdir%
     - set bhslibdir2=%HOME%\apps\fcs\bin

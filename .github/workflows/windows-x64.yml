@@ -80,11 +80,11 @@ jobs:
                 SET PY3MODS=cookiecutter cffi pycotap pydistman pysol_cards pytest
                 pytest-cov random2 six tox tox-appveyor wheel
 
-                SET TOXENV=py310
+                SET TOXENV=py313
 
                 SET TOX_APPVEYOR_X64=1
 
-                SET PATH=C:\Python38-x64;%PATH%
+                SET PATH=C:\Python313-x64;%PATH%
 
                 python3 --version || ( echo Failed & exit /B 1 )
 
@@ -97,7 +97,7 @@ jobs:
 
                 set CMAKE_MAKE_PROGRAM=C:\strawberry\c\bin\gmake.exe
 
-                set TOXENV=py310
+                set TOXENV=py313
 
                 set bhslibdir=%HOME%\apps\fcs\lib
 
