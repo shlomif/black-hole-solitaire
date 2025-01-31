@@ -17,10 +17,9 @@ filt()
 }
 head_()
 {
-    echo $'Old\tNew\tCount'
+    perl -lE '$_="Old\tNew\tCount";say;s/\w/-/g;say;'
 }
 (
     head_
-    head_ | perl -lpE 's/\w/-/g'
     paste <(< old-golfs.txt filt) <(< new-golfs.txt filt) | sort | uniq -c | perl -lanE 'say "$F[1]\t$F[2]\t$F[0]"'
 ) | perl -lanE 'printf"%-20s%-20s%s\n",@F'
