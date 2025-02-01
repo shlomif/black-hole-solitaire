@@ -25,23 +25,30 @@ my $const_attrs = [
 ];
 
 my $CHECK_SET_ONLY_ONCE = 0;
-foreach my $const_attr (@$const_attrs)
+if ( not $CHECK_SET_ONLY_ONCE )
 {
-    has $const_attr => (
-        is => 'rw',
-        (
-            $CHECK_SET_ONLY_ONCE
-            ? (
-                trigger => sub {
-                    my ( $self, $newval ) = @_;
-                    die "self=$self const_attr=$const_attr"
-                        if ( $self->{_CTR}->{$const_attr}++ );
-                    return;
-                }
-                )
-            : ()
-        )
-    );
+    has [@$const_attrs] => ( is => 'rw', );
+}
+else
+{
+    foreach my $const_attr (@$const_attrs)
+    {
+        has $const_attr => (
+            is => 'rw',
+            (
+                $CHECK_SET_ONLY_ONCE
+                ? (
+                    trigger => sub {
+                        my ( $self, $newval ) = @_;
+                        die "self=$self const_attr=$const_attr"
+                            if ( $self->{_CTR}->{$const_attr}++ );
+                        return;
+                    }
+                    )
+                : ()
+            )
+        );
+    }
 }
 
 # These attributes mutate during a solver's run.
