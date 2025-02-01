@@ -8,23 +8,49 @@ use List::Util 1.34  qw/ any first max /;
 
 extends('Exporter');
 
+# These attributes should remain constant during a solver's run.
 has '_num_foundations' => ( default => 1, is => 'rw', );
 
+my $const_attrs = [
+    '_bits_offset',           '_board_cards',
+    '_board_lines',           '_board_values',
+    '_display_boards',        '_init_foundation',
+    '_init_foundation_cards', '_init_queue',
+    '_init_tasks_configs',    '_is_good_diff',
+    '_max_iters_limit',       '_prelude',
+    '_prelude_string',        '_talon_cards',
+    '_quiet',                 '_output_handle',
+    '_output_fn',             '_should_show_maximal_num_played_cards',
+    '_tasks_by_names',
+];
+
+my $CHECK_SET_ONLY_ONCE = 0;
+foreach my $const_attr (@$const_attrs)
+{
+    has $const_attr => (
+        is => 'rw',
+        (
+            $CHECK_SET_ONLY_ONCE
+            ? (
+                trigger => sub {
+                    my ( $self, $newval ) = @_;
+                    die "self=$self const_attr=$const_attr"
+                        if ( $self->{_CTR}->{$const_attr}++ );
+                    return;
+                }
+                )
+            : ()
+        )
+    );
+}
+
+# These attributes mutate during a solver's run.
 has [
-    '_active_record',                            '_active_task',
-    '_bits_offset',                              '_board_cards',
-    '_board_lines',                              '_board_values',
-    '_display_boards',                           '_init_foundation',
-    '_init_foundation_cards',                    '_init_queue',
-    '_init_tasks_configs',                       '_is_good_diff',
-    '_maximal_num_played_cards__from_all_tasks', '_max_iters_limit',
-    '_prelude',                                  '_prelude_iter',
-    '_prelude_string',                           '_talon_cards',
-    '_positions',                                '_quiet',
-    '_output_handle',                            '_output_fn',
-    '_should_show_maximal_num_played_cards',     '_tasks',
-    '_tasks_by_names',                           '_task_idx',
+    '_active_record', '_active_task',
+    '_maximal_num_played_cards__from_all_tasks',
+    '_prelude_iter', '_positions', '_tasks', '_task_idx',
 ] => ( is => 'rw' );
+
 our %EXPORT_TAGS = ( 'all' => [qw($card_re)] );
 our @EXPORT_OK   = ( @{ $EXPORT_TAGS{'all'} } );
 
@@ -349,11 +375,11 @@ sub _process_cmd_line
 {
     my ( $self, $args ) = @_;
 
-    $self->_set_bits_offset();
-    $self->_max_iters_limit( ( 1 << 31 ) );
-    $self->_should_show_maximal_num_played_cards(0);
-    my $display_boards = '';
-    my $quiet          = '';
+    my $_max_iters_limit                      = ( 1 << 31 );
+    my $_num_foundations                      = 1;
+    my $_should_show_maximal_num_played_cards = 0;
+    my $display_boards                        = '';
+    my $quiet                                 = '';
     my $output_fn;
     my ( $help, $man, $version );
     my @tasks;
@@ -381,8 +407,7 @@ sub _process_cmd_line
             {
                 die;
             }
-            $self->_num_foundations($val);
-            $self->_set_bits_offset();
+            $_num_foundations = $val;
             return;
         },
         "prelude=s" => sub {
@@ -410,12 +435,12 @@ sub _process_cmd_line
         },
         "show-max-num-played-cards!" => sub {
             my ( undef, $val ) = @_;
-            $self->_should_show_maximal_num_played_cards($val);
+            $_should_show_maximal_num_played_cards = $val;
             return;
         },
         "max-iters=i" => sub {
             my ( undef, $val ) = @_;
-            $self->_max_iters_limit($val);
+            $_max_iters_limit = $val;
             return;
         },
         'help|h|?' => \$help,
@@ -444,7 +469,13 @@ sub _process_cmd_line
     }
 
     $self->_display_boards($display_boards);
+    $self->_max_iters_limit($_max_iters_limit);
+    $self->_num_foundations($_num_foundations);
     $self->_quiet($quiet);
+    $self->_should_show_maximal_num_played_cards(
+        $_should_show_maximal_num_played_cards);
+    $self->_set_bits_offset();
+
     my $output_handle;
 
     if ( defined($output_fn) )
