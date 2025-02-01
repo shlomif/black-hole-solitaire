@@ -90,7 +90,7 @@ def generate_linux_yaml():
 
 def generate_windows_yaml(plat, output_path, is_act):
     x86 = (plat == 'x86')
-    with open("./.appveyor.yml", "rt") as infh:
+    with open("./.disabled-appveyor.yml", "rt") as infh:
         data = yaml.safe_load(infh)
     with open("./black-hole-solitaire/CI-testing/gh-actions--" +
               "windows-yml--from-p5-UV.yml", "rt") as infh:
