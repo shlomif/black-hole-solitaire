@@ -22,7 +22,7 @@ do
     export FCS_THEME_RAND="$seed"
     if (../c-solver/Tatzer && make && make check)
     then
-        let seed++
+        let ++seed
     else
         echo "seed=$seed failed"
         exit 1

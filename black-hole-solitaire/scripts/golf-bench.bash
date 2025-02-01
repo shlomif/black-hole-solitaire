@@ -13,10 +13,12 @@ run()
     echo "== ] $fn $args [ =="
     $cmd $args "$fn"
 }
-for i in $(seq 1 1000)
+i=1
+while test "$i" -le 1000
 do
     fn=boards/golf"$i".board
     echo "== $fn =="
     run "" || run "--queens-on-kings" || run "--wrap-ranks"
     # run "--queens-on-kings"
+    let ++i
 done
