@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # game="all_in_a_row"
 game="black_hole"
@@ -16,7 +16,10 @@ f()
         cat # grep -vP '^(Total number of states checked|This scan generated)'
 }
 
-for idx in `seq 1 1000` ; do
+idx=1
+while test "$idx" -le 1000
+do
     echo "Idx: $idx"
     diff -u <(f "$idx" "") <(f "$idx" "--rank-reach-prune")
+    let ++idx
 done
