@@ -256,7 +256,7 @@ sub get_max_num_played_cards
     return $self->_maximal_num_played_cards__from_all_tasks() - 1;
 }
 
-sub _my_exit
+sub _end_report
 {
     my ( $self, $verdict, ) = @_;
     my $output_handle = $self->_output_handle;
@@ -273,9 +273,16 @@ sub _my_exit
         );
     }
 
+    return;
+}
+
+sub _my_exit
+{
+    my ( $self, $verdict, ) = @_;
+
     if ( defined( $self->_output_fn ) )
     {
-        close($output_handle);
+        close( $self->_output_handle );
     }
 
     exit( !$verdict );
@@ -382,8 +389,9 @@ sub _process_cmd_line
 {
     my ( $self, $args ) = @_;
 
-    my $_max_iters_limit                      = ( 1 << 31 );
-    my $_num_foundations                      = 1;
+    my $_max_iters_limit = ( 1 << 31 );
+    my $_num_foundations = 1;
+    my $_prelude_string;
     my $_should_show_maximal_num_played_cards = 0;
     my $display_boards                        = '';
     my $quiet                                 = '';
@@ -423,7 +431,7 @@ sub _process_cmd_line
             {
                 die "Invalid prelude string '$val' !";
             }
-            $self->_prelude_string($val);
+            $_prelude_string = $val;
             return;
         },
         "task-name=s" => sub {
@@ -478,6 +486,10 @@ sub _process_cmd_line
     $self->_display_boards($display_boards);
     $self->_max_iters_limit($_max_iters_limit);
     $self->_num_foundations($_num_foundations);
+    if ( defined($_prelude_string) )
+    {
+        $self->_prelude_string($_prelude_string);
+    }
     $self->_quiet($quiet);
     $self->_should_show_maximal_num_played_cards(
         $_should_show_maximal_num_played_cards);
@@ -493,12 +505,15 @@ sub _process_cmd_line
     else
     {
         ## no critic
-        open( $output_handle, ">&STDOUT" );
+        # open( $output_handle, ">&STDOUT" );
+        $output_handle = \*STDOUT;
         ## use critic
+        # die $output_handle;"applj";
     }
     $self->_output_fn($output_fn);
     $self->_output_handle($output_handle);
-    $self->_calc_lines( shift(@ARGV) );
+
+    # $self->_calc_lines( shift(@ARGV) );
 
     return;
 }

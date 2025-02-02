@@ -119,36 +119,46 @@ sub run
         }
     );
 
-    $self->_set_up_solver( 0, [ 1, $RANK_KING ] );
-
-    my $verdict = 0;
-
-    $self->_next_task;
-
-QUEUE_LOOP:
-    while ( my $state = $self->_get_next_state_wrapper )
+    my $global_verdict = 1;
+    foreach my $board_fn (@ARGV)
     {
-        # The foundation
-        my $no_cards = 1;
+        my $verdict = 0;
+        $self->_calc_lines( $board_fn, );
+        $self->_set_up_solver( 0, [ 1, $RANK_KING ] );
 
-        my @_pending;
+        $self->_next_task;
 
-        if (1)
+    QUEUE_LOOP:
+        while ( my $state = $self->_get_next_state_wrapper )
         {
-            $self->_find_moves( \@_pending, $state, \$no_cards );
-        }
+            # The foundation
+            my $no_cards = 1;
 
-        if ($no_cards)
-        {
-            $self->_trace_solution( $state, );
-            $verdict = 1;
-            last QUEUE_LOOP;
+            my @_pending;
+
+            if (1)
+            {
+                $self->_find_moves( \@_pending, $state, \$no_cards );
+            }
+
+            if ($no_cards)
+            {
+                $self->_trace_solution( $state, );
+                $verdict = 1;
+
+                # $self->_output_handle->print("END solved run\n");
+                last QUEUE_LOOP;
+            }
+            last QUEUE_LOOP
+                if not $self->_process_pending_items( \@_pending, $state );
         }
-        last QUEUE_LOOP
-            if not $self->_process_pending_items( \@_pending, $state );
+        $self->_end_report( $verdict, );
+        if ( not $verdict )
+        {
+            $global_verdict = 0;
+        }
     }
-
-    return $self->_my_exit( $verdict, );
+    return $self->_my_exit( $global_verdict, );
 }
 
 =head1 SEE ALSO

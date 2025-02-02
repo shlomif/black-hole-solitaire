@@ -112,6 +112,7 @@ sub run
     {
         $place_queens_on_kings = 1;
     }
+    $self->_calc_lines( shift(@ARGV), );
 
     my $talon_line = shift( @{ $self->_board_lines } );
     my @talon_values;
