@@ -26,7 +26,7 @@ my $board_const_attrs = [
     '_init_foundation_cards', '_init_queue',
 ];
 
-my $CHECK_SET_ONLY_ONCE_KEY = "BHSRUNCHECK";
+my $CHECK_SET_ONLY_ONCE_KEY = "BLACK_HOLE_SOLVER_RUNTIME_CHECKS";
 my $CHECK_SET_ONLY_ONCE     = $ENV{$CHECK_SET_ONLY_ONCE_KEY};
 if ( not $CHECK_SET_ONLY_ONCE )
 {
