@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 mkdir -p boards
 ~/progs/freecell/git/fc-solve/fc-solve/source/board_gen/gen-multiple-pysol-layouts --dir boards/ --game golf --prefix golf --suffix .board seq 1 10000
 (
