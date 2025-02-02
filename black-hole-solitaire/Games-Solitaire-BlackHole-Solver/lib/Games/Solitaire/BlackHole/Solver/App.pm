@@ -119,9 +119,11 @@ sub run
         }
     );
 
+    STDOUT->autoflush(1);
     my $global_verdict = 1;
     foreach my $board_fn (@ARGV)
     {
+        delete $self->{_BOARD_CTR};
         my $verdict = 0;
         $self->_calc_lines( $board_fn, );
         $self->_set_up_solver( 0, [ 1, $RANK_KING ] );

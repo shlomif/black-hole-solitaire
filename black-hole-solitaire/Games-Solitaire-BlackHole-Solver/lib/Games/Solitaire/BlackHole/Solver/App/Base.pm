@@ -11,27 +11,30 @@ extends('Exporter');
 # These attributes should remain constant during a solver's run.
 has '_num_foundations' => ( default => 1, is => 'rw', );
 
-my $const_attrs = [
-    '_bits_offset',           '_board_cards',
-    '_board_lines',           '_board_values',
-    '_display_boards',        '_init_foundation',
-    '_init_foundation_cards', '_init_queue',
-    '_init_tasks_configs',    '_is_good_diff',
-    '_max_iters_limit',       '_prelude',
-    '_prelude_string',        '_talon_cards',
-    '_quiet',                 '_output_handle',
-    '_output_fn',             '_should_show_maximal_num_played_cards',
-    '_tasks_by_names',
+my $solver_const_attrs = [
+    '_bits_offset',        '_display_boards',
+    '_init_tasks_configs', '_is_good_diff',
+    '_max_iters_limit',    '_prelude',
+    '_prelude_string',     '_talon_cards',
+    '_quiet',              '_output_handle',
+    '_output_fn',          '_should_show_maximal_num_played_cards',
 ];
 
-my $CHECK_SET_ONLY_ONCE = 0;
+my $board_const_attrs = [
+    '_board_cards',           '_board_lines',
+    '_board_values',          '_init_foundation',
+    '_init_foundation_cards', '_init_queue',
+];
+
+my $CHECK_SET_ONLY_ONCE_KEY = "BHSRUNCHECK";
+my $CHECK_SET_ONLY_ONCE     = $ENV{$CHECK_SET_ONLY_ONCE_KEY};
 if ( not $CHECK_SET_ONLY_ONCE )
 {
-    has [@$const_attrs] => ( is => 'rw', );
+    has [ @$board_const_attrs, @$solver_const_attrs ] => ( is => 'rw', );
 }
 else
 {
-    foreach my $const_attr (@$const_attrs)
+    foreach my $const_attr (@$solver_const_attrs)
     {
         has $const_attr => (
             is => 'rw',
@@ -41,7 +44,25 @@ else
                     trigger => sub {
                         my ( $self, $newval ) = @_;
                         die "self=$self const_attr=$const_attr"
-                            if ( $self->{_CTR}->{$const_attr}++ );
+                            if ( $self->{_SOLVER_CTR}->{$const_attr}++ );
+                        return;
+                    }
+                    )
+                : ()
+            )
+        );
+    }
+    foreach my $const_attr (@$board_const_attrs)
+    {
+        has $const_attr => (
+            is => 'rw',
+            (
+                $CHECK_SET_ONLY_ONCE
+                ? (
+                    trigger => sub {
+                        my ( $self, $newval ) = @_;
+                        die "self=$self const_attr=$const_attr"
+                            if ( $self->{_BOARD_CTR}->{$const_attr}++ );
                         return;
                     }
                     )
@@ -550,42 +571,44 @@ sub _set_up_tasks
     }
     $self->_task_idx(0);
     $self->_tasks( \@tasks );
-    $self->_tasks_by_names( \%tasks_by_names );
-    my @prelude;
-    my $process_item = sub {
-        my $s = shift;
-        if ( my ( $quota, $name ) = $s =~ /\A([0-9]+)\@($TASK_NAME_RE)\z/ )
-        {
-            if ( not exists $self->_tasks_by_names->{$name} )
+    if ( not $self->_prelude )
+    {
+        my @prelude;
+        my $process_item = sub {
+            my $s = shift;
+            if ( my ( $quota, $name ) = $s =~ /\A([0-9]+)\@($TASK_NAME_RE)\z/ )
             {
-                die "Unknown task name $name in prelude!";
-            }
-            my $task_obj = $self->_tasks_by_names->{$name};
-            return
-                Games::Solitaire::BlackHole::Solver::App::Base::PreludeItem
-                ->new(
+                if ( not exists $self->_tasks_by_names->{$name} )
                 {
-                    _quota     => $quota,
-                    _task      => $task_obj,
-                    _task_idx  => $task_obj->_task_idx,
-                    _task_name => $task_obj->_name,
+                    die "Unknown task name $name in prelude!";
                 }
+                my $task_obj = $self->_tasks_by_names->{$name};
+                return
+                    Games::Solitaire::BlackHole::Solver::App::Base::PreludeItem
+                    ->new(
+                    {
+                        _quota     => $quota,
+                        _task      => $task_obj,
+                        _task_idx  => $task_obj->_task_idx,
+                        _task_name => $task_obj->_name,
+                    }
+                    );
+            }
+            else
+            {
+                die "foo";
+            }
+        };
+        if ( my $_prelude_string = $self->_prelude_string )
+        {
+            push @prelude,
+                (
+                map { $process_item->($_) }
+                    split /,/, $_prelude_string
                 );
         }
-        else
-        {
-            die "foo";
-        }
-    };
-    if ( my $_prelude_string = $self->_prelude_string )
-    {
-        push @prelude,
-            (
-            map { $process_item->($_) }
-                split /,/, $_prelude_string
-            );
+        $self->_prelude( \@prelude );
     }
-    $self->_prelude( \@prelude );
     $self->_prelude_iter(0);
     if ( @{ $self->_prelude } )
     {
@@ -776,7 +799,10 @@ sub _set_up_solver
     $self->_parse_board;
     $self->_set_up_initial_position($talon_ptr);
     $self->_set_up_tasks;
-    $self->_is_good_diff( +{ map { $_ => 1 } map { $_, -$_ } @$diffs, } );
+    if ( not $self->_is_good_diff )
+    {
+        $self->_is_good_diff( +{ map { $_ => 1 } map { $_, -$_ } @$diffs, } );
+    }
 
     return;
 }
