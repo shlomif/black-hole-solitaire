@@ -130,29 +130,43 @@ sub run
 
         $self->_next_task;
 
-    QUEUE_LOOP:
-        while ( my $state = $self->_get_next_state_wrapper )
+        eval {
+        QUEUE_LOOP:
+            while ( my $state = $self->_get_next_state_wrapper )
+            {
+                # The foundation
+                my $no_cards = 1;
+
+                my @_pending;
+
+                if (1)
+                {
+                    $self->_find_moves( \@_pending, $state, \$no_cards );
+                }
+
+                if ($no_cards)
+                {
+                    $self->_trace_solution( $state, );
+                    $verdict = 1;
+
+                    # $self->_output_handle->print("END solved run\n");
+                    last QUEUE_LOOP;
+                }
+                last QUEUE_LOOP
+                    if not $self->_process_pending_items( \@_pending, $state );
+            }
+        };
+        my $Err = $@;
+        if ( $Err =~ /Exceeded max_iters_limit/ms )
         {
-            # The foundation
-            my $no_cards = 1;
+            $verdict = 1;
 
-            my @_pending;
-
-            if (1)
-            {
-                $self->_find_moves( \@_pending, $state, \$no_cards );
-            }
-
-            if ($no_cards)
-            {
-                $self->_trace_solution( $state, );
-                $verdict = 1;
-
-                # $self->_output_handle->print("END solved run\n");
-                last QUEUE_LOOP;
-            }
-            last QUEUE_LOOP
-                if not $self->_process_pending_items( \@_pending, $state );
+            # STDERR->print( $Err . "\n" );
+            die "$Err";
+        }
+        else
+        {
+            die $Err;
         }
         $self->_end_report( $verdict, );
         if ( not $verdict )
