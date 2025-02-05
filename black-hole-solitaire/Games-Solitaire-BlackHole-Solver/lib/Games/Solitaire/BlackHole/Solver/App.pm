@@ -184,7 +184,7 @@ sub _multi_filename_run
 
         $self->_next_task;
 
-    QUEUE_LOOP:
+    MFN_QUEUE_LOOP:
         while ( my $state = $self->_get_next_state_wrapper )
         {
             # The foundation
@@ -203,9 +203,9 @@ sub _multi_filename_run
                 $verdict = 1;
 
                 # $self->_output_handle->print("END solved run\n");
-                last QUEUE_LOOP;
+                last MFN_QUEUE_LOOP;
             }
-            last QUEUE_LOOP
+            last MFN_QUEUE_LOOP
                 if not $self->_process_pending_items( \@_pending, $state );
         }
         $self->_end_report( $verdict, );
