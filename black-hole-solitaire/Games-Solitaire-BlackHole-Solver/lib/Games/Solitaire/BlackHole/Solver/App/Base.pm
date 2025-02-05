@@ -12,12 +12,13 @@ extends('Exporter');
 has '_num_foundations' => ( default => 1, is => 'rw', );
 
 my $solver_const_attrs = [
-    '_bits_offset',        '_display_boards',
-    '_init_tasks_configs', '_is_good_diff',
-    '_max_iters_limit',    '_prelude',
-    '_prelude_string',     '_talon_cards',
-    '_quiet',              '_output_handle',
-    '_output_fn',          '_should_show_maximal_num_played_cards',
+    '_bits_offset',                             '_display_boards',
+    '_do_not_err_on_exceeding_max_iters_limit', '_init_tasks_configs',
+    '_is_good_diff',                            '_max_iters_limit',
+    '_prelude',                                 '_prelude_string',
+    '_talon_cards',                             '_quiet',
+    '_output_handle',                           '_output_fn',
+    '_should_show_maximal_num_played_cards',
 ];
 
 my $board_const_attrs = [
@@ -74,9 +75,10 @@ else
 
 # These attributes mutate during a solver's run.
 has [
-    '_active_record', '_active_task',
-    '_maximal_num_played_cards__from_all_tasks',
-    '_prelude_iter', '_positions', '_tasks', '_task_idx',
+    '_active_record',            '_active_task',
+    '_max_iters_limit_exceeded', '_maximal_num_played_cards__from_all_tasks',
+    '_prelude_iter',             '_positions',
+    '_tasks',                    '_task_idx',
 ] => ( is => 'rw' );
 
 our %EXPORT_TAGS = ( 'all' => [qw($card_re)] );
@@ -348,6 +350,8 @@ sub _parse_board
 sub _set_up_initial_position
 {
     my ( $self, $talon_ptr ) = @_;
+
+    $self->_max_iters_limit_exceeded(0);
 
     my $init_state = "";
 
@@ -772,6 +776,12 @@ sub _find_moves
                         $positions->{$next_s} = [ $state, $col_idx, 1, 0 ];
                         if ( keys(%$positions) > $max_iters_limit )
                         {
+                            $self->_max_iters_limit_exceeded(1);
+                            if ( $self->_do_not_err_on_exceeding_max_iters_limit
+                                )
+                            {
+                                return;
+                            }
                             die "Exceeded max_iters_limit !";
                         }
                         $to_add = 1;

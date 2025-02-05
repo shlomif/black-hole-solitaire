@@ -120,6 +120,60 @@ sub run
     );
 
     STDOUT->autoflush(1);
+    if ( @ARGV > 1 )
+    {
+        $self->_do_not_err_on_exceeding_max_iters_limit(1);
+        return $self->_multi_filename_run();
+    }
+    $self->_do_not_err_on_exceeding_max_iters_limit(0);
+    my $global_verdict = 1;
+    foreach my $board_fn (@ARGV)
+    {
+        delete $self->{_BOARD_CTR};
+        my $verdict = 0;
+        $self->_calc_lines( $board_fn, );
+        $self->_set_up_solver( 0, [ 1, $RANK_KING ] );
+
+        $self->_next_task;
+
+    QUEUE_LOOP:
+        while ( my $state = $self->_get_next_state_wrapper )
+        {
+            # The foundation
+            my $no_cards = 1;
+
+            my @_pending;
+
+            if (1)
+            {
+                $self->_find_moves( \@_pending, $state, \$no_cards );
+            }
+
+            if ($no_cards)
+            {
+                $self->_trace_solution( $state, );
+                $verdict = 1;
+
+                # $self->_output_handle->print("END solved run\n");
+                last QUEUE_LOOP;
+            }
+            last QUEUE_LOOP
+                if not $self->_process_pending_items( \@_pending, $state );
+        }
+        $self->_end_report( $verdict, );
+        if ( not $verdict )
+        {
+            $global_verdict = 0;
+        }
+    }
+    return $self->_my_exit( $global_verdict, );
+}
+
+sub _multi_filename_run
+{
+    my $self      = shift;
+    my $RANK_KING = $self->_RANK_KING;
+
     my $global_verdict = 1;
     foreach my $board_fn (@ARGV)
     {
