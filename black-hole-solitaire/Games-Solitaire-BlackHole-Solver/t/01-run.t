@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 18;
+use Test::More tests => 20;
 
 use Path::Tiny           qw/ path cwd /;
 use Dir::Manifest::Slurp qw/ as_lf /;
@@ -16,7 +16,14 @@ sub _filename_2to3
 {
     my $n = shift;
     return cwd()
-        ->child( "t", "data", "run-2-to-3-with-3-unsolved/bh${n}.board" );
+        ->child( "t", "data", "run-2-to-3-with-3-unsolved", "bh${n}.board" );
+}
+
+sub _filename_maxiters2000
+{
+    my $n = shift;
+    return cwd()
+        ->child( "t", "data", "run-with-max-iters-2000", "bh${n}.board" );
 }
 
 sub _exe
@@ -1459,6 +1466,62 @@ sub _test_max_num_played_cards
             name         => "max-num-played on no moves",
             expected_num => [ 50, 48, ],
             input_lines  => [ path($sol_fn)->lines_utf8() ]
+        }
+    );
+
+    unlink($sol_fn);
+}
+
+sub _test_multiple_verdict_lines
+{
+    my %is_verdict_line = map { $_ => 1, }
+        ( "Solved!", "Unsolved!", "Exceeded max_iters_limit !" );
+    my ($args) = @_;
+    my ( $name, $want, $input_lines ) =
+        @{$args}{qw/ name expected_results input_lines/};
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    return subtest $name => sub {
+        plan tests => 2;
+        my @matches = (
+            map {
+                my $l = $_;
+                chomp $l;
+                $is_verdict_line{$l} ? ($l) : ();
+            }
+            map { as_lf($_) } @$input_lines,
+        );
+
+        is( scalar(@matches), scalar(@$want), "lines count." );
+
+        eq_or_diff( [@matches], [@$want], "expected results.", );
+    };
+}
+
+{
+    my $sol_fn = _filename("_test_multiple_verdict_lines.bh.sol.txt");
+
+    # TEST
+    ok(
+        system(
+            $^X, "-Mblib", $BHS, "--max-iters", 2000,
+            @MAX_NUM_PLAYED_FLAG, "-o", $sol_fn,
+            _filename_maxiters2000(11),
+            _filename_maxiters2000(12),
+            _filename_maxiters2000(13),
+            _filename_maxiters2000(25),
+
+        )
+    );
+
+    # TEST
+    _test_multiple_verdict_lines(
+        {
+            name             => "max-num-played on no moves",
+            expected_results => [
+                "Exceeded max_iters_limit !", "Solved!",
+                "Exceeded max_iters_limit !", "Unsolved!"
+            ],
+            input_lines => [ path($sol_fn)->lines_utf8() ]
         }
     );
 

@@ -174,9 +174,15 @@ sub _multi_filename_run
     my $self      = shift;
     my $RANK_KING = $self->_RANK_KING;
 
+    my $SOFT_EXCEEDED  = $self->_do_not_err_on_exceeding_max_iters_limit();
     my $global_verdict = 1;
     foreach my $board_fn (@ARGV)
     {
+        if ( $board_fn !~ m#\A[A-Za-z0-9_\-/\.=]{3,512}\z#ms )
+        {
+            die "dangerous board filename '${board_fn}'!";
+        }
+        $self->_output_handle->printf( "[= Starting file %s =]\n", $board_fn );
         delete $self->{_BOARD_CTR};
         my $verdict = 0;
         $self->_calc_lines( $board_fn, );
@@ -208,11 +214,19 @@ sub _multi_filename_run
             last MFN_QUEUE_LOOP
                 if not $self->_process_pending_items( \@_pending, $state );
         }
+        if ($SOFT_EXCEEDED)
+        {
+            if ( $SOFT_EXCEEDED and $self->_max_iters_limit_exceeded() )
+            {
+                $verdict = 0;
+            }
+        }
         $self->_end_report( $verdict, );
         if ( not $verdict )
         {
             $global_verdict = 0;
         }
+        $self->_output_handle->printf( "[= END of file %s =]\n", $board_fn );
     }
     return $self->_my_exit( $global_verdict, );
 }

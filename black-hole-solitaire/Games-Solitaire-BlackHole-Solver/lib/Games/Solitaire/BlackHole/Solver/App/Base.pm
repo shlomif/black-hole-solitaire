@@ -287,7 +287,15 @@ sub _end_report
 
     if ( !$verdict )
     {
-        $output_handle->print("Unsolved!\n");
+        my $SOFT_EXCEEDED = $self->_do_not_err_on_exceeding_max_iters_limit();
+        if ( $SOFT_EXCEEDED and $self->_max_iters_limit_exceeded() )
+        {
+            $output_handle->print("Exceeded max_iters_limit !\n");
+        }
+        else
+        {
+            $output_handle->print("Unsolved!\n");
+        }
     }
     if ( $self->_should_show_maximal_num_played_cards() )
     {
