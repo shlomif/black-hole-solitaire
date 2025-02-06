@@ -276,7 +276,8 @@ sub get_max_num_played_cards
 
     $self->_update_max_num_played_cards();
 
-    return $self->_maximal_num_played_cards__from_all_tasks() - 1;
+    my $ret = $self->_maximal_num_played_cards__from_all_tasks();
+    return ( ( $ret == 0 ) ? $ret : ( $ret - 1 ) );
 }
 
 sub _end_report
@@ -642,9 +643,9 @@ sub _next_task
     {
         my $alloc = $self->_prelude->[ $self->{_prelude_iter}++ ];
         my $task  = $alloc->_task;
+        $self->_update_max_reached_depths_stack_len($task);
         if ( !@{ $task->_queue } )
         {
-            $self->_update_max_reached_depths_stack_len($task);
             return $self->_next_task;
         }
         $task->_remaining_iters( $alloc->_quota );
@@ -659,6 +660,7 @@ sub _next_task
         return $self->_next_task;
     }
     my $task = $tasks->[ $self->_task_idx ];
+    $self->_update_max_reached_depths_stack_len($task);
     $self->_task_idx( ( $self->_task_idx + 1 ) % @$tasks );
     $task->_remaining_iters(100);
     $self->_active_task($task);
