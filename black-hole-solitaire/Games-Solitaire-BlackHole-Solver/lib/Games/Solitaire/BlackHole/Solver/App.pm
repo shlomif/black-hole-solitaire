@@ -178,11 +178,15 @@ sub _multi_filename_run
     my $global_verdict = 1;
     foreach my $board_fn (@ARGV)
     {
-        if ( $board_fn !~ m#\A[A-Za-z0-9_\-/\.=]{3,512}\z#ms )
+        my $board_display_fn = $board_fn;
+        $board_display_fn =~
+            s#([^A-Za-z0-9_\-/\.=\\\:])#sprintf("%%{%x}", ord($1))#egms;
+        if (0)
         {
             die "dangerous board filename '${board_fn}'!";
         }
-        $self->_output_handle->printf( "[= Starting file %s =]\n", $board_fn );
+        $self->_output_handle->printf( "[= Starting file %s =]\n",
+            $board_display_fn );
         delete $self->{_BOARD_CTR};
         my $verdict = 0;
         $self->_calc_lines( $board_fn, );
@@ -226,7 +230,8 @@ sub _multi_filename_run
         {
             $global_verdict = 0;
         }
-        $self->_output_handle->printf( "[= END of file %s =]\n", $board_fn );
+        $self->_output_handle->printf( "[= END of file %s =]\n",
+            $board_display_fn );
     }
     return $self->_my_exit( $global_verdict, );
 }
