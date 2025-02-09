@@ -234,11 +234,12 @@ static inline bhs_settings parse_cmd_line(
     return settings;
 }
 
-static inline int solve_filename(
-    const char *const filename, bhs_settings *const settings_ptr)
+static inline int solve_filename(const char *const filename,
+    bhs_settings *const settings_ptr, bool *const should_abort)
 {
 #define settings (*settings_ptr)
     int ret = 0;
+    *should_abort = false;
 
     FILE *fh = stdin;
     if (filename)
@@ -247,6 +248,7 @@ static inline int solve_filename(
         if (!fh)
         {
             fprintf(stderr, "Cannot open '%s' for reading!\n", filename);
+            *should_abort = true;
             return -1;
         }
     }
@@ -329,6 +331,7 @@ static inline int solve_filename(
                 fprintf(stderr, "%s - %d\n",
                     "Get next move routine returned the wrong error code.",
                     next_move_ret_code);
+                *should_abort = true;
                 ret = -1;
             }
         }
@@ -336,6 +339,7 @@ static inline int solve_filename(
     else if (solver_ret_code == BLACK_HOLE_SOLVER__OUT_OF_MEMORY)
     {
         fputs("Out of memory!\n", stderr);
+        *should_abort = true;
         exit(-1);
     }
     else if (solver_ret_code == BLACK_HOLE_SOLVER__OUT_OF_ITERS)

@@ -12,7 +12,15 @@ int main(int argc, char *argv[])
     {
         char *const filename = argv[arg_idx];
         fprintf(settings.out_fh, "[= Starting file %s =]\n", filename);
-        solve_filename(filename, &settings);
+        bool should_abort;
+        const int ret = solve_filename(filename, &settings, &should_abort);
+        if (ret && should_abort)
+        {
+            /* code */
+            fflush(settings.out_fh);
+            solve_free(&settings);
+            return ret;
+        }
         fprintf(settings.out_fh, "[= END of file %s =]\n", filename);
     }
     fflush(settings.out_fh);

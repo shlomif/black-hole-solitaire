@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 24;
+use Test::More tests => 25;
 use Test::Differences qw/ eq_or_diff /;
 use Test::Some;
 
@@ -256,35 +256,70 @@ foreach my $exe ( './black-hole-solve', )
 }
 
 {
-    my $tmp    = tempdir();
-    my $out_fn = $tmp->child("golf1to20out.txt");
-    trap
+    my $master_tmp = tempdir();
+    my $count      = 0;
     {
-        mysys(
-            './multi-bhs-solver',
-            '--output',
-            $out_fn,
-            '--game',
-            'golf',
-            '--display-boards',
-            '--wrap-ranks',
-            ( map { $mani->fh("golf$_.board") } 1 .. 20 )
+        my $tmp = $master_tmp->child( "multibhs-" . ++$count );
+        $tmp->mkdir();
+
+        my $out_fn = $tmp->child("golf1to20out.txt");
+        trap
+        {
+            mysys(
+                './multi-bhs-solver',
+                '--output',
+                $out_fn,
+                '--game',
+                'golf',
+                '--display-boards',
+                '--wrap-ranks',
+                ( map { $mani->fh("golf$_.board") } 1 .. 20 )
+            );
+        };
+
+        # TEST
+        ok( !($exit_code),
+            "Exit code for --display-boards for golf board #906." );
+
+        my $stdout = as_lf( path($out_fn)->slurp_raw );
+        $stdout =~
+s#^(\[= (?:Starting|END of) file )(\S+)#$1 . path($2)->basename#egms;
+
+        # TEST
+        is(
+            $stdout,
+            $mani->text( "golf-1to20.sol.txt", { lf => 1 } ),
+            "recycling works",
         );
-    };
+    }
 
-    # TEST
-    ok( !($exit_code), "Exit code for --display-boards for golf board #906." );
+    {
+        my $tmp = $master_tmp->child( "multibhs-" . ++$count );
+        $tmp->mkdir();
+        my $out_fn = $tmp->child("golf1to20out.txt");
+        trap
+        {
+            mysys(
+                './multi-bhs-solver',
+                '--output',
+                $out_fn,
+                '--game',
+                'golf',
+                '--display-boards',
+                '--wrap-ranks',
+                ( map { $mani->fh("golf$_.board") } 1 .. 2 ),
+                $tmp->child("not--------exist.c"),
+                ( map { $mani->fh("golf$_.board") } 3 .. 4 ),
+            );
+        };
 
-    my $stdout = as_lf( path($out_fn)->slurp_raw );
-    $stdout =~
-        s#^(\[= (?:Starting|END of) file )(\S+)#$1 . path($2)->basename#egms;
+        # TEST
+        ok( $exit_code, "Exit code for --display-boards for golf board #906." );
 
-    # TEST
-    is(
-        $stdout,
-        $mani->text( "golf-1to20.sol.txt", { lf => 1 } ),
-        "recycling works",
-    );
+        my $stdout = as_lf( path($out_fn)->slurp_raw );
+        $stdout =~
+s#^(\[= (?:Starting|END of) file )(\S+)#$1 . path($2)->basename#egms;
+    }
 }
 
 my $MAX_NUM_PLAYED_CARDS_RE =

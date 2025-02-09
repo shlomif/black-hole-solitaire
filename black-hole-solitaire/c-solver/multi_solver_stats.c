@@ -3,7 +3,7 @@
 // Distributed under terms of the Expat license.
 #include <solver_common.h>
 
-static inline void output_stats__solve_file(
+static inline int output_stats__solve_file(
     const char *const filename, bhs_settings *const settings_ptr)
 {
 #define settings (*settings_ptr)
@@ -14,7 +14,7 @@ static inline void output_stats__solve_file(
         if (!fh)
         {
             fprintf(stderr, "Cannot open '%s' for reading!\n", filename);
-            return;
+            return -1;
         }
     }
     char board[MAX_LEN_BOARD_STRING];
@@ -78,6 +78,7 @@ static inline void output_stats__solve_file(
 
     black_hole_solver_recycle(solver);
 #undef settings
+    return 0;
 }
 
 int main(int argc, char *argv[])
@@ -89,7 +90,12 @@ int main(int argc, char *argv[])
     {
         char *const filename = argv[arg_idx];
         fprintf(settings.out_fh, "[= Starting file %s =]\n", filename);
-        output_stats__solve_file(filename, &settings);
+        const int ret = output_stats__solve_file(filename, &settings);
+        if (unlikely(ret))
+        {
+            solve_free(&settings);
+            return -1;
+        }
         fprintf(settings.out_fh, "[= END of file %s =]\n", filename);
     }
     fflush(settings.out_fh);

@@ -18,7 +18,8 @@ int main(int argc, char *argv[])
         }
     }
 
-    const int ret = solve_filename(filename, &settings);
+    bool should_abort;
+    const int ret = solve_filename(filename, &settings, &should_abort);
     solve_free(&settings);
     return ret;
 }
