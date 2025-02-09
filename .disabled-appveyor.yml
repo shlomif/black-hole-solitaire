@@ -27,7 +27,7 @@ install:
     - SET PERL_MB_OPT=--install_base C:/Perl5
     - SET PERL_MM_OPT=INSTALL_BASE=C:/Perl5
     # - pkg-config --version
-    - cpanm --notest Code::TidyAll::Plugin::ClangFormat Code::TidyAll::Plugin::TestCount Dir::Manifest Dist::Zilla Env::Path Games::Solitaire::Verify::Solution IO::All Inline Inline::C Perl::Critic Perl::Tidy Pod::Coverage::TrustPod Pod::Weaver::Section::Support String::ShellQuote Test::CPAN::Changes Test::Code::TidyAll Test::Differences Test::EOL Test::Kwalitee Test::NoTabs Test::Pod Test::Pod::Coverage Test::RunValgrind Test::Some Test::TrailingSpace Test::Trap
+    - cpanm --notest Code::TidyAll::Plugin::ClangFormat Code::TidyAll::Plugin::TestCount Dir::Manifest Dist::Zilla Env::Path Games::Solitaire::Verify::Solution IO::All Inline Inline::C Path::Tiny~0.146 Perl::Critic Perl::Tidy Pod::Coverage::TrustPod Pod::Weaver::Section::Support String::ShellQuote Test::CPAN::Changes Test::Code::TidyAll Test::Differences Test::EOL Test::Kwalitee Test::NoTabs Test::Pod Test::Pod::Coverage Test::RunValgrind Test::Some Test::TrailingSpace Test::Trap
       # - cd black-hole-solitaire\Games-Solitaire-BlackHole-Solver
       # - dzil authordeps --missing | cpanm -n
       # - dzil listdeps   --missing | cpanm -n

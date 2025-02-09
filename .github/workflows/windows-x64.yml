@@ -41,6 +41,8 @@ jobs:
 
                     Inline::C
 
+                    Path::Tiny~0.146
+
                     Perl::Critic
 
                     Perl::Tidy
