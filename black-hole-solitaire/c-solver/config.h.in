@@ -23,11 +23,6 @@ extern "C" {
 
 #cmakedefine CARD_DEBUG_PRES
 
-/*
-    The sort margin size for the previous states array.
-*/
-#define PREV_STATES_SORT_MARGIN 32
-
 /* The size of a single pack in alloc.c/alloc.h measured in 1024 chars. */
 #cmakedefine FCS_IA_PACK_SIZE ${FCS_IA_PACK_SIZE}
 
@@ -48,4 +43,3 @@ extern "C" {
 #endif
 
 #endif    /* #ifndef BLACK_HOLE_SOLVE__CONFIG_H */
-
