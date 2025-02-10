@@ -75,7 +75,7 @@ static inline bool bh_solve_hash_rehash(bh_solve_hash_t *hash)
     return false;
 }
 
-int bh_solve_hash_init(bh_solve_hash_t *hash, meta_allocator *const meta_alloc)
+bool bh_solve_hash_init(bh_solve_hash_t *hash, meta_allocator *const meta_alloc)
 {
     const bh_solve_hash_value_t size = 256;
 
@@ -89,7 +89,7 @@ int bh_solve_hash_init(bh_solve_hash_t *hash, meta_allocator *const meta_alloc)
     if (!(hash->entries =
                 calloc((size_t)size, sizeof(bh_solve_hash_symlink_t))))
     {
-        return 1;
+        return true;
     }
 #ifdef BHS_WITH_HASH_VACANT_ITEMS
     hash->list_of_vacant_items = NULL;
@@ -100,10 +100,10 @@ int bh_solve_hash_init(bh_solve_hash_t *hash, meta_allocator *const meta_alloc)
     {
         free(hash->entries);
         hash->entries = NULL;
-        return 1;
+        return true;
     }
 
-    return 0;
+    return false;
 }
 
 int bh_solve_hash_insert(

@@ -90,7 +90,7 @@ typedef struct
 
 } bh_solve_hash_t;
 
-extern int bh_solve_hash_init(bh_solve_hash_t *hash, meta_allocator *);
+extern bool bh_solve_hash_init(bh_solve_hash_t *hash, meta_allocator *);
 
 // Returns false if the key is new and the key/val pair was inserted.
 // Returns true if the key is not new and *existing_key / *existing_val
