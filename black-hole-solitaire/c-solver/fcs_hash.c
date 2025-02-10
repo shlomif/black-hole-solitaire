@@ -27,15 +27,14 @@
 // hash table, allowing for smaller chains, and faster lookup.
 static inline bool bh_solve_hash_rehash(bh_solve_hash_t *hash)
 {
-    bh_solve_hash_symlink_t *new_entries;
-
     const_AUTO(old_size, hash->size);
 
     const_AUTO(new_size, old_size << 1);
     const_AUTO(new_size_bitmask, new_size - 1);
 
-    if (unlikely(!(new_entries = calloc(
-                       (size_t)new_size, sizeof(bh_solve_hash_symlink_t)))))
+    bh_solve_hash_symlink_t *new_entries;
+    if (unlikely(
+            !(new_entries = calloc((size_t)new_size, sizeof(new_entries[0])))))
     {
         return true;
     }
