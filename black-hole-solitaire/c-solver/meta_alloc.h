@@ -16,6 +16,7 @@
 extern "C" {
 #endif
 
+#include <stdbool.h>
 #include <stddef.h>
 #include "rinutils/likely.h"
 #include "rinutils/typeof_wrap.h"
@@ -39,10 +40,10 @@ typedef struct
     meta_allocator *meta;
 } compact_allocator;
 
-extern int bh_solve_compact_allocator_extend(compact_allocator *);
+extern bool bh_solve_compact_allocator_extend(compact_allocator *);
 
 /* To be called after the meta_alloc was set. */
-static inline int fc_solve_compact_allocator_init_helper(
+static inline bool fc_solve_compact_allocator_init_helper(
     compact_allocator *const allocator)
 {
     allocator->old_list = NULL;
@@ -115,7 +116,7 @@ static inline void fc_solve_compact_allocator_recycle(
     fc_solve_compact_allocator_init_helper(allocator);
 }
 
-static inline int fc_solve_compact_allocator_init(
+static inline bool fc_solve_compact_allocator_init(
     compact_allocator *const allocator, meta_allocator *const meta_alloc)
 {
     allocator->meta = meta_alloc;
