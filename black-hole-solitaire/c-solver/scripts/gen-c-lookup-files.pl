@@ -53,21 +53,6 @@ foreach my $wrap_ranks ( 0, 1 )
     }
 }
 
-path('board_gen_lookup1.h')->spew_utf8(
-    "#pragma once\n",
-    'static const size_t offset_by_i[52] = {',
-    join(
-        ',',
-        map {
-            my $i   = $_;
-            my $col = ( $i & ( 8 - 1 ) );
-            3 *
-                ( $col * 7 - ( ( $col > 4 ) ? ( $col - 4 ) : 0 ) + ( $i >> 3 ) )
-        } 0 .. ( 52 - 1 )
-    ),
-    "};\n"
-);
-
 emit(
 qq#const bool black_hole_solver__can_move[2][@{[$MAX_RANK+1]}][@{[$MAX_RANK]}]#,
     'can_move',

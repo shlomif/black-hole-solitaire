@@ -16,7 +16,6 @@ int main(int argc, char *argv[])
         const int ret = solve_filename(filename, &settings, &should_abort);
         if (ret && should_abort)
         {
-            /* code */
             fflush(settings.out_fh);
             solve_free(&settings);
             return ret;
