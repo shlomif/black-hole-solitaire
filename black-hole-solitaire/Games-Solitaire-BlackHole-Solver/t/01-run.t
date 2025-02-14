@@ -1477,19 +1477,42 @@ sub _test_multiple_verdict_lines
     my %is_verdict_line = map { $_ => 1, }
         ( "Solved!", "Unsolved!", "Exceeded max_iters_limit !" );
     my ($args) = @_;
-    my ( $name, $want, $input_lines ) =
-        @{$args}{qw/ name expected_results input_lines/};
+    my ( $name, $expected_files_checks, $want, $input_lines ) =
+        @{$args}{qw/ name expected_files_checks expected_results input_lines/};
     local $Test::Builder::Level = $Test::Builder::Level + 1;
     return subtest $name => sub {
         plan tests => 2;
-        my @matches = (
-            map {
-                my $l = $_;
-                chomp $l;
-                $is_verdict_line{$l} ? ($l) : ();
+        $input_lines =
+            [ map { my $l = as_lf($_); chomp $l; $l } @$input_lines ];
+        my @matches;
+        while (@$input_lines)
+        {
+            my $dealstart = shift @$input_lines;
+            my ($fn) = $dealstart =~ /^\[\= Starting file (\S+) \=\]$/ms
+                or die "cannot match";
+            if ( not shift(@$expected_files_checks)->($fn) )
+            {
+                die "filename check";
             }
-            map { as_lf($_) } @$input_lines,
-        );
+            my $dealverdict = shift @$input_lines;
+            if ( $is_verdict_line{$dealverdict} )
+            {
+                push @matches, $dealverdict;
+            }
+            else
+            {
+                die "mismatch";
+            }
+            while ( @$input_lines and $input_lines->[0] !~ /^\[\= /ms )
+            {
+                shift @$input_lines;
+            }
+            my $dealend = shift @$input_lines;
+            if ( $dealend ne "[= END of file $fn =]" )
+            {
+                die "dealend mismatch";
+            }
+        }
 
         is( scalar(@matches), scalar(@$want), "lines count." );
 
@@ -1521,7 +1544,18 @@ sub _test_multiple_verdict_lines
                 "Exceeded max_iters_limit !", "Solved!",
                 "Exceeded max_iters_limit !", "Unsolved!"
             ],
-            input_lines => [ path($sol_fn)->lines_utf8() ]
+            expected_files_checks => [
+                map {
+                    my $bnidx = $_;
+                    sub {
+                        my $fn = path(shift);
+                        my $bn = $fn->basename();
+
+                        return ( $bn =~ m#bh\Q$bnidx\E\.board#ms );
+                    }
+                } ( 11, 12, 13, 25, )
+            ],
+            input_lines => [ path($sol_fn)->lines_utf8() ],
         }
     );
 
