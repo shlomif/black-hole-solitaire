@@ -1485,12 +1485,13 @@ sub _test_multiple_verdict_lines
         $input_lines =
             [ map { my $l = as_lf($_); chomp $l; $l } @$input_lines ];
         my @matches;
+        my $deal_idx = 0;
         while (@$input_lines)
         {
             my $dealstart = shift @$input_lines;
             my ($fn) = $dealstart =~ /^\[\= Starting file (\S+) \=\]$/ms
                 or die "cannot match";
-            if ( not shift(@$expected_files_checks)->($fn) )
+            if ( not $expected_files_checks->( $deal_idx, $fn ) )
             {
                 die "filename check";
             }
@@ -1512,6 +1513,10 @@ sub _test_multiple_verdict_lines
             {
                 die "dealend mismatch";
             }
+        }
+        continue
+        {
+            ++$deal_idx;
         }
 
         is( scalar(@matches), scalar(@$want), "lines count." );
@@ -1541,17 +1546,14 @@ sub _test_multiple_verdict_lines
                 "Exceeded max_iters_limit !", "Solved!",
                 "Exceeded max_iters_limit !", "Unsolved!"
             ],
-            expected_files_checks => [
-                map {
-                    my $bnidx = $_;
-                    sub {
-                        my $fn = path(shift);
-                        my $bn = $fn->basename();
+            expected_files_checks => sub {
+                my $i       = shift;
+                my $dealidx = $deals_indexes[$i];
+                my $fn      = path(shift);
+                my $bn      = $fn->basename();
 
-                        return ( $bn =~ m#bh\Q$bnidx\E\.board#ms );
-                    }
-                } @deals_indexes
-            ],
+                return ( $bn =~ m#bh\Q$dealidx\E\.board#ms );
+            },
             input_lines => [ path($sol_fn)->lines_utf8() ],
         }
     );
