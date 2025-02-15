@@ -1521,18 +1521,15 @@ sub _test_multiple_verdict_lines
 }
 
 {
-    my $sol_fn = _filename("_test_multiple_verdict_lines.bh.sol.txt");
+    my $sol_fn        = _filename("_test_multiple_verdict_lines.bh.sol.txt");
+    my @deals_indexes = ( 11, 12, 13, 25, );
 
     # TEST
     ok(
         system(
             $^X, "-Mblib", $BHS, "--max-iters", 2000,
             @MAX_NUM_PLAYED_FLAG, "-o", $sol_fn,
-            _filename_maxiters2000(11),
-            _filename_maxiters2000(12),
-            _filename_maxiters2000(13),
-            _filename_maxiters2000(25),
-
+            ( map { _filename_maxiters2000($_), } @deals_indexes ),
         )
     );
 
@@ -1553,7 +1550,7 @@ sub _test_multiple_verdict_lines
 
                         return ( $bn =~ m#bh\Q$bnidx\E\.board#ms );
                     }
-                } ( 11, 12, 13, 25, )
+                } @deals_indexes
             ],
             input_lines => [ path($sol_fn)->lines_utf8() ],
         }
