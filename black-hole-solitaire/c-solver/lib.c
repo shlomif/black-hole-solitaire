@@ -761,6 +761,7 @@ extern int DLLEXPORT black_hole_solver_run(
         }
         else if (iterations_num >= max_iters_limit)
         {
+            assert(iterations_num == max_iters_limit);
             solver->max_reached_depths_stack_len = max_reached_depths_stack_len;
             solver->iterations_num = iterations_num;
             solver->current_depths_stack_len = current_depths_stack_len;
