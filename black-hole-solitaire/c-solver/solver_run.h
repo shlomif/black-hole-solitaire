@@ -3,10 +3,17 @@
 //
 // Distributed under terms of the Expat license.
 #pragma once
+#include <assert.h>
 
 static inline int solver_run(black_hole_solver_instance_t *const solver,
     const unsigned long max_iters_limit, const unsigned long iters_display_step)
 {
+    if (iters_display_step == 0)
+    {
+        // fprintf(stderr, "iters_display_step is 0.\n");
+        black_hole_solver_set_max_iters_limit(solver, max_iters_limit);
+        return black_hole_solver_run(solver);
+    }
     unsigned long iters_limit = min(iters_display_step, max_iters_limit);
     black_hole_solver_set_max_iters_limit(solver, iters_limit);
     unsigned long iters_num;
@@ -16,15 +23,15 @@ static inline int solver_run(black_hole_solver_instance_t *const solver,
     {
         solver_ret_code = black_hole_solver_run(solver);
         iters_num = black_hole_solver_get_iterations_num(solver);
-        if (iters_limit == iters_num)
+        if (iters_limit <= iters_num)
         {
-            printf("Iteration: %lu\n", iters_limit);
+            printf("Iteration: %lu\n", iters_num);
             fflush(stdout);
         }
         iters_limit += iters_display_step;
         iters_limit = min(iters_limit, max_iters_limit);
         black_hole_solver_set_max_iters_limit(solver, iters_limit);
     } while ((solver_ret_code == BLACK_HOLE_SOLVER__OUT_OF_ITERS) &&
-             (iters_num < max_iters_limit));
+             (iters_num <= max_iters_limit));
     return solver_ret_code;
 }
