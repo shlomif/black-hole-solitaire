@@ -1506,6 +1506,7 @@ sub _test_multiple_verdict_lines
             }
             while ( @$input_lines and $input_lines->[0] !~ /^\[\= /ms )
             {
+                diag( "unrecognised: '" . $input_lines->[0] . "'" );
                 shift @$input_lines;
             }
             my $dealend = shift @$input_lines;
@@ -1532,7 +1533,7 @@ sub _test_multiple_verdict_lines
     # TEST
     ok(
         system(
-            $^X, "-Mblib", $BHS, "--max-iters", 2000,
+            $^X, "-Mblib", $BHS, "--quiet", "--max-iters", 2000,
             @MAX_NUM_PLAYED_FLAG, "-o", $sol_fn,
             ( map { _filename_maxiters2000($_), } @deals_indexes ),
         )
