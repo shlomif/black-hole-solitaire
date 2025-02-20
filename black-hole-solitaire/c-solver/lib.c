@@ -661,6 +661,11 @@ extern int DLLEXPORT black_hole_solver_run(
         max_reached_depths_stack_len, solver->max_reached_depths_stack_len);
     var_AUTO(current_depths_stack_len, solver->current_depths_stack_len);
 
+    if (iterations_num >= max_iters_limit)
+    {
+        return BLACK_HOLE_SOLVER__OUT_OF_ITERS;
+    }
+
     while (solver->queue_len > 0)
     {
         const_AUTO(prev_len, solver->queue_len);
@@ -754,7 +759,7 @@ extern int DLLEXPORT black_hole_solver_run(
 
             return BLACK_HOLE_SOLVER__SUCCESS;
         }
-        else if (iterations_num == max_iters_limit)
+        else if (iterations_num >= max_iters_limit)
         {
             solver->max_reached_depths_stack_len = max_reached_depths_stack_len;
             solver->iterations_num = iterations_num;

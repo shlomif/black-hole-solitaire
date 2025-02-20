@@ -57,3 +57,30 @@ def test_limit_iters():
         move = solver.get_next_move()
         assert 0 <= move.get_column_idx() < 17
         solver.recycle()
+    for deal_idx in [5]:
+        solver = black_hole_solver.BlackHoleSolver()
+        solver.read_board(
+            board=Game(
+                'black_hole', deal_idx, RandomBase.DEALS_MS
+            ).calc_deal_string(
+                deal_idx, pysol_cards.cards.CardRenderer(print_ts=True)),
+            game_type='black_hole',
+            place_queens_on_kings=True,
+            wrap_ranks=True,
+        )
+        limit = 20
+        solver.limit_iterations(limit)
+        assert solver.resume_solution() == \
+            black_hole_solver.BlackHoleSolver.BLACK_HOLE_SOLVER__OUT_OF_ITERS
+        assert solver.get_num_times() == limit
+        assert solver.get_num_states_in_collection() > 0
+        assert solver.resume_solution() == \
+            black_hole_solver.BlackHoleSolver.BLACK_HOLE_SOLVER__OUT_OF_ITERS
+        assert solver.get_num_times() == limit
+        assert solver.get_num_states_in_collection() > 0
+        solver.limit_iterations(limit)
+        assert solver.resume_solution() == \
+            black_hole_solver.BlackHoleSolver.BLACK_HOLE_SOLVER__OUT_OF_ITERS
+        assert solver.get_num_times() == limit
+        assert solver.get_num_states_in_collection() > 0
+        solver.recycle()
