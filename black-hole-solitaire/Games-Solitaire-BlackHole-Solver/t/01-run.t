@@ -1504,6 +1504,15 @@ sub _test_multiple_verdict_lines
             {
                 die "mismatch";
             }
+            my $at_most_num_cards__line = 0;
+            if (    @$input_lines
+                and $input_lines->[0] =~
+                /^At most (?:(?:0)|(?:[1-9][0-9]*)) cards could be played\.\z/ms
+                )
+            {
+                $at_most_num_cards__line = 1;
+                shift @$input_lines;
+            }
             while ( @$input_lines and $input_lines->[0] !~ /^\[\= /ms )
             {
                 diag( "unrecognised: '" . $input_lines->[0] . "'" );
@@ -1513,6 +1522,10 @@ sub _test_multiple_verdict_lines
             if ( $dealend ne "[= END of file $fn =]" )
             {
                 die "dealend mismatch";
+            }
+            if ( not $at_most_num_cards__line )
+            {
+                die "At most cards played line is absent";
             }
         }
         continue
