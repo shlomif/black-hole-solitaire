@@ -87,6 +87,7 @@ TD
 6C
 5H
 4D
+This scan generated 8672 states.
 EOF
 
 {
@@ -1209,6 +1210,7 @@ Foundations: [ 5H -> 4D ]
 :
 :
 
+This scan generated 8672 states.
 EOF
 
 {
@@ -1513,6 +1515,14 @@ sub _test_multiple_verdict_lines
                 $at_most_num_cards__line = 1;
                 shift @$input_lines;
             }
+            my $generated_states_count__line = 0;
+            if (    @$input_lines
+                and $input_lines->[0] =~
+                /^This scan generated (?:(?:0)|(?:[1-9][0-9]*)) states\.\z/ms )
+            {
+                $generated_states_count__line = 1;
+                shift @$input_lines;
+            }
             while ( @$input_lines and $input_lines->[0] !~ /^\[\= /ms )
             {
                 diag( "unrecognised: '" . $input_lines->[0] . "'" );
@@ -1526,6 +1536,10 @@ sub _test_multiple_verdict_lines
             if ( not $at_most_num_cards__line )
             {
                 die "At most cards played line is absent";
+            }
+            if ( not $generated_states_count__line )
+            {
+                die "'This scan generated' line is absent";
             }
         }
         continue

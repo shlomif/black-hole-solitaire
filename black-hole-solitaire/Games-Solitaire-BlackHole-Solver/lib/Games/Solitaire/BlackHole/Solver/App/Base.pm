@@ -304,6 +304,10 @@ sub _end_report
             $self->get_max_num_played_cards()
         );
     }
+    $output_handle->printf(
+        "This scan generated %u states.\n",
+        scalar( keys %{ $self->_positions } ),
+    );
 
     return;
 }
@@ -784,7 +788,7 @@ sub _find_moves
                     if ( !$exists )
                     {
                         $positions->{$next_s} = [ $state, $col_idx, 1, 0 ];
-                        if ( keys(%$positions) > $max_iters_limit )
+                        if ( keys(%$positions) >= $max_iters_limit )
                         {
                             $self->_max_iters_limit_exceeded(1);
                             if ( $self->_do_not_err_on_exceeding_max_iters_limit
