@@ -1533,10 +1533,13 @@ sub _test_multiple_verdict_lines
                 $generated_states_count__line = 1;
                 shift @$input_lines;
             }
-            while ( @$input_lines and $input_lines->[0] !~ /^\[\= /ms )
+            if (0)
             {
-                diag( "unrecognised: '" . $input_lines->[0] . "'" );
-                shift @$input_lines;
+                while ( @$input_lines and $input_lines->[0] !~ /^\[\= /ms )
+                {
+                    diag( "unrecognised: '" . $input_lines->[0] . "'" );
+                    shift @$input_lines;
+                }
             }
             my $dealend = shift @$input_lines;
             if ( $dealend ne "[= END of file $fn =]" )
