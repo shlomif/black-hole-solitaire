@@ -77,8 +77,9 @@ else
 has [
     '_active_record',            '_active_task',
     '_max_iters_limit_exceeded', '_maximal_num_played_cards__from_all_tasks',
-    '_prelude_iter',             '_positions',
-    '_tasks',                    '_task_idx',
+    '_num_traversed_positions',  '_prelude_iter',
+    '_positions',                '_tasks',
+    '_task_idx',
 ] => ( is => 'rw' );
 
 our %EXPORT_TAGS = ( 'all' => [qw($card_re)] );
@@ -305,6 +306,10 @@ sub _end_report
         );
     }
     $output_handle->printf(
+        "Total number of states checked is %u.\n",
+        scalar( $self->_num_traversed_positions() ),
+    );
+    $output_handle->printf(
         "This scan generated %u states.\n",
         scalar( keys %{ $self->_positions } ),
     );
@@ -365,6 +370,7 @@ sub _set_up_initial_position
     my ( $self, $talon_ptr ) = @_;
 
     $self->_max_iters_limit_exceeded(0);
+    $self->_num_traversed_positions(0);
 
     my $init_state = "";
 
@@ -753,6 +759,7 @@ sub _find_moves
     my $offset           = $self->_bits_offset();
     my $used             = '';
     my @fnd;
+    $self->_num_traversed_positions( 1 + $self->_num_traversed_positions() );
     foreach my $i ( 0 .. $_num_foundations - 1 )
     {
         my $v = vec( $state, $i, 8 );

@@ -87,6 +87,7 @@ TD
 6C
 5H
 4D
+Total number of states checked is 8636.
 This scan generated 8672 states.
 EOF
 
@@ -1210,6 +1211,7 @@ Foundations: [ 5H -> 4D ]
 :
 :
 
+Total number of states checked is 8636.
 This scan generated 8672 states.
 EOF
 
@@ -1324,8 +1326,7 @@ EOF
     unlink($sol_fn);
 }
 
-my $MAX_NUM_PLAYED_CARDS_RE =
-    qr/\AAt most ([0-9]+) cards could be played\.\n?\z/ms;
+my $MAX_NUM_PLAYED_CARDS_RE = qr/\AAt most ([0-9]+) cards could be played\.$/ms;
 
 my @MAX_NUM_PLAYED_FLAG = ("--show-max-num-played-cards");
 
@@ -1515,6 +1516,15 @@ sub _test_multiple_verdict_lines
                 $at_most_num_cards__line = 1;
                 shift @$input_lines;
             }
+            my $traversed_states_count__line = 0;
+            if (    @$input_lines
+                and $input_lines->[0] =~
+/^Total number of states checked is (?:(?:0)|(?:[1-9][0-9]*))\.\z/ms,
+                )
+            {
+                $traversed_states_count__line = 1;
+                shift @$input_lines;
+            }
             my $generated_states_count__line = 0;
             if (    @$input_lines
                 and $input_lines->[0] =~
@@ -1536,6 +1546,10 @@ sub _test_multiple_verdict_lines
             if ( not $at_most_num_cards__line )
             {
                 die "At most cards played line is absent";
+            }
+            if ( not $traversed_states_count__line )
+            {
+                die "'checked states' line is absent";
             }
             if ( not $generated_states_count__line )
             {
@@ -1569,7 +1583,7 @@ sub _test_multiple_verdict_lines
     # TEST
     _test_multiple_verdict_lines(
         {
-            name             => "max-num-played on no moves",
+            name             => "test multiple verdict lines",
             expected_results => [
                 "Exceeded max_iters_limit !", "Solved!",
                 "Exceeded max_iters_limit !", "Unsolved!"
