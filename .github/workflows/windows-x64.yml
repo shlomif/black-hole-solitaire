@@ -90,7 +90,7 @@ jobs:
 
                 python3 --version || ( echo Failed & exit /B 1 )
 
-                python3 -mpip install %PY3MODS% || ( echo Failed & exit /B 1 )
+                python3 -m pip install %PY3MODS% || ( echo Failed & exit /B 1 )
 
                 perl -v || ( echo Failed & exit /B 1 )
 

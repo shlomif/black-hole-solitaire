@@ -14,11 +14,8 @@ install:
     - choco install strawberryperl
     - SET PATH=C:\strawberry\c\bin;C:\strawberry\perl\site\bin;C:\strawberry\perl\bin;%PATH%
     - SET PATH=C:\Python312-x64;%PATH%
-    # try to run the windows tests without these "copy"s.
-    # - copy c:\Python312-x64\python.exe c:\Python312-x64\python3.exe
-    # - copy c:\Python312-x64\python.exe c:\Python312-x64\python312.exe
     - python3 --version
-    - python3 -mpip install %PY3MODS%
+    - python3 -m pip install %PY3MODS%
     - perl -v
     - if not exist C:\Perl5 mkdir C:\Perl5
     - SET PATH=C:\msys64\bin;C:\Perl5\bin;C:\strawberry\c\bin;C:\strawberry\perl\site\bin;C:\strawberry\perl\bin;%PATH%
@@ -26,26 +23,14 @@ install:
     - SET PERL_LOCAL_LIB_ROOT=C:/Perl5
     - SET PERL_MB_OPT=--install_base C:/Perl5
     - SET PERL_MM_OPT=INSTALL_BASE=C:/Perl5
-    # - pkg-config --version
     - cpanm --notest Code::TidyAll::Plugin::ClangFormat Code::TidyAll::Plugin::TestCount Dir::Manifest Dist::Zilla Env::Path Games::Solitaire::Verify::Solution IO::All Inline Inline::C Path::Tiny~0.146 Perl::Critic Perl::Tidy Pod::Coverage::TrustPod Pod::Weaver::Section::Support String::ShellQuote Test::CPAN::Changes Test::Code::TidyAll Test::Differences Test::EOL Test::Kwalitee Test::NoTabs Test::Pod Test::Pod::Coverage Test::RunValgrind Test::Some Test::TrailingSpace Test::Trap
-      # - cd black-hole-solitaire\Games-Solitaire-BlackHole-Solver
-      # - dzil authordeps --missing | cpanm -n
-      # - dzil listdeps   --missing | cpanm -n
-    # - pkg-config --version
 build: off
 test_script:
-    # - pkg-config --version
     - set CMAKE_MAKE_PROGRAM=C:\strawberry\c\bin\gmake.exe
-      # - cd ..\..
-    # Removing for now because it is too much trouble on windows.
-    # - set FCS_TEST_BUILD=1
-    # - pkg-config --version
     - set TOXENV=py312
     - set bhslibdir=%HOME%\apps\fcs\lib
     - SET PATH=%PATH%;%bhslibdir%
     - set bhslibdir2=%HOME%\apps\fcs\bin
     - SET PATH=%PATH%;%bhslibdir2%
     - perl black-hole-solitaire/CI-testing/continuous-integration-testing.pl --gen="MSYS Makefiles" --skip-pypi
-# cache:
-#   - C:\Perl5
 shallow_clone: true
