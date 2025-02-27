@@ -74,6 +74,7 @@ typedef struct
     bool quiet_output;
     bool wrap_ranks;
     bool show_max_num_played_cards;
+    bool was_output_filepath_set;
 } bhs_settings;
 #pragma clang diagnostic pop
 
@@ -91,6 +92,7 @@ static inline bhs_settings parse_cmd_line(
     settings.wrap_ranks = true;
     settings.max_iters_limit = ULONG_MAX;
     settings.show_max_num_played_cards = false;
+    settings.was_output_filepath_set = false;
 
     int arg_idx = 1;
     while (argc > arg_idx)
@@ -113,7 +115,15 @@ static inline bhs_settings parse_cmd_line(
                 fputs("Error! --output requires an argument.\n", stderr);
                 exit(-1);
             }
+            if (settings.was_output_filepath_set)
+            {
+                fputs("Error! --output can only be used once in order to avoid "
+                      "filehandles leaks.\n",
+                    stderr);
+                exit(-1);
+            }
             settings.out_fh = fopen(argv[arg_idx++], "wt");
+            settings.was_output_filepath_set = true;
         }
         else if (!strcmp(argv[arg_idx], "--max-iters"))
         {
@@ -371,7 +381,7 @@ static inline int solve_filename(const char *const filename,
 
 static inline void solve_free(bhs_settings *const settings_ptr)
 {
-    if (settings_ptr->out_fh != stdout)
+    if (settings_ptr->was_output_filepath_set)
     {
         fclose(settings_ptr->out_fh);
     }

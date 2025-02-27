@@ -59,6 +59,7 @@ static inline int output_stats__solve_file(
 
     if (!solver_ret_code)
     {
+        fputs("Solved!\n", out_fh);
     }
     else if (solver_ret_code == BLACK_HOLE_SOLVER__OUT_OF_MEMORY)
     {
