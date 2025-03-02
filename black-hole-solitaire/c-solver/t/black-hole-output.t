@@ -13,6 +13,8 @@ use Test::Trap qw(
 
 use Path::Tiny qw/ path tempdir /;
 
+use Games::Solitaire::BlackHole::Test qw/ _test_multiple_verdict_lines /;
+
 my $bin_dir   = path(__FILE__)->parent->absolute;
 my $data_dir  = $bin_dir->child('data');
 my $texts_dir = $data_dir->child('texts');
@@ -255,9 +257,9 @@ foreach my $exe ( './black-hole-solve', )
     );
 }
 
+my $master_tmp = tempdir();
 {
-    my $master_tmp = tempdir();
-    my $count      = 0;
+    my $count = 0;
     {
         my $tmp = $master_tmp->child( "multibhs-" . ++$count );
         $tmp->mkdir();
@@ -363,7 +365,7 @@ unlike(
 
 # TEST
 subtest 'max_num_played' => sub {
-    plan tests => 10;
+    plan tests => 12;
     trap
     {
         mysys( './black-hole-solve', '--game', 'black_hole',
@@ -458,5 +460,53 @@ EOF
             input_text   => scalar( $trap->stdout() ),
         },
     );
+
+    {
+        my $count = 0;
+        my $tmp   = $master_tmp->child( "statsmultibhs-" . ++$count );
+        $tmp->mkdir();
+
+        my @deals_indexes = ( 1 .. 20 );
+        my $out_fn        = $tmp->child("golf1to20out.txt");
+        trap
+        {
+            mysys(
+                './stats-multi-bhs-solver',
+                '--output',
+                $out_fn,
+                '--game',
+                'golf',
+                '--display-boards',
+                '--wrap-ranks',
+                ( map { $mani->fh("golf$_.board") } 1 .. 20 )
+            );
+        };
+
+        ok( !($exit_code),
+            "Exit code for --display-boards for golf board #906." );
+
+        _test_multiple_verdict_lines(
+            {
+                name             => "test multiple verdict lines",
+                expected_results => [
+                    "Solved!", "Solved!", "Solved!",   "Solved!",
+                    "Solved!", "Solved!", "Solved!",   "Solved!",
+                    "Solved!", "Solved!", "Unsolved!", "Solved!",
+                    "Solved!", "Solved!", "Solved!",   "Solved!",
+                    "Solved!", "Solved!", "Solved!",   "Solved!",
+                ],
+                expected_files_checks => sub {
+                    my $i       = shift;
+                    my $dealidx = $deals_indexes[$i];
+                    my $fn      = path(shift);
+                    my $bn      = $fn->basename();
+
+                    return ( $bn =~ m#golf\Q$dealidx\E\.board#ms );
+                },
+                input_lines => [ path($out_fn)->lines_utf8() ],
+            }
+        );
+
+    }
     },
     '!no_max_num_played';
