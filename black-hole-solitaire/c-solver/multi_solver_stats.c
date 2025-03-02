@@ -73,9 +73,15 @@ static inline int output_stats__solve_file(
     else
     {
         fputs("Unsolved!\n", out_fh);
-        fprintf(out_fh, "At most %lu cards could be played.\n",
-            black_hole_solver_get_max_num_played_cards(solver));
     }
+
+    fprintf(out_fh, "At most %lu cards could be played.\n",
+        black_hole_solver_get_max_num_played_cards(solver));
+    fprintf(out_fh,
+        "Total number of states checked is %lu.\n"
+        "This scan generated %lu states.\n",
+        black_hole_solver_get_iterations_num(solver),
+        black_hole_solver_get_num_states_in_collection(solver));
 
     black_hole_solver_recycle(solver);
 #undef settings
