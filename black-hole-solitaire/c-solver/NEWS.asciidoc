@@ -1,8 +1,20 @@
 Black Hole Solver's News File
 =============================
 Shlomi Fish <shlomif@cpan.org>
-:Date: 2020-06-28
+:Date: 2025-03-03
 :Revision: $Id$
+
+1.14.0       ( 03 March 2025 ):
+-------------------------------
+
+* Fixed running black_hole_solver_run with the same (or a smaller) iterations
+limit.  It ran indefinetely then (Possible Denial-of-service?)
+
+* Fix some hypothetical rresource leaks (e.g.: with "fopen()").
+
+* Cleanups: add "const"s , convert "int" to "bool", etc.
+
+* Add tests.
 
 1.12.0       ( 28 March 2022 ):
 -------------------------------
