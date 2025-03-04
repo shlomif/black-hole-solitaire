@@ -1,3 +1,8 @@
+0.2.4
+    Test the resume-without-updating max-num-times fix in the c-solver.
+
+    Refactoring.
+
 0.2.3
     Fix the description's RST (PyPI).
 
