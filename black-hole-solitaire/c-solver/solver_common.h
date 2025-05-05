@@ -75,6 +75,7 @@ typedef struct
     bool wrap_ranks;
     bool show_max_num_played_cards;
     bool was_output_filepath_set;
+    const char *game_string;
 } bhs_settings;
 #pragma clang diagnostic pop
 
@@ -163,6 +164,7 @@ static inline bhs_settings parse_cmd_line(
                     "\"all_in_a_row\".");
                 exit(-1);
             }
+            settings.game_string = g;
         }
         else if (!strcmp(argv[arg_idx], "--no-queens-on-kings"))
         {

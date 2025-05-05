@@ -2,6 +2,9 @@
 //
 // Distributed under terms of the Expat license.
 #include <solver_common.h>
+#ifdef BLACK_HOLE_SOLVER_WITH_PYTHON
+#include "libpysol_cards/python_embed.h"
+#endif
 
 static inline int output_stats__solve_board_string(
     const char *const board, bhs_settings *const settings_ptr)
@@ -91,26 +94,81 @@ static inline int output_stats__solve_file(
     }
     board[MAX_LEN_BOARD_STRING - 1] = '\0';
 #undef settings
-    return output_stats__solve_board_string(board, settings_ptr);
+    const int ret = output_stats__solve_board_string(board, settings_ptr);
+    return ret;
 }
 
 int main(int argc, char *argv[])
 {
     int arg_idx;
     bhs_settings settings = parse_cmd_line(argc, argv, &arg_idx);
+#ifdef BLACK_HOLE_SOLVER_WITH_PYTHON
+    global_python_instance_type global_python_struct;
+    global_python_instance_type *const global_python = &global_python_struct;
+    global_python_instance__init(global_python);
+    pysol_cards__master_instance_type master_instance_struct;
+    pysol_cards__master_instance_type *const master_instance =
+        &master_instance_struct;
+    pysol_cards__master_instance_init(master_instance, global_python);
+    pysol_cards__generator_type generator;
+    pysol_cards__create_generator(&generator, global_python,
+        master_instance->create_gen, settings.game_string, 0);
+#endif
+    char board_string[BOARD_STRING_SIZE];
 
     for (; arg_idx < argc; ++arg_idx)
     {
-        char *const filename = argv[arg_idx];
-        fprintf(settings.out_fh, "[= Starting file %s =]\n", filename);
-        const int ret = output_stats__solve_file(filename, &settings);
-        if (unlikely(ret))
+        char *const arg = argv[arg_idx];
+        long startidx, endidx;
+#ifdef BLACK_HOLE_SOLVER_WITH_PYTHON
+        if (!strcmp(arg, "seq"))
         {
-            solve_free(&settings);
-            return -1;
+            if (arg_idx + 2 + 0 >= argc)
+            {
+                exit(1);
+            }
+            startidx = atol(argv[++arg_idx]);
+            endidx = atol(argv[++arg_idx]);
+            const bool keep_running = true;
+            for (long deal_idx = startidx; keep_running && (deal_idx <= endidx);
+                ++deal_idx)
+            {
+                const int ret_code =
+                    pysol_cards__deal(&generator, board_string, deal_idx);
+                if (ret_code)
+                {
+                    Py_DECREF(global_python->py_module);
+                    fprintf(stderr, "Cannot convert argument\n");
+                    return PYSOL_CARDS__FAIL;
+                }
+                output_stats__solve_board_string(board_string, &settings);
+#if 0
+                if ((deal_idx & ((1 << 12) - 1)) == 0)
+                {
+                    fprintf(stderr, "Reached %ld\n", deal_idx);
+                    fflush(stderr);
+                }
+#endif
+            }
         }
-        fprintf(settings.out_fh, "[= END of file %s =]\n", filename);
+        else
+#endif
+        {
+            char *const filename = arg;
+            fprintf(settings.out_fh, "[= Starting file %s =]\n", filename);
+            const int ret = output_stats__solve_file(filename, &settings);
+            if (unlikely(ret))
+            {
+                solve_free(&settings);
+                return -1;
+            }
+            fprintf(settings.out_fh, "[= END of file %s =]\n", filename);
+        }
     }
+#ifdef BLACK_HOLE_SOLVER_WITH_PYTHON
+    pysol_cards__master_instance_release(master_instance);
+    global_python_instance__release(global_python);
+#endif
     fflush(settings.out_fh);
     solve_free(&settings);
 

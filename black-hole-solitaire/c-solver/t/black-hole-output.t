@@ -482,12 +482,20 @@ EOF
             );
         };
 
-        ok( !($exit_code),
-            "Exit code for --display-boards for golf board #906." );
+        if (
+            not ok(
+                !($exit_code),
+                "Exit code for --display-boards for golf boards 1-to-20 ."
+            )
+            )
+        {
+            diag( $trap->stderr() );
+        }
 
         _test_multiple_verdict_lines(
             {
-                name             => "test multiple verdict lines",
+                name =>
+"test multiple verdict lines for --display-boards for golf boards 1-to-20 .",
                 expected_results => [
                     "Solved!", "Solved!", "Solved!",   "Solved!",
                     "Solved!", "Solved!", "Solved!",   "Solved!",
