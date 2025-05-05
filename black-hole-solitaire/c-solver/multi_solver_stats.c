@@ -3,30 +3,10 @@
 // Distributed under terms of the Expat license.
 #include <solver_common.h>
 
-static inline int output_stats__solve_file(
-    const char *const filename, bhs_settings *const settings_ptr)
+static inline int output_stats__solve_board_string(
+    const char *const board, bhs_settings *const settings_ptr)
 {
 #define settings (*settings_ptr)
-    FILE *fh = stdin;
-    if (filename)
-    {
-        fh = fopen(filename, "rt");
-        if (!fh)
-        {
-            fprintf(stderr, "Cannot open '%s' for reading!\n", filename);
-            return -1;
-        }
-    }
-    char board[MAX_LEN_BOARD_STRING];
-    fread(board, sizeof(board[0]), MAX_LEN_BOARD_STRING, fh);
-
-    if (filename)
-    {
-        fclose(fh);
-    }
-
-    board[MAX_LEN_BOARD_STRING - 1] = '\0';
-
     int error_line_num;
     const enum GAME_TYPE game_type = settings.game_type;
     const unsigned num_columns =
@@ -86,6 +66,32 @@ static inline int output_stats__solve_file(
     black_hole_solver_recycle(solver);
 #undef settings
     return 0;
+}
+
+static inline int output_stats__solve_file(
+    const char *const filename, bhs_settings *const settings_ptr)
+{
+#define settings (*settings_ptr)
+    FILE *fh = stdin;
+    if (filename)
+    {
+        fh = fopen(filename, "rt");
+        if (!fh)
+        {
+            fprintf(stderr, "Cannot open '%s' for reading!\n", filename);
+            return -1;
+        }
+    }
+    char board[MAX_LEN_BOARD_STRING];
+    fread(board, sizeof(board[0]), MAX_LEN_BOARD_STRING, fh);
+
+    if (filename)
+    {
+        fclose(fh);
+    }
+    board[MAX_LEN_BOARD_STRING - 1] = '\0';
+#undef settings
+    return output_stats__solve_board_string(board, settings_ptr);
 }
 
 int main(int argc, char *argv[])
