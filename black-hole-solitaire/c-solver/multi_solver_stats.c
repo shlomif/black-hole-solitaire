@@ -141,6 +141,8 @@ int main(int argc, char *argv[])
                     fprintf(stderr, "Cannot convert argument\n");
                     return PYSOL_CARDS__FAIL;
                 }
+                fprintf(
+                    settings.out_fh, "[= Starting file deal%ld =]\n", deal_idx);
                 output_stats__solve_board_string(board_string, &settings);
 #if 0
                 if ((deal_idx & ((1 << 12) - 1)) == 0)
@@ -149,6 +151,8 @@ int main(int argc, char *argv[])
                     fflush(stderr);
                 }
 #endif
+                fprintf(
+                    settings.out_fh, "[= END of file deal%ld =]\n", deal_idx);
             }
         }
         else
