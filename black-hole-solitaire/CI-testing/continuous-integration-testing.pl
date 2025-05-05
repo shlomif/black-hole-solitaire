@@ -37,7 +37,8 @@ if ( defined $cmake_gen )
 
 if ( !$IS_WIN )
 {
-    $ENV{PATH} .= ":$ENV{HOME}/.local/bin";
+    my $HOME = $ENV{HOME};
+    $ENV{PATH} .= ":$HOME/.local/bin";
 
     # See: https://pypi.org/project/tox/
     # A Python tester - must be invocable
@@ -46,6 +47,26 @@ if ( !$IS_WIN )
             cmd => [ "which", "tox", ],
         }
     );
+    my $py = "$HOME/progs/python";
+    if ( not -d $py )
+    {
+        do_system(
+            {
+                cmd => [ "mkdir", "-p", $py, ],
+            }
+        );
+    }
+    my $gitrepo = "pysol-cards-in-C";
+    my $pygit   = "$py/$gitrepo/.git";
+    if ( not -d $pygit )
+    {
+        do_system(
+            {
+                cmd =>
+                    ["cd $py && git clone https://github.com/shlomif/$gitrepo"],
+            }
+        );
+    }
 }
 
 do_system(
