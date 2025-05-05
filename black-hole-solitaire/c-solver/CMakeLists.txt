@@ -12,6 +12,7 @@ option (USE_SYSTEM_XXHASH "Link to the system's xxHash instead of the bundled co
 option (BUILD_STATIC_LIBRARY "Build and install the static library")
 option (LINK_TO_STATIC "Link the executables to the static library")
 option (DISABLE_APPLYING_RPATH "Disable applying rpath")
+option (DISABLE_EMBEDDED_PYTHON "Disable embedding libpython3 in C programs")
 option (ENABLE_DISPLAYING_MAX_NUM_PLAYED_CARDS "Allow recording and displaying the maximal number of played/\"moved\" cards. Enabling it may make the non-related run time somewhat slower.")
 option (USE_SIGNED_CHARS "-fsigned-char")
 option (USE_UNSIGNED_CHARS "-funsigned-char")
@@ -302,6 +303,26 @@ IF (ENABLE_DISPLAYING_MAX_NUM_PLAYED_CARDS)
         "multi_solver_stats.c"
     )
     LIST(APPEND exes "stats-multi-bhs-solver")
+
+    IF ( NOT "${DISABLE_EMBEDDED_PYTHON}" )
+
+        FIND_PACKAGE(Python3 COMPONENTS Development Development.Embed)
+
+        IF ( NOT "${Python3_Development.Embed_FOUND}" )
+            MESSAGE( FATAL_ERROR "Python_Development Embed not found" )
+        ELSE ()
+            ADD_DEFINITIONS( "-DBLACK_HOLE_SOLVER_WITH_PYTHON=1" )
+        ENDIF ()
+
+        SET(wrapperexe "stats-multi-bhs-solver")
+        SET(wrappermod "multi_solver_stats.c")
+        # ADD_EXECUTABLE("${wrapperexe}" "${wrappermod}")
+        SET_PROPERTY(TARGET "${wrapperexe}" APPEND PROPERTY INCLUDE_DIRECTORIES "$ENV{HOME}/progs/python/pysol-cards-in-C" ${Python3_INCLUDE_DIRS})
+        SET_PROPERTY(TARGET "${wrapperexe}" APPEND PROPERTY LIBRARIES ${Python3_Development.Embed_LIBRARIES})
+        SET_PROPERTY(TARGET "${wrapperexe}" APPEND PROPERTY LINK_OPTIONS ${Python3_Development.Embed_LINK_OPTIONS} ${Python3_LIBRARY_RELEASE})
+
+    ENDIF ()
+
 ENDIF ()
 
 FOREACH (exe ${exes})

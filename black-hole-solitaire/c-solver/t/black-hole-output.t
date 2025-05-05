@@ -365,7 +365,7 @@ unlike(
 
 # TEST
 subtest 'max_num_played' => sub {
-    plan tests => 12;
+    plan tests => 14;
     trap
     {
         mysys( './black-hole-solve', '--game', 'black_hole',
@@ -461,33 +461,63 @@ EOF
         },
     );
 
+REC_LOOP:
+    foreach my $rec (
+        { base => "golf", extension => ".board", },
+        { base => "deal", extension => "", },
+        )
     {
+        my $base      = $rec->{'base'};
+        my $extension = $rec->{'extension'};
+
+        if ( $base eq "deal" )
+        {
+            if ( $ENV{BHSOLVER_DISABLE_EMBEDDED_PYTHON} )
+            {
+                foreach my $cnt ( 1 .. 2 )
+                {
+                    pass("SKIP on BHSOLVER_DISABLE_EMBEDDED_PYTHON");
+                }
+                next REC_LOOP;
+            }
+        }
+
         my $count = 0;
         my $tmp   = $master_tmp->child( "statsmultibhs-" . ++$count );
         $tmp->mkdir();
 
         my @deals_indexes = ( 1 .. 20 );
-        my $out_fn        = $tmp->child("golf1to20out.txt");
+        my $out_fn        = $tmp->child("${base}1to20out.txt");
         trap
         {
             mysys(
                 './stats-multi-bhs-solver',
                 '--output',
-                $out_fn,
-                '--game',
-                'golf',
+                $out_fn, '--game', 'golf',
                 '--display-boards',
                 '--wrap-ranks',
-                ( map { $mani->fh("golf$_.board") } 1 .. 20 )
+                (
+                    ${base} eq "golf"
+                    ? ( map { $mani->fh("golf$_.board") } 1 .. 20 )
+                    : (qw( seq 1 20 ))
+                ),
             );
         };
 
-        ok( !($exit_code),
-            "Exit code for --display-boards for golf board #906." );
+        if (
+            not ok(
+                !($exit_code),
+                "Exit code for --display-boards for ${base} boards 1-to-20 ."
+            )
+            )
+        {
+            diag( $trap->stderr() );
+        }
 
         _test_multiple_verdict_lines(
             {
-                name             => "test multiple verdict lines",
+                name =>
+"test multiple verdict lines for --display-boards for ${base} boards 1-to-20 .",
                 expected_results => [
                     "Solved!", "Solved!", "Solved!",   "Solved!",
                     "Solved!", "Solved!", "Solved!",   "Solved!",
@@ -501,7 +531,8 @@ EOF
                     my $fn      = path(shift);
                     my $bn      = $fn->basename();
 
-                    return ( $bn =~ m#golf\Q$dealidx\E\.board#ms );
+                    return (
+                        $bn =~ m#\Q${base}\E\Q$dealidx\E\Q$extension\E#ms );
                 },
                 input_lines => [ path($out_fn)->lines_utf8() ],
             }

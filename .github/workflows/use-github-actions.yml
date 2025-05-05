@@ -49,6 +49,7 @@ jobs:
                 LD_LIBRARY_PATH+=":$libdir" ; LIBRARY_PATH+=":$libdir" ; export LIBRARY_PATH
                 LD_LIBRARY_PATH ; export FCS_TEST_BUILD=1 TOXENV="py312" ; export
                 GCC_CPU_ARCH=x64 ; perl black-hole-solitaire/CI-testing/continuous-integration-testing.pl
+                --disable-embedded-python
 name: use-github-actions
 'on':
 - push
