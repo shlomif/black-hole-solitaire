@@ -19,10 +19,11 @@ sub do_system
     }
 }
 
-my $IS_WIN = ( $^O eq "MSWin32" );
-my $SEP    = $IS_WIN ? "\\"    : '/';
-my $MAKE   = $IS_WIN ? 'gmake' : 'make';
-my $SUDO   = $IS_WIN ? ''      : 'sudo';
+my $IS_WIN     = ( $^O eq "MSWin32" );
+my $SEP        = $IS_WIN ? "\\"    : '/';
+my $MAKE       = $IS_WIN ? 'gmake' : 'make';
+my $MAKE_FLAGS = "VERBOSE=1";
+my $SUDO       = $IS_WIN ? '' : 'sudo';
 
 my $cmake_gen;
 my $skip_pypi = 0;
@@ -143,8 +144,10 @@ foreach my $SIGNED_CHARS_ARGS (
                 cmd => [
 "cd black-hole-solitaire && @{[_refresh_dir($dir)]} && $^X ..${SEP}scripts${SEP}Tatzer @$tatzer_args -l ${CPU_ARCH}t "
                         . ( defined($cmake_gen) ? qq#--gen="$cmake_gen"# : "" )
-                        . " && $MAKE && $^X ..${SEP}c-solver${SEP}run-tests.pl"
-                        . ( $INSTALL ? qq# && $SUDO $MAKE install# : '' )
+                        . " && $MAKE $MAKE_FLAGS && $^X ..${SEP}c-solver${SEP}run-tests.pl"
+                        . (
+                        $INSTALL ? qq# && $SUDO $MAKE $MAKE_FLAGS install# : ''
+                        )
                 ]
             }
         );
