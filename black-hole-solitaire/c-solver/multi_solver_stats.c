@@ -131,7 +131,7 @@ int main(int argc, char *argv[])
 #ifdef BLACK_HOLE_SOLVER__HANDLE_SIGINT_GRACEFULLY
     signal(SIGINT, sigint_handler);
 #endif
-    char board_string[BOARD_STRING_SIZE];
+    char board[MAX_LEN_BOARD_STRING];
 
     for (; arg_idx < argc; ++arg_idx)
     {
@@ -150,16 +150,17 @@ int main(int argc, char *argv[])
                 ++deal_idx)
             {
                 const int ret_code =
-                    pysol_cards__deal(&generator, board_string, deal_idx);
+                    pysol_cards__deal(&generator, board, deal_idx);
                 if (ret_code)
                 {
                     Py_DECREF(global_python->py_module);
                     fprintf(stderr, "Cannot convert argument\n");
                     return PYSOL_CARDS__FAIL;
                 }
+                board[MAX_LEN_BOARD_STRING - 1] = '\0';
                 fprintf(
                     settings.out_fh, "[= Starting file deal%ld =]\n", deal_idx);
-                output_stats__solve_board_string(board_string, &settings);
+                output_stats__solve_board_string(board, &settings);
 #if 0
                 if ((deal_idx & ((1 << 12) - 1)) == 0)
                 {
