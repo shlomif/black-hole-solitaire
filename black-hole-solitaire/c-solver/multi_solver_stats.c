@@ -108,8 +108,7 @@ static inline int output_stats__solve_file(
     }
     board[MAX_LEN_BOARD_STRING - 1] = '\0';
 #undef settings
-    const int ret = output_stats__solve_board_string(board, settings_ptr);
-    return ret;
+    return output_stats__solve_board_string(board, settings_ptr);
 }
 
 int main(int argc, char *argv[])
