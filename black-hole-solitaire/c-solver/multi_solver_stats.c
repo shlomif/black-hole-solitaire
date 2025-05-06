@@ -115,7 +115,10 @@ int main(int argc, char *argv[])
 {
     int arg_idx;
     bhs_settings settings = parse_cmd_line(argc, argv, &arg_idx);
+
 #ifdef BLACK_HOLE_SOLVER_WITH_PYTHON
+    const int DEALS_MS = 0;
+
     global_python_instance_type global_python_struct;
     global_python_instance_type *const global_python = &global_python_struct;
     global_python_instance__init(global_python);
@@ -125,11 +128,14 @@ int main(int argc, char *argv[])
     pysol_cards__master_instance_init(master_instance, global_python);
     pysol_cards__generator_type generator;
     pysol_cards__create_generator(&generator, global_python,
-        master_instance->create_gen, settings.game_string, 0);
+        master_instance->create_gen, settings.game_string, DEALS_MS);
+
 #endif
+
 #ifdef BLACK_HOLE_SOLVER__HANDLE_SIGINT_GRACEFULLY
     signal(SIGINT, sigint_handler);
 #endif
+
     char board[MAX_LEN_BOARD_STRING];
 
     for (; arg_idx < argc; ++arg_idx)
