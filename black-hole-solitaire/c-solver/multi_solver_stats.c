@@ -4,12 +4,16 @@
 #include <solver_common.h>
 #ifdef BLACK_HOLE_SOLVER_WITH_PYTHON
 #include "libpysol_cards/python_embed.h"
+#define BLACK_HOLE_SOLVER__HANDLE_SIGINT_GRACEFULLY 1
 #endif
+
+#ifdef BLACK_HOLE_SOLVER__HANDLE_SIGINT_GRACEFULLY
 #include <signal.h>
 
 static volatile bool keep_running = true;
 
 static void sigint_handler(int dummy) { keep_running = false; }
+#endif
 
 static inline int output_stats__solve_board_string(
     const char *const board, bhs_settings *const settings_ptr)
@@ -118,6 +122,8 @@ int main(int argc, char *argv[])
     pysol_cards__generator_type generator;
     pysol_cards__create_generator(&generator, global_python,
         master_instance->create_gen, settings.game_string, 0);
+#endif
+#ifdef BLACK_HOLE_SOLVER__HANDLE_SIGINT_GRACEFULLY
     signal(SIGINT, sigint_handler);
 #endif
     char board_string[BOARD_STRING_SIZE];
