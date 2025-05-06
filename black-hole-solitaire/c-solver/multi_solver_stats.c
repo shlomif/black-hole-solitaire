@@ -141,7 +141,6 @@ int main(int argc, char *argv[])
     for (; arg_idx < argc; ++arg_idx)
     {
         char *const arg = argv[arg_idx];
-        long startidx, endidx;
 #ifdef BLACK_HOLE_SOLVER_WITH_PYTHON
         if (!strcmp(arg, "seq"))
         {
@@ -149,8 +148,8 @@ int main(int argc, char *argv[])
             {
                 exit(1);
             }
-            startidx = atol(argv[++arg_idx]);
-            endidx = atol(argv[++arg_idx]);
+            const long startidx = atol(argv[++arg_idx]);
+            const long endidx = atol(argv[++arg_idx]);
             for (long deal_idx = startidx; keep_running && (deal_idx <= endidx);
                 ++deal_idx)
             {
