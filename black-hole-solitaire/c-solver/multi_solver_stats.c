@@ -1,19 +1,24 @@
 // Copyright (C) 2018 Shlomi Fish <shlomif@cpan.org>
 //
 // Distributed under terms of the Expat license.
-#include <solver_common.h>
 #ifdef BLACK_HOLE_SOLVER_WITH_PYTHON
-#include "libpysol_cards/python_embed.h"
 #define BLACK_HOLE_SOLVER__HANDLE_SIGINT_GRACEFULLY 1
 #endif
 
 #ifdef BLACK_HOLE_SOLVER__HANDLE_SIGINT_GRACEFULLY
 #include <signal.h>
+#include <stdbool.h>
 
 static volatile bool keep_running = true;
 
 static void sigint_handler(int dummy) { keep_running = false; }
 #endif
+
+#ifdef BLACK_HOLE_SOLVER_WITH_PYTHON
+#include "libpysol_cards/python_embed.h"
+#endif
+
+#include <solver_common.h>
 
 static inline int output_stats__solve_board_string(
     const char *const board, bhs_settings *const settings_ptr)
