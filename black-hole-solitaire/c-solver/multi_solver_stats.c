@@ -165,13 +165,6 @@ int main(int argc, char *argv[])
                 fprintf(
                     settings.out_fh, "[= Starting file deal%ld =]\n", deal_idx);
                 output_stats__solve_board_string(board, &settings);
-#if 0
-                if ((deal_idx & ((1 << 12) - 1)) == 0)
-                {
-                    fprintf(stderr, "Reached %ld\n", deal_idx);
-                    fflush(stderr);
-                }
-#endif
                 fprintf(
                     settings.out_fh, "[= END of file deal%ld =]\n", deal_idx);
             }
@@ -190,10 +183,12 @@ int main(int argc, char *argv[])
             fprintf(settings.out_fh, "[= END of file %s =]\n", filename);
         }
     }
+
 #ifdef BLACK_HOLE_SOLVER_WITH_PYTHON
     pysol_cards__master_instance_release(master_instance);
     global_python_instance__release(global_python);
 #endif
+
     fflush(settings.out_fh);
     solve_free(&settings);
 
