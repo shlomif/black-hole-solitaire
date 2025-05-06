@@ -26,14 +26,22 @@ my $MAKE_FLAGS = "VERBOSE=1";
 my $SUDO       = $IS_WIN ? '' : 'sudo';
 
 my $cmake_gen;
-my $skip_pypi = 0;
-GetOptions( 'gen=s' => \$cmake_gen, 'skip-pypi!' => \$skip_pypi, )
-    or die 'Wrong options';
+my $skip_pypi               = 0;
+my $disable_embedded_python = 0;
+GetOptions(
+    'disable-embedded-python!' => \$disable_embedded_python,
+    'gen=s'                    => \$cmake_gen,
+    'skip-pypi!'               => \$skip_pypi,
+) or die 'Wrong options';
 
 local $ENV{RUN_TESTS_VERBOSE} = 1;
 if ( defined $cmake_gen )
 {
     $ENV{CMAKE_GEN} = $cmake_gen;
+}
+if ($disable_embedded_python)
+{
+    $ENV{BHSOLVER_DISABLE_EMBEDDED_PYTHON} = 1;
 }
 
 if ( !$IS_WIN )
@@ -132,7 +140,12 @@ foreach my $SIGNED_CHARS_ARGS (
         {
             dir         => "B_with_max_num_played",
             tatzer_args => [
-                qw/ --cmakedefine ENABLE_DISPLAYING_MAX_NUM_PLAYED_CARDS:BOOL=TRUE /
+                qw/ --cmakedefine ENABLE_DISPLAYING_MAX_NUM_PLAYED_CARDS:BOOL=TRUE /,
+                (
+                    $disable_embedded_python
+                    ? (qw/ --cmakedefine DISABLE_EMBEDDED_PYTHON:BOOL=TRUE /)
+                    : ()
+                ),
             ],
         },
         )

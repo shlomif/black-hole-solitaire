@@ -32,5 +32,5 @@ test_script:
     - SET PATH=%PATH%;%bhslibdir%
     - set bhslibdir2=%HOME%\apps\fcs\bin
     - SET PATH=%PATH%;%bhslibdir2%
-    - perl black-hole-solitaire/CI-testing/continuous-integration-testing.pl --gen="MSYS Makefiles" --skip-pypi
+    - perl black-hole-solitaire/CI-testing/continuous-integration-testing.pl --disable-embedded-python --gen="MSYS Makefiles" --skip-pypi
 shallow_clone: true

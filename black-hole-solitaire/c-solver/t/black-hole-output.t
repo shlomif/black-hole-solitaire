@@ -461,6 +461,7 @@ EOF
         },
     );
 
+REC_LOOP:
     foreach my $rec (
         { base => "golf", extension => ".board", },
         { base => "deal", extension => "", },
@@ -468,6 +469,18 @@ EOF
     {
         my $base      = $rec->{'base'};
         my $extension = $rec->{'extension'};
+
+        if ( $base eq "deal" )
+        {
+            if ( $ENV{BHSOLVER_DISABLE_EMBEDDED_PYTHON} )
+            {
+                foreach my $cnt ( 1 .. 2 )
+                {
+                    pass("SKIP on BHSOLVER_DISABLE_EMBEDDED_PYTHON");
+                }
+                next REC_LOOP;
+            }
+        }
 
         my $count = 0;
         my $tmp   = $master_tmp->child( "statsmultibhs-" . ++$count );
