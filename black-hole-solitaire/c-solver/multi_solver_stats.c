@@ -1,6 +1,6 @@
 // Copyright (C) 2018 Shlomi Fish <shlomif@cpan.org>
 //
-// Distributed under terms of the Expat license.
+// Distributed under terms of the MIT license.
 #ifdef BLACK_HOLE_SOLVER_WITH_PYTHON
 #define BLACK_HOLE_SOLVER__HANDLE_SIGINT_GRACEFULLY 1
 #endif
@@ -150,6 +150,13 @@ int main(int argc, char *argv[])
             }
             const long startidx = atol(argv[++arg_idx]);
             const long endidx = atol(argv[++arg_idx]);
+            if (startidx <= 0)
+            {
+                Py_DECREF(global_python->py_module);
+                fprintf(stderr, "Non-positive seed range index: \"%ld\"\n",
+                    startidx);
+                return PYSOL_CARDS__FAIL;
+            }
             for (long deal_idx = startidx; keep_running && (deal_idx <= endidx);
                 ++deal_idx)
             {
