@@ -111,6 +111,45 @@ static inline int output_stats__solve_file(
     return output_stats__solve_board_string(board, settings_ptr);
 }
 
+#ifdef BLACK_HOLE_SOLVER_WITH_PYTHON
+
+static void solve_range(const int argc, char *const *const argv,
+    int *const arg_idx_ptr, global_python_instance_type *const global_python,
+    char *const board, pysol_cards__generator_type *const generator,
+    bhs_settings *const settings_ptr)
+{
+    if ((*(arg_idx_ptr)) + 2 + 0 >= argc)
+    {
+        exit(1);
+    }
+    const long startidx = atol(argv[++(*(arg_idx_ptr))]);
+    const long endidx = atol(argv[++(*(arg_idx_ptr))]);
+    if (startidx <= 0)
+    {
+        Py_DECREF(global_python->py_module);
+        fprintf(stderr, "Non-positive seed range index: \"%ld\"\n", startidx);
+        exit(PYSOL_CARDS__FAIL);
+    }
+    for (long deal_idx = startidx; keep_running && (deal_idx <= endidx);
+        ++deal_idx)
+    {
+        const int ret_code = pysol_cards__deal(generator, board, deal_idx);
+        if (ret_code)
+        {
+            Py_DECREF(global_python->py_module);
+            fprintf(stderr, "Cannot convert argument\n");
+            exit(PYSOL_CARDS__FAIL);
+        }
+        board[MAX_LEN_BOARD_STRING - 1] = '\0';
+        fprintf(
+            settings_ptr->out_fh, "[= Starting file deal%ld =]\n", deal_idx);
+        output_stats__solve_board_string(board, settings_ptr);
+        fprintf(settings_ptr->out_fh, "[= END of file deal%ld =]\n", deal_idx);
+    }
+}
+
+#endif
+
 int main(int argc, char *argv[])
 {
     int arg_idx;
@@ -144,37 +183,8 @@ int main(int argc, char *argv[])
 #ifdef BLACK_HOLE_SOLVER_WITH_PYTHON
         if (!strcmp(arg, "seq"))
         {
-            if (arg_idx + 2 + 0 >= argc)
-            {
-                exit(1);
-            }
-            const long startidx = atol(argv[++arg_idx]);
-            const long endidx = atol(argv[++arg_idx]);
-            if (startidx <= 0)
-            {
-                Py_DECREF(global_python->py_module);
-                fprintf(stderr, "Non-positive seed range index: \"%ld\"\n",
-                    startidx);
-                return PYSOL_CARDS__FAIL;
-            }
-            for (long deal_idx = startidx; keep_running && (deal_idx <= endidx);
-                ++deal_idx)
-            {
-                const int ret_code =
-                    pysol_cards__deal(&generator, board, deal_idx);
-                if (ret_code)
-                {
-                    Py_DECREF(global_python->py_module);
-                    fprintf(stderr, "Cannot convert argument\n");
-                    return PYSOL_CARDS__FAIL;
-                }
-                board[MAX_LEN_BOARD_STRING - 1] = '\0';
-                fprintf(
-                    settings.out_fh, "[= Starting file deal%ld =]\n", deal_idx);
-                output_stats__solve_board_string(board, &settings);
-                fprintf(
-                    settings.out_fh, "[= END of file deal%ld =]\n", deal_idx);
-            }
+            solve_range(argc, argv, &arg_idx, global_python, board, &generator,
+                &settings);
         }
         else
 #endif
