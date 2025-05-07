@@ -127,8 +127,8 @@ int main(int argc, char *argv[])
         &master_instance_struct;
     pysol_cards__master_instance_init(master_instance, global_python);
     pysol_cards__generator_type generator;
-    pysol_cards__create_generator(&generator, global_python,
-        master_instance->create_gen, settings.game_string, DEALS_MS);
+    pysol_cards__create_generator(&generator, global_python, master_instance,
+        settings.game_string, DEALS_MS);
 
 #endif
 
