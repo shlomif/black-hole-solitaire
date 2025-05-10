@@ -486,7 +486,9 @@ REC_LOOP:
         my $tmp   = $master_tmp->child( "statsmultibhs-" . ++$count );
         $tmp->mkdir();
 
-        my @deals_indexes = ( 1 .. 20 );
+        my $start_idx     = 1;
+        my $end_idx       = 20;
+        my @deals_indexes = ( $start_idx .. $end_idx );
         my $out_fn        = $tmp->child("${base}1to20out.txt");
         trap
         {
@@ -498,8 +500,8 @@ REC_LOOP:
                 '--wrap-ranks',
                 (
                     ${base} eq "golf"
-                    ? ( map { $mani->fh("golf$_.board") } 1 .. 20 )
-                    : (qw( seq 1 20 ))
+                    ? ( map { $mani->fh("golf$_.board") } @deals_indexes )
+                    : ( "seq", $start_idx, $end_idx, )
                 ),
             );
         };
