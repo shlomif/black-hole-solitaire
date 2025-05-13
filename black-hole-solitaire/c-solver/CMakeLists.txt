@@ -310,10 +310,9 @@ IF (ENABLE_DISPLAYING_MAX_NUM_PLAYED_CARDS)
 
         IF ( NOT "${Python3_Development.Embed_FOUND}" )
             MESSAGE( FATAL_ERROR "Python_Development Embed not found" )
-        ELSE ()
-            ADD_DEFINITIONS( "-DBLACK_HOLE_SOLVER_WITH_PYTHON=1" )
         ENDIF ()
 
+        ADD_DEFINITIONS( "-DBLACK_HOLE_SOLVER_WITH_PYTHON=1" )
         SET(wrapperexe "stats-multi-bhs-solver")
         SET(wrappermod "multi_solver_stats.c")
         # ADD_EXECUTABLE("${wrapperexe}" "${wrappermod}")
