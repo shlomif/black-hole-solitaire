@@ -76,6 +76,9 @@ typedef struct
     bool show_max_num_played_cards;
     bool was_output_filepath_set;
     const char *game_string;
+    int argc;
+    char **argv;
+    int *arg_idx_ptr;
 } bhs_settings;
 #pragma clang diagnostic pop
 
@@ -83,6 +86,9 @@ static inline bhs_settings parse_cmd_line(
     const int argc, char *argv[], int *const out_arg_idx)
 {
     bhs_settings settings;
+    settings.argc = argc;
+    settings.argv = argv;
+    settings.arg_idx_ptr = out_arg_idx;
     settings.out_fh = stdout;
     settings.iters_display_step = 0;
     settings.game_type = GAME__UNKNOWN;
