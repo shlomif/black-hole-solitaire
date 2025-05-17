@@ -113,11 +113,11 @@ static inline int output_stats__solve_file(
 
 #ifdef BLACK_HOLE_SOLVER_WITH_PYTHON
 
-static void solve_range(int *const arg_idx_ptr,
-    global_python_instance_type *const global_python, char *const board,
-    pysol_cards__generator_type *const generator,
+static void solve_range(global_python_instance_type *const global_python,
+    char *const board, pysol_cards__generator_type *const generator,
     bhs_settings *const settings_ptr)
 {
+    int *const arg_idx_ptr = settings_ptr->arg_idx_ptr;
     if ((*(arg_idx_ptr)) + 2 + 0 >= settings_ptr->argc)
     {
         exit(1);
@@ -183,7 +183,7 @@ int main(int argc, char *argv[])
 #ifdef BLACK_HOLE_SOLVER_WITH_PYTHON
         if (!strcmp(arg, "seq"))
         {
-            solve_range(&arg_idx, global_python, board, &generator, &settings);
+            solve_range(global_python, board, &generator, &settings);
         }
         else
 #endif
