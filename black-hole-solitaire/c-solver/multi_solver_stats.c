@@ -1,7 +1,9 @@
 // Copyright (C) 2018 Shlomi Fish <shlomif@cpan.org>
 //
 // Distributed under terms of the MIT license.
-#ifdef BLACK_HOLE_SOLVER_WITH_PYTHON
+
+// #ifdef BLACK_HOLE_SOLVER_WITH_PYTHON
+#if 1
 #define BLACK_HOLE_SOLVER__HANDLE_SIGINT_GRACEFULLY 1
 #endif
 
