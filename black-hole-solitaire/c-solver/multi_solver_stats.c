@@ -113,6 +113,8 @@ static inline int output_stats__solve_file(
     return output_stats__solve_board_string(board, settings_ptr);
 }
 
+#define BHS__FAIL (-1)
+
 static void solve_read_consecutive(
     char *const board, bhs_settings *const settings_ptr)
 {
@@ -131,7 +133,7 @@ static void solve_read_consecutive(
         Py_DECREF(global_python->py_module);
 #endif
         fprintf(stderr, "Non-positive seed range index: \"%ld\"\n", startidx);
-        exit(PYSOL_CARDS__FAIL);
+        exit(BHS__FAIL);
     }
     if (width <= 0)
     {
@@ -139,7 +141,7 @@ static void solve_read_consecutive(
         Py_DECREF(global_python->py_module);
 #endif
         fprintf(stderr, "Non-positive width index: \"%ld\"\n", width);
-        exit(PYSOL_CARDS__FAIL);
+        exit(BHS__FAIL);
     }
     if (width >= MAX_LEN_BOARD_STRING)
     {
@@ -147,7 +149,7 @@ static void solve_read_consecutive(
         Py_DECREF(global_python->py_module);
 #endif
         fprintf(stderr, "Too large width index: \"%ld\"\n", width);
-        exit(PYSOL_CARDS__FAIL);
+        exit(BHS__FAIL);
     }
     FILE *const fh = fopen(filename, "rt");
     if (!fh)
@@ -156,7 +158,7 @@ static void solve_read_consecutive(
         Py_DECREF(global_python->py_module);
 #endif
         fprintf(stderr, "Cannot open: \"%s\"\n", filename);
-        exit(PYSOL_CARDS__FAIL);
+        exit(BHS__FAIL);
     }
     const long endidx = (1L << 30L);
     for (long deal_idx = startidx; keep_running && (deal_idx <= endidx);
@@ -173,7 +175,7 @@ static void solve_read_consecutive(
             Py_DECREF(global_python->py_module);
 #endif
             fprintf(stderr, "Cannot convert argument\n");
-            exit(PYSOL_CARDS__FAIL);
+            exit(BHS__FAIL);
         }
         fprintf(
             settings_ptr->out_fh, "[= Starting file deal%ld =]\n", deal_idx);
