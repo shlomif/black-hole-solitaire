@@ -1,7 +1,9 @@
 // Copyright (C) 2018 Shlomi Fish <shlomif@cpan.org>
 //
 // Distributed under terms of the MIT license.
-#ifdef BLACK_HOLE_SOLVER_WITH_PYTHON
+
+// #ifdef BLACK_HOLE_SOLVER_WITH_PYTHON
+#if 1
 #define BLACK_HOLE_SOLVER__HANDLE_SIGINT_GRACEFULLY 1
 #endif
 
@@ -111,6 +113,62 @@ static inline int output_stats__solve_file(
     return output_stats__solve_board_string(board, settings_ptr);
 }
 
+#define BHS__FAIL (-1)
+
+static void solve_read_consecutive(
+    char *const board, bhs_settings *const settings_ptr)
+{
+    memset(board, '\0', MAX_LEN_BOARD_STRING);
+    int *const arg_idx_ptr = settings_ptr->arg_idx_ptr;
+    if ((*(arg_idx_ptr)) + 3 + 0 >= settings_ptr->argc)
+    {
+        exit(1);
+    }
+    const char *const filename = settings_ptr->argv[++(*(arg_idx_ptr))];
+    const long width = atol(settings_ptr->argv[++(*(arg_idx_ptr))]);
+    const long startidx = atol(settings_ptr->argv[++(*(arg_idx_ptr))]);
+    if (startidx <= 0)
+    {
+        fprintf(stderr, "Non-positive seed range index: \"%ld\"\n", startidx);
+        exit(BHS__FAIL);
+    }
+    if (width <= 0)
+    {
+        fprintf(stderr, "Non-positive width index: \"%ld\"\n", width);
+        exit(BHS__FAIL);
+    }
+    if (width >= MAX_LEN_BOARD_STRING)
+    {
+        fprintf(stderr, "Too large width index: \"%ld\"\n", width);
+        exit(BHS__FAIL);
+    }
+    FILE *const fh = fopen(filename, "rt");
+    if (!fh)
+    {
+        fprintf(stderr, "Cannot open: \"%s\"\n", filename);
+        exit(BHS__FAIL);
+    }
+    /* Avoid deal_idx overflow */
+    for (long deal_idx = startidx; keep_running && (deal_idx >= startidx);
+        ++deal_idx)
+    {
+        if (feof(fh))
+        {
+            break;
+        }
+        const size_t read_len = fread(board, width, 1, fh);
+        if (0 == read_len)
+        {
+            break;
+        }
+        fprintf(
+            settings_ptr->out_fh, "[= Starting file deal%ld =]\n", deal_idx);
+        output_stats__solve_board_string(board, settings_ptr);
+        fprintf(settings_ptr->out_fh, "[= END of file deal%ld =]\n", deal_idx);
+    }
+    fclose(fh);
+}
+
 #ifdef BLACK_HOLE_SOLVER_WITH_PYTHON
 
 static void solve_range(global_python_instance_type *const global_python,
@@ -187,6 +245,11 @@ int main(int argc, char *argv[])
         }
         else
 #endif
+            if (!strcmp(arg, "readconsec"))
+        {
+            solve_read_consecutive(board, &settings);
+        }
+        else
         {
             char *const filename = arg;
             fprintf(settings.out_fh, "[= Starting file %s =]\n", filename);

@@ -365,7 +365,7 @@ unlike(
 
 # TEST
 subtest 'max_num_played' => sub {
-    plan tests => 14;
+    plan tests => 16;
     trap
     {
         mysys( './black-hole-solve', '--game', 'black_hole',
@@ -461,13 +461,16 @@ EOF
         },
     );
 
+    my $dirs_count = 0;
 REC_LOOP:
     foreach my $rec (
-        { base => "golf", extension => ".board", },
-        { base => "deal", extension => "", },
+        { base => "golf",       extension => ".board", },
+        { base => "deal",       extension => "", },
+        { base => "readconsec", deal_base => "deal", extension => "", },
         )
     {
         my $base      = $rec->{'base'};
+        my $deal_base = $rec->{'deal_base'} || $base;
         my $extension = $rec->{'extension'};
 
         if ( $base eq "deal" )
@@ -482,28 +485,48 @@ REC_LOOP:
             }
         }
 
-        my $count = 0;
-        my $tmp   = $master_tmp->child( "statsmultibhs-" . ++$count );
+        my $tmp = $master_tmp->child( "statsmultibhs-" . ++$dirs_count );
         $tmp->mkdir();
 
         my $start_idx     = 1;
         my $end_idx       = 20;
         my @deals_indexes = ( $start_idx .. $end_idx );
         my $out_fn        = $tmp->child("${base}1to20out.txt");
+
+        my $gen_readconsecutive_cmd = sub {
+            my $text  = "";
+            my $width = 176;
+            foreach my $deal_idx (@deals_indexes)
+            {
+                # body...
+                my $fh    = $mani->fh("golf$deal_idx.board");
+                my $ftext = $fh->slurp_raw;
+                if ( length($ftext) != $width )
+                {
+                    exit 1;
+                }
+                $text .= $ftext;
+            }
+            my $cat = $tmp->child("cat.txt");
+            $cat->spew_raw($text);
+
+            my @ret = ( $base, $cat, $width, $start_idx );
+            return @ret;
+        };
+
+        my @cmd = (
+            $base eq "golf"
+            ? ( map { $mani->fh("golf$_.board") } @deals_indexes )
+            : ( $base eq "readconsec" ) ? $gen_readconsecutive_cmd->()
+            : ( "seq", $start_idx, $end_idx, )
+
+        );
+
         trap
         {
-            mysys(
-                './stats-multi-bhs-solver',
-                '--output',
-                $out_fn, '--game', 'golf',
-                '--display-boards',
-                '--wrap-ranks',
-                (
-                    ${base} eq "golf"
-                    ? ( map { $mani->fh("golf$_.board") } @deals_indexes )
-                    : ( "seq", $start_idx, $end_idx, )
-                ),
-            );
+            mysys( './stats-multi-bhs-solver', '--output',
+                $out_fn, '--game', 'golf', '--display-boards', '--wrap-ranks',
+                @cmd, );
         };
 
         if (
@@ -533,8 +556,8 @@ REC_LOOP:
                     my $fn      = path(shift);
                     my $bn      = $fn->basename();
 
-                    return (
-                        $bn =~ m#\Q${base}\E\Q$dealidx\E\Q$extension\E#ms );
+                    return ( $bn =~
+                            m#\Q${deal_base}\E\Q$dealidx\E\Q$extension\E#ms );
                 },
                 input_lines => [ path($out_fn)->lines_utf8() ],
             }
