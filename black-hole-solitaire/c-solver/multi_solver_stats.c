@@ -111,6 +111,76 @@ static inline int output_stats__solve_file(
     return output_stats__solve_board_string(board, settings_ptr);
 }
 
+static void solve_read_consecutive(
+    char *const board, bhs_settings *const settings_ptr)
+{
+    memset(board, '\0', MAX_LEN_BOARD_STRING);
+    int *const arg_idx_ptr = settings_ptr->arg_idx_ptr;
+    if ((*(arg_idx_ptr)) + 3 + 0 >= settings_ptr->argc)
+    {
+        exit(1);
+    }
+    const char *const filename = settings_ptr->argv[++(*(arg_idx_ptr))];
+    const long width = atol(settings_ptr->argv[++(*(arg_idx_ptr))]);
+    const long startidx = atol(settings_ptr->argv[++(*(arg_idx_ptr))]);
+    if (startidx <= 0)
+    {
+#if 0
+        Py_DECREF(global_python->py_module);
+#endif
+        fprintf(stderr, "Non-positive seed range index: \"%ld\"\n", startidx);
+        exit(PYSOL_CARDS__FAIL);
+    }
+    if (width <= 0)
+    {
+#if 0
+        Py_DECREF(global_python->py_module);
+#endif
+        fprintf(stderr, "Non-positive width index: \"%ld\"\n", width);
+        exit(PYSOL_CARDS__FAIL);
+    }
+    if (width >= MAX_LEN_BOARD_STRING)
+    {
+#if 0
+        Py_DECREF(global_python->py_module);
+#endif
+        fprintf(stderr, "Too large width index: \"%ld\"\n", width);
+        exit(PYSOL_CARDS__FAIL);
+    }
+    FILE *const fh = fopen(filename, "rt");
+    if (!fh)
+    {
+#if 0
+        Py_DECREF(global_python->py_module);
+#endif
+        fprintf(stderr, "Cannot open: \"%s\"\n", filename);
+        exit(PYSOL_CARDS__FAIL);
+    }
+    const long endidx = (1L << 30L);
+    for (long deal_idx = startidx; keep_running && (deal_idx <= endidx);
+        ++deal_idx)
+    {
+        if (feof(fh))
+        {
+            break;
+        }
+        const size_t ret_code = fread(board, width, 1, fh);
+        if (0 == ret_code)
+        {
+#if 0
+            Py_DECREF(global_python->py_module);
+#endif
+            fprintf(stderr, "Cannot convert argument\n");
+            exit(PYSOL_CARDS__FAIL);
+        }
+        fprintf(
+            settings_ptr->out_fh, "[= Starting file deal%ld =]\n", deal_idx);
+        output_stats__solve_board_string(board, settings_ptr);
+        fprintf(settings_ptr->out_fh, "[= END of file deal%ld =]\n", deal_idx);
+    }
+    fclose(fh);
+}
+
 #ifdef BLACK_HOLE_SOLVER_WITH_PYTHON
 
 static void solve_range(global_python_instance_type *const global_python,
@@ -187,6 +257,11 @@ int main(int argc, char *argv[])
         }
         else
 #endif
+            if (!strcmp(arg, "readconsec"))
+        {
+            solve_read_consecutive(board, &settings);
+        }
+        else
         {
             char *const filename = arg;
             fprintf(settings.out_fh, "[= Starting file %s =]\n", filename);
