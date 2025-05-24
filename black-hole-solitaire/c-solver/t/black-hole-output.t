@@ -493,31 +493,31 @@ REC_LOOP:
         my @deals_indexes = ( $start_idx .. $end_idx );
         my $out_fn        = $tmp->child("${base}1to20out.txt");
 
+        my $gen_readconsecutive_cmd = sub {
+            my $text  = "";
+            my $width = 176;
+            foreach my $deal_idx (@deals_indexes)
+            {
+                # body...
+                my $fh    = $mani->fh("golf$deal_idx.board");
+                my $ftext = $fh->slurp_raw;
+                if ( length($ftext) != $width )
+                {
+                    exit 1;
+                }
+                $text .= $ftext;
+            }
+            my $cat = $tmp->child("cat.txt");
+            $cat->spew_raw($text);
+
+            my @ret = ( $base, $cat, $width, $start_idx );
+            return @ret;
+        };
+
         my @cmd = (
             $base eq "golf"
             ? ( map { $mani->fh("golf$_.board") } @deals_indexes )
-            : ( $base eq "readconsec" ) ? sub {
-
-                my $text  = "";
-                my $width = 176;
-                foreach my $deal_idx (@deals_indexes)
-                {
-                    # body...
-                    my $fh    = $mani->fh("golf$deal_idx.board");
-                    my $ftext = $fh->slurp_raw;
-                    if ( length($ftext) != $width )
-                    {
-                        exit 1;
-                    }
-                    $text .= $ftext;
-                }
-                my $cat = $tmp->child("cat.txt");
-                $cat->spew_raw($text);
-                my @ret = ( $base, $cat, $width, $start_idx );
-                return @ret;
-
-                }
-                ->()
+            : ( $base eq "readconsec" ) ? $gen_readconsecutive_cmd->()
             : ( "seq", $start_idx, $end_idx, )
 
         );
