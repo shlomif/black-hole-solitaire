@@ -171,11 +171,12 @@ static void solve_read_consecutive(
         const size_t ret_code = fread(board, width, 1, fh);
         if (0 == ret_code)
         {
+            break;
 #if 0
             Py_DECREF(global_python->py_module);
-#endif
             fprintf(stderr, "Cannot convert argument\n");
             exit(BHS__FAIL);
+#endif
         }
         fprintf(
             settings_ptr->out_fh, "[= Starting file deal%ld =]\n", deal_idx);
