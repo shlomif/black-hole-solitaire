@@ -466,15 +466,11 @@ REC_LOOP:
     foreach my $rec (
         { base => "golf",       extension => ".board", },
         { base => "deal",       extension => "", },
-        { base => "readconsec", extension => "", },
+        { base => "readconsec", deal_base => "deal", extension => "", },
         )
     {
         my $base      = $rec->{'base'};
-        my $deal_base = $base;
-        if ( "readconsec" eq $base )
-        {
-            $deal_base = "deal";
-        }
+        my $deal_base = $rec->{'deal_base'} || $base;
         my $extension = $rec->{'extension'};
 
         if ( $base eq "deal" )
@@ -498,34 +494,31 @@ REC_LOOP:
         my $out_fn        = $tmp->child("${base}1to20out.txt");
 
         my @cmd = (
-            ${base} eq "golf"
+            $base eq "golf"
             ? ( map { $mani->fh("golf$_.board") } @deals_indexes )
-            : (
-                ( ${base} eq "readconsec" )
-                ? sub {
+            : ( $base eq "readconsec" ) ? sub {
 
-                    my $text  = "";
-                    my $width = 176;
-                    foreach my $deal_idx (@deals_indexes)
+                my $text  = "";
+                my $width = 176;
+                foreach my $deal_idx (@deals_indexes)
+                {
+                    # body...
+                    my $fh    = $mani->fh("golf$deal_idx.board");
+                    my $ftext = $fh->slurp_raw;
+                    if ( length($ftext) != $width )
                     {
-                        # body...
-                        my $fh    = $mani->fh("golf$deal_idx.board");
-                        my $ftext = $fh->slurp_raw;
-                        if ( length($ftext) != $width )
-                        {
-                            exit 1;
-                        }
-                        $text .= $ftext;
+                        exit 1;
                     }
-                    my $cat = $tmp->child("cat.txt");
-                    $cat->spew_raw($text);
-                    my @ret = ( $base, $cat, $width, $start_idx );
-                    return @ret;
+                    $text .= $ftext;
+                }
+                my $cat = $tmp->child("cat.txt");
+                $cat->spew_raw($text);
+                my @ret = ( $base, $cat, $width, $start_idx );
+                return @ret;
 
-                    }
-                    ->()
-                : ( "seq", $start_idx, $end_idx, )
-            )
+                }
+                ->()
+            : ( "seq", $start_idx, $end_idx, )
 
         );
 
