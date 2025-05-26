@@ -129,34 +129,22 @@ static void solve_read_consecutive(
     const long startidx = atol(settings_ptr->argv[++(*(arg_idx_ptr))]);
     if (startidx <= 0)
     {
-#if 0
-        Py_DECREF(global_python->py_module);
-#endif
         fprintf(stderr, "Non-positive seed range index: \"%ld\"\n", startidx);
         exit(BHS__FAIL);
     }
     if (width <= 0)
     {
-#if 0
-        Py_DECREF(global_python->py_module);
-#endif
         fprintf(stderr, "Non-positive width index: \"%ld\"\n", width);
         exit(BHS__FAIL);
     }
     if (width >= MAX_LEN_BOARD_STRING)
     {
-#if 0
-        Py_DECREF(global_python->py_module);
-#endif
         fprintf(stderr, "Too large width index: \"%ld\"\n", width);
         exit(BHS__FAIL);
     }
     FILE *const fh = fopen(filename, "rt");
     if (!fh)
     {
-#if 0
-        Py_DECREF(global_python->py_module);
-#endif
         fprintf(stderr, "Cannot open: \"%s\"\n", filename);
         exit(BHS__FAIL);
     }
@@ -172,11 +160,6 @@ static void solve_read_consecutive(
         if (0 == ret_code)
         {
             break;
-#if 0
-            Py_DECREF(global_python->py_module);
-            fprintf(stderr, "Cannot convert argument\n");
-            exit(BHS__FAIL);
-#endif
         }
         fprintf(
             settings_ptr->out_fh, "[= Starting file deal%ld =]\n", deal_idx);
