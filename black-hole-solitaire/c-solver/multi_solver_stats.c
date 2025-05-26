@@ -156,8 +156,8 @@ static void solve_read_consecutive(
         {
             break;
         }
-        const size_t ret_code = fread(board, width, 1, fh);
-        if (0 == ret_code)
+        const size_t read_len = fread(board, width, 1, fh);
+        if (0 == read_len)
         {
             break;
         }
