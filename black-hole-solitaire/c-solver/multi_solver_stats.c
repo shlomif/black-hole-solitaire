@@ -148,8 +148,8 @@ static void solve_read_consecutive(
         fprintf(stderr, "Cannot open: \"%s\"\n", filename);
         exit(BHS__FAIL);
     }
-    const long endidx = (1L << 30L);
-    for (long deal_idx = startidx; keep_running && (deal_idx <= endidx);
+    /* Avoid deal_idx overflow */
+    for (long deal_idx = startidx; keep_running && (deal_idx >= startidx);
         ++deal_idx)
     {
         if (feof(fh))
