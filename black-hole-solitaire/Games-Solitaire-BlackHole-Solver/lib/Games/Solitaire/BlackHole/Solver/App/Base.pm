@@ -77,9 +77,9 @@ else
 has [
     '_active_record',            '_active_task',
     '_max_iters_limit_exceeded', '_maximal_num_played_cards__from_all_tasks',
-    '_num_traversed_positions',  '_prelude_iter',
-    '_positions',                '_tasks',
-    '_task_idx',
+    '_num_traversed_positions',  '_pending_board_lines',
+    '_prelude_iter',             '_positions',
+    '_tasks',                    '_task_idx',
 ] => ( is => 'rw' );
 
 our %EXPORT_TAGS = ( 'all' => [qw($card_re)] );
@@ -108,7 +108,12 @@ sub _calc_lines
     my $filename = shift;
 
     my @lines;
-    if ( $filename eq "-" )
+    if ( $self->_pending_board_lines )
+    {
+        @lines = @{ $self->_pending_board_lines };
+        $self->_pending_board_lines(undef);
+    }
+    elsif ( $filename eq "-" )
     {
         @lines = <STDIN>;
     }

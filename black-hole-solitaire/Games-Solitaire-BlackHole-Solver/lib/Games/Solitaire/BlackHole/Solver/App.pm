@@ -176,9 +176,41 @@ sub _multi_filename_run
 
     my $SOFT_EXCEEDED  = $self->_do_not_err_on_exceeding_max_iters_limit();
     my $global_verdict = 1;
-    foreach my $board_fn (@ARGV)
+    my $read_fh;
+    my $width;
+BOARD_FN:
+    while ( $read_fh or @ARGV )
     {
-        my $board_display_fn = $board_fn;
+        my $board_fn;
+        my $board_s = '';
+        if ( defined $read_fh )
+        {
+            read( $read_fh, $board_s, $width );
+            if ( eof($read_fh) )
+            {
+                close($read_fh);
+                $read_fh = undef;
+                $width   = undef;
+            }
+            $self->_pending_board_lines( [ split /\n/ms, $board_s ] );
+        }
+        elsif (@ARGV)
+        {
+            my $arg = shift(@ARGV);
+            if ( $arg eq "readconsec" )
+            {
+                my $fn = shift(@ARGV);
+                $width = shift(@ARGV);
+                my $startidx = shift(@ARGV);
+                open $read_fh, "<", $fn;
+                redo BOARD_FN;
+            }
+            else
+            {
+                $board_fn = $arg;
+            }
+        }
+        my $board_display_fn = $board_fn // "None";
         $board_display_fn =~
             s#([^A-Za-z0-9_\-/\.=\\\:])#sprintf("%%{%x}", ord($1))#egms;
         if (0)
