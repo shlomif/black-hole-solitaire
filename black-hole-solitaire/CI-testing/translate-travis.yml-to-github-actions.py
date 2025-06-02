@@ -80,7 +80,8 @@ def generate_linux_yaml():
         '-Mlocal::lib=$HOME/' + \
         'perl_modules)"; } ; local_lib_shim ; '
     for arr in ['before_install', 'install', 'script']:
-        steps += [{"run": local_lib_shim + x} for x in data[arr]]
+        steps += [{"run": ((local_lib_shim if (i == 0) else "") + x)}
+                  for i, x in enumerate(data[arr])]
     o = {'jobs': {'test-black-hole-solver': {'runs-on': 'ubuntu-latest',
          'steps': steps, }},
          'name': 'use-github-actions', 'on': ['push', ], }
