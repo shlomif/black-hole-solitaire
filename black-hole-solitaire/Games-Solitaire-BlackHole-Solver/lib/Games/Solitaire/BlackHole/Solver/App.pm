@@ -178,6 +178,7 @@ sub _multi_filename_run
     my $global_verdict = 1;
     my $read_fh;
     my $width;
+    my $boardidx;
 BOARD_FN:
     while ( $read_fh or @ARGV )
     {
@@ -185,12 +186,14 @@ BOARD_FN:
         my $board_s = '';
         if ( defined $read_fh )
         {
+            $board_fn = "deal" . ( $boardidx++ );
             read( $read_fh, $board_s, $width );
             if ( eof($read_fh) )
             {
                 close($read_fh);
-                $read_fh = undef;
-                $width   = undef;
+                $read_fh  = undef;
+                $width    = undef;
+                $boardidx = undef;
             }
             $self->_pending_board_lines( [ split /\n/ms, $board_s ] );
         }
@@ -200,8 +203,8 @@ BOARD_FN:
             if ( $arg eq "readconsec" )
             {
                 my $fn = shift(@ARGV);
-                $width = shift(@ARGV);
-                my $startidx = shift(@ARGV);
+                $width    = shift(@ARGV);
+                $boardidx = shift(@ARGV);
                 open $read_fh, "<", $fn;
                 redo BOARD_FN;
             }
