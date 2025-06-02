@@ -213,7 +213,7 @@ BOARD_FN:
                 $board_fn = $arg;
             }
         }
-        my $board_display_fn = $board_fn // "None";
+        my $board_display_fn = $board_fn;
         $board_display_fn =~
             s#([^A-Za-z0-9_\-/\.=\\\:])#sprintf("%%{%x}", ord($1))#egms;
         if (0)
