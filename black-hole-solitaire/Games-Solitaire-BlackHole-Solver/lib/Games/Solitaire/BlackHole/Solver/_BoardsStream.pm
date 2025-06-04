@@ -30,6 +30,15 @@ sub _my_open
     return;
 }
 
+sub _fetch
+{
+    my ( $self, ) = @_;
+
+    my $s = '';
+    read( $self->_fh(), $s, $self->_width );
+    return ( $self->_board_fn(), $s, );
+}
+
 1;
 
 __END__

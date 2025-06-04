@@ -187,8 +187,7 @@ BOARD_FN:
         my $board_s = '';
         if ( $boards_stream->_fh() )
         {
-            $board_fn = $boards_stream->_board_fn();
-            read( $boards_stream->_fh(), $board_s, $boards_stream->_width );
+            ( $board_fn, $board_s ) = $boards_stream->_fetch();
             if ( eof( $boards_stream->_fh() ) )
             {
                 close( $boards_stream->_fh() );
