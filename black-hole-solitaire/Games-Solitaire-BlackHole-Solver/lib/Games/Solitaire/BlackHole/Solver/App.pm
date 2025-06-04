@@ -188,14 +188,6 @@ BOARD_FN:
         if ( $boards_stream->_fh() )
         {
             ( $board_fn, $board_s ) = $boards_stream->_fetch();
-            if ( eof( $boards_stream->_fh() ) )
-            {
-                close( $boards_stream->_fh() );
-                $boards_stream->_fh(undef);
-                $boards_stream =
-                    Games::Solitaire::BlackHole::Solver::_BoardsStream->new(
-                    _width => 0, );
-            }
             $self->_pending_board_lines( [ split /\n/ms, $board_s ] );
         }
         elsif (@ARGV)

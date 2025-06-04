@@ -36,7 +36,14 @@ sub _fetch
 
     my $s = '';
     read( $self->_fh(), $s, $self->_width );
-    return ( $self->_board_fn(), $s, );
+    my $fn = $self->_board_fn();
+    if ( eof( $self->_fh() ) )
+    {
+        close( $self->_fh() );
+        $self->_fh(undef);
+        $self->_width(0);
+    }
+    return ( $fn, $s, );
 }
 
 1;
