@@ -169,6 +169,8 @@ sub run
     return $self->_my_exit( $global_verdict, );
 }
 
+use Games::Solitaire::BlackHole::Solver::_BoardsStream ();
+
 sub _multi_filename_run
 {
     my $self      = shift;
@@ -176,24 +178,23 @@ sub _multi_filename_run
 
     my $SOFT_EXCEEDED  = $self->_do_not_err_on_exceeding_max_iters_limit();
     my $global_verdict = 1;
-    my $read_fh;
-    my $width;
-    my $boardidx;
+    my $w =
+        Games::Solitaire::BlackHole::Solver::_BoardsStream->new( _width => 0, );
 BOARD_FN:
-    while ( $read_fh or @ARGV )
+    while ( $w->_fh() or @ARGV )
     {
         my $board_fn;
         my $board_s = '';
-        if ( defined $read_fh )
+        if ( $w->_fh() )
         {
-            $board_fn = "deal" . ( $boardidx++ );
-            read( $read_fh, $board_s, $width );
-            if ( eof($read_fh) )
+            $board_fn = $w->_board_fn();
+            read( $w->_fh(), $board_s, $w->_width );
+            if ( eof( $w->_fh() ) )
             {
-                close($read_fh);
-                $read_fh  = undef;
-                $width    = undef;
-                $boardidx = undef;
+                close( $w->_fh() );
+                $w->_fh(undef);
+                $w = Games::Solitaire::BlackHole::Solver::_BoardsStream->new(
+                    _width => 0, );
             }
             $self->_pending_board_lines( [ split /\n/ms, $board_s ] );
         }
@@ -202,10 +203,14 @@ BOARD_FN:
             my $arg = shift(@ARGV);
             if ( $arg eq "readconsec" )
             {
-                my $fn = shift(@ARGV);
-                $width    = shift(@ARGV);
-                $boardidx = shift(@ARGV);
+                my $fn     = shift(@ARGV) or die "readconsec arguments";
+                my $_width = shift(@ARGV) or die "readconsec arguments";
+                $w = Games::Solitaire::BlackHole::Solver::_BoardsStream->new(
+                    _width => $_width, );
+                $w->_boardidx( shift(@ARGV) ) or die "readconsec arguments";
+                my $read_fh;
                 open $read_fh, "<", $fn;
+                $w->_fh($read_fh);
                 redo BOARD_FN;
             }
             else
