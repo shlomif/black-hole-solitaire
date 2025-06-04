@@ -178,22 +178,23 @@ sub _multi_filename_run
 
     my $SOFT_EXCEEDED  = $self->_do_not_err_on_exceeding_max_iters_limit();
     my $global_verdict = 1;
-    my $w =
+    my $boards_stream =
         Games::Solitaire::BlackHole::Solver::_BoardsStream->new( _width => 0, );
 BOARD_FN:
-    while ( $w->_fh() or @ARGV )
+    while ( $boards_stream->_fh() or @ARGV )
     {
         my $board_fn;
         my $board_s = '';
-        if ( $w->_fh() )
+        if ( $boards_stream->_fh() )
         {
-            $board_fn = $w->_board_fn();
-            read( $w->_fh(), $board_s, $w->_width );
-            if ( eof( $w->_fh() ) )
+            $board_fn = $boards_stream->_board_fn();
+            read( $boards_stream->_fh(), $board_s, $boards_stream->_width );
+            if ( eof( $boards_stream->_fh() ) )
             {
-                close( $w->_fh() );
-                $w->_fh(undef);
-                $w = Games::Solitaire::BlackHole::Solver::_BoardsStream->new(
+                close( $boards_stream->_fh() );
+                $boards_stream->_fh(undef);
+                $boards_stream =
+                    Games::Solitaire::BlackHole::Solver::_BoardsStream->new(
                     _width => 0, );
             }
             $self->_pending_board_lines( [ split /\n/ms, $board_s ] );
@@ -205,10 +206,12 @@ BOARD_FN:
             {
                 my $fn     = shift(@ARGV) or die "readconsec arguments";
                 my $_width = shift(@ARGV) or die "readconsec arguments";
-                $w = Games::Solitaire::BlackHole::Solver::_BoardsStream->new(
+                $boards_stream =
+                    Games::Solitaire::BlackHole::Solver::_BoardsStream->new(
                     _width => $_width, );
-                $w->_boardidx( shift(@ARGV) ) or die "readconsec arguments";
-                $w->_my_open($fn);
+                $boards_stream->_boardidx( shift(@ARGV) )
+                    or die "readconsec arguments";
+                $boards_stream->_my_open($fn);
                 redo BOARD_FN;
             }
             else
