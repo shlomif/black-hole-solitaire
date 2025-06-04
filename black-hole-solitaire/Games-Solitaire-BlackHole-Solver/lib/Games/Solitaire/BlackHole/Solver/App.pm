@@ -208,9 +208,7 @@ BOARD_FN:
                 $w = Games::Solitaire::BlackHole::Solver::_BoardsStream->new(
                     _width => $_width, );
                 $w->_boardidx( shift(@ARGV) ) or die "readconsec arguments";
-                my $read_fh;
-                open $read_fh, "<", $fn;
-                $w->_fh($read_fh);
+                $w->_my_open($fn);
                 redo BOARD_FN;
             }
             else

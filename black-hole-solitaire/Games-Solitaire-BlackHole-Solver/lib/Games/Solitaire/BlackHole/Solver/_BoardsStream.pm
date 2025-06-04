@@ -20,6 +20,16 @@ sub _board_fn
     return $ret;
 }
 
+sub _my_open
+{
+    my ( $self, $fn ) = @_;
+
+    open my $read_fh, "<", $fn;
+    $self->_fh($read_fh);
+
+    return;
+}
+
 1;
 
 __END__
