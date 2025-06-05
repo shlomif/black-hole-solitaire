@@ -264,6 +264,10 @@ BOARD_FN:
     return $self->_my_exit( $global_verdict, );
 }
 
+=head1 Filename Processing
+
+=head2 readconsec [filename] [width in bytes] [start deal index]
+
 =head1 SEE ALSO
 
 The Black Hole Solitaire Solvers homepage is at
