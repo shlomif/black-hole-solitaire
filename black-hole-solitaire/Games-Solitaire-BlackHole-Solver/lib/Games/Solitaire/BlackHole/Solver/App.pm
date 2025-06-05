@@ -195,14 +195,10 @@ BOARD_FN:
             my $arg = shift(@ARGV);
             if ( $arg eq "readconsec" )
             {
-                my $fn     = shift(@ARGV) or die "readconsec arguments";
-                my $_width = shift(@ARGV) or die "readconsec arguments";
-                $boards_stream =
-                    Games::Solitaire::BlackHole::Solver::_BoardsStream->new(
-                    _width => $_width, );
-                $boards_stream->_boardidx( shift(@ARGV) )
-                    or die "readconsec arguments";
-                $boards_stream->_my_open($fn);
+                my $fn        = shift(@ARGV) or die "readconsec arguments";
+                my $_width    = shift(@ARGV) or die "readconsec arguments";
+                my $_boardidx = shift(@ARGV) or die "readconsec arguments";
+                $boards_stream->_reset( $fn, $_width, $_boardidx, );
                 redo BOARD_FN;
             }
             else

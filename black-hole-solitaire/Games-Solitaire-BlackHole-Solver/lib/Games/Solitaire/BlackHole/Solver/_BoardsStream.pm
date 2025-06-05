@@ -2,6 +2,7 @@ package Games::Solitaire::BlackHole::Solver::_BoardsStream;
 
 use strict;
 use warnings;
+use autodie;
 
 use 5.014;
 use Moo;
@@ -44,6 +45,16 @@ sub _fetch
         $self->_width(0);
     }
     return ( $fn, $s, );
+}
+
+sub _reset
+{
+    my ( $self, $_fn, $_width, $_boardidx, ) = @_;
+    $self->_width($_width);
+    $self->_boardidx($_boardidx);
+    $self->_my_open($_fn);
+
+    return;
 }
 
 1;
