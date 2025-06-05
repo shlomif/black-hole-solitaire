@@ -9,7 +9,7 @@ use Moo;
 
 has '_boardidx' => ( is => 'rw' );
 has '_fh'       => ( is => 'rw', default => 0, );
-has '_width'    => ( is => 'ro' );
+has '_width'    => ( is => 'rw' );
 
 sub _board_fn
 {
