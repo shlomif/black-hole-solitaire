@@ -6,8 +6,8 @@ games https://en.wikipedia.org/wiki/Golf_%28patience%29[“Golf”],
 http://en.wikipedia.org/wiki/Black_Hole_%28solitaire%29[“Black Hole”],
 and http://en.wikipedia.org/wiki/All_in_a_Row_%28Solitaire%29[“All in a Row”] .
 
-https://travis-ci.org/shlomif/black-hole-solitaire[image:https://travis-ci.org/shlomif/black-hole-solitaire.svg?branch=master[Build
-Status]]
+https://github.com/shlomif/black-hole-solitaire/actions[image:https://github.com/shlomif/black-hole-solitaire/actions/workflows/use-github.actions.yml/badge.svg[GitHub Actions Build Status]]
+
 https://ci.appveyor.com/project/shlomif/black-hole-solitaire[image:https://ci.appveyor.com/api/projects/status/yvne045w9dmd4h92?svg=true[AppVeyor
 Build Status]]
 
@@ -23,8 +23,10 @@ Black Hole in PySolFC]
 === Guide to the code
 
 The interesting code in C is under the black-hole-solitaire/c-solver/
-directory and there’s also some older code in Perl under
-black-hole-solitaire/Games-Solitaire-BlackHole-Solver/ .
+directory. There’s also some code in Perl under
+black-hole-solitaire/Games-Solitaire-BlackHole-Solver/ which is slower
+and consumes more RAM, and which has been used for prototyping interesting
+features.
 
 Some related links:
 
@@ -35,5 +37,5 @@ solvers]
 
 === CI Build+Tests
 
-* https://travis-ci.org/shlomif/black-hole-solitaire
+* https://github.com/shlomif/black-hole-solitaire/actions
 * https://ci.appveyor.com/project/shlomif/black-hole-solitaire
