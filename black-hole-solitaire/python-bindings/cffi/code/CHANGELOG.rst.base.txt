@@ -1,3 +1,6 @@
+0.2.5
+    Fix the homepage URL ( actually the GitHub repo URL ) on pypi / etc.
+
 0.2.4
     Test the resume-without-updating max-num-times fix in the c-solver.
 
