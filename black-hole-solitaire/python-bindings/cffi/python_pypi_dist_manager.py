@@ -8,9 +8,23 @@
 
 from pydistman import DistManager
 
+
+class MyDistManager(DistManager):
+    def _build_only_command_custom_steps(self):
+        for fn in ["{dest_dir}/PKGBUILD", "{dest_dir}/PKGBUILD-git",
+                   "{dest_dir}/setup.py", ]:
+            s = "https://github.com/shlomif/black-hole-solitaire"
+            self._re_mutate(
+                fn_proto=fn,
+                pattern=("https://github\\.com/shlomif/black_hole_solver"),
+                prefix='',
+                suffix=s,
+            )
+
+
 dist_name = "black_hole_solver"
 
-obj = DistManager(
+obj = MyDistManager(
     aur_email="shlomif@cpan.org",
     dist_name=dist_name,
     dist_version="0.2.4",
