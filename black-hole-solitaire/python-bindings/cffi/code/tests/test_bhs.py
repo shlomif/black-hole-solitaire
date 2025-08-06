@@ -84,3 +84,16 @@ def test_limit_iters():
         assert solver.get_num_times() == limit
         assert solver.get_num_states_in_collection() > 0
         solver.recycle()
+
+
+def test_num_bits_per_column():
+    import black_hole_solver
+    solver = black_hole_solver.BlackHoleSolver()
+    assert solver
+
+    for game_type in ['all_in_a_row', 'black_hole', 'golf', ]:
+        max_num_cards_in_col = solver.MAX_NUM_CARDS_IN_COL[game_type]
+        bits_per_col = solver.BITS_PER_COL[game_type]
+        assert bits_per_col >= 1
+        assert max_num_cards_in_col + 1 <= (1 << bits_per_col)
+        assert max_num_cards_in_col + 1 > (1 << (bits_per_col - 1))
