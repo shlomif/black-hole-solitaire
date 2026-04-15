@@ -22,6 +22,10 @@ static void sigint_handler(int dummy) { keep_running = false; }
 
 #include <solver_common.h>
 
+static unsigned long iterations_num = 0;
+static unsigned long max_iterations_num = 0;
+static long iterations_num_dealidx = 0;
+
 static inline int output_stats__solve_board_string(
     const char *const board, bhs_settings *const settings_ptr)
 {
@@ -76,11 +80,11 @@ static inline int output_stats__solve_board_string(
 
     fprintf(out_fh, "At most %lu cards could be played.\n",
         black_hole_solver_get_max_num_played_cards(solver));
+    iterations_num = black_hole_solver_get_iterations_num(solver);
     fprintf(out_fh,
         "Total number of states checked is %lu.\n"
         "This scan generated %lu states.\n",
-        black_hole_solver_get_iterations_num(solver),
-        black_hole_solver_get_num_states_in_collection(solver));
+        iterations_num, black_hole_solver_get_num_states_in_collection(solver));
 
     black_hole_solver_recycle(solver);
 #undef settings
@@ -202,7 +206,22 @@ static void solve_range(global_python_instance_type *const global_python,
         fprintf(
             settings_ptr->out_fh, "[= Starting file deal%ld =]\n", deal_idx);
         output_stats__solve_board_string(board, settings_ptr);
+        if (iterations_num > max_iterations_num)
+        {
+            max_iterations_num = iterations_num;
+            iterations_num_dealidx = deal_idx;
+        }
         fprintf(settings_ptr->out_fh, "[= END of file deal%ld =]\n", deal_idx);
+        if (settings_ptr->output_max)
+        {
+            if (deal_idx % 20 == 0)
+            {
+                fprintf(settings_ptr->out_fh,
+                    "[= ON deal = %ld : max_iterations_num = %lu "
+                    "iterations_num_dealidx = %ld =]\n",
+                    deal_idx, max_iterations_num, iterations_num_dealidx);
+            }
+        }
     }
 }
 

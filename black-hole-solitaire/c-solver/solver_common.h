@@ -75,6 +75,7 @@ typedef struct
     bool wrap_ranks;
     bool show_max_num_played_cards;
     bool was_output_filepath_set;
+    bool output_max;
     const char *game_string;
     int argc;
     char **argv;
@@ -100,6 +101,7 @@ static inline bhs_settings parse_cmd_line(
     settings.max_iters_limit = ULONG_MAX;
     settings.show_max_num_played_cards = false;
     settings.was_output_filepath_set = false;
+    settings.output_max = false;
 
     int arg_idx = 1;
     while (argc > arg_idx)
@@ -206,6 +208,11 @@ static inline bhs_settings parse_cmd_line(
         {
             ++arg_idx;
             settings.is_rank_reachability_prune_enabled = true;
+        }
+        else if (!strcmp(argv[arg_idx], "--output-max"))
+        {
+            ++arg_idx;
+            settings.output_max = true;
         }
         else if (!strcmp(argv[arg_idx], "--iters-display-step"))
         {
