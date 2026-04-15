@@ -31,7 +31,7 @@ def make_pysol_board(deal_idx):
 
 def main():
     solver = BlackHoleSolver()
-    deal_idx = 170000
+    deal_idx = 0
     max_num_times = -1
     longest_idx = -1
 
