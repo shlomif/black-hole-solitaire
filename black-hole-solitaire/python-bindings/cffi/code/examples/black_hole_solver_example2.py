@@ -31,11 +31,27 @@ def make_pysol_board(deal_idx):
     ).calc_layout_string(renderer)
 
 
+class IntStats:
+    """docstring for IntStats"""
+    def __init__(self):
+        self.n = 0
+        self.s = 0
+        self.sq = 0
+
+    def add(self, key, val):
+        """docstring for add"""
+        assert isinstance(val, int)
+        self.n += 1
+        self.s += val
+        self.sq += pow(val, 2)
+
+
 def main():
     solver = BlackHoleSolver()
     deal_idx = 0
     max_num_times = -1
     longest_idx = -1
+    stats = IntStats()
 
     def _output_progress():
         print('Reached deal No. {} [ '
@@ -67,6 +83,7 @@ def main():
             )
             solver.resume_solution()
             this_count = solver.get_num_times()
+            stats.add(deal_idx, this_count)
             if max_num_times < this_count:
                 max_num_times = this_count + 0
                 longest_idx = deal_idx
