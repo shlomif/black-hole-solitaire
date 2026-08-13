@@ -46,12 +46,15 @@ class IntStats:
         self.sq += pow(val, 2)
 
 
+BLACK_HOLE_SOLVER__NOT_SOLVABLE = 8
+
+
 def main():
     solver = BlackHoleSolver()
     deal_idx = 0
     max_num_times = -1
     longest_idx = -1
-    stats = IntStats()
+    stats = {False: IntStats(), True: IntStats(), }
 
     def _output_progress():
         print('Reached deal No. {} [ '
@@ -81,9 +84,15 @@ def main():
                 place_queens_on_kings=True,
                 wrap_ranks=True,
             )
-            solver.resume_solution()
+            ret_code = solver.resume_solution()
+            if ret_code == solver.BLACK_HOLE_SOLVER__SUCCESS:
+                was_solved = True
+            elif ret_code == BLACK_HOLE_SOLVER__NOT_SOLVABLE:
+                was_solved = False
+            else:
+                raise Exception("mis handled ret_code")
             this_count = solver.get_num_times()
-            stats.add(deal_idx, this_count)
+            stats[was_solved].add(deal_idx, this_count)
             if max_num_times < this_count:
                 max_num_times = this_count + 0
                 longest_idx = deal_idx
