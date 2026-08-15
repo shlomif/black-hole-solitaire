@@ -55,11 +55,17 @@ def main():
     max_num_times = -1
     longest_idx = -1
     stats = {False: IntStats(), True: IntStats(), }
+    max_num_states = -1
+    states_longest_idx = -1
+    states_stats = {False: IntStats(), True: IntStats(), }
 
     def _output_progress():
         print('Reached deal No. {} [ '
               'max_num_times = {} ; longest_idx = {} ]'.format(
                   deal_idx, max_num_times, longest_idx), flush=True)
+        print('Reached deal No. {} [ '
+              'max_num_states = {} ; states_longest_idx = {} ]'.format(
+                  deal_idx, max_num_states, states_longest_idx), flush=True)
     while True:
         if len(sys.argv) <= 1:
             break
@@ -96,6 +102,12 @@ def main():
             if max_num_times < this_count:
                 max_num_times = this_count + 0
                 longest_idx = deal_idx
+                _output_progress()
+            this_count = solver.get_num_states_in_collection()
+            states_stats[was_solved].add(deal_idx, this_count)
+            if max_num_states < this_count:
+                max_num_states = this_count + 0
+                states_longest_idx = deal_idx
                 _output_progress()
             solver.recycle()
 
