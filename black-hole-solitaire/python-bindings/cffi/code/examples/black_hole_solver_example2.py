@@ -37,6 +37,8 @@ class IntStats:
         self.n = 0
         self.s = 0
         self.sq = 0
+        self.max_val = -1
+        self.max_key = -1
 
     def add(self, key, val):
         """docstring for add"""
@@ -44,6 +46,11 @@ class IntStats:
         self.n += 1
         self.s += val
         self.sq += pow(val, 2)
+        if val > self.max_val:
+            self.max_val = val
+            self.max_key = key
+            return True
+        return False
 
 
 BLACK_HOLE_SOLVER__NOT_SOLVABLE = 8
@@ -52,20 +59,21 @@ BLACK_HOLE_SOLVER__NOT_SOLVABLE = 8
 def main():
     solver = BlackHoleSolver()
     deal_idx = 0
-    max_num_times = -1
-    longest_idx = -1
     stats = {False: IntStats(), True: IntStats(), }
-    max_num_states = -1
-    states_longest_idx = -1
     states_stats = {False: IntStats(), True: IntStats(), }
 
     def _output_progress():
         print('Reached deal No. {} [ '
-              'max_num_times = {} ; longest_idx = {} ]'.format(
-                  deal_idx, max_num_times, longest_idx), flush=True)
+              'max_num_times = {};{} ; longest_idx = {};{} ]'.format(
+                  deal_idx, stats[False].max_val, stats[True].max_val,
+                  stats[False].max_key, stats[True].max_key,
+                  ), flush=True)
         print('Reached deal No. {} [ '
-              'max_num_states = {} ; states_longest_idx = {} ]'.format(
-                  deal_idx, max_num_states, states_longest_idx), flush=True)
+              'max_num_states = {};{} ; longest_idx = {};{} ]'.format(
+                  deal_idx, states_stats[False].max_val,
+                  states_stats[True].max_val,
+                  states_stats[False].max_key, states_stats[True].max_key,
+                  ), flush=True)
     while True:
         if len(sys.argv) <= 1:
             break
@@ -98,16 +106,10 @@ def main():
             else:
                 raise Exception("mis handled ret_code")
             this_count = solver.get_num_times()
-            stats[was_solved].add(deal_idx, this_count)
-            if max_num_times < this_count:
-                max_num_times = this_count + 0
-                longest_idx = deal_idx
+            if stats[was_solved].add(deal_idx, this_count):
                 _output_progress()
             this_count = solver.get_num_states_in_collection()
-            states_stats[was_solved].add(deal_idx, this_count)
-            if max_num_states < this_count:
-                max_num_states = this_count + 0
-                states_longest_idx = deal_idx
+            if states_stats[was_solved].add(deal_idx, this_count):
                 _output_progress()
             solver.recycle()
 
