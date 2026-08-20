@@ -52,6 +52,14 @@ class IntStats:
             return True
         return False
 
+    def getMean(self):
+        """docstring for getMean"""
+        return self.s / self.n
+
+    def getVariance(self):
+        """docstring for getMean"""
+        return self.sq - pow(self.s, 2)
+
 
 BLACK_HOLE_SOLVER__NOT_SOLVABLE = 8
 
