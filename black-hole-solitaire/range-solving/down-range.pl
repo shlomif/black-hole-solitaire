@@ -2,8 +2,9 @@
 
 use strict;
 use warnings;
+use autodie;
 
-use LWP::UserAgent;
+use LWP::UserAgent ();
 
 my $ua = LWP::UserAgent->new;
 $ua->timeout(10_000);
