@@ -214,15 +214,18 @@ int main(int argc, char *argv[])
     bhs_settings settings = parse_cmd_line(argc, argv, &arg_idx);
 
 #ifdef BLACK_HOLE_SOLVER_WITH_PYTHON
+
     const int DEALS_MS = 0;
 
     global_python_instance_type global_python_struct;
     global_python_instance_type *const global_python = &global_python_struct;
     global_python_instance__init(global_python);
+
     pysol_cards__master_instance_type master_instance_struct;
     pysol_cards__master_instance_type *const master_instance =
         &master_instance_struct;
     pysol_cards__master_instance_init(master_instance, global_python);
+
     pysol_cards__generator_type generator;
     pysol_cards__create_generator(&generator, global_python, master_instance,
         settings.game_string, DEALS_MS);
