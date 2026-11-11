@@ -216,6 +216,7 @@ int main(int argc, char *argv[])
 #ifdef BLACK_HOLE_SOLVER_WITH_PYTHON
 
     const int DEALS_MS = 0;
+    const int DEALS_PYSOLFC = 1;
 
     global_python_instance_type global_python_struct;
     global_python_instance_type *const global_python = &global_python_struct;
