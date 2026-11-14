@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -e
+set -e -x
 
 not_needed()
 {
@@ -12,7 +12,9 @@ not_needed()
 
 run()
 {
-    time ./stats-multi-bhs-solver --game black_hole --quiet "$@" seq 1 500
+    # local outdir="${TMPDIR}"
+    local outdir="."
+    time ./stats-multi-bhs-solver --game black_hole --output "${outdir}/${outbn}" --quiet "$@" seq 1 500
 }
-run --rank-reach-prune
-run
+outbn="output.rrp500.txt" run --rank-reach-prune
+outbn="output.noprune500.txt" run
