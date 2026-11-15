@@ -5,15 +5,15 @@
 test_bhs
 ----------------------------------
 
-Tests for `bhs` module.
+Tests for `black_hole_solver` module.
 """
 
 import pytest  # noqa: F401
 
 
 def test_bhs():
-    """Sample pytest test function with the pytest fixture as an argument.
-    """
+    """Test constructor, read_board(), resume_solution(). A smoke
+    test of sorts."""
     import black_hole_solver
     solver = black_hole_solver.BlackHoleSolver()
     assert solver
