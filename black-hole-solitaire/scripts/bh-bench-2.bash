@@ -16,5 +16,17 @@ run()
     local outdir="."
     time ./stats-multi-bhs-solver --game black_hole --output "${outdir}/${outbn}" --quiet "$@" seq 1 500
 }
+
+boardsfn="boards.txt"
+gen-multiple-pysol-layouts --concat --dir "${boardsfn}" --game black_hole --prefix "" --suffix "" seq 1 500
+
+run_perl_solver()
+{
+    # local outdir="${TMPDIR}"
+    local outdir="."
+    time perl -M Games::Solitaire::BlackHole::Solver::App -E 'my $app = Games::Solitaire::BlackHole::Solver::App->new; $app->run(); ' -- --output "${outdir}/${outbn}" --quiet "$@" readconsec "${boardsfn}" 169 1
+}
+
+outbn="output.perl.txt" run_perl_solver
 outbn="output.rrp500.txt" run --rank-reach-prune
 outbn="output.noprune500.txt" run
