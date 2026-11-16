@@ -65,7 +65,7 @@ if ( !$IS_WIN )
             }
         );
     }
-    my $gitrepo = "pysol-cards-in-C";
+    my $gitrepo = "pysol-cards-in-c";
     my $pygit   = "$py/$gitrepo/.git";
     if ( not -d $pygit )
     {
@@ -144,7 +144,7 @@ foreach my $SIGNED_CHARS_ARGS (
                 (
                     $disable_embedded_python
                     ? (qw/ --cmakedefine DISABLE_EMBEDDED_PYTHON:BOOL=TRUE /)
-                    : ()
+                    : (qw/ --cmakedefine DISABLE_EMBEDDED_PYTHON:BOOL=FALSE /)
                 ),
             ],
         },
