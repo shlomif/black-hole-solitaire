@@ -127,6 +127,12 @@ if ($IS_WIN)
 
 my $CPU_ARCH = ( delete( $ENV{GCC_CPU_ARCH} ) // 'n2' );
 
+my $common = [
+    $disable_embedded_python
+    ? (qw/ --cmakedefine DISABLE_EMBEDDED_PYTHON:BOOL=TRUE /)
+    : (qw/ --cmakedefine DISABLE_EMBEDDED_PYTHON:BOOL=FALSE /)
+];
+
 foreach my $SIGNED_CHARS_ARGS (
     [ "--cmakedefine", "USE_SIGNED_CHARS:BOOL=TRUE", ],
     [ "--cmakedefine", "USE_UNSIGNED_CHARS:BOOL=TRUE", ],
@@ -141,17 +147,12 @@ foreach my $SIGNED_CHARS_ARGS (
             dir         => "B_with_max_num_played",
             tatzer_args => [
                 qw/ --cmakedefine ENABLE_DISPLAYING_MAX_NUM_PLAYED_CARDS:BOOL=TRUE /,
-                (
-                    $disable_embedded_python
-                    ? (qw/ --cmakedefine DISABLE_EMBEDDED_PYTHON:BOOL=TRUE /)
-                    : (qw/ --cmakedefine DISABLE_EMBEDDED_PYTHON:BOOL=FALSE /)
-                ),
             ],
         },
         )
     {
         my ( $dir, $tatzer_args ) = @{$config_record}{qw/ dir tatzer_args /};
-        $tatzer_args = [ @$tatzer_args, @$SIGNED_CHARS_ARGS, ];
+        $tatzer_args = [ @$tatzer_args, @$common, @$SIGNED_CHARS_ARGS, ];
         do_system(
             {
                 cmd => [
