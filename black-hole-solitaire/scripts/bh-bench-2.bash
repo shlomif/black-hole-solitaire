@@ -10,6 +10,8 @@ not_needed()
     fi
 }
 
+not_needed
+
 run()
 {
     # local outdir="${TMPDIR}"
@@ -25,6 +27,13 @@ run_perl_solver()
     # local outdir="${TMPDIR}"
     local outdir="."
     time perl -M Games::Solitaire::BlackHole::Solver::App -E 'my $app = Games::Solitaire::BlackHole::Solver::App->new; $app->run(); ' -- --output "${outdir}/${outbn}" --quiet "$@" readconsec "${boardsfn}" 169 1
+}
+
+run_perl_solver()
+{
+    # local outdir="${TMPDIR}"
+    local outdir="."
+    time perl -E $'for my $idx ( 1 .. 500 ) { print "idx=$idx\\n"; system(qw& perl -M Games::Solitaire::BlackHole::Solver::App -E &, \'my $app = Games::Solitaire::BlackHole::Solver::App->new; $app->run(); \', qw& -- --quiet &,  "boards/bh$idx.board", );}'
 }
 
 outbn="output.perl.txt" run_perl_solver
