@@ -38,6 +38,6 @@ run_perl_solver()
     time perl -E $'for my $idx ( 1 .. 500 ) { print "idx=$idx\\n"; system(qw& perl -M Games::Solitaire::BlackHole::Solver::App -E &, \'my $app = Games::Solitaire::BlackHole::Solver::App->new; $app->run(); \', qw& -- --quiet &,  "boards/bh$idx.board", );}'
 }
 
-outbn="output.perl.txt" run_perl_solver
 outbn="output.rrp500.txt" run --rank-reach-prune
 outbn="output.noprune500.txt" run
+outbn="output.perl.txt" run_perl_solver
