@@ -1,16 +1,20 @@
 #!/usr/bin/env bash
 set -e -x
 
-not_needed()
+boardsfn="boards.txt"
+
+generate_board_files()
 {
     if ! test -d boards
     then
         mkdir -p boards
         gen-multiple-pysol-layouts --dir boards/ --game black_hole --prefix bh --suffix .board seq 1 10000
+
+        gen-multiple-pysol-layouts --concat --dir "${boardsfn}" --game black_hole --prefix "" --suffix "" seq 1 500
     fi
 }
 
-not_needed
+generate_board_files
 
 run()
 {
@@ -19,10 +23,8 @@ run()
     time ./stats-multi-bhs-solver --game black_hole --output "${outdir}/${outbn}" --quiet "$@" seq 1 500
 }
 
-boardsfn="boards.txt"
-gen-multiple-pysol-layouts --concat --dir "${boardsfn}" --game black_hole --prefix "" --suffix "" seq 1 500
-
-run_perl_solver()
+# slow
+run_perl_solver__single_process()
 {
     # local outdir="${TMPDIR}"
     local outdir="."
